@@ -1,0 +1,11 @@
+{
+  "name": "astrovisor-demo", "version": "0.1.0", "private": true,
+  "workspaces": ["apps/*"], "engines": {"node": ">=22.12.0"},
+  "scripts": {
+    "dev": "concurrently -k -n API,WEB \"npm run dev -w apps/api\" \"npm run dev -w apps/web\"",
+    "dev:api": "npm run dev -w apps/api", "dev:web": "npm run dev -w apps/web",
+    "build": "npm run build --workspaces", "test": "tsx --test tests/*.test.ts", "smoke": "node tests/browser-smoke.mjs",
+    "start:api": "npm run start -w apps/api", "preview": "npm run preview -w apps/web"
+  },
+  "devDependencies": {"concurrently": "^9.2.1", "tsx": "^4.20.6", "typescript": "^5.9.3", "@types/node": "^24.0.0"}
+}
