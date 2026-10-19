@@ -1,0 +1,26 @@
+[
+  {
+    "id": "orion",
+    "titulo": "Orión",
+    "resumen": "Identifica una figura conocida del cielo nocturno y algunas de sus estrellas.",
+    "demostracion": true,
+    "libros": [],
+    "multimedia": []
+  },
+  {
+    "id": "osa-mayor",
+    "titulo": "Osa Mayor",
+    "resumen": "Descubre un grupo de estrellas que sirve como referencia al observar el cielo.",
+    "demostracion": true,
+    "libros": [],
+    "multimedia": []
+  },
+  {
+    "id": "escorpio",
+    "titulo": "Escorpio",
+    "resumen": "Explora la silueta de esta constelación y aprende a reconocer sus estrellas más llamativas.",
+    "demostracion": true,
+    "libros": [],
+    "multimedia": []
+  }
+]

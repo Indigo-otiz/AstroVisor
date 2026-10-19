@@ -1,0 +1,8 @@
+schema: spec-driven
+created: 2026-10-17
+goal: Establecer un arranque reproducible con rutas web/visor/admin, lectura documental y seguridad administrativa denegada por defecto.
+affected_areas:
+  - frontend
+  - backend
+  - contenido
+  - documentacion

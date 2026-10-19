@@ -1,0 +1,18 @@
+schema: spec-driven
+context: |
+  Proyecto: AstroVisor, aplicación de divulgación astronómica orientada prioritariamente a personas adultas mayores.
+  Temática de trabajo provisional: Constelaciones e historias del cielo. El guion, los libros y materiales finales de la biblioteca están pendientes.
+  Interfaces: web convencional, experiencia Homido opcional y panel administrativo simplificado.
+  Frontend Vue.js con Vite y Vue Router; escena inmersiva prevista con A-Frame.
+  Backend Node.js y Express, sin base de datos: contenidos en archivos JSON o Markdown mediante una capa de acceso separada.
+  Visitantes públicos sin cuentas; panel administrativo exclusivo y autenticación/verificación de permisos reales en el servidor en sprint posterior.
+  No implementar préstamos, reservas, disponibilidad de libros ni registro de visitantes.
+  Usar datos marcados como demostración y respetar licencias. Priorizar legibilidad, navegación sencilla y 2D alternativo.
+  Los cambios de Sprint 1 deben ser pequeños, verificables y coordinables entre 4 estudiantes.
+rules:
+  proposal:
+    - Explicar alcance y exclusiones de cada incremento.
+    - Indicar dependencias del hardware o material de biblioteca sin presentarlas como confirmadas.
+  tasks:
+    - Redactar tareas comprobables y evidencias observables.
+    - Evitar tareas de CRUD o VR final fuera del Sprint 1.
