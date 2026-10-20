@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#142033" />
+  <title>Prueba técnica Homido — AstroVisor</title>
+  <link rel="stylesheet" href="./styles.css" />
+  <!-- Versión fija de A-Frame: el modo estereoscópico se construye aparte. -->
+  <script src="https://aframe.io/releases/1.8.0/aframe.min.js"></script>
+  <script defer src="./prueba.js"></script>
+</head>
+<body>
+  <header class="site-header">
+    <div class="header-content">
+      <a href="/visor" class="brand">AstroVisor</a>
+      <span>Experimento técnico de Sprint 1</span>
+    </div>
+  </header>
+  <main id="main">
+    <h1>Prueba técnica de visor Homido</h1>
+    <p class="lead">Una escena mínima para comprobar sensores, seguimiento de la vista, retícula y presentación estereoscópica. No es la experiencia final de la biblioteca.</p>
+    <div class="notice" role="note"><strong>Prueba con precaución.</strong> Si aparece mareo, incomodidad o doble imagen, retira el visor y detén la prueba. Siéntate, mantén el entorno despejado y solicita ayuda si la necesitas.</div>
+
+    <section aria-labelledby="control-title" class="controls-panel">
+      <h2 id="control-title">Controles de la prueba</h2>
+      <p>Primero abre esta página en el teléfono mediante HTTPS. Autoriza los sensores si el navegador lo solicita; después prueba el modo 2D y, por último, la vista dividida.</p>
+      <div class="actions">
+        <button id="permissionButton" type="button">Solicitar sensores</button>
+        <button id="stereoButton" type="button" disabled>Probar vista dividida</button>
+        <button id="exitButton" class="secondary" type="button" hidden>Salir de vista dividida</button>
+        <a class="button secondary" href="/explorar">Regresar al modo web 2D</a>
+      </div>
+      <p class="status" id="orientationStatus" role="status" aria-live="polite">Sensores: aún no comprobados.</p>
+      <p class="status" id="stereoStatus" role="status" aria-live="polite">Vista estereoscópica: no iniciada.</p>
+      <p class="status" id="selectionStatus" role="status" aria-live="polite">Selección: apunta al círculo central y mantén la mirada durante 1.8 segundos.</p>
+      <p class="small" id="angles">Ángulos de orientación: sin datos.</p>
+    </section>
+
+    <section aria-labelledby="scene-title">
+      <h2 id="scene-title">Escena de demostración</h2>
+      <p class="scene-help">En computadora: arrastra la vista con el mouse. En teléfono: mueve suavemente el dispositivo (si hay sensores disponibles), o desliza el dedo. Centra la retícula sobre el círculo naranja para seleccionarlo sin tocar la pantalla.</p>
+      <div class="scene-host" id="sceneHost">
+        <a-scene id="testScene" embedded vr-mode-ui="enabled: false" renderer="antialias: true; colorManagement: true;">
+          <a-sky color="#071426"></a-sky>
+          <a-entity light="type: ambient; intensity: 1.2"></a-entity>
+          <a-sphere class="selectable" id="target" position="0 1.6 -4" radius="0.42" color="#e59b3d" material="shader: flat"></a-sphere>
+          <a-ring position="0 1.6 -4.02" radius-inner="0.55" radius-outer="0.57" color="#f5e4c0" material="shader: flat; side: double"></a-ring>
+          <a-entity id="cameraRig" camera="active: true" look-controls="magicWindowTrackingEnabled: true; touchEnabled: true; mouseEnabled: true" position="0 1.6 0">
+            <a-entity id="gazeCursor" cursor="fuse: true; fuseTimeout: 1800; rayOrigin: entity" raycaster="objects: .selectable; far: 25" geometry="primitive: ring; radiusInner: 0.017; radiusOuter: 0.027" material="color: #ffffff; shader: flat; opacity: 0.95" position="0 0 -1.2"
+              animation__fusing="property: scale; startEvents: fusing; from: 1 1 1; to: 0.6 0.6 0.6; dur: 1800"
+              animation__reset="property: scale; startEvents: mouseleave, click; to: 1 1 1; dur: 160"></a-entity>
+          </a-entity>
+        </a-scene>
+      </div>
+    </section>
+
+    <section class="log-panel" aria-labelledby="log-title">
+      <h2 id="log-title">Registro de esta sesión</h2>
+      <p class="small">El registro es local y no se envía a ningún servidor. Copia los resultados antes de cerrar la página.</p>
+      <div class="actions">
+        <button id="copyButton" class="secondary" type="button">Copiar registro</button>
+        <button id="clearButton" class="secondary" type="button">Limpiar registro</button>
+      </div>
+      <pre id="log" aria-label="Registro de eventos de la prueba"></pre>
+    </section>
+    <p class="small">El modo estereoscópico es experimental: emplea dos cámaras virtuales y no asegura calibración óptica ni compatibilidad física con Homido. La orientación, la selección y la vista dividida se evalúan por separado.</p>
+  </main>
+</body>
+</html>
