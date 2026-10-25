@@ -1,5 +1,5 @@
 <script setup>
-import { computed } from 'vue'
+import { computed, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { useRecorridos } from '../composables/useRecorridos.js'
 import ConstellationArt from '../components/ConstellationArt.vue'
@@ -7,6 +7,17 @@ import ContentState from '../components/ContentState.vue'
 const route = useRoute()
 const { recorridos, cargando, error, cargar } = useRecorridos()
 const constelacion = computed(() => recorridos.value.find((x) => x.id === route.params.id))
+const tituloEstado = computed(() => {
+  if (cargando.value) return 'Cargando constelación…'
+  if (error.value) return 'No pudimos cargar la constelación'
+  return 'Constelación no encontrada'
+})
+const tituloPagina = computed(() =>
+  !cargando.value && !error.value && constelacion.value
+    ? constelacion.value.titulo
+    : tituloEstado.value,
+)
+watch(tituloPagina, (titulo) => { document.title = `${titulo} · AstroVisor` }, { immediate: true })
 </script>
 <template>
   <section>
@@ -43,7 +54,7 @@ const constelacion = computed(() => recorridos.value.find((x) => x.id === route.
       </div>
     </template>
     <template v-else
-      ><h1 class="state-title" tabindex="-1">Historia de una constelación</h1>
+      ><h1 class="state-title" tabindex="-1">{{ tituloEstado }}</h1>
       <ContentState :cargando="cargando" :error="error" detalle @reintentar="cargar"
     /></template>
     <p class="public-demo">

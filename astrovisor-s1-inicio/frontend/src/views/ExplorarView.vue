@@ -33,8 +33,7 @@ const { recorridos, cargando, error, cargar } = useRecorridos()
           <RouterLink
             class="public-text-link"
             :to="`/explorar/${recorrido.id}`"
-            :aria-label="`Leer la historia de ${recorrido.titulo}`"
-            >Leer su historia
+            >Leer la historia de {{ recorrido.titulo }}
             <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12h15m-6-6 6 6-6 6" /></svg
           ></RouterLink>
         </div>

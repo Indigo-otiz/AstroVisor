@@ -2,14 +2,14 @@
 
 Responsable académico: Luis. Sprint: 19–23 de octubre de 2026. Verificación técnica realizada el **24 de octubre de 2026**, zona America/Mexico_City. El periodo académico y la fecha real de prueba se registran por separado.
 
-La interfaz pública permite explorar Orión, Osa Mayor y Escorpio, abrir sus historias y regresar al listado sin visor ni cuenta. Los textos y diagramas son demostrativos; el material autorizado de la biblioteca sigue pendiente. La revisión de otro integrante todavía no se ha realizado.
+La interfaz pública permite explorar Orión, Osa Mayor y Escorpio, abrir sus historias y regresar al listado sin visor ni cuenta. Los textos y diagramas son demostrativos; el material autorizado de la biblioteca sigue pendiente. Se recibió una revisión técnica automatizada sobre `084b764`, aprobada con observaciones; la revisión manual complementaria de otro integrante continúa pendiente.
 
 ## Versión y entorno
 
 - Rama local: `codex/s2-interfaz-publica-constelaciones`.
 - Commit base: `3f888bb686f9c606ca0b080447d85be20c795c00`. Las capturas corresponden a la implementación S2 de esta rama posterior a ese commit, no al Sprint 1 original. El commit de entrega puede identificarse en el historial de la rama.
 - [Rama para revisión en GitHub](https://github.com/Indigo-otiz/AstroVisor/tree/codex/s2-interfaz-publica-constelaciones).
-- [Manifiesto SHA-256 de código y capturas](evidencias/s2/version.json): identifica los archivos de esta revisión. Para el código, calcular SHA-256 del texto UTF-8 sin BOM y con finales de línea LF; para las capturas, calcularlo sobre los bytes originales. Esta normalización permite verificar el contenido aunque Git convierta CRLF/LF al clonar.
+- [Manifiesto SHA-256 original](evidencias/s2/version.json): identifica el código y las capturas de `084b764`. Para el código, calcular SHA-256 del texto UTF-8 sin BOM y con finales de línea LF; para las capturas, calcularlo sobre los bytes originales. Esta normalización permite verificar el contenido aunque Git convierta CRLF/LF al clonar. Las correcciones posteriores tienen [su propio manifiesto](evidencias/s2/revision/version.json).
 - Windows, Node.js v24.20.0, npm 11.19.0, Vue 3, Vite 6.4.4 y API Express documental.
 - Página real: `http://127.0.0.1:5173/`; API real: `http://127.0.0.1:3001/`. Ambos servicios limitados a esta computadora.
 - Navegador integrado de Codex/Chromium. Pruebas de viewport de 1280×900 y 360×800; las imágenes de página completa pueden excluir el ancho de la barra de desplazamiento.
@@ -58,7 +58,7 @@ Las pruebas automatizadas del cliente inducen HTTP fallido, red interrumpida, JS
 
 ## Capturas auténticas
 
-Las capturas fueron obtenidas del navegador con la aplicación ejecutándose. No son imágenes generadas ni montajes de diseño.
+Las capturas fueron obtenidas del navegador con la aplicación ejecutándose. No son imágenes generadas ni montajes de diseño. Las nueve imágenes de esta sección documentan la versión original `084b764`; se conservan sin sobrescribir como evidencia histórica. Las nuevas imágenes se enlazan en la sección de correcciones posterior a la revisión.
 
 | Captura | Origen y condición |
 |---|---|
@@ -94,6 +94,30 @@ Este servidor auxiliar se limita a 127.0.0.1, no cambia los documentos, no forma
 ## Referencia y diferencias de alcance
 
 [Figma Make compartido por el usuario](https://www.figma.com/make/1JNE45ayMot6p5VclicI3F/AstroVisor-design-setup?code-node-id=0-6&fullscreen=1): se conserva la dirección de fondo crema, azul web, diagramas sobre azul oscuro, tipografía grande y navegación sencilla. La ficha tiene URL propia en lugar de modal. El listado usa las tres constelaciones existentes del proyecto. No se incorporan los controles de reproducción, el catálogo, la selección de marcos de Figma ni los módulos administrativos/VR de la referencia.
+
+## Revisión técnica recibida y correcciones
+
+Informe comunicado por el usuario en esta conversación sobre el commit **`084b764`**. Dictamen recibido: **aprobado con observaciones**, pendiente de revisión manual complementaria. No se proporcionaron el nombre del revisor ni la fecha exacta de ejecución; no se inventan esos datos.
+
+Según el informe recibido, un agente ejecutó `npm test` (1/1), `npm run test:web` (10/10) y `npm run build` correctamente. También verificó las tres historias, apertura directa, historial, teclado, viewport de 360 px y recuperación ante fallos. El entorno reportado fue **Edge 156 en modo headless**, sin evaluación presencial. Estos son resultados reportados por el revisor, separados de las comprobaciones nuevas de esta sesión.
+
+| Observación recibida | Corrección aplicada y comprobación nueva |
+|---|---|
+| Nombre accesible distinto del texto visible | Los enlaces muestran «Leer la historia de Orión/Osa Mayor/Escorpio». Se retiró el `aria-label` que sustituía el texto. El árbol accesible y el texto visible coinciden; Tab y Enter abren Orión. |
+| Todas las pestañas tenían el mismo título | Se distinguen inicio, listado y las tres constelaciones. Se verificaron recarga, atrás/adelante, carga, fallo y recuperación; la ficha controla el título según su respuesta real. |
+| Pie de página público de 15 px | Aumentado a 20 px; medición computada aproximada de 19.9998 px en escritorio y móvil. No cambian los estilos de administración ni visor. |
+| Favicon con 404 | Se añadió `/favicon.svg` y su enlace explícito en el HTML. HTTP 200 con `image/svg+xml`; el build contiene el archivo. |
+| Encabezado genérico para constelación inexistente | El encabezado principal y la pestaña indican «Constelación no encontrada» después de una consulta válida sin coincidencia. Carga y fallo conservan mensajes propios. |
+
+Después de corregir, se ejecutaron nuevamente **1/1 pruebas documentales, 10/10 pruebas de consumo frontend y build**, todos correctos. Las comprobaciones de navegador se realizaron en Chromium integrado, en 1280×900 y 360×800. El listado móvil tiene una columna, sin desbordamiento horizontal; el enlace largo de Osa Mayor ocupa dos líneas sin recortes. Se comprobó el reintento con HTTP 503 inducido y el cambio de título al recuperarse la ficha.
+
+Evidencia nueva:
+
+- [Listado de escritorio](evidencias/s2/revision/listado-escritorio.jpg) y [listado móvil](evidencias/s2/revision/listado-movil.jpg).
+- [Detalle de escritorio](evidencias/s2/revision/detalle-escritorio.jpg) y [constelación no encontrada](evidencias/s2/revision/constelacion-no-encontrada.jpg).
+- [Mediciones y títulos observados en navegador](evidencias/s2/revision/comprobaciones.json) y [manifiesto de la corrección](evidencias/s2/revision/version.json).
+
+El informe recibido y esta corrección no acreditan pruebas con lectores de pantalla, zoom nativo al 200 %, teléfonos físicos ni personas adultas mayores. La ampliación por CSS del primer registro permanece identificada como condición controlada. El revisor debe confirmar manualmente la versión corregida antes de integrar la rama.
 
 ## Revisión por otro integrante
 

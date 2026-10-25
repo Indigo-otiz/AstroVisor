@@ -27,6 +27,13 @@ Responsable: Luis. Periodo académico: 19–23 de octubre de 2026. Estado de est
 - [x] 4.2 Guardar capturas reales en `docs/evidencias/s2/` de listado/detalle en escritorio y móvil y de carga/error; vincularlas desde `docs/PRUEBA-S2.md` con entorno, tamaño, escenario, condición inducida si aplica y versión del código. Verificar cada enlace sin presentar las capturas como prueba de usuarios o de hardware físico.
 - [ ] 4.3 Completar la revisión cruzada con otro integrante y registrar su nombre, fecha, versión/commit/PR, observaciones y resultado en `docs/PRUEBA-S2.md`; mantener esta tarea pendiente hasta contar con evidencia auténtica del compañero, sin sustituirla por revisión automática.
 
+## 5. Observaciones de la revisión técnica de 084b764
+
+- [x] 5.1 Hacer coincidir texto visible y nombre accesible de los enlaces de historia; verificar los tres enlaces en el árbol de accesibilidad y su funcionamiento con teclado.
+- [x] 5.2 Actualizar los títulos de pestaña según ruta, constelación y estados de consulta; verificar acceso directo, recarga, historial, carga/error y ficha inexistente en navegador, sin títulos obsoletos al regresar al listado.
+- [x] 5.3 Aumentar el pie público a 20 px, proporcionar favicon y aclarar el encabezado de ficha inexistente; verificar tipografía computada y distribución en 360/1280 px, respuesta HTTP 200 del icono y estado desconocido.
+- [x] 5.4 Incorporar la revisión recibida a `docs/PRUEBA-S2.md`, ejecutar pruebas/build y guardar evidencia posterior a las correcciones; distinguir resultados reportados por el revisor de comprobaciones nuevas, conservar la evidencia de 084b764 y mantener pendiente la revisión manual complementaria.
+
 ## Workflow follow-up
 
 - Presentar estos artefactos y obtener la aprobación del usuario antes de modificar código, según `AGENTS.md`.

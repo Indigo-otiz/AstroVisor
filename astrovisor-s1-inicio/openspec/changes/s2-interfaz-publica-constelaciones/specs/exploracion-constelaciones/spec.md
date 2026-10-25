@@ -82,6 +82,19 @@ Las pantallas públicas SHALL conservar legibilidad y controles operables con ra
 - **THEN** puede leer los textos completos y activar los controles sin superposiciones ni recortes de contenido.
 - **AND** las ilustraciones de estrellas no sustituyen los nombres, las instrucciones ni las historias textuales.
 
+### Requirement: Identificación de la página en la pestaña
+
+La aplicación SHALL identificar la página pública o constelación actual en el título del documento. Durante la consulta de una ficha SHALL distinguir carga, fallo y constelación inexistente, sin conservar el nombre de otra ficha.
+
+#### Scenario: Título de una historia
+- **WHEN** termina correctamente la consulta de una constelación disponible
+- **THEN** la pestaña identifica su nombre y AstroVisor.
+- **AND** al regresar al listado identifica la exploración de constelaciones.
+
+#### Scenario: Ficha no encontrada
+- **WHEN** termina correctamente la consulta pero no existe el identificador
+- **THEN** el encabezado principal y la pestaña identifican que la constelación no fue encontrada.
+
 ### Requirement: Coexistencia con los módulos existentes
 
 La aplicación SHALL mantener accesibles los enlaces existentes al modo Homido y al acceso administrativo, sin condicionar la exploración de constelaciones a ninguno de ellos.

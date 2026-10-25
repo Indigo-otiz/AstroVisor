@@ -4,13 +4,24 @@ import { useRoute } from 'vue-router'
 import './public.css'
 const route = useRoute()
 const esPublica = computed(() => ['inicio', 'explorar', 'constelacion'].includes(route.name))
+const titulos = {
+  inicio: 'Inicio',
+  explorar: 'Constelaciones e historias del cielo',
+  visor: 'Modo Homido',
+  'admin-acceso': 'Acceso administrativo',
+  admin: 'Panel de administración',
+}
 watch(
   () => route.fullPath,
   async () => {
+    // La ficha resuelve su propio título al terminar la consulta documental.
+    if (route.name !== 'constelacion') {
+      document.title = `${titulos[route.name] ?? 'Historias del cielo'} · AstroVisor`
+    }
     await nextTick()
     document.querySelector('#contenido h1')?.focus({ preventScroll: true })
-    document.title = 'AstroVisor · Historias del cielo'
   },
+  { immediate: true },
 )
 </script>
 <template>
