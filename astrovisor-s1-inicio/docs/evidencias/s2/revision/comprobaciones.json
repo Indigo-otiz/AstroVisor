@@ -1,0 +1,113 @@
+[
+  {
+    "documentWidth": 1265,
+    "footerSize": "19.9998px",
+    "icon": "/favicon.svg",
+    "links": [
+      {
+        "ariaLabel": null,
+        "height": 48,
+        "visible": "Leer la historia de Orión"
+      },
+      {
+        "ariaLabel": null,
+        "height": 48,
+        "visible": "Leer la historia de Osa Mayor"
+      },
+      {
+        "ariaLabel": null,
+        "height": 48,
+        "visible": "Leer la historia de Escorpio"
+      }
+    ],
+    "title": "Constelaciones e historias del cielo · AstroVisor",
+    "url": "/explorar",
+    "width": 1280
+  },
+  {
+    "heading": "Orión",
+    "title": "Orión · AstroVisor",
+    "url": "/explorar/orion"
+  },
+  {
+    "test": "recarga",
+    "title": "Orión · AstroVisor",
+    "url": "/explorar/orion"
+  },
+  {
+    "test": "atras",
+    "title": "Constelaciones e historias del cielo · AstroVisor",
+    "url": "/explorar"
+  },
+  {
+    "test": "adelante",
+    "title": "Orión · AstroVisor",
+    "url": "/explorar/orion"
+  },
+  {
+    "title": "Osa Mayor · AstroVisor",
+    "url": "/explorar/osa-mayor"
+  },
+  {
+    "title": "Escorpio · AstroVisor",
+    "url": "/explorar/escorpio"
+  },
+  {
+    "heading": "Constelación no encontrada",
+    "title": "Constelación no encontrada · AstroVisor",
+    "url": "/explorar/no-existe"
+  },
+  {
+    "columns": "304.8px",
+    "documentWidth": 345,
+    "footerSize": "19.9998px",
+    "links": [
+      {
+        "height": 48,
+        "visible": "Leer la historia de Orión",
+        "width": 256.8000183105469
+      },
+      {
+        "height": 59.400001525878906,
+        "visible": "Leer la historia de Osa Mayor",
+        "width": 256.8000183105469
+      },
+      {
+        "height": 59.400001525878906,
+        "visible": "Leer la historia de Escorpio",
+        "width": 256.8000183105469
+      }
+    ],
+    "title": "Constelaciones e historias del cielo · AstroVisor",
+    "url": "/explorar",
+    "width": 360
+  },
+  {
+    "focus": "Orión",
+    "test": "teclado",
+    "title": "Orión · AstroVisor",
+    "url": "/explorar/orion"
+  },
+  {
+    "heading": "Cargando constelación…",
+    "test": "carga-controlada",
+    "title": "Cargando constelación… · AstroVisor",
+    "url": "/explorar/orion"
+  },
+  {
+    "test": "salida-durante-carga",
+    "title": "Inicio · AstroVisor",
+    "url": "/"
+  },
+  {
+    "heading": "No pudimos cargar la constelación",
+    "test": "error-controlado",
+    "title": "No pudimos cargar la constelación · AstroVisor",
+    "url": "/explorar/orion"
+  },
+  {
+    "test": "recuperacion",
+    "title": "Orión · AstroVisor",
+    "url": "/explorar/orion"
+  }
+]

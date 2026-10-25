@@ -1,0 +1,112 @@
+{
+  "baseCommit": "3f888bb686f9c606ca0b080447d85be20c795c00",
+  "branch": "codex/s2-interfaz-publica-constelaciones",
+  "condition": "Instantánea técnica S2 incluida en la rama de revisión; revisión humana pendiente",
+  "date": "2026-10-24",
+  "timezone": "America/Mexico_City",
+  "source": [
+    {
+      "path": "frontend/src/App.vue",
+      "sha256": "fe1c9807483343c9664bd6e2555eb7f16529fd8ae3a8872cb9c438c225963410"
+    },
+    {
+      "path": "frontend/src/router/index.js",
+      "sha256": "865c857ceeba85705be4797e4550a0a069939a37883a312bdacd57eceaac360b"
+    },
+    {
+      "path": "frontend/src/public.css",
+      "sha256": "94165d41767069cbde44911b66f1215d8f0c641faa240ef81a8182557428e7a2"
+    },
+    {
+      "path": "frontend/src/components/ConstellationArt.vue",
+      "sha256": "9c46f73b644640483c871d2a4c03a418d018af1fb2d51a85b5037d5d365cade2"
+    },
+    {
+      "path": "frontend/src/components/ContentState.vue",
+      "sha256": "0d34c326d2d9e3cb28224ead5c8890cba712ccdd57b1328f01dba6666e3f5c16"
+    },
+    {
+      "path": "frontend/src/views/InicioView.vue",
+      "sha256": "12874c7e4b6150621223fb25958ac71517831b9b5dd340dc9e30c42e3b3fa51f"
+    },
+    {
+      "path": "frontend/src/views/ExplorarView.vue",
+      "sha256": "6671b17590352e7cc36c88fc51e725e23c1144d82d9bc058f314248fa8f9e63a"
+    },
+    {
+      "path": "frontend/src/views/ConstelacionView.vue",
+      "sha256": "42ea07ce3dafec34501046f1abd8800a893086b6deef36412ada6b633fa94c43"
+    },
+    {
+      "path": "frontend/src/services/contentService.js",
+      "sha256": "72cff4dd81337e107475c3baa95a3bcf035d803385e4ba3c6061ddb6c40b1657"
+    },
+    {
+      "path": "frontend/src/composables/useRecorridos.js",
+      "sha256": "bbaefa56f0fe740728411fb6e2187de1ef91e299be690d3832e3c062ce525af1"
+    },
+    {
+      "path": "frontend/test/contentService.test.js",
+      "sha256": "ec9cda8513974c70b40e33aeab02d9d67cdee5245dfc33ee0ef01d3833952f8f"
+    },
+    {
+      "path": "backend/test/documentRepository.test.js",
+      "sha256": "68a09efea6f640c2f2a5b10bd6af8bb077185af45f1dbe3375279c2ed767d424"
+    },
+    {
+      "path": "content/recorridos.json",
+      "sha256": "8881c7d675ab69cafc3fc5868ec7c3c84a607b4b61f7096367489582b0a990d9"
+    },
+    {
+      "path": "scripts/prueba-estados.mjs",
+      "sha256": "be31550d7b9a70eb0d5d5415222bb5165a45f717e4844b2025d7c379bca59525"
+    },
+    {
+      "path": "package.json",
+      "sha256": "0d3c94fe22d61111d48ef0a49119d1b788d5f0db4d03a0713e8a97d720d4dc9e"
+    },
+    {
+      "path": "frontend/package.json",
+      "sha256": "4d29d20cadcd7865d840668e67590d4b87bab619fb06273f0afea59212b369f0"
+    }
+  ],
+  "captures": [
+    {
+      "path": "carga-controlada.jpg",
+      "sha256": "6578322c6fc1cc7e2d3683a4bbeb2930bb2b5d3d9085f88cfe9ab7f99db92231"
+    },
+    {
+      "path": "detalle-escritorio.jpg",
+      "sha256": "ed5c2f72181e2d392a796a1063ac3b92a7899404e8d06497c5ef89684c93fab4"
+    },
+    {
+      "path": "detalle-movil.jpg",
+      "sha256": "56a5b9a7e5c60402cef3ae099d7ee6aa820d8fb15e1ef6b513b1aea7a72b2d57"
+    },
+    {
+      "path": "error-controlado.jpg",
+      "sha256": "4d7d93392ca7fb655309e527caaf1e092afea9a9769cfcda1284c7f5457f5ac2"
+    },
+    {
+      "path": "inicio-escritorio.jpg",
+      "sha256": "63cc4369339e379a26b229876f548d8b2d89990c67dc3cb6aed868428d8fc3e0"
+    },
+    {
+      "path": "listado-escritorio.jpg",
+      "sha256": "b10ed4f0111823acdc74411424d5e667ec52cf692c3d7b91dc5843c3cc26e439"
+    },
+    {
+      "path": "listado-movil.jpg",
+      "sha256": "5a16f6968455093766d4c84ff149570ddc2a32e9c62839316dff672b39364e11"
+    },
+    {
+      "path": "texto-200-movil.jpg",
+      "sha256": "2c19e6799d0cf5d0d6d3b233bd6fc6eb60d0467eaf4c652449c1fb78e8f8dbd4"
+    },
+    {
+      "path": "texto-200.jpg",
+      "sha256": "227ea008488841907e96d1067069f956a1e2d904196608afecdf03d823ae5f0c"
+    }
+  ],
+  "sourceHashEncoding": "UTF-8 sin BOM, finales de línea LF"
+}

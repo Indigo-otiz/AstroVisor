@@ -1,0 +1,109 @@
+{
+  "reviewedCommit": "084b7646faba9c92c11f9923830acf712b6239e7",
+  "branch": "codex/s2-interfaz-publica-constelaciones",
+  "condition": "Correcciones posteriores a la revisión técnica de 084b764; revisión manual complementaria pendiente",
+  "date": "2026-10-24",
+  "timezone": "America/Mexico_City",
+  "sourceHashEncoding": "UTF-8 sin BOM, finales de línea LF",
+  "source": [
+    {
+      "path": "frontend/src/App.vue",
+      "sha256": "161f67f607e82ae5d5e5d4e44125ba4f7bdc0a7dbfad56d75c6f1d726efcc51d"
+    },
+    {
+      "path": "frontend/src/router/index.js",
+      "sha256": "865c857ceeba85705be4797e4550a0a069939a37883a312bdacd57eceaac360b"
+    },
+    {
+      "path": "frontend/src/public.css",
+      "sha256": "d795f6b1e96c958ac5cebbdae4d3818592207cdbdfdd7c1816315c5998517871"
+    },
+    {
+      "path": "frontend/src/components/ConstellationArt.vue",
+      "sha256": "9c46f73b644640483c871d2a4c03a418d018af1fb2d51a85b5037d5d365cade2"
+    },
+    {
+      "path": "frontend/src/components/ContentState.vue",
+      "sha256": "0d34c326d2d9e3cb28224ead5c8890cba712ccdd57b1328f01dba6666e3f5c16"
+    },
+    {
+      "path": "frontend/src/views/InicioView.vue",
+      "sha256": "12874c7e4b6150621223fb25958ac71517831b9b5dd340dc9e30c42e3b3fa51f"
+    },
+    {
+      "path": "frontend/src/views/ExplorarView.vue",
+      "sha256": "5b0460eaf8348b9fe993b5ced830c873a326d80993152988eb6680835a7ba041"
+    },
+    {
+      "path": "frontend/src/views/ConstelacionView.vue",
+      "sha256": "eabe4644991c7d09bd4f1ef613e1bf3a9c2f0d9e0c8299cc783407dc153eb45b"
+    },
+    {
+      "path": "frontend/src/services/contentService.js",
+      "sha256": "72cff4dd81337e107475c3baa95a3bcf035d803385e4ba3c6061ddb6c40b1657"
+    },
+    {
+      "path": "frontend/src/composables/useRecorridos.js",
+      "sha256": "bbaefa56f0fe740728411fb6e2187de1ef91e299be690d3832e3c062ce525af1"
+    },
+    {
+      "path": "frontend/test/contentService.test.js",
+      "sha256": "ec9cda8513974c70b40e33aeab02d9d67cdee5245dfc33ee0ef01d3833952f8f"
+    },
+    {
+      "path": "backend/test/documentRepository.test.js",
+      "sha256": "68a09efea6f640c2f2a5b10bd6af8bb077185af45f1dbe3375279c2ed767d424"
+    },
+    {
+      "path": "content/recorridos.json",
+      "sha256": "8881c7d675ab69cafc3fc5868ec7c3c84a607b4b61f7096367489582b0a990d9"
+    },
+    {
+      "path": "scripts/prueba-estados.mjs",
+      "sha256": "be31550d7b9a70eb0d5d5415222bb5165a45f717e4844b2025d7c379bca59525"
+    },
+    {
+      "path": "package.json",
+      "sha256": "0d3c94fe22d61111d48ef0a49119d1b788d5f0db4d03a0713e8a97d720d4dc9e"
+    },
+    {
+      "path": "frontend/package.json",
+      "sha256": "4d29d20cadcd7865d840668e67590d4b87bab619fb06273f0afea59212b369f0"
+    },
+    {
+      "path": "frontend/index.html",
+      "sha256": "72c1cbdc9620b9ea396b3e30ee4dd94a9ab12bb26b2557d0a0979c210b89049b"
+    },
+    {
+      "path": "frontend/public/favicon.svg",
+      "sha256": "b775347dcb0d0ddbabc6739cfdd499a15973671655b4174fbac02fcb13cb72a6"
+    }
+  ],
+  "evidence": [
+    {
+      "path": "comprobaciones.json",
+      "sha256": "ac850d8270c3846d7d3f0cceda79cc34f2480a34fe6ee38c0d627aac6115da22",
+      "hashEncoding": "UTF-8 sin BOM, finales de línea LF"
+    },
+    {
+      "path": "constelacion-no-encontrada.jpg",
+      "sha256": "2310f8de4f38f30e03ab6be7500a97dd131beeb89fc28bc4068f728ce638e060",
+      "hashEncoding": "bytes originales"
+    },
+    {
+      "path": "detalle-escritorio.jpg",
+      "sha256": "79b1208445dcd723fa476e7f3fdaa00222ab8b931fe784a94849810c28f953e5",
+      "hashEncoding": "bytes originales"
+    },
+    {
+      "path": "listado-escritorio.jpg",
+      "sha256": "25095aa92cee1ec65fdfae5ee7302277c27c636fc4c37876b69dc542338b7dab",
+      "hashEncoding": "bytes originales"
+    },
+    {
+      "path": "listado-movil.jpg",
+      "sha256": "7dfdd93389d33c62b29cb41c76a4a5c0a61056fa53163484c3e5626c5fc7075b",
+      "hashEncoding": "bytes originales"
+    }
+  ]
+}
