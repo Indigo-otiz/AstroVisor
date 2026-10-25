@@ -37,4 +37,4 @@ Ninguna especificación principal: `openspec list --specs --json` devuelve un in
 
 Referencia visual: https://www.figma.com/make/1JNE45ayMot6p5VclicI3F/AstroVisor-design-setup?code-node-id=0-6&fullscreen=1
 
-Estado: implementación solicitada por el usuario después de presentar el plan; ver tareas y evidencia técnica. La revisión cruzada continúa pendiente. Periodo académico: 19–23 de octubre de 2026; la fecha real de cada comprobación se registrará sin retrocederla al periodo del sprint.
+Estado: implementación solicitada por el usuario después de presentar el plan; ver tareas y evidencia técnica. Luis confirmó el 25 de octubre de 2026 la aprobación presencial de Índigo, responsable de las pruebas manuales y automatizadas; la constancia está en docs/PRUEBA-S2.md. Periodo académico: 19–23 de octubre de 2026; la fecha real de cada comprobación se registrará sin retrocederla al periodo del sprint.

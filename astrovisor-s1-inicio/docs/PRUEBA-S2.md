@@ -2,7 +2,7 @@
 
 Responsable académico: Luis. Sprint: 19–23 de octubre de 2026. Verificación técnica realizada el **24 de octubre de 2026**, zona America/Mexico_City. El periodo académico y la fecha real de prueba se registran por separado.
 
-La interfaz pública permite explorar Orión, Osa Mayor y Escorpio, abrir sus historias y regresar al listado sin visor ni cuenta. Los textos y diagramas son demostrativos; el material autorizado de la biblioteca sigue pendiente. Se recibió una revisión técnica automatizada sobre `084b764`, aprobada con observaciones, y Luis confirmó la prueba manual de la versión corregida `6591006`. La aprobación cruzada de otro integrante continúa pendiente.
+La interfaz pública permite explorar Orión, Osa Mayor y Escorpio, abrir sus historias y regresar al listado sin visor ni cuenta. Los textos y diagramas son demostrativos; el material autorizado de la biblioteca sigue pendiente. Índigo realizó la revisión técnica y manual; Luis confirmó el 25 de octubre de 2026 que Índigo le dio la aprobación en persona. Esta aprobación presencial se registra como información comunicada por Luis, sin atribuirle una aprobación formal dentro de GitHub.
 
 ## Versión y entorno
 
@@ -97,7 +97,7 @@ Este servidor auxiliar se limita a 127.0.0.1, no cambia los documentos, no forma
 
 ## Revisión técnica recibida y correcciones
 
-Informe comunicado por el usuario en esta conversación sobre el commit **`084b764`**. Dictamen recibido: **aprobado con observaciones**, pendiente de revisión manual complementaria. No se proporcionaron el nombre del revisor ni la fecha exacta de ejecución; no se inventan esos datos.
+Informe comunicado por el usuario en esta conversación sobre el commit **`084b764`**. Dictamen inicial: **aprobado con observaciones**, entonces pendiente de revisión manual complementaria. El 25 de octubre de 2026, Luis aclaró que el revisor fue **Índigo**, que realizó las pruebas automatizadas y manuales y le dio la aprobación en persona. La fecha exacta de ejecución no fue especificada; se registra la fecha de esa aclaración sin atribuirla a la ejecución de las pruebas.
 
 Según el informe recibido, un agente ejecutó `npm test` (1/1), `npm run test:web` (10/10) y `npm run build` correctamente. También verificó las tres historias, apertura directa, historial, teclado, viewport de 360 px y recuperación ante fallos. El entorno reportado fue **Edge 156 en modo headless**, sin evaluación presencial. Estos son resultados reportados por el revisor, separados de las comprobaciones nuevas de esta sesión.
 
@@ -117,33 +117,36 @@ Evidencia nueva:
 - [Detalle de escritorio](evidencias/s2/revision/detalle-escritorio.jpg) y [constelación no encontrada](evidencias/s2/revision/constelacion-no-encontrada.jpg).
 - [Mediciones y títulos observados en navegador](evidencias/s2/revision/comprobaciones.json) y [manifiesto de la corrección](evidencias/s2/revision/version.json).
 
-El informe recibido y esta corrección no acreditan pruebas con lectores de pantalla, zoom nativo al 200 %, teléfonos físicos ni personas adultas mayores. La ampliación por CSS del primer registro permanece identificada como condición controlada. El revisor debe confirmar manualmente la versión corregida antes de integrar la rama.
+El informe recibido y esta corrección no acreditan pruebas con lectores de pantalla, zoom nativo al 200 %, teléfonos físicos ni personas adultas mayores. La ampliación por CSS del primer registro permanece identificada como condición controlada. La aprobación manual de Índigo sobre el trabajo corregido quedó confirmada por Luis en la aclaración posterior.
 
-## Validación manual confirmada por el autor
+## Validación manual y aclaración del revisor
 
-El **24 de octubre de 2026**, zona America/Mexico_City, Luis confirmó en esta conversación: «ya hice la prueba manual y todo esta bien». El registro corresponde a la versión corregida **`659100628ce21d49f55824739645f00ccc2e5f2e`**, que era la versión local y publicada al recibir la confirmación; no había cambios de código locales posteriores.
+El **24 de octubre de 2026**, zona America/Mexico_City, Luis informó en esta conversación: «ya hice la prueba manual y todo esta bien». Inicialmente se registró como validación del autor. El **25 de octubre de 2026** aclaró: «indigo fue quien hizo la prueba manul y atumotizada, el me dio la aprovación en persona». Se corrige por ello la atribución: las pruebas y la aprobación corresponden a Índigo, según el testimonio de Luis.
+
+La versión de código corregida es **`659100628ce21d49f55824739645f00ccc2e5f2e`**. Los commits posteriores hasta esta aclaración solo actualizan documentación; no añaden cambios funcionales.
 
 | Campo | Registro |
 |---|---|
-| Persona que confirma | Luis, autor de esta entrega S2 |
+| Persona que realizó la revisión | Índigo, integrante del equipo, según la aclaración de Luis |
+| Persona que comunica el resultado | Luis, autor de esta entrega S2 |
 | Resultado informado | Prueba manual correcta, sin incidencias reportadas |
-| Fuente | Confirmación directa del usuario en la conversación de trabajo |
+| Fuente | Confirmación directa de Luis de la aprobación presencial de Índigo |
 | Navegador, dispositivo y pasos exactos | No especificados en la confirmación |
-| Alcance de la evidencia | Validación manual reportada por el autor; no se atribuye a otro integrante ni a una evaluación con personas adultas mayores |
+| Alcance de la evidencia | Revisión cruzada manual y técnica de Índigo reportada por Luis; no equivale a evaluación con personas adultas mayores |
 
-Esta confirmación permite avanzar a la propuesta de integración. Se conservan por separado las comprobaciones automatizadas, las observaciones corregidas y la aprobación cruzada que debe registrar otro integrante.
+Esta confirmación permite avanzar a la integración del [PR #1](https://github.com/Indigo-otiz/AstroVisor/pull/1). Se conservan por separado las comprobaciones automatizadas, las observaciones corregidas y la aprobación presencial. No se crea ni se simula una revisión de GitHub en nombre de Índigo.
 
 ## Revisión por otro integrante
 
-**Pendiente. Esta sección debe completarla o respaldarla un integrante real del equipo.** Una revisión técnica asistida no sustituye este criterio académico.
+**Aprobación presencial comunicada por Luis el 25 de octubre de 2026.** El revisor fue Índigo. La constancia identifica que el resultado fue recibido verbalmente y que no hay una aprobación formal de su cuenta dentro de GitHub.
 
 | Campo | Registro |
 |---|---|
-| Integrante revisor | Pendiente |
-| Fecha | Pendiente |
-| Commit, PR o versión revisada | Pendiente; registrar el commit exacto de la rama que pruebe el integrante. |
-| Dispositivo y recorrido probado | Pendiente |
-| Observaciones y correcciones | Pendiente |
-| Resultado y enlace a evidencia | Pendiente |
+| Integrante revisor | Índigo |
+| Fecha | Constancia de la aprobación recibida el 25 de octubre de 2026, America/Mexico_City; día exacto de la prueba y de la conversación presencial no especificado |
+| Commit, PR o versión revisada | Código corregido `6591006`, con seguimiento en el PR #1; el informe técnico inicial corresponde a `084b764` |
+| Dispositivo y recorrido probado | El informe técnico describe Edge 156 headless, historias, navegación, teclado, viewport móvil y recuperación. El dispositivo y los pasos exactos de la comprobación manual no fueron especificados. |
+| Observaciones y correcciones | Cinco observaciones técnicas atendidas en `6591006`, descritas arriba |
+| Resultado y enlace a evidencia | Aprobado presencialmente por Índigo, según confirmación directa de Luis; constancia en este documento vinculado al [PR #1](https://github.com/Indigo-otiz/AstroVisor/pull/1) |
 
-No se han realizado en esta sesión pruebas con personas adultas mayores, evaluación con lector de pantalla, validación en teléfono físico ni aprobación del material por la biblioteca. Las pruebas móviles usan viewport del navegador. La publicación de la rama no acredita revisión humana ni integración en `main`. La implementación técnica y la revisión cruzada se mantienen como estados distintos.
+No se han realizado en esta sesión pruebas con personas adultas mayores, evaluación con lector de pantalla, validación en teléfono físico ni aprobación del material por la biblioteca. Las pruebas móviles técnicas usan viewport del navegador. La revisión cruzada queda respaldada por la confirmación de Luis de la aprobación presencial de Índigo; la integración en `main` se comprueba por separado en el estado del PR.

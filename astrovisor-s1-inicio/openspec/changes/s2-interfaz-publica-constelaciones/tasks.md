@@ -25,7 +25,9 @@ Responsable: Luis. Periodo académico: 19–23 de octubre de 2026. Estado de est
 
 - [x] 4.1 Ejecutar pruebas documentales y de consumo frontend, `npm run build` y comprobación integrada con Vite/Express; verificar el flujo inicio → listado → historia → regreso, la API de lectura, `/visor`, `/admin/acceso`, la redirección de `/admin` y la denegación existente de `/api/admin`, registrando comandos, fecha real y resultados.
 - [x] 4.2 Guardar capturas reales en `docs/evidencias/s2/` de listado/detalle en escritorio y móvil y de carga/error; vincularlas desde `docs/PRUEBA-S2.md` con entorno, tamaño, escenario, condición inducida si aplica y versión del código. Verificar cada enlace sin presentar las capturas como prueba de usuarios o de hardware físico.
-- [ ] 4.3 Completar la revisión cruzada con otro integrante y registrar su nombre, fecha, versión/commit/PR, observaciones y resultado en `docs/PRUEBA-S2.md`; mantener esta tarea pendiente hasta contar con evidencia auténtica del compañero, sin sustituirla por revisión automática.
+- [x] 4.3 Completar la revisión cruzada con otro integrante y registrar su nombre, fecha, versión/commit/PR, observaciones y resultado en `docs/PRUEBA-S2.md`; mantener esta tarea pendiente hasta contar con evidencia auténtica del compañero, sin sustituirla por revisión automática.
+
+Constancia de 4.3: el 25 de octubre de 2026 Luis identificó a Índigo como responsable de las pruebas manuales y automatizadas y confirmó su aprobación presencial. Se registra como testimonio de Luis, con el dispositivo manual y el día exacto de ejecución sin especificar, sin simular una aprobación de GitHub.
 
 ## 5. Observaciones de la revisión técnica de 084b764
 
