@@ -2,7 +2,7 @@
 
 Responsable académico: Luis. Sprint: 19–23 de octubre de 2026. Verificación técnica realizada el **24 de octubre de 2026**, zona America/Mexico_City. El periodo académico y la fecha real de prueba se registran por separado.
 
-La interfaz pública permite explorar Orión, Osa Mayor y Escorpio, abrir sus historias y regresar al listado sin visor ni cuenta. Los textos y diagramas son demostrativos; el material autorizado de la biblioteca sigue pendiente. Se recibió una revisión técnica automatizada sobre `084b764`, aprobada con observaciones; la revisión manual complementaria de otro integrante continúa pendiente.
+La interfaz pública permite explorar Orión, Osa Mayor y Escorpio, abrir sus historias y regresar al listado sin visor ni cuenta. Los textos y diagramas son demostrativos; el material autorizado de la biblioteca sigue pendiente. Se recibió una revisión técnica automatizada sobre `084b764`, aprobada con observaciones, y Luis confirmó la prueba manual de la versión corregida `6591006`. La aprobación cruzada de otro integrante continúa pendiente.
 
 ## Versión y entorno
 
@@ -118,6 +118,20 @@ Evidencia nueva:
 - [Mediciones y títulos observados en navegador](evidencias/s2/revision/comprobaciones.json) y [manifiesto de la corrección](evidencias/s2/revision/version.json).
 
 El informe recibido y esta corrección no acreditan pruebas con lectores de pantalla, zoom nativo al 200 %, teléfonos físicos ni personas adultas mayores. La ampliación por CSS del primer registro permanece identificada como condición controlada. El revisor debe confirmar manualmente la versión corregida antes de integrar la rama.
+
+## Validación manual confirmada por el autor
+
+El **24 de octubre de 2026**, zona America/Mexico_City, Luis confirmó en esta conversación: «ya hice la prueba manual y todo esta bien». El registro corresponde a la versión corregida **`659100628ce21d49f55824739645f00ccc2e5f2e`**, que era la versión local y publicada al recibir la confirmación; no había cambios de código locales posteriores.
+
+| Campo | Registro |
+|---|---|
+| Persona que confirma | Luis, autor de esta entrega S2 |
+| Resultado informado | Prueba manual correcta, sin incidencias reportadas |
+| Fuente | Confirmación directa del usuario en la conversación de trabajo |
+| Navegador, dispositivo y pasos exactos | No especificados en la confirmación |
+| Alcance de la evidencia | Validación manual reportada por el autor; no se atribuye a otro integrante ni a una evaluación con personas adultas mayores |
+
+Esta confirmación permite avanzar a la propuesta de integración. Se conservan por separado las comprobaciones automatizadas, las observaciones corregidas y la aprobación cruzada que debe registrar otro integrante.
 
 ## Revisión por otro integrante
 
