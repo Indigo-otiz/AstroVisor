@@ -3,6 +3,8 @@
     "id": "orion",
     "titulo": "Orión",
     "resumen": "Identifica una figura conocida del cielo nocturno y algunas de sus estrellas.",
+    "historia": "En un relato de la tradición griega, Orión era un cazador que recorría la tierra. Las personas imaginaron su figura entre las estrellas: dos hombros, dos pies y un cinturón en el centro. Contar su historia ayudaba a recordar ese dibujo en el cielo. Esta es una adaptación breve de muestra; otras culturas han encontrado figuras y relatos diferentes en las mismas estrellas.",
+    "comoReconocerla": "Busca tres estrellas cercanas que parecen formar una línea: representan el cinturón. Imagina después una figura alrededor de ellas. El esquema es una guía de la forma, no un mapa para localizarla en una fecha o lugar concreto.",
     "demostracion": true,
     "libros": [],
     "multimedia": []
@@ -11,6 +13,8 @@
     "id": "osa-mayor",
     "titulo": "Osa Mayor",
     "resumen": "Descubre un grupo de estrellas que sirve como referencia al observar el cielo.",
+    "historia": "Una historia de la tradición griega relaciona a la Osa Mayor con Calisto, transformada en una osa y situada en el cielo. Es una de muchas maneras de interpretar estas estrellas. Otras personas han visto en parte de la figura un carro o un cucharón. Esos dibujos compartidos permiten recordar las estrellas y pasar historias de una generación a otra. Este relato es una adaptación de muestra.",
+    "comoReconocerla": "En una parte de esta constelación se distingue una figura de siete estrellas: cuatro parecen formar un recipiente y tres, un mango. Esa figura es solo una parte de la Osa Mayor. Observa el esquema para reconocer su silueta; no indica su posición actual en el cielo.",
     "demostracion": true,
     "libros": [],
     "multimedia": []
@@ -19,6 +23,8 @@
     "id": "escorpio",
     "titulo": "Escorpio",
     "resumen": "Explora la silueta de esta constelación y aprende a reconocer sus estrellas más llamativas.",
+    "historia": "Algunos relatos de la tradición griega cuentan que un escorpión se enfrentó a Orión. Quienes narraban la historia imaginaron a ambos entre las estrellas y convirtieron sus figuras en una forma de recordar el cielo. El arco de estrellas de Escorpio recuerda una cola curvada. Esta adaptación breve es contenido de muestra y no representa todas las tradiciones que han interpretado la constelación.",
+    "comoReconocerla": "Imagina una línea larga que termina en una curva, como la cola de un escorpión. Una de sus estrellas más conocidas es Antares. El esquema representa la figura de manera simplificada y no permite saber si está visible desde tu ubicación.",
     "demostracion": true,
     "libros": [],
     "multimedia": []

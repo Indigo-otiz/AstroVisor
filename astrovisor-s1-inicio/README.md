@@ -1,4 +1,4 @@
-# AstroVisor — Base técnica Sprint 1
+# AstroVisor — Base S1 e interfaz pública S2
 
 Prototipo académico de **AstroVisor: Historias del cielo**, orientado prioritariamente a adultos mayores. El contenido todavía es demostrativo hasta recibir y validar el material de la biblioteca.
 
@@ -28,6 +28,29 @@ npm run dev:web
 Abrir **http://localhost:5173**. La API escuchará en **http://localhost:3001/api/health**.
 
 Rutas: `/` inicio; `/explorar` contenido JSON de demostración; `/visor` marcador Homido; `/admin/acceso` puerta administrativa; `/admin` redirige a puerta de acceso. Ninguna acción administrativa está habilitada todavía.
+
+## Interfaz pública Sprint 2
+
+Luis: constelaciones e historias del cielo para visitantes, prioritariamente personas adultas mayores. `/explorar` muestra Orión, Osa Mayor y Escorpio; `/explorar/:id` permite leer la historia y reconocer su figura. Los datos se consultan desde la API documental, con carga, error/reintento, lista vacía y constelación no encontrada. Los textos y los esquemas son demostrativos.
+
+Para ejecutar solo en esta computadora, iniciar la API y la web con estos comandos desde la raíz de este proyecto (en dos terminales):
+
+```bash
+node --input-type=module -e "process.env.NODE_ENV='test'; const { app } = await import('./backend/src/index.js'); app.listen(3001, '127.0.0.1');"
+npm run dev --workspace frontend -- --host 127.0.0.1 --port 5173 --strictPort
+```
+
+Abrir http://127.0.0.1:5173/. La variable `NODE_ENV=test` evita el arranque automático del módulo de la API para enlazarla explícitamente a localhost; no simula sus respuestas.
+
+Verificación técnica:
+
+```bash
+npm test
+npm run test:web
+npm run build
+```
+
+`test:web` ejecuta las pruebas de consumo de la API con el runner de Node: contrato real, HTTP/red/JSON fallidos, campos inválidos, lista vacía y recuperación. Las condiciones de fallo de esas pruebas son simuladas. Ver [registro de pruebas S2](docs/PRUEBA-S2.md) para la revisión en navegador, capturas y revisión cruzada pendiente.
 
 ## Alcance de Sprint 1
 - Proyecto Vue/Vite/Router y Express, instalable y documentado.
