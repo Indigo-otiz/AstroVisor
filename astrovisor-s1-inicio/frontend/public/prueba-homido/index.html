@@ -6,7 +6,7 @@
   <meta name="theme-color" content="#142033" />
   <title>Prueba técnica Homido — AstroVisor</title>
   <link rel="stylesheet" href="./styles.css" />
-  <!-- Versión fija de A-Frame: el modo estereoscópico se construye aparte. -->
+  <!-- Versión fija de A-Frame -->
   <script src="https://aframe.io/releases/1.8.0/aframe.min.js"></script>
   <script defer src="./prueba.js"></script>
 </head>
@@ -19,14 +19,14 @@
   </header>
   <main id="main">
     <h1>Prueba técnica de visor Homido</h1>
-    <p class="lead">Selección por mirada accesible con retícula de permanencia de 3 segundos (sin prisa), confirmación visual y alternativa de regreso a modo 2D.</p>
+    <p class="lead">Selección por mirada con retroalimentación accesible. Al enfocar el punto fijo, su anillo exterior amarillo (#F5B301) se va llenando en 3 segundos sin prisa hasta confirmar la selección.</p>
     <div class="notice" role="note">
-      <strong>Prueba con precaución.</strong> Si aparece mareo, incomodidad o fatiga visual, retira el visor o pulsa el botón de Pausa. Siéntate y mantén el entorno despejado.
+      <strong>Prueba con precaución.</strong> Si aparece mareo o cansancio visual, retira el visor o pulsa el botón de Pausa. Siéntate y mantén el entorno despejado.
     </div>
 
     <section aria-labelledby="control-title" class="controls-panel">
       <h2 id="control-title">Controles de la prueba</h2>
-      <p>Primero abre esta página en el teléfono mediante HTTPS. Autoriza los sensores si el navegador lo solicita; después prueba el modo 2D y, por último, la vista dividida.</p>
+      <p>Abre esta página en el teléfono mediante HTTPS para activar sensores. También puedes probar en la computadora arrastrando con el mouse.</p>
       <div class="actions">
         <button id="permissionButton" type="button">Solicitar sensores</button>
         <button id="stereoButton" type="button" disabled>Probar vista dividida</button>
@@ -34,33 +34,37 @@
         <button id="exitButton" class="secondary" type="button" hidden>Salir de vista dividida</button>
         <a class="button secondary" href="/explorar">Regresar al modo web 2D</a>
       </div>
-      <p class="status" id="orientationStatus" role="status" aria-live="polite">Sensores: aún no comprobados.</p>
-      <p class="status" id="stereoStatus" role="status" aria-live="polite">Vista estereoscópica: no iniciada.</p>
-      <p class="status" id="selectionStatus" role="status" aria-live="polite">Selección: apunta al círculo central y mantén la mirada durante 3 segundos. El anillo amarillo se irá llenando de 0 % a 100 %.</p>
+      <p class="status" id="orientationStatus" role="status" aria-live="polite">Sensores: listos para comprobar.</p>
+      <p class="status" id="stereoStatus" role="status" aria-live="polite">Vista estereoscópica: modo 2D activo.</p>
+      <p class="status" id="selectionStatus" role="status" aria-live="polite">Selección: apunta al círculo fijo central durante 3 segundos. Su anillo amarillo se llenará de 0 % a 100 %.</p>
       <p class="small" id="angles">Ángulos de orientación: sin datos.</p>
     </section>
 
     <section aria-labelledby="scene-title">
       <h2 id="scene-title">Escena de demostración</h2>
-      <p class="scene-help">En computadora: arrastra la vista con el mouse para centrar la mirilla. En teléfono: mueve suavemente el dispositivo o desliza el dedo. Centra la retícula sobre el círculo naranja y mantén la vista durante 3 segundos sin tocar la pantalla.</p>
+      <p class="scene-help">En computadora: arrastra con el mouse para centrar la mirilla sobre el punto. En teléfono: mueve suavemente el dispositivo o desliza el dedo. Mantén la vista fija en el punto naranja y observa cómo carga su anillo amarillo.</p>
       <div class="scene-host" id="sceneHost">
         <a-scene id="testScene" embedded vr-mode-ui="enabled: false" renderer="antialias: true; colorManagement: true;">
           <a-sky color="#071426"></a-sky>
           <a-entity light="type: ambient; intensity: 1.2"></a-entity>
           
-          <!-- Punto de objetivo central (posición original S1) -->
-          <a-sphere class="selectable" id="target" position="0 1.6 -4" radius="0.42" color="#e59b3d" material="shader: flat"></a-sphere>
-          <a-ring position="0 1.6 -4.02" radius-inner="0.55" radius-outer="0.57" color="#f5e4c0" material="shader: flat; side: double"></a-ring>
+          <!-- Punto fijo interactivo con aro de carga progresiva amarilla -->
+          <a-entity id="targetContainer" position="0 1.6 -4">
+            <!-- Esfera / punto fijo central -->
+            <a-sphere class="selectable" id="target" radius="0.42" color="#e59b3d" material="shader: flat"></a-sphere>
+            <!-- Aro base neutro de fondo -->
+            <a-ring id="targetBaseRing" position="0 0 -0.02" radius-inner="0.52" radius-outer="0.68" color="#FFF4CF" material="shader: flat; side: double; opacity: 0.35"></a-ring>
+            <!-- Aro de carga amarilla (#F5B301) que se llena de 0° a 360° sobre el punto fijo -->
+            <a-ring id="targetProgressRing" position="0 0 0.02" radius-inner="0.50" radius-outer="0.70" theta-start="90" theta-length="0.01" color="#F5B301" material="shader: flat; side: double; opacity: 0.95"></a-ring>
+          </a-entity>
 
-          <!-- Cámara con mirilla central y anillo de progreso de 3 segundos (#F5B301) -->
+          <!-- Cámara con mirilla central (retícula ligera y visible) -->
           <a-entity id="cameraRig" camera="active: true" look-controls="magicWindowTrackingEnabled: true; touchEnabled: true; mouseEnabled: true" position="0 1.6 0">
             <a-entity id="reticleGroup" position="0 0 -1.2">
-              <!-- Halo de contraste oscuro universal -->
-              <a-ring radius-inner="0.016" radius-outer="0.034" color="#0B1530" material="shader: flat; side: double; opacity: 0.5"></a-ring>
-              <!-- Pista base tenue -->
-              <a-ring radius-inner="0.019" radius-outer="0.027" color="#ffffff" material="shader: flat; side: double; opacity: 0.3"></a-ring>
-              <!-- Anillo de progreso amarillo acento #F5B301 (se llena de 0° a 360° en 3 segundos) -->
-              <a-ring id="progressRing" radius-inner="0.018" radius-outer="0.028" theta-start="90" theta-length="0.01" color="#F5B301" material="shader: flat; side: double; opacity: 0.95"></a-ring>
+              <!-- Halo oscuro exterior para contraste universal -->
+              <a-ring radius-inner="0.016" radius-outer="0.026" color="#0B1530" material="shader: flat; side: double; opacity: 0.55"></a-ring>
+              <!-- Aro mirilla blanco -->
+              <a-ring id="reticleRing" radius-inner="0.018" radius-outer="0.024" color="#ffffff" material="shader: flat; side: double; opacity: 0.85"></a-ring>
               <!-- Mirilla central: núcleo blanco -->
               <a-circle id="centerDot" radius="0.005" color="#ffffff" material="shader: flat"></a-circle>
               <!-- Raycaster de detección de mirada -->

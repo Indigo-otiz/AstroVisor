@@ -1,4 +1,7 @@
-/* AstroVisor — Sprint 2: Selección por mirada y retroalimentación accesible (Karime) */
+/* AstroVisor — Sprint 2: Selección por mirada accesible (Karime)
+   El punto fijo objetivo muestra su anillo de carga amarillo (#F5B301)
+   llenándose de 0 % a 100 % en 3 segundos sin prisa al sostener la mirada.
+*/
 (function () {
   'use strict';
   const $ = (id) => document.getElementById(id);
@@ -14,10 +17,9 @@
   };
 
   const browserInfo = `${navigator.userAgent}`;
-  eventLine(`Prueba iniciada | Sprint 2: Selección por mirada (Karime) | ${new Date().toISOString()}`);
+  eventLine(`Prueba iniciada | S2: Punto fijo con carga de permanencia amarilla | ${new Date().toISOString()}`);
   eventLine(`Navegador: ${browserInfo}`);
   eventLine(`Contexto seguro: ${window.isSecureContext ? 'sí' : 'no'}`);
-  eventLine(`Modo de entrada: ${'ontouchstart' in window ? 'pantalla táctil disponible' : 'mouse/teclado'}`);
 
   const permissionButton = $('permissionButton');
   const stereoButton = $('stereoButton');
@@ -30,7 +32,8 @@
   const selectionStatus = $('selectionStatus');
   const angles = $('angles');
   const target = $('target');
-  const progressRing = $('progressRing');
+  const targetProgressRing = $('targetProgressRing');
+  const reticleRing = $('reticleRing');
   const centerDot = $('centerDot');
 
   let orientationEvents = 0;
@@ -58,8 +61,8 @@
       const gain = ctx.createGain();
 
       osc.type = 'sine';
-      osc.frequency.setValueAtTime(587.33, ctx.currentTime); // Re 5
-      osc.frequency.exponentialRampToValueAtTime(880, ctx.currentTime + 0.16); // La 5
+      osc.frequency.setValueAtTime(587.33, ctx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(880, ctx.currentTime + 0.16);
 
       gain.gain.setValueAtTime(0.12, ctx.currentTime);
       gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.28);
@@ -68,18 +71,16 @@
       gain.connect(ctx.destination);
       osc.start();
       osc.stop(ctx.currentTime + 0.3);
-    } catch (_) {
-      // Audio no admitido sin interacción previa
-    }
+    } catch (_) {}
   }
 
-  // Actualización geométrica del anillo en A-Frame (de 0° a -360° en sentido horario)
-  function setRingProgress(progress, color = '#F5B301') {
-    if (!progressRing) return;
+  // Actualiza el anillo de carga amarillo (#F5B301) sobre el punto fijo objetivo
+  function setTargetRingProgress(progress, ringColor = '#F5B301') {
+    if (!targetProgressRing) return;
     const p = Math.max(0.001, Math.min(1.0, progress));
-    const angle = -(p * 360);
-    progressRing.setAttribute('geometry', `primitive: ring; radiusInner: 0.018; radiusOuter: 0.028; thetaStart: 90; thetaLength: ${angle}`);
-    progressRing.setAttribute('material', `color: ${color}; shader: flat; side: double; opacity: 0.95`);
+    const angle = -(p * 360); // sentido horario desde arriba (thetaStart=90)
+    targetProgressRing.setAttribute('geometry', `primitive: ring; radiusInner: 0.50; radiusOuter: 0.70; thetaStart: 90; thetaLength: ${angle}`);
+    targetProgressRing.setAttribute('material', `color: ${ringColor}; shader: flat; side: double; opacity: 0.95`);
   }
 
   function startGaze() {
@@ -87,9 +88,12 @@
     isTargetHovered = true;
     gazeStartTime = performance.now();
     currentStage = '0%';
-    setRingProgress(0.01, '#F5B301');
-    if (centerDot) centerDot.setAttribute('material', 'color: #ffffff');
-    eventLine('Mirada enfocada en el objetivo — iniciando temporizador de 3.0 s');
+    setTargetRingProgress(0.01, '#F5B301');
+    target.setAttribute('color', '#F5B301'); // Ilumina el punto fijo en amarillo indicando inicio de carga
+    if (reticleRing) reticleRing.setAttribute('material', 'color: #F5B301');
+    if (centerDot) centerDot.setAttribute('material', 'color: #F5B301');
+
+    eventLine('Mirada fija sobre el punto — iniciando carga de anillo amarillo (3.0 s)');
 
     function tick() {
       if (!isTargetHovered || isPaused) return;
@@ -104,11 +108,11 @@
 
       if (stage !== currentStage) {
         currentStage = stage;
-        eventLine(`Progreso de mirada: ${stage} (${Math.round(elapsed)} ms)`);
+        eventLine(`Carga del punto fijo: ${stage} (${Math.round(elapsed)} ms)`);
       }
 
-      setRingProgress(progress, '#F5B301');
-      selectionStatus.textContent = `Enfocando objetivo: etapa ${stage} (${Math.round(progress * 100)} %)...`;
+      setTargetRingProgress(progress, '#F5B301');
+      selectionStatus.textContent = `Cargando punto fijo: ${stage} (${Math.round(progress * 100)} %)...`;
 
       if (progress >= 1.0) {
         completeGazeSelection();
@@ -128,10 +132,12 @@
       gazeRaf = null;
     }
     const elapsed = gazeStartTime ? Math.round(performance.now() - gazeStartTime) : 0;
-    eventLine(`Mirada retirada a los ${elapsed} ms — reinicio suave a 0 %`);
-    selectionStatus.textContent = 'Mirada retirada antes de completar los 3 s. Retícula en 0 %.';
+    eventLine(`Mirada retirada a los ${elapsed} ms — carga cancelada, punto en 0 %`);
+    selectionStatus.textContent = 'Mirada retirada. El anillo amarillo de carga se reinició a 0 %.';
     currentStage = '0%';
-    setRingProgress(0.01, '#F5B301');
+    setTargetRingProgress(0.01, '#F5B301');
+    target.setAttribute('color', selectionCount % 2 ? '#62bda1' : '#e59b3d');
+    if (reticleRing) reticleRing.setAttribute('material', 'color: #ffffff');
     if (centerDot) centerDot.setAttribute('material', 'color: #ffffff');
   }
 
@@ -141,39 +147,39 @@
     isTargetHovered = false;
 
     selectionCount++;
-    // Confirmación visual en verde de éxito (#1E7B3A)
-    setRingProgress(1.0, '#1E7B3A');
+    // Confirmación visual en verde de éxito (#1E7B3A y #62bda1)
+    setTargetRingProgress(1.0, '#1E7B3A');
+    const confirmedColor = selectionCount % 2 ? '#62bda1' : '#4bb392';
+    target.setAttribute('color', confirmedColor);
+    if (reticleRing) reticleRing.setAttribute('material', 'color: #1E7B3A');
     if (centerDot) centerDot.setAttribute('material', 'color: #1E7B3A');
 
-    // Cambiar color del objetivo (verde menta #62bda1 alternando con naranja #e59b3d)
-    const nextColor = selectionCount % 2 ? '#62bda1' : '#e59b3d';
-    target.setAttribute('color', nextColor);
-
     playConfirmationSound();
-    selectionStatus.textContent = `✓ Selección #${selectionCount} confirmada por mirada (3.0 s continuos).`;
-    eventLine(`✓ Selección #${selectionCount} COMPLETADA al 100% por permanencia (3000 ms).`);
+    selectionStatus.textContent = `✓ Selección #${selectionCount} COMPLETADA: el punto fijo cargó al 100% por permanencia de 3 s.`;
+    eventLine(`✓ Selección #${selectionCount} COMPLETADA: anillo lleno y confirmado a los 3000 ms.`);
 
-    // Regresar la mirilla a reposo suavemente tras mostrar confirmación
+    // Reinicia el anillo de carga tras 500 ms de confirmación para permitir nueva selección
     setTimeout(() => {
-      setRingProgress(0.01, '#F5B301');
+      setTargetRingProgress(0.01, '#F5B301');
+      if (reticleRing) reticleRing.setAttribute('material', 'color: #ffffff');
       if (centerDot) centerDot.setAttribute('material', 'color: #ffffff');
-    }, 450);
+    }, 550);
   }
 
-  // Eventos sobre el objetivo central
+  // Eventos sobre el punto objetivo
   target.addEventListener('mouseenter', startGaze);
   target.addEventListener('mouseleave', cancelGaze);
 
-  // Soporte directo con clic/toque (accesibilidad 2D sin visor)
+  // Soporte directo por clic o toque en el punto (accesibilidad en pantalla 2D)
   target.addEventListener('click', () => {
     selectionCount++;
     target.setAttribute('color', selectionCount % 2 ? '#62bda1' : '#e59b3d');
     playConfirmationSound();
-    selectionStatus.textContent = `Selección #${selectionCount} activada por clic/toque directo.`;
-    eventLine(`Selección #${selectionCount} activada por entrada táctil o mouse.`);
+    selectionStatus.textContent = `Selección #${selectionCount} activada por clic/toque en el punto.`;
+    eventLine(`Selección #${selectionCount} por interacción táctil/ratón.`);
   });
 
-  // Botón Pausa de la mirilla
+  // Botón Pausar mirilla
   if (pauseButton) {
     pauseButton.addEventListener('click', () => {
       isPaused = !isPaused;
@@ -183,48 +189,43 @@
         pauseButton.style.background = '#e59b3d';
         pauseButton.style.color = '#fff';
         selectionStatus.textContent = 'Mirilla en PAUSA: permanencia desactivada para descanso visual.';
-        eventLine('Mirilla pausada por el usuario.');
+        eventLine('Mirilla pausada.');
       } else {
         pauseButton.textContent = 'Pausar mirilla';
         pauseButton.style.background = '';
         pauseButton.style.color = '';
-        selectionStatus.textContent = 'Mirilla reanudada: apunta al círculo durante 3 s para seleccionarlo.';
+        selectionStatus.textContent = 'Mirilla activa: enfoca el punto durante 3 s para que cargue su anillo amarillo.';
         eventLine('Mirilla reanudada.');
       }
     });
   }
 
-  // Sensores de orientación física
+  // Sensores de orientación física (móvil)
   const listenOrientation = (event) => {
     if ([event.alpha, event.beta, event.gamma].every((v) => v == null)) return;
     orientationEvents++;
     const now = Date.now();
     if (now - lastUpdate > 400) {
       lastUpdate = now;
-      const fmt = (v) => (typeof v === 'number' ? v.toFixed(1) + '°' : 'no disponible');
+      const fmt = (v) => (typeof v === 'number' ? v.toFixed(1) + '°' : 'N/D');
       angles.textContent = `Orientación recibida: α ${fmt(event.alpha)} · β ${fmt(event.beta)} · γ ${fmt(event.gamma)}`;
-      status.textContent = `Sensores: recibidos ${orientationEvents} eventos de orientación.`;
+      status.textContent = `Sensores: recibidos ${orientationEvents} eventos. Mueve el teléfono para orientar.`;
     }
     if (orientationEvents === 1) eventLine('Se recibió el primer evento de orientación con datos.');
     if (lastSample && orientationEvents > 2 && Math.abs((event.beta ?? 0) - (lastSample.beta ?? 0)) > 8) {
       if (!window.__astroOrientationVariationLogged) {
         window.__astroOrientationVariationLogged = true;
-        eventLine('Se detectó variación de ángulo beta durante la sesión.');
+        eventLine('Variación de ángulo detectada.');
       }
     }
     lastSample = { beta: event.beta };
   };
   window.addEventListener('deviceorientation', listenOrientation);
 
-  if (!window.isSecureContext) {
-    status.textContent = 'Sensores: la página no está en HTTPS. El navegador móvil podría bloquearlos.';
-    eventLine('ADVERTENCIA: contexto no seguro; usar HTTPS para sensores móviles.');
-  }
-
   permissionButton.addEventListener('click', () => {
     if (!window.DeviceOrientationEvent) {
-      status.textContent = 'Sensores: API DeviceOrientationEvent no disponible.';
-      eventLine('La API DeviceOrientationEvent no está disponible.');
+      status.textContent = 'Sensores: API no disponible.';
+      eventLine('DeviceOrientationEvent no disponible.');
       return;
     }
     if (typeof window.DeviceOrientationEvent.requestPermission === 'function') {
@@ -232,23 +233,22 @@
         .then((result) => {
           eventLine(`Permiso de orientación: ${result}`);
           status.textContent = result === 'granted'
-            ? 'Permiso concedido. Mueve el teléfono y observa si cambian los ángulos y la cámara.'
-            : 'Permiso denegado. Utiliza los controles táctiles o el modo web 2D.';
+            ? 'Permiso concedido. Mueve el teléfono para enfocar el punto.'
+            : 'Permiso denegado. Puedes usar la pantalla táctil o el mouse.';
         })
         .catch((error) => {
-          status.textContent = 'No se pudo solicitar el permiso. Prueba HTTPS y revisa la configuración del navegador.';
-          eventLine(`Error al solicitar permiso: ${error.name || 'Error'} — ${error.message || ''}`);
+          status.textContent = 'Error al pedir permiso. Revisa la configuración del navegador.';
+          eventLine(`Error de permiso: ${error.message || ''}`);
         });
     } else {
-      status.textContent = 'Este navegador no requiere solicitud de permiso; mueve el teléfono para orientar.';
-      eventLine('No existe requestPermission; esperando eventos de orientación directos.');
+      status.textContent = 'Este navegador no requiere solicitud previa; mueve el teléfono para orientar.';
+      eventLine('Esperando eventos de orientación directos.');
     }
   });
 
   // A-Frame Estereoscópico
   if (!window.AFRAME) {
-    stereoStatus.textContent = 'A-Frame no pudo cargarse. Revisa la conexión a Internet.';
-    eventLine('ERROR: no se pudo cargar A-Frame 1.8.0.');
+    stereoStatus.textContent = 'A-Frame no pudo cargarse.';
     return;
   }
 
@@ -288,10 +288,9 @@
   function onSceneReady() {
     if (!stereoComponent) stereoComponent = scene.components['experimental-stereo'];
     stereoButton.disabled = !stereoComponent;
-    eventLine('Escena A-Frame cargada.');
     stereoStatus.textContent = stereoComponent
-      ? 'Escena cargada. La vista dividida puede probarse por separado.'
-      : 'Escena cargada, pero el componente estereoscópico no se inició.';
+      ? 'Escena lista. Compatible con 2D y vista dividida Homido.'
+      : 'Escena cargada sin componente estéreo.';
   }
   if (scene.hasLoaded) onSceneReady();
   else scene.addEventListener('loaded', onSceneReady, { once: true });
@@ -304,8 +303,8 @@
     document.body.classList.remove('stereo-mode');
     exitButton.hidden = true;
     stereoButton.disabled = false;
-    stereoStatus.textContent = 'Vista dividida desactivada. Continúa en modo 2D.';
-    eventLine('Vista dividida finalizada.');
+    stereoStatus.textContent = 'Vista dividida desactivada. Continuando en modo 2D.';
+    eventLine('Vista dividida desactivada.');
     window.dispatchEvent(new Event('resize'));
   }
 
