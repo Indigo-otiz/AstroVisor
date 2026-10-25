@@ -54,8 +54,8 @@
             <a-sphere class="selectable" id="target" radius="0.42" color="#e59b3d" material="shader: flat"></a-sphere>
             <!-- Aro base neutro de fondo -->
             <a-ring id="targetBaseRing" position="0 0 -0.02" radius-inner="0.52" radius-outer="0.68" color="#FFF4CF" material="shader: flat; side: double; opacity: 0.35"></a-ring>
-            <!-- Aro de carga amarilla (#F5B301) que se llena de 0° a 360° sobre el punto fijo -->
-            <a-ring id="targetProgressRing" position="0 0 0.02" radius-inner="0.50" radius-outer="0.70" theta-start="90" theta-length="0.01" color="#F5B301" material="shader: flat; side: double; opacity: 0.95"></a-ring>
+            <!-- Aro de carga amarilla (#F5B301) que se llena de 0° a 360° sobre el punto fijo (oculto en reposo) -->
+            <a-ring id="targetProgressRing" visible="false" position="0 0 0.02" radius-inner="0.50" radius-outer="0.70" theta-start="90" theta-length="0.001" color="#F5B301" material="shader: flat; side: double; opacity: 0.95"></a-ring>
           </a-entity>
 
           <!-- Cámara con mirilla central (retícula ligera y visible) -->

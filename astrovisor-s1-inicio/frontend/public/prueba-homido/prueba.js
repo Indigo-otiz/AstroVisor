@@ -77,7 +77,13 @@
   // Actualiza el anillo de carga amarillo (#F5B301) sobre el punto fijo objetivo
   function setTargetRingProgress(progress, ringColor = '#F5B301') {
     if (!targetProgressRing) return;
-    const p = Math.max(0.001, Math.min(1.0, progress));
+    if (progress <= 0) {
+      targetProgressRing.setAttribute('visible', 'false');
+      targetProgressRing.setAttribute('geometry', 'primitive: ring; radiusInner: 0.50; radiusOuter: 0.70; thetaStart: 90; thetaLength: 0.001');
+      return;
+    }
+    targetProgressRing.setAttribute('visible', 'true');
+    const p = Math.min(1.0, Math.max(0.002, progress));
     const angle = -(p * 360); // sentido horario desde arriba (thetaStart=90)
     targetProgressRing.setAttribute('geometry', `primitive: ring; radiusInner: 0.50; radiusOuter: 0.70; thetaStart: 90; thetaLength: ${angle}`);
     targetProgressRing.setAttribute('material', `color: ${ringColor}; shader: flat; side: double; opacity: 0.95`);
@@ -88,7 +94,7 @@
     isTargetHovered = true;
     gazeStartTime = performance.now();
     currentStage = '0%';
-    setTargetRingProgress(0.01, '#F5B301');
+    setTargetRingProgress(0.002, '#F5B301');
     target.setAttribute('color', '#F5B301'); // Ilumina el punto fijo en amarillo indicando inicio de carga
     if (reticleRing) reticleRing.setAttribute('material', 'color: #F5B301');
     if (centerDot) centerDot.setAttribute('material', 'color: #F5B301');
@@ -135,7 +141,7 @@
     eventLine(`Mirada retirada a los ${elapsed} ms — carga cancelada, punto en 0 %`);
     selectionStatus.textContent = 'Mirada retirada. El anillo amarillo de carga se reinició a 0 %.';
     currentStage = '0%';
-    setTargetRingProgress(0.01, '#F5B301');
+    setTargetRingProgress(0, '#F5B301'); // Oculta completamente el anillo
     target.setAttribute('color', selectionCount % 2 ? '#62bda1' : '#e59b3d');
     if (reticleRing) reticleRing.setAttribute('material', 'color: #ffffff');
     if (centerDot) centerDot.setAttribute('material', 'color: #ffffff');
@@ -158,9 +164,9 @@
     selectionStatus.textContent = `✓ Selección #${selectionCount} COMPLETADA: el punto fijo cargó al 100% por permanencia de 3 s.`;
     eventLine(`✓ Selección #${selectionCount} COMPLETADA: anillo lleno y confirmado a los 3000 ms.`);
 
-    // Reinicia el anillo de carga tras 500 ms de confirmación para permitir nueva selección
+    // Oculta el anillo de carga tras 500 ms de confirmación para permitir nueva selección limpia
     setTimeout(() => {
-      setTargetRingProgress(0.01, '#F5B301');
+      setTargetRingProgress(0, '#F5B301');
       if (reticleRing) reticleRing.setAttribute('material', 'color: #ffffff');
       if (centerDot) centerDot.setAttribute('material', 'color: #ffffff');
     }, 550);
