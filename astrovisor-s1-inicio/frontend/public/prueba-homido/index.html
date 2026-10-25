@@ -3,10 +3,10 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="theme-color" content="#142033" />
-  <title>Prueba técnica Homido — AstroVisor</title>
+  <meta name="theme-color" content="#0B1530" />
+  <title>AstroVisor — Selección por mirada accesible (Homido S2)</title>
   <link rel="stylesheet" href="./styles.css" />
-  <!-- Versión fija de A-Frame: el modo estereoscópico se construye aparte. -->
+  <!-- Versión fija de A-Frame 1.8.0 -->
   <script src="https://aframe.io/releases/1.8.0/aframe.min.js"></script>
   <script defer src="./prueba.js"></script>
 </head>
@@ -14,57 +14,174 @@
   <header class="site-header">
     <div class="header-content">
       <a href="/visor" class="brand">AstroVisor</a>
-      <span>Experimento técnico de Sprint 1</span>
+      <span class="sprint-badge">S2 · Selección por mirada accesible · Karime</span>
     </div>
   </header>
-  <main id="main">
-    <h1>Prueba técnica de visor Homido</h1>
-    <p class="lead">Una escena mínima para comprobar sensores, seguimiento de la vista, retícula y presentación estereoscópica. No es la experiencia final de la biblioteca.</p>
-    <div class="notice" role="note"><strong>Prueba con precaución.</strong> Si aparece mareo, incomodidad o doble imagen, retira el visor y detén la prueba. Siéntate, mantén el entorno despejado y solicita ayuda si la necesitas.</div>
 
+  <!-- Selector de Marcos AstroVisor (Figma Make de Karime - Pág. 10 y 17) -->
+  <nav class="marcos-bar" aria-label="Selector de marcos de inspección">
+    <span class="bar-title">Marcos AstroVisor:</span>
+    <button type="button" id="marco0Btn" class="active">Visor: 0 %</button>
+    <button type="button" id="marco33Btn">Visor: 33 %</button>
+    <button type="button" id="marco66Btn">Visor: 66 %</button>
+    <button type="button" id="marco100Btn">Visor: 100 %</button>
+    <button type="button" id="marcoInfoBtn">Visor: Información</button>
+    <button type="button" id="marcoDynamicBtn">▶ Modo Interactivo (3 s)</button>
+  </nav>
+
+  <main id="main">
+    <h1>Visor Homido: Selección por mirada</h1>
+    <p class="lead">Experiencia inmersiva con retícula accesible, permanencia visual de 3 segundos sin prisa, confirmación inequívoca y retorno inmediato a modo web 2D.</p>
+
+    <div class="notice" role="note">
+      <strong>Recomendación de accesibilidad y bienestar:</strong> Sesiones cortas de 10 minutos. Si aparece mareo, incomodidad o fatiga visual, retira el visor o pulsa <em>Pausar</em> o <em>Salir a modo 2D</em>.
+    </div>
+
+    <!-- Panel de controles del entorno -->
     <section aria-labelledby="control-title" class="controls-panel">
-      <h2 id="control-title">Controles de la prueba</h2>
-      <p>Primero abre esta página en el teléfono mediante HTTPS. Autoriza los sensores si el navegador lo solicita; después prueba el modo 2D y, por último, la vista dividida.</p>
+      <h2 id="control-title">Controles de conexión y vista</h2>
+      <p>Prueba en teléfono con HTTPS para activar sensores de movimiento. Si no tienes visor ni sensores, puedes arrastrar la vista con el mouse o deslizar el dedo.</p>
+      
       <div class="actions">
         <button id="permissionButton" type="button">Solicitar sensores</button>
-        <button id="stereoButton" type="button" disabled>Probar vista dividida</button>
+        <button id="stereoButton" type="button" disabled>Probar vista dividida (Homido)</button>
         <button id="exitButton" class="secondary" type="button" hidden>Salir de vista dividida</button>
         <a class="button secondary" href="/explorar">Regresar al modo web 2D</a>
       </div>
-      <p class="status" id="orientationStatus" role="status" aria-live="polite">Sensores: aún no comprobados.</p>
-      <p class="status" id="stereoStatus" role="status" aria-live="polite">Vista estereoscópica: no iniciada.</p>
-      <p class="status" id="selectionStatus" role="status" aria-live="polite">Selección: apunta al círculo central y mantén la mirada durante 1.8 segundos.</p>
-      <p class="small" id="angles">Ángulos de orientación: sin datos.</p>
+
+      <p class="status" id="orientationStatus" role="status" aria-live="polite">Sensores: listos para comprobar.</p>
+      <p class="status" id="stereoStatus" role="status" aria-live="polite">Vista estereoscópica: modo 2D activo.</p>
+      <p class="status" id="selectionStatus" role="status" aria-live="polite">Selección: fija la mirilla sobre una constelación durante 3 segundos para elegirla.</p>
+      <p class="small" id="angles">Ángulos de orientación: α 0.0° · β 0.0° · γ 0.0°</p>
     </section>
 
-    <section aria-labelledby="scene-title">
-      <h2 id="scene-title">Escena de demostración</h2>
-      <p class="scene-help">En computadora: arrastra la vista con el mouse. En teléfono: mueve suavemente el dispositivo (si hay sensores disponibles), o desliza el dedo. Centra la retícula sobre el círculo naranja para seleccionarlo sin tocar la pantalla.</p>
+    <!-- Escena Inmersiva 3D con Retícula Accesible -->
+    <section class="scene-section" aria-labelledby="scene-title">
+      <h2 id="scene-title">Cielo nocturno interactivo</h2>
+      <p class="small">Centra la mirilla sobre los puntos de Orión, Osa Mayor o Cruz del Sur. El anillo amarillo se irá llenando de 0 % a 100 % en 3 segundos.</p>
+
       <div class="scene-host" id="sceneHost">
+        <!-- Capa HUD de Retícula de Mirada Accesible (Superpuesta y fija al centro de vista) -->
+        <div class="hud-overlay" id="hudOverlay" aria-hidden="true">
+          <div class="reticle-container" id="reticleContainer">
+            <svg class="reticle-svg" viewBox="0 0 72 72" width="72" height="72">
+              <!-- Halo oscuro exterior para contraste universal -->
+              <circle cx="36" cy="36" r="32" fill="none" stroke="#0B1530" stroke-width="5" opacity="0.75" />
+              <!-- Pista base neutra -->
+              <circle cx="36" cy="36" r="28" fill="none" stroke="#FFFFFF" stroke-width="3" opacity="0.35" />
+              <!-- Anillo de progreso amarillo acento #F5B301 (Figma Karime) -->
+              <circle id="progressCircle" class="reticle-progress-ring" cx="36" cy="36" r="28" fill="none"
+                stroke="#F5B301" stroke-width="4.5" stroke-linecap="round"
+                stroke-dasharray="175.93" stroke-dashoffset="175.93"
+                transform="rotate(-90 36 36)" />
+              <!-- Anillo de confirmación al 100% -->
+              <circle id="confirmPulseRing" cx="36" cy="36" r="33" fill="none" stroke="#1E7B3A" stroke-width="3" opacity="0" />
+              <!-- Mirilla central: núcleo blanco con borde oscuro -->
+              <circle cx="36" cy="36" r="6" fill="#0B1530" />
+              <circle id="reticleDot" cx="36" cy="36" r="4.2" fill="#FFFFFF" />
+            </svg>
+            <span class="reticle-badge" id="reticleBadge">0 %</span>
+          </div>
+        </div>
+
+        <!-- Controles dentro del visor (Figma: 72 px de alto con borde blanco de 4 px) -->
+        <div class="scene-overlay-controls" id="sceneControls">
+          <button type="button" id="pauseVisorBtn" class="visor-ctrl-btn pause-btn" aria-label="Pausar o reanudar permanencia">
+            <span id="pauseIcon">⏸</span> <span id="pauseText">Pausa</span>
+          </button>
+          <a href="/explorar" class="visor-ctrl-btn exit-btn" aria-label="Salir a modo web 2D">
+            🚪 Salir al modo 2D
+          </a>
+        </div>
+
+        <!-- Panel Informativo de Constelación dentro del visor (Figma: Sección 6.8) -->
+        <div class="info-modal-backdrop" id="infoModal" hidden role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+          <article class="info-card">
+            <header class="info-card-header">
+              <span class="badge-muestra">Dato de muestra</span>
+            </header>
+            <h2 id="modalTitle">Orión</h2>
+            <p class="story-text" id="modalStory">
+              Orión parece una figura con dos hombros, dos pies y tres estrellas alineadas en el centro que forman su cinturón. Para encontrarla, busca primero esas tres estrellas juntas en el cielo nocturno.
+            </p>
+            <div class="book-recommendation">
+              <p class="prompt">Si te interesa saber más, tenemos este libro en la biblioteca:</p>
+              <div class="book-title" id="modalBook">Libro de muestra 1 — Guía visual de constelaciones</div>
+              <p class="book-shelf">Pídelo en persona en el mostrador de la biblioteca.</p>
+            </div>
+            <div class="info-card-actions">
+              <button type="button" id="closeInfoBtn" class="button selectable-action">Volver al recorrido</button>
+            </div>
+          </article>
+        </div>
+
+        <!-- Escena A-Frame -->
         <a-scene id="testScene" embedded vr-mode-ui="enabled: false" renderer="antialias: true; colorManagement: true;">
           <a-sky color="#071426"></a-sky>
-          <a-entity light="type: ambient; intensity: 1.2"></a-entity>
-          <a-sphere class="selectable" id="target" position="0 1.6 -4" radius="0.42" color="#e59b3d" material="shader: flat"></a-sphere>
-          <a-ring position="0 1.6 -4.02" radius-inner="0.55" radius-outer="0.57" color="#f5e4c0" material="shader: flat; side: double"></a-ring>
+          <a-entity light="type: ambient; intensity: 1.35"></a-entity>
+          <a-entity light="type: directional; position: 1 3 2; intensity: 0.6"></a-entity>
+
+          <!-- 1. Constelación de Orión (Figma: 7 estrellas, Betelgeuse amarillo #F5B301) -->
+          <a-entity id="constelacionOrion" position="0 1.6 -4">
+            <!-- Objetivo interactivo para selección por mirada -->
+            <a-sphere class="selectable" id="target-orion" data-target="orion" position="0 0 0" radius="0.45" color="#F5B301" material="shader: flat; opacity: 0.9"></a-sphere>
+            <a-ring position="0 0 -0.02" radius-inner="0.55" radius-outer="0.62" color="#FFF4CF" material="shader: flat; side: double; opacity: 0.85"></a-ring>
+            <a-text value="Orión" align="center" position="0 -0.85 0" color="#FFFFFF" width="4.5" background-color="#0B1530"></a-text>
+            <!-- Estrellas decorativas del cuerpo -->
+            <a-sphere position="-0.7 0.8 0" radius="0.09" color="#F5B301"></a-sphere> <!-- Betelgeuse -->
+            <a-sphere position="0.7 0.75 0" radius="0.08" color="#FFF4CF"></a-sphere>  <!-- Bellatrix -->
+            <a-sphere position="-0.6 -0.8 0" radius="0.08" color="#FFF4CF"></a-sphere> <!-- Saiph -->
+            <a-sphere position="0.65 -0.75 0" radius="0.09" color="#FFF4CF"></a-sphere> <!-- Rigel -->
+            <!-- Cinturón -->
+            <a-sphere position="-0.22 0 0" radius="0.06" color="#FFF4CF"></a-sphere>
+            <a-sphere position="0 0 0" radius="0.06" color="#FFF4CF"></a-sphere>
+            <a-sphere position="0.22 0 0" radius="0.06" color="#FFF4CF"></a-sphere>
+          </a-entity>
+
+          <!-- 2. Constelación de Osa Mayor -->
+          <a-entity id="constelacionOsaMayor" position="-3.4 2.1 -3.2" rotation="0 40 0">
+            <a-sphere class="selectable" id="target-osamayor" data-target="osamayor" position="0 0 0" radius="0.45" color="#F5B301" material="shader: flat; opacity: 0.9"></a-sphere>
+            <a-ring position="0 0 -0.02" radius-inner="0.55" radius-outer="0.62" color="#FFF4CF" material="shader: flat; side: double; opacity: 0.85"></a-ring>
+            <a-text value="Osa Mayor" align="center" position="0 -0.85 0" color="#FFFFFF" width="4.5" background-color="#0B1530"></a-text>
+            <!-- 7 estrellas de la cacerola -->
+            <a-sphere position="-0.7 0.4 0" radius="0.08" color="#FFF4CF"></a-sphere>
+            <a-sphere position="-0.2 0.5 0" radius="0.08" color="#FFF4CF"></a-sphere>
+            <a-sphere position="0.3 0.25 0" radius="0.08" color="#FFF4CF"></a-sphere>
+            <a-sphere position="0.75 0.5 0" radius="0.08" color="#FFF4CF"></a-sphere>
+          </a-entity>
+
+          <!-- 3. Constelación de Cruz del Sur -->
+          <a-entity id="constelacionCruz" position="3.4 1.1 -3.2" rotation="0 -40 0">
+            <a-sphere class="selectable" id="target-cruz" data-target="cruz" position="0 0 0" radius="0.45" color="#F5B301" material="shader: flat; opacity: 0.9"></a-sphere>
+            <a-ring position="0 0 -0.02" radius-inner="0.55" radius-outer="0.62" color="#FFF4CF" material="shader: flat; side: double; opacity: 0.85"></a-ring>
+            <a-text value="Cruz del Sur" align="center" position="0 -0.85 0" color="#FFFFFF" width="4.5" background-color="#0B1530"></a-text>
+            <!-- 5 estrellas en cruz -->
+            <a-sphere position="0 0.6 0" radius="0.08" color="#FFF4CF"></a-sphere>
+            <a-sphere position="0 -0.6 0" radius="0.09" color="#FFF4CF"></a-sphere>
+            <a-sphere position="-0.45 0.05 0" radius="0.08" color="#FFF4CF"></a-sphere>
+            <a-sphere position="0.45 0.05 0" radius="0.08" color="#FFF4CF"></a-sphere>
+            <a-sphere position="0.2 -0.2 0" radius="0.05" color="#FFF4CF"></a-sphere>
+          </a-entity>
+
+          <!-- Cámara con raycaster y look-controls -->
           <a-entity id="cameraRig" camera="active: true" look-controls="magicWindowTrackingEnabled: true; touchEnabled: true; mouseEnabled: true" position="0 1.6 0">
-            <a-entity id="gazeCursor" cursor="fuse: true; fuseTimeout: 1800; rayOrigin: entity" raycaster="objects: .selectable; far: 25" geometry="primitive: ring; radiusInner: 0.017; radiusOuter: 0.027" material="color: #ffffff; shader: flat; opacity: 0.95" position="0 0 -1.2"
-              animation__fusing="property: scale; startEvents: fusing; from: 1 1 1; to: 0.6 0.6 0.6; dur: 1800"
-              animation__reset="property: scale; startEvents: mouseleave, click; to: 1 1 1; dur: 160"></a-entity>
+            <!-- Raycaster central que detecta colisión con objetos .selectable -->
+            <a-entity id="gazeRaycaster" raycaster="objects: .selectable; far: 25; interval: 50" position="0 0 0"></a-entity>
           </a-entity>
         </a-scene>
       </div>
     </section>
 
+    <!-- Registro de auditoría local -->
     <section class="log-panel" aria-labelledby="log-title">
-      <h2 id="log-title">Registro de esta sesión</h2>
-      <p class="small">El registro es local y no se envía a ningún servidor. Copia los resultados antes de cerrar la página.</p>
+      <h2 id="log-title">Registro de auditoría local</h2>
+      <p class="small">Eventos registrados en esta sesión para trazabilidad y reporte de pruebas.</p>
       <div class="actions">
         <button id="copyButton" class="secondary" type="button">Copiar registro</button>
         <button id="clearButton" class="secondary" type="button">Limpiar registro</button>
       </div>
-      <pre id="log" aria-label="Registro de eventos de la prueba"></pre>
+      <pre id="log" aria-label="Registro de eventos"></pre>
     </section>
-    <p class="small">El modo estereoscópico es experimental: emplea dos cámaras virtuales y no asegura calibración óptica ni compatibilidad física con Homido. La orientación, la selección y la vista dividida se evalúan por separado.</p>
   </main>
 </body>
 </html>

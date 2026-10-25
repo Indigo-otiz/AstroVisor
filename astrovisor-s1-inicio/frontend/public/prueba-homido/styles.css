@@ -1,27 +1,540 @@
-:root { color-scheme: light; font-family: Arial, Helvetica, sans-serif; background: #f8f9fb; color: #172438; }
-* { box-sizing: border-box; }
-body { margin: 0; line-height: 1.55; }
-.site-header { background: #11213b; color: #fff; }
-.header-content { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 1rem; max-width: 1020px; margin: auto; padding: 1rem; }
-.brand { font-size: 1.35rem; font-weight: 700; color: #fff; text-decoration: none; }
-main { max-width: 1020px; padding: 1rem 1rem 3rem; margin: auto; }
-h1 { font-size: clamp(1.9rem,4vw,2.6rem); line-height: 1.15; }
-h2 { font-size: 1.3rem; margin-bottom: 0.5rem; }
-.lead { font-size: 1.1rem; }
-.notice { padding: 1rem; border: 1px solid #a7aab1; background: #fff; border-radius: 0.4rem; }
-.controls-panel, .log-panel { margin: 1.4rem 0; padding: 1rem; background: #fff; border: 1px solid #cfd7e0; border-radius: 0.4rem; }
-.actions { display: flex; gap: 0.65rem; flex-wrap: wrap; align-items: center; }
-button, .button { padding: 0.7rem 1rem; font-size: 1rem; font-weight: 600; cursor: pointer; color: #fff; background: #1a4077; border: 2px solid #1a4077; border-radius: 0.35rem; text-decoration: none; min-height: 44px; }
-button.secondary,.button.secondary { background: #fff; color: #1a4077; }
-button:disabled { cursor: not-allowed; opacity: 0.5; }
-button:focus-visible,.button:focus-visible { outline: 3px solid #df932b; outline-offset: 3px; }
-.status { margin: 0.6rem 0; }
-.small, .scene-help { font-size: 0.96rem; }
-.scene-host { height: min(60vh, 480px); min-height: 280px; position: relative; overflow: hidden; background: #071426; border-radius: 0.4rem; border: 2px solid #354760; }
-.scene-host a-scene { display: block; height: 100%; width: 100%; }
-.scene-host.stereo-active { position: fixed; inset: 0; width: 100vw; height: 100dvh; min-height: 0; max-height: none; border: 0; border-radius: 0; z-index: 900; }
-.scene-host.stereo-active a-scene { width:100%;height:100%; }
-#exitButton[hidden] { display: none; }
-body.stereo-mode #exitButton { display: block; position: fixed; top: 8px; right: 8px; z-index: 1000; font-size: .95rem; background: #fff; }
-#log { max-height: 270px; overflow: auto; white-space: pre-wrap; overflow-wrap: anywhere; background: #f6f7f9; color: #15243b; padding: 0.75rem; min-height: 80px; }
-@media (max-width: 650px) { main{padding:.85rem} .actions button,.actions .button{width:100%;text-align:center;} .scene-host{height:48vh;min-height:260px;} body.stereo-mode #exitButton{width:auto;} }
+/* AstroVisor — Sistema visual de Karime (Sprint 2)
+   Colores oficiales:
+   espacio: #0B1530 | fondo: #FAF7F0 | texto: #1B2430 | acento (progreso): #F5B301
+   homido: #4A3F99 | homido-dark: #3B327A | éxito: #1E7B3A | estrellas: #FFF4CF
+*/
+
+:root {
+  --color-espacio: #0B1530;
+  --color-espacio-2: #1B2A5A;
+  --color-fondo: #FAF7F0;
+  --color-tarjeta: #FFFFFF;
+  --color-texto: #1B2430;
+  --color-apoyo: #4A5565;
+  --color-acento: #F5B301;
+  --color-homido: #4A3F99;
+  --color-homido-dark: #3B327A;
+  --color-homido-light: #EEECFA;
+  --color-exito: #1E7B3A;
+  --color-borde: #C9CED6;
+  --color-borde-suave: #E3E6EB;
+  --color-estrella: #FFF4CF;
+  font-family: 'Atkinson Hyperlegible', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  color-scheme: light;
+  background-color: var(--color-fondo);
+  color: var(--color-texto);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  line-height: 1.55;
+  background: var(--color-fondo);
+  color: var(--color-texto);
+}
+
+/* Header */
+.site-header {
+  background: var(--color-espacio);
+  color: #fff;
+  border-bottom: 2px solid var(--color-acento);
+}
+
+.header-content {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  max-width: 1120px;
+  margin: auto;
+  padding: 0.85rem 1.25rem;
+}
+
+.brand {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #fff;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.brand::before {
+  content: '✦';
+  color: var(--color-acento);
+  font-size: 1.2rem;
+}
+
+.sprint-badge {
+  background: var(--color-homido);
+  color: #fff;
+  font-size: 0.88rem;
+  font-weight: 600;
+  padding: 0.25rem 0.75rem;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+}
+
+/* Barra de revisión rápida de marcos (Figma Make de Karime) */
+.marcos-bar {
+  background: #111e3b;
+  color: #fff;
+  padding: 0.6rem 1.25rem;
+  border-bottom: 1px solid #233760;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.6rem;
+  font-size: 0.9rem;
+}
+
+.marcos-bar .bar-title {
+  color: var(--color-acento);
+  font-weight: 700;
+  margin-right: 0.4rem;
+}
+
+.marcos-bar button {
+  background: #1a2f58;
+  color: #fff;
+  border: 1px solid #3d568c;
+  padding: 0.35rem 0.75rem;
+  border-radius: 8px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  min-height: 36px;
+  transition: all 0.15s ease;
+}
+
+.marcos-bar button:hover {
+  background: var(--color-homido);
+  border-color: var(--color-acento);
+}
+
+.marcos-bar button.active {
+  background: var(--color-acento);
+  color: #0B1530;
+  border-color: #fff;
+  font-weight: 800;
+}
+
+/* Contenido Principal */
+main {
+  max-width: 1120px;
+  padding: 1.5rem 1.25rem 3rem;
+  margin: auto;
+}
+
+h1 {
+  font-size: clamp(2rem, 3.5vw, 2.5rem);
+  color: var(--color-texto);
+  margin-top: 0.25rem;
+  margin-bottom: 0.5rem;
+}
+
+.lead {
+  font-size: 1.18rem;
+  color: var(--color-apoyo);
+  max-width: 820px;
+}
+
+/* Avisos accesibles */
+.notice {
+  padding: 1.2rem;
+  background: #fff;
+  border-left: 6px solid var(--color-homido);
+  border-radius: 12px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.05);
+  margin-bottom: 1.5rem;
+}
+
+.notice strong {
+  color: var(--color-homido-dark);
+}
+
+/* Panel de Controles y Estados */
+.controls-panel, .log-panel {
+  margin: 1.5rem 0;
+  padding: 1.4rem;
+  background: #fff;
+  border: 1px solid var(--color-borde-suave);
+  border-radius: 16px;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.04);
+}
+
+.actions {
+  display: flex;
+  gap: 0.85rem;
+  flex-wrap: wrap;
+  align-items: center;
+  margin: 1rem 0;
+}
+
+/* Botones principales */
+button, .button {
+  padding: 0.85rem 1.4rem;
+  font-size: 1.05rem;
+  font-weight: 700;
+  cursor: pointer;
+  color: #fff;
+  background: var(--color-homido);
+  border: 2px solid var(--color-homido);
+  border-radius: 14px;
+  text-decoration: none;
+  min-height: 52px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  transition: all 0.18s ease;
+}
+
+button:hover, .button:hover {
+  background: var(--color-homido-dark);
+  border-color: var(--color-homido-dark);
+}
+
+button.secondary, .button.secondary {
+  background: #fff;
+  color: var(--color-homido);
+  border-color: var(--color-borde);
+}
+
+button.secondary:hover, .button.secondary:hover {
+  background: var(--color-homido-light);
+  border-color: var(--color-homido);
+}
+
+button:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+
+button:focus-visible, .button:focus-visible {
+  outline: 3px solid var(--color-acento);
+  outline-offset: 3px;
+}
+
+/* Botones de control del visor (Figma: 72 px de alto con borde blanco de 4 px) */
+.visor-ctrl-btn {
+  min-height: 72px;
+  padding: 0.85rem 1.8rem;
+  font-size: 1.15rem;
+  font-weight: 800;
+  border: 4px solid #ffffff;
+  border-radius: 18px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+}
+
+.visor-ctrl-btn.pause-btn {
+  background: #2a3a5e;
+  color: #ffffff;
+}
+
+.visor-ctrl-btn.pause-btn:hover {
+  background: #3c4f7a;
+}
+
+.visor-ctrl-btn.exit-btn {
+  background: #8b2323;
+  color: #ffffff;
+}
+
+.visor-ctrl-btn.exit-btn:hover {
+  background: #a82e2e;
+}
+
+/* Escena y HUD */
+.scene-section {
+  margin: 2rem 0;
+}
+
+.scene-host {
+  height: min(65vh, 520px);
+  min-height: 340px;
+  position: relative;
+  overflow: hidden;
+  background: var(--color-espacio);
+  border-radius: 20px;
+  border: 3px solid #233760;
+  box-shadow: 0 8px 32px rgba(11, 21, 48, 0.28);
+}
+
+.scene-host a-scene {
+  display: block;
+  height: 100%;
+  width: 100%;
+}
+
+/* Capa HUD Central con Retícula de Mirada */
+.hud-overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+}
+
+.reticle-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.15s ease-out;
+}
+
+.reticle-svg {
+  display: block;
+  filter: drop-shadow(0 3px 10px rgba(0, 0, 0, 0.65));
+}
+
+.reticle-progress-ring {
+  transition: stroke-dashoffset 0.05s linear, stroke 0.2s ease;
+}
+
+.reticle-container.stage-active .reticle-svg {
+  transform: scale(1.08);
+}
+
+.reticle-container.stage-confirmed .reticle-svg {
+  animation: pop-confirm 0.4s ease-out;
+}
+
+@keyframes pop-confirm {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.28); }
+  100% { transform: scale(1); }
+}
+
+.reticle-badge {
+  margin-top: 6px;
+  background: rgba(11, 21, 48, 0.88);
+  color: var(--color-acento);
+  font-size: 0.9rem;
+  font-weight: 800;
+  padding: 3px 10px;
+  border-radius: 999px;
+  border: 1.5px solid var(--color-acento);
+  letter-spacing: 0.5px;
+}
+
+.reticle-container.is-paused .reticle-badge {
+  color: #ff9d9d;
+  border-color: #ff9d9d;
+}
+
+/* Controles dentro del visor flotantes */
+.scene-overlay-controls {
+  position: absolute;
+  bottom: 16px;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: center;
+  gap: 1.25rem;
+  z-index: 150;
+  pointer-events: auto;
+  padding: 0 1rem;
+}
+
+/* Panel Informativo de Constelación (Figma 6.8) */
+.info-modal-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(11, 21, 48, 0.85);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 200;
+  padding: 1.25rem;
+  backdrop-filter: blur(4px);
+}
+
+.info-card {
+  background: var(--color-tarjeta);
+  color: var(--color-texto);
+  border-radius: 20px;
+  padding: 1.8rem 2rem;
+  max-width: 680px;
+  width: 100%;
+  max-height: 90%;
+  overflow-y: auto;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
+  border: 2px solid var(--color-acento);
+  animation: slide-in 0.28s ease-out;
+}
+
+@keyframes slide-in {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.info-card-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 0.75rem;
+}
+
+.badge-muestra {
+  background: var(--color-homido-light);
+  color: var(--color-homido-dark);
+  font-size: 0.85rem;
+  font-weight: 700;
+  padding: 0.25rem 0.75rem;
+  border-radius: 8px;
+  border: 1px solid var(--color-homido);
+  display: inline-block;
+  margin-bottom: 0.4rem;
+}
+
+.info-card h2 {
+  font-size: 1.85rem;
+  margin: 0.2rem 0 0.5rem;
+  color: var(--color-espacio);
+}
+
+.info-card .story-text {
+  font-size: 1.2rem;
+  line-height: 1.6;
+  color: #2b3a4a;
+  margin-bottom: 1.2rem;
+}
+
+.book-recommendation {
+  background: var(--color-fondo);
+  border: 1.5px solid var(--color-borde);
+  border-radius: 14px;
+  padding: 1.2rem;
+  margin: 1.2rem 0;
+}
+
+.book-recommendation p.prompt {
+  font-size: 1rem;
+  color: var(--color-apoyo);
+  margin-top: 0;
+  margin-bottom: 0.5rem;
+}
+
+.book-recommendation .book-title {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: var(--color-homido-dark);
+  margin: 0.25rem 0;
+}
+
+.book-recommendation .book-shelf {
+  font-size: 0.95rem;
+  color: #1e7b3a;
+  font-weight: 600;
+  margin-bottom: 0;
+}
+
+.info-card-actions {
+  margin-top: 1.5rem;
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.85rem;
+}
+
+/* Modo Estéreo Pantalla Completa (Homido / Cardboard) */
+.scene-host.stereo-active {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100dvh;
+  min-height: 0;
+  max-height: none;
+  border: 0;
+  border-radius: 0;
+  z-index: 900;
+}
+
+body.stereo-mode {
+  overflow: hidden;
+}
+
+body.stereo-mode .hud-overlay {
+  display: flex;
+  justify-content: space-around;
+  padding: 0 10vw;
+}
+
+body.stereo-mode .info-modal-backdrop {
+  display: flex;
+  justify-content: space-around;
+  padding: 1rem;
+}
+
+body.stereo-mode .info-card {
+  max-width: 44vw;
+  font-size: 0.88rem;
+  padding: 1rem;
+}
+
+body.stereo-mode .info-card h2 {
+  font-size: 1.35rem;
+}
+
+body.stereo-mode .info-card .story-text {
+  font-size: 0.98rem;
+}
+
+#exitButton[hidden] {
+  display: none;
+}
+
+body.stereo-mode #exitButton {
+  display: inline-flex;
+  position: fixed;
+  top: 12px;
+  right: 12px;
+  z-index: 1000;
+  background: #ffffff;
+  color: var(--color-homido);
+  border: 2px solid var(--color-homido);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+}
+
+/* Registro local de eventos */
+#log {
+  max-height: 250px;
+  overflow: auto;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  background: #111a2e;
+  color: #c9d8ee;
+  padding: 1rem;
+  border-radius: 10px;
+  font-family: monospace;
+  font-size: 0.92rem;
+  border: 1px solid #233760;
+}
+
+/* Responsive */
+@media (max-width: 760px) {
+  .actions button, .actions .button {
+    width: 100%;
+    text-align: center;
+  }
+  .scene-overlay-controls {
+    flex-direction: column;
+    align-items: stretch;
+    bottom: 8px;
+    gap: 0.5rem;
+  }
+  .visor-ctrl-btn {
+    min-height: 56px;
+    padding: 0.6rem 1rem;
+    font-size: 1rem;
+  }
+}
