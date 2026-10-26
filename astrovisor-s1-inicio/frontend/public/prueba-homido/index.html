@@ -42,7 +42,7 @@
 
     <section aria-labelledby="scene-title">
       <h2 id="scene-title">Escena inmersiva 3D</h2>
-      <p class="scene-help">En computadora: arrastra con el mouse para centrar la mirilla sobre el punto. En teléfono: mueve el dispositivo para explorar. Mantén la vista fija en el punto naranja y observa cómo carga su anillo amarillo. También puedes mirar a los botones 3D de Pausa y Salir en las esquinas superiores del cielo.</p>
+      <p class="scene-help">En computadora: arrastra con el mouse para centrar la mirilla sobre el punto. En teléfono: mueve el dispositivo para explorar. Mantén la vista fija en el punto naranja y observa cómo carga su anillo amarillo. En las esquinas superiores del cielo verás los botones 3D de Pausa (izquierda) y Salir (derecha).</p>
       
       <div class="scene-host" id="sceneHost">
         <!-- Escena A-Frame 3D -->
@@ -55,22 +55,22 @@
           <a-sky color="#071426"></a-sky>
           <a-entity light="type: ambient; intensity: 1.2"></a-entity>
 
-          <!-- Botones 3D integrados DENTRO DE LA INMERSIÓN (Págs. 11-12 de Karime) -->
-          <a-entity id="hudControls3D" position="0 0 0">
-            <!-- Botón 3D: Pausa / Reanudar mirilla (operable por mirada durante 3 s o clic) -->
-            <a-plane id="pauseBtn3D" class="selectable" data-action="pause" position="-1.5 2.5 -3.6" width="1.15" height="0.42" color="#FFFFFF" material="shader: flat">
-              <a-plane id="pauseBtn3DInner" position="0 0 0.005" width="1.10" height="0.37" color="#1F4E8C" material="shader: flat"></a-plane>
+          <!-- Botones 3D integrados DENTRO DE LA INMERSIÓN EN LAS ESQUINAS SUPERIORES (Págs. 11-12 de Karime) -->
+          <a-entity id="hudControls3D">
+            <!-- Esquina superior izquierda 3D: Pausa / Reanudar mirilla (orientado hacia el usuario) -->
+            <a-plane id="pauseBtn3D" class="selectable" data-action="pause" position="-2.3 2.7 -3.0" rotation="20 37 0" width="1.20" height="0.46" color="#FFFFFF" material="shader: flat">
+              <a-plane id="pauseBtn3DInner" position="0 0 0.005" width="1.14" height="0.40" color="#1F4E8C" material="shader: flat"></a-plane>
               <a-ring position="0 0 0.01" radius-inner="0.08" radius-outer="0.12" color="#FFFFFF" material="shader: flat; side: double; opacity: 0.35"></a-ring>
               <a-ring id="pauseProgressRing" visible="false" position="0 0 0.02" radius-inner="0.08" radius-outer="0.12" theta-start="90" theta-length="0.001" color="#F5B301" material="shader: flat; side: double; opacity: 0.95"></a-ring>
-              <a-text id="pause3DText" value="||  Pausa" align="center" position="0 0 0.03" color="#FFFFFF" width="3.0"></a-text>
+              <a-text id="pause3DText" value="||  Pausa" align="center" position="0 0 0.03" color="#FFFFFF" width="3.2"></a-text>
             </a-plane>
 
-            <!-- Botón 3D: Salir a modo web 2D (operable por mirada durante 3 s o clic) -->
-            <a-plane id="exitBtn3D" class="selectable" data-action="exit" position="1.5 2.5 -3.6" width="1.15" height="0.42" color="#FFFFFF" material="shader: flat">
-              <a-plane id="exitBtn3DInner" position="0 0 0.005" width="1.10" height="0.37" color="#8B2020" material="shader: flat"></a-plane>
+            <!-- Esquina superior derecha 3D: Salir a modo web 2D (orientado hacia el usuario) -->
+            <a-plane id="exitBtn3D" class="selectable" data-action="exit" position="2.3 2.7 -3.0" rotation="20 -37 0" width="1.20" height="0.46" color="#FFFFFF" material="shader: flat">
+              <a-plane id="exitBtn3DInner" position="0 0 0.005" width="1.14" height="0.40" color="#8B2020" material="shader: flat"></a-plane>
               <a-ring position="0 0 0.01" radius-inner="0.08" radius-outer="0.12" color="#FFFFFF" material="shader: flat; side: double; opacity: 0.35"></a-ring>
               <a-ring id="exitProgressRing" visible="false" position="0 0 0.02" radius-inner="0.08" radius-outer="0.12" theta-start="90" theta-length="0.001" color="#F5B301" material="shader: flat; side: double; opacity: 0.95"></a-ring>
-              <a-text value="Salir" align="center" position="0 0 0.03" color="#FFFFFF" width="3.0"></a-text>
+              <a-text value="Salir" align="center" position="0 0 0.03" color="#FFFFFF" width="3.2"></a-text>
             </a-plane>
           </a-entity>
           
