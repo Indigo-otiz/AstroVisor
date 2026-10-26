@@ -34,6 +34,7 @@
   const stereoStatus = $('stereoStatus');
   const selectionStatus = $('selectionStatus');
   const angles = $('angles');
+  const gazeCursor = $('gazeCursor');
 
   // Elementos de la escena 3D
   const targetContainer = $('targetContainer');
@@ -282,13 +283,19 @@
   }
 
   function startGaze(el) {
-    if (!userReady || isPaused || activeTarget) return;
+    if (!userReady || isPaused) return;
+    if (activeTarget === el) return; // Ya enfocado
 
     const action = el.getAttribute('data-action') || 'target';
 
     // Reglas de estado: si la ficha está abierta, solo interactúa con return o audio
     if (isModalOpen && action === 'target') return;
     if (!isModalOpen && action !== 'target') return;
+
+    if (gazeRaf) {
+      cancelAnimationFrame(gazeRaf);
+      gazeRaf = null;
+    }
 
     activeTarget = el;
     if (action === 'target') {
@@ -377,24 +384,25 @@
       selectionStatus.textContent = `✔ Selección #${selectionCount} COMPLETADA: abriendo información de Orión en el visor 3D...`;
       eventLine(`✔ Selección #${selectionCount} completada: abriendo ficha 3D de Orión.`);
 
-      // Apertura inmediata en el espacio 3D (100 ms de confirmación visual)
+      activeTarget = null;
+      activeRing = null;
+
       setTimeout(() => {
         openConstellationInfo3D();
         setRingProgress(targetProgressRing, 0, '#F5B301', 0.50, 0.70);
         target.setAttribute('color', TARGET_BASE_COLOR);
-        activeTarget = null;
-        activeRing = null;
-      }, 120);
+      }, 100);
     } else if (action === 'return') {
       selectionStatus.textContent = '✔ Volviendo al cielo nocturno...';
       eventLine('✔ Cerrando ficha 3D y volviendo a las constelaciones.');
 
+      activeTarget = null;
+      activeRing = null;
+
       setTimeout(() => {
         closeConstellationInfo3D();
         setRingProgress(returnProgressRing, 0, '#F5B301', 0.10, 0.16);
-        activeTarget = null;
-        activeRing = null;
-      }, 120);
+      }, 100);
     } else if (action === 'audio') {
       audioNoticeActive = !audioNoticeActive;
       drawConstellationCard(audioNoticeActive);
@@ -408,7 +416,13 @@
     if (infoPanel3D) infoPanel3D.setAttribute('visible', 'true');
     if (targetContainer) targetContainer.setAttribute('visible', 'false');
     drawConstellationCard(audioNoticeActive);
-    selectionStatus.textContent = 'Ficha 3D de Orión abierta dentro de la escena. Enfoca "← Volver al recorrido" durante 3 s o tócalo para regresar.';
+
+    // Refrescar raycaster para que detecte de inmediato a returnBtn3D
+    if (gazeCursor && gazeCursor.components && gazeCursor.components.raycaster) {
+      gazeCursor.components.raycaster.refreshObjects();
+    }
+
+    selectionStatus.textContent = 'Ficha 3D abierta. Enfoca "← Volver al recorrido" durante 3 s o tócalo para regresar.';
     eventLine('Ficha accesible 3D de Orión abierta dentro de la escena.');
   }
 
@@ -417,33 +431,52 @@
     if (infoPanel3D) infoPanel3D.setAttribute('visible', 'false');
     if (targetContainer) targetContainer.setAttribute('visible', 'true');
     cancelGaze();
+
+    if (gazeCursor && gazeCursor.components && gazeCursor.components.raycaster) {
+      gazeCursor.components.raycaster.refreshObjects();
+    }
+
     selectionStatus.textContent = 'De vuelta en el cielo nocturno. Enfoca el punto de nuevo durante 3 s para abrir su información.';
     eventLine('Regresando a las constelaciones (Visor: 0 %).');
   }
 
+  function handleSelectableClick(el) {
+    userReady = true;
+    const action = el.getAttribute('data-action') || 'target';
+    if (action === 'target' && !isModalOpen) {
+      selectionCount++;
+      playConfirmationSound();
+      openConstellationInfo3D();
+    } else if (action === 'return' && isModalOpen) {
+      playConfirmationSound();
+      closeConstellationInfo3D();
+    } else if (action === 'audio' && isModalOpen) {
+      playConfirmationSound();
+      audioNoticeActive = !audioNoticeActive;
+      drawConstellationCard(audioNoticeActive);
+      eventLine('Botón Escuchar pulsado en la tarjeta 3D.');
+    }
+  }
+
   // Conectar eventos sobre todos los objetos seleccionables (.selectable)
-  const selectableEls = document.querySelectorAll('.selectable');
-  selectableEls.forEach((el) => {
-    el.addEventListener('mouseenter', () => startGaze(el));
-    el.addEventListener('mouseleave', cancelGaze);
-    el.addEventListener('click', () => {
-      userReady = true;
-      const action = el.getAttribute('data-action') || 'target';
-      if (action === 'target') {
-        selectionCount++;
-        playConfirmationSound();
-        openConstellationInfo3D();
-      } else if (action === 'return') {
-        playConfirmationSound();
-        closeConstellationInfo3D();
-      } else if (action === 'audio') {
-        playConfirmationSound();
-        audioNoticeActive = !audioNoticeActive;
-        drawConstellationCard(audioNoticeActive);
-        eventLine('Botón Escuchar pulsado en la tarjeta 3D.');
-      }
+  function bindSelectableElements() {
+    const selectableEls = document.querySelectorAll('.selectable');
+    selectableEls.forEach((el) => {
+      // Eventos estándar de A-Frame cursor
+      el.addEventListener('mouseenter', () => startGaze(el));
+      el.addEventListener('mouseleave', cancelGaze);
+      // Eventos directos del raycaster para máxima fiabilidad en WebGL
+      el.addEventListener('raycaster-intersected', () => startGaze(el));
+      el.addEventListener('raycaster-intersected-cleared', cancelGaze);
+      // Eventos de clic / toque táctil
+      el.addEventListener('click', () => handleSelectableClick(el));
     });
-  });
+  }
+
+  if (scene) {
+    if (scene.hasLoaded) bindSelectableElements();
+    else scene.addEventListener('loaded', bindSelectableElements, { once: true });
+  }
 
   // Botón Pausar mirilla de la interfaz
   function togglePause() {
@@ -559,6 +592,7 @@
       ? 'Escena lista. Compatible con 2D y vista dividida Homido.'
       : 'Escena cargada sin componente estéreo.';
     drawConstellationCard(audioNoticeActive);
+    bindSelectableElements();
   }
   if (scene.hasLoaded) onSceneReady();
   else scene.addEventListener('loaded', onSceneReady, { once: true });
