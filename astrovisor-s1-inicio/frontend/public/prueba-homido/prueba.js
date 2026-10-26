@@ -4,7 +4,7 @@
    - Ficha de información accesible con diseño oficial de Karime (Págs. 13-15 y 18).
    - Integrada 100% DENTRO DE LA ESCENA 3D en alta definición sobre lienzo accesible.
    - Botón "Escuchar", ficha de biblioteca "Dato de muestra" y "← Volver al recorrido" operable por mirada o toque.
-   - Controles HUD accesibles sobre el visor: [⏸ Pausa] y [🚪 Salir] (Págs. 11-12).
+   - Controles 3D DENTRO DE LA INMERSIÓN: [|| Pausa] y [Salir] (Págs. 11-12) operables por mirada o toque.
 */
 (function () {
   'use strict';
@@ -21,7 +21,7 @@
   };
 
   const browserInfo = `${navigator.userAgent}`;
-  eventLine(`Prueba iniciada | S2: HUD accesible y ficha 3D de Karime | ${new Date().toISOString()}`);
+  eventLine(`Prueba iniciada | S2: Controles 3D y ficha dentro de la inmersión | ${new Date().toISOString()}`);
   eventLine(`Navegador: ${browserInfo}`);
   eventLine(`Contexto seguro: ${window.isSecureContext ? 'sí' : 'no'}`);
 
@@ -37,11 +37,15 @@
   const angles = $('angles');
   const gazeCursor = $('gazeCursor');
 
-  // Controles HUD accesibles del visor (Págs. 11-12)
-  const hudPauseBtn = $('hudPauseBtn');
-  const hudPauseIcon = $('hudPauseIcon');
-  const hudPauseText = $('hudPauseText');
-  const hudExitBtn = $('hudExitBtn');
+  // Controles 3D dentro de la inmersión (Págs. 11-12)
+  const pauseBtn3D = $('pauseBtn3D');
+  const pauseBtn3DInner = $('pauseBtn3DInner');
+  const pauseProgressRing = $('pauseProgressRing');
+  const pause3DText = $('pause3DText');
+
+  const exitBtn3D = $('exitBtn3D');
+  const exitBtn3DInner = $('exitBtn3DInner');
+  const exitProgressRing = $('exitProgressRing');
 
   // Elementos de la escena 3D
   const targetContainer = $('targetContainer');
@@ -290,14 +294,12 @@
   }
 
   function startGaze(el) {
-    if (!userReady || isPaused) return;
-    if (activeTarget === el) return;
-
+    if (!userReady) return;
     const action = el.getAttribute('data-action') || 'target';
 
-    // Reglas de estado: si la ficha está abierta, solo interactúa con return o audio
-    if (isModalOpen && action === 'target') return;
-    if (!isModalOpen && action !== 'target') return;
+    // Si está pausado, solo permite interactuar con el botón de Pausa (para reanudar)
+    if (isPaused && action !== 'pause') return;
+    if (activeTarget === el) return;
 
     if (gazeRaf) {
       cancelAnimationFrame(gazeRaf);
@@ -313,6 +315,14 @@
       activeRing = returnProgressRing;
       activeRadii = { inner: 0.10, outer: 0.16 };
       eventLine('Mirada fija sobre [Volver al recorrido] — iniciando carga de 3 s');
+    } else if (action === 'pause') {
+      activeRing = pauseProgressRing;
+      activeRadii = { inner: 0.08, outer: 0.12 };
+      eventLine(`Mirada fija sobre [${isPaused ? 'Reanudar' : 'Pausa'} 3D] — iniciando carga de 3 s`);
+    } else if (action === 'exit') {
+      activeRing = exitProgressRing;
+      activeRadii = { inner: 0.08, outer: 0.12 };
+      eventLine('Mirada fija sobre [Salir 3D] — iniciando carga de 3 s');
     } else if (action === 'audio') {
       activeRing = null;
     }
@@ -324,7 +334,7 @@
     }
 
     function tick() {
-      if (!activeTarget || isPaused) return;
+      if (!activeTarget) return;
 
       const elapsed = performance.now() - gazeStartTime;
       const progress = Math.min(elapsed / DWELL_TIME_MS, 1.0);
@@ -342,7 +352,7 @@
       if (activeRing) {
         setRingProgress(activeRing, progress, '#F5B301', activeRadii.inner, activeRadii.outer);
       }
-      selectionStatus.textContent = `Enfocando ${action === 'target' ? 'Orión' : 'Volver al recorrido'}: etapa ${stage} (${Math.round(progress * 100)} %)...`;
+      selectionStatus.textContent = `Enfocando ${action}: etapa ${stage} (${Math.round(progress * 100)} %)...`;
 
       if (progress >= 1.0) {
         completeGazeSelection(activeTarget, action);
@@ -365,11 +375,15 @@
     eventLine(`Mirada retirada a los ${elapsed} ms — carga reiniciada a 0 %`);
     selectionStatus.textContent = isModalOpen
       ? 'Ficha 3D de Orión abierta. Enfoca "← Volver al recorrido" o pulsa sobre él.'
-      : 'Mirada retirada. Anillo reiniciado a 0 %.';
+      : isPaused
+        ? 'Mirilla en PAUSA. Enfoca [▶ Reanudar] para continuar.'
+        : 'Mirada retirada. Anillo reiniciado a 0 %.';
     currentStage = '0%';
 
     setRingProgress(targetProgressRing, 0, '#F5B301', 0.50, 0.70);
     setRingProgress(returnProgressRing, 0, '#F5B301', 0.10, 0.16);
+    setRingProgress(pauseProgressRing, 0, '#F5B301', 0.08, 0.12);
+    setRingProgress(exitProgressRing, 0, '#F5B301', 0.08, 0.12);
     target.setAttribute('color', TARGET_BASE_COLOR);
 
     activeTarget = null;
@@ -410,6 +424,22 @@
         closeConstellationInfo3D();
         setRingProgress(returnProgressRing, 0, '#F5B301', 0.10, 0.16);
       }, 100);
+    } else if (action === 'pause') {
+      activeTarget = null;
+      activeRing = null;
+      setTimeout(() => {
+        setRingProgress(pauseProgressRing, 0, '#F5B301', 0.08, 0.12);
+        togglePause();
+      }, 120);
+    } else if (action === 'exit') {
+      selectionStatus.textContent = '✔ Saliendo del visor inmersivo...';
+      eventLine('✔ Saliendo del visor inmersivo hacia el modo web 2D (/explorar).');
+      activeTarget = null;
+      activeRing = null;
+      setTimeout(() => {
+        if (stereoActive) exitStereo();
+        window.location.href = '/explorar';
+      }, 300);
     } else if (action === 'audio') {
       audioNoticeActive = !audioNoticeActive;
       drawConstellationCard(audioNoticeActive);
@@ -457,6 +487,13 @@
     } else if (action === 'return' && isModalOpen) {
       playConfirmationSound();
       closeConstellationInfo3D();
+    } else if (action === 'pause') {
+      playConfirmationSound();
+      togglePause();
+    } else if (action === 'exit') {
+      playConfirmationSound();
+      if (stereoActive) exitStereo();
+      window.location.href = '/explorar';
     } else if (action === 'audio' && isModalOpen) {
       playConfirmationSound();
       audioNoticeActive = !audioNoticeActive;
@@ -485,7 +522,7 @@
     else scene.addEventListener('loaded', bindSelectableElements, { once: true });
   }
 
-  // Lógica sincronizada para Pausar / Reanudar mirilla (Panel y HUD flotante)
+  // Lógica sincronizada para Pausar / Reanudar mirilla (Panel y botones 3D dentro del visor)
   function togglePause() {
     isPaused = !isPaused;
     if (isPaused) {
@@ -495,10 +532,11 @@
         pauseButton.style.background = '#e59b3d';
         pauseButton.style.color = '#fff';
       }
-      if (hudPauseBtn) {
-        hudPauseBtn.classList.add('is-paused');
-        if (hudPauseIcon) hudPauseIcon.textContent = '▶';
-        if (hudPauseText) hudPauseText.textContent = 'Reanudar';
+      if (pause3DText) {
+        pause3DText.setAttribute('value', '>  Reanudar');
+      }
+      if (pauseBtn3DInner) {
+        pauseBtn3DInner.setAttribute('color', '#E59B3D');
       }
       selectionStatus.textContent = 'Mirilla en PAUSA: permanencia desactivada para descanso visual.';
       eventLine('Mirilla pausada para descanso visual.');
@@ -508,10 +546,11 @@
         pauseButton.style.background = '';
         pauseButton.style.color = '';
       }
-      if (hudPauseBtn) {
-        hudPauseBtn.classList.remove('is-paused');
-        if (hudPauseIcon) hudPauseIcon.textContent = '⏸';
-        if (hudPauseText) hudPauseText.textContent = 'Pausa';
+      if (pause3DText) {
+        pause3DText.setAttribute('value', '||  Pausa');
+      }
+      if (pauseBtn3DInner) {
+        pauseBtn3DInner.setAttribute('color', '#1F4E8C');
       }
       selectionStatus.textContent = 'Mirilla activa: enfoca el punto durante 3 s para abrir su información.';
       eventLine('Mirilla reanudada.');
@@ -520,19 +559,6 @@
 
   if (pauseButton) {
     pauseButton.addEventListener('click', togglePause);
-  }
-  if (hudPauseBtn) {
-    hudPauseBtn.addEventListener('click', togglePause);
-  }
-
-  // Botón Salir del HUD: sale de pantalla completa/estéreo o regresa a /explorar en 2D
-  if (hudExitBtn) {
-    hudExitBtn.addEventListener('click', (e) => {
-      if (stereoActive) {
-        e.preventDefault();
-        exitStereo();
-      }
-    });
   }
 
   // Sensores de orientación física (móvil)
