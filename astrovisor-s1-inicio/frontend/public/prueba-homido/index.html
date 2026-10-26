@@ -19,9 +19,9 @@
   </header>
   <main id="main">
     <h1>Prueba técnica de visor Homido</h1>
-    <p class="lead">Selección por mirada con retroalimentación accesible. Al enfocar el punto fijo, su anillo exterior amarillo (#F5B301) se va llenando en 3 segundos sin prisa hasta confirmar la selección.</p>
+    <p class="lead">Selección por mirada con retroalimentación accesible. Al enfocar el punto de la constelación durante 3 segundos, se carga su anillo amarillo (#F5B301) y se abre la ficha con su historia y libro recomendado.</p>
     <div class="notice" role="note">
-      <strong>Prueba con precaución.</strong> Si aparece mareo o cansancio visual, retira el visor o pulsa el botón de Pausa. Siéntate y mantén el entorno despejado.
+      <strong>Prueba con precaución.</strong> Si aparece mareo o fatiga visual, retira el visor o pulsa el botón de Pausa. Siéntate y mantén el entorno despejado.
     </div>
 
     <section aria-labelledby="control-title" class="controls-panel">
@@ -36,45 +36,48 @@
       </div>
       <p class="status" id="orientationStatus" role="status" aria-live="polite">Sensores: listos para comprobar.</p>
       <p class="status" id="stereoStatus" role="status" aria-live="polite">Vista estereoscópica: modo 2D activo.</p>
-      <p class="status" id="selectionStatus" role="status" aria-live="polite">Selección: apunta al círculo fijo central durante 3 segundos. Su anillo amarillo se llenará de 0 % a 100 %.</p>
+      <p class="status" id="selectionStatus" role="status" aria-live="polite">Selección: apunta al punto fijo de Orión durante 3 segundos para abrir su información.</p>
       <p class="small" id="angles">Ángulos de orientación: sin datos.</p>
     </section>
 
     <section aria-labelledby="scene-title">
       <h2 id="scene-title">Escena de demostración</h2>
       <p class="scene-help">En computadora: arrastra con el mouse para centrar la mirilla sobre el punto. En teléfono: mueve suavemente el dispositivo o desliza el dedo. Mantén la vista fija en el punto naranja y observa cómo carga su anillo amarillo.</p>
+      
       <div class="scene-host" id="sceneHost">
+        <!-- Ficha de información de la constelación (Página 18 de Karime: abre al completar los 3s) -->
+        <div class="constellation-info-backdrop" id="constellationInfoModal" role="dialog" aria-modal="true" aria-labelledby="constellationTitle">
+          <div class="constellation-info-card">
+            <span class="badge-sample">Dato de muestra</span>
+            <h2 id="constellationTitle">Orión</h2>
+            <p class="constellation-desc" id="constellationDesc">
+              Orión parece una figura con dos hombros, dos pies y tres estrellas alineadas en el centro que forman su cinturón. Para encontrarla, busca primero esas tres estrellas juntas en el cielo nocturno.
+            </p>
+            <div class="book-box">
+              <p class="book-prompt">Si te interesa saber más, tenemos este libro en la biblioteca:</p>
+              <p class="book-name">Libro de muestra 1 — Guía de constelaciones</p>
+              <p class="book-note">Pídelo en persona en el mostrador de la biblioteca.</p>
+            </div>
+            <div class="card-actions">
+              <button type="button" id="returnToSkyBtn" class="return-btn">
+                ← Volver al recorrido
+              </button>
+            </div>
+          </div>
+        </div>
+
         <a-scene id="testScene" embedded vr-mode-ui="enabled: false" renderer="antialias: true; colorManagement: true;">
           <a-sky color="#071426"></a-sky>
           <a-entity light="type: ambient; intensity: 1.2"></a-entity>
           
-          <!-- Punto fijo interactivo con aro de carga progresiva amarilla -->
+          <!-- Punto fijo de la constelación de Orión con aro de carga progresiva amarilla -->
           <a-entity id="targetContainer" position="0 1.6 -4">
             <!-- Esfera / punto fijo central -->
-            <a-sphere class="selectable" id="target" data-action="target" radius="0.42" color="#e59b3d" material="shader: flat"></a-sphere>
+            <a-sphere class="selectable" id="target" radius="0.42" color="#e59b3d" material="shader: flat"></a-sphere>
             <!-- Aro base neutro de fondo -->
             <a-ring id="targetBaseRing" position="0 0 -0.02" radius-inner="0.52" radius-outer="0.68" color="#FFF4CF" material="shader: flat; side: double; opacity: 0.35"></a-ring>
             <!-- Aro de carga amarilla (#F5B301) que se llena de 0° a 360° sobre el punto fijo (oculto en reposo) -->
             <a-ring id="targetProgressRing" visible="false" position="0 0 0.02" radius-inner="0.50" radius-outer="0.70" theta-start="90" theta-length="0.001" color="#F5B301" material="shader: flat; side: double; opacity: 0.95"></a-ring>
-          </a-entity>
-
-          <!-- Controles 3D del visor: Pausa y Salir (activables con la mirada durante 3 s o por clic/toque) -->
-          <a-entity id="visorControls3D" position="0 0.65 -3.5">
-            <!-- Botón 3D Pausa -->
-            <a-entity id="pauseBtn3D" class="selectable" position="-0.95 0 0" data-action="pause">
-              <a-plane width="0.88" height="0.36" color="#1B2A5A" material="shader: flat; opacity: 0.92"></a-plane>
-              <a-ring position="0 0 0.01" radius-inner="0.12" radius-outer="0.16" color="#FFFFFF" material="shader: flat; side: double; opacity: 0.35"></a-ring>
-              <a-ring id="pauseProgressRing" visible="false" position="0 0 0.02" radius-inner="0.11" radius-outer="0.17" theta-start="90" theta-length="0.001" color="#F5B301" material="shader: flat; side: double; opacity: 0.95"></a-ring>
-              <a-text id="pause3DLabel" value="|| Pausa" align="center" position="0 0 0.03" color="#FFFFFF" width="3.2"></a-text>
-            </a-entity>
-
-            <!-- Botón 3D Salir a Modo 2D -->
-            <a-entity id="exitBtn3D" class="selectable" position="0.95 0 0" data-action="exit">
-              <a-plane width="0.88" height="0.36" color="#4A2030" material="shader: flat; opacity: 0.92"></a-plane>
-              <a-ring position="0 0 0.01" radius-inner="0.12" radius-outer="0.16" color="#FFFFFF" material="shader: flat; side: double; opacity: 0.35"></a-ring>
-              <a-ring id="exitProgressRing" visible="false" position="0 0 0.02" radius-inner="0.11" radius-outer="0.17" theta-start="90" theta-length="0.001" color="#F5B301" material="shader: flat; side: double; opacity: 0.95"></a-ring>
-              <a-text value="Salir 2D" align="center" position="0 0 0.03" color="#FFFFFF" width="3.2"></a-text>
-            </a-entity>
           </a-entity>
 
           <!-- Cámara con mirilla central (retícula ligera y visible) -->

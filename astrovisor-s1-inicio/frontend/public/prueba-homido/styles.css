@@ -24,4 +24,120 @@ button:focus-visible,.button:focus-visible { outline: 3px solid #df932b; outline
 #exitButton[hidden] { display: none; }
 body.stereo-mode #exitButton { display: block; position: fixed; top: 8px; right: 8px; z-index: 1000; font-size: .95rem; background: #fff; }
 #log { max-height: 270px; overflow: auto; white-space: pre-wrap; overflow-wrap: anywhere; background: #f6f7f9; color: #15243b; padding: 0.75rem; min-height: 80px; }
-@media (max-width: 650px) { main{padding:.85rem} .actions button,.actions .button{width:100%;text-align:center;} .scene-host{height:48vh;min-height:260px;} body.stereo-mode #exitButton{width:auto;} }
+
+/* Ficha de información de la constelación (Página 18 del diseño) */
+.constellation-info-backdrop {
+  display: none; /* OCULTO POR DEFECTO */
+  position: absolute;
+  inset: 0;
+  background: rgba(7, 20, 38, 0.92);
+  align-items: center;
+  justify-content: center;
+  z-index: 500;
+  padding: 1rem;
+}
+
+.constellation-info-backdrop.is-open {
+  display: flex; /* VISIBLE AL COMPLETAR 3s */
+}
+
+.constellation-info-card {
+  background: #ffffff;
+  color: #172438;
+  border-radius: 12px;
+  padding: 1.5rem;
+  max-width: 540px;
+  width: 100%;
+  max-height: 90%;
+  overflow-y: auto;
+  border: 2px solid #F5B301;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+  animation: cardIn 0.22s ease-out;
+}
+
+@keyframes cardIn {
+  from { opacity: 0; transform: scale(0.96); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.badge-sample {
+  display: inline-block;
+  background: #eeecfa;
+  color: #4a3f99;
+  font-size: 0.85rem;
+  font-weight: 700;
+  padding: 0.2rem 0.6rem;
+  border-radius: 6px;
+  margin-bottom: 0.5rem;
+}
+
+.constellation-info-card h2 {
+  margin: 0.2rem 0 0.5rem;
+  color: #11213b;
+  font-size: 1.6rem;
+}
+
+.constellation-desc {
+  font-size: 1.05rem;
+  line-height: 1.55;
+  color: #2b3a4a;
+  margin-bottom: 1rem;
+}
+
+.book-box {
+  background: #faf7f0;
+  border: 1px solid #c9ced6;
+  border-radius: 8px;
+  padding: 0.85rem 1rem;
+  margin: 1rem 0;
+}
+
+.book-box .book-prompt {
+  font-size: 0.92rem;
+  color: #4a5565;
+  margin: 0 0 0.3rem;
+}
+
+.book-box .book-name {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #1a4077;
+  margin: 0.2rem 0;
+}
+
+.book-box .book-note {
+  font-size: 0.88rem;
+  color: #1e7b3a;
+  margin: 0.2rem 0 0;
+  font-weight: 600;
+}
+
+.card-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 1.2rem;
+}
+
+.return-btn {
+  background: #1a4077;
+  color: #fff;
+  border: 2px solid #1a4077;
+  padding: 0.75rem 1.4rem;
+  font-size: 1.05rem;
+  font-weight: 700;
+  border-radius: 8px;
+  cursor: pointer;
+  min-height: 48px;
+}
+
+.return-btn:hover {
+  background: #122d56;
+}
+
+@media (max-width: 650px) {
+  main{padding:.85rem}
+  .actions button,.actions .button{width:100%;text-align:center;}
+  .scene-host{height:48vh;min-height:260px;}
+  body.stereo-mode #exitButton{width:auto;}
+  .constellation-info-card{padding:1.1rem;font-size:0.95rem;}
+}
