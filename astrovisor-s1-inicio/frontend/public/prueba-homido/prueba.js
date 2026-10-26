@@ -1,6 +1,8 @@
 /* AstroVisor — Sprint 2: Selección por mirada accesible (Karime)
-   El punto fijo objetivo muestra su anillo de carga amarillo (#F5B301)
-   llenándose de 0 % a 100 % en 3 segundos sin prisa al sostener la mirada.
+   - Retícula y permanencia de 3 segundos sin prisa (#F5B301).
+   - Anillo de carga sobre el punto fijo central.
+   - Controles accesibles en escena: [ || Pausa ] y [ Salir 2D ] activables con la mirada o con clic/toque.
+   - Cancelación suave al retirar la vista y confirmación visual (#1E7B3A) + sonora.
 */
 (function () {
   'use strict';
@@ -17,7 +19,7 @@
   };
 
   const browserInfo = `${navigator.userAgent}`;
-  eventLine(`Prueba iniciada | S2: Punto fijo con carga de permanencia amarilla | ${new Date().toISOString()}`);
+  eventLine(`Prueba iniciada | S2: Selección por mirada y controles de salida (Karime) | ${new Date().toISOString()}`);
   eventLine(`Navegador: ${browserInfo}`);
   eventLine(`Contexto seguro: ${window.isSecureContext ? 'sí' : 'no'}`);
 
@@ -31,10 +33,22 @@
   const stereoStatus = $('stereoStatus');
   const selectionStatus = $('selectionStatus');
   const angles = $('angles');
+
+  // Elementos 3D interactivos
   const target = $('target');
   const targetProgressRing = $('targetProgressRing');
+  const pauseBtn3D = $('pauseBtn3D');
+  const pauseProgressRing = $('pauseProgressRing');
+  const pause3DLabel = $('pause3DLabel');
+  const exitBtn3D = $('exitBtn3D');
+  const exitProgressRing = $('exitProgressRing');
   const reticleRing = $('reticleRing');
   const centerDot = $('centerDot');
+
+  // Constantes visuales
+  const TARGET_BASE_COLOR = '#e59b3d';
+  const CONFIRM_COLOR = '#1E7B3A'; // Verde de éxito según WCAG
+  const DWELL_TIME_MS = 3000;      // 3 segundos sin prisa (para adultos mayores)
 
   let orientationEvents = 0;
   let lastUpdate = 0;
@@ -44,12 +58,13 @@
   let stereoComponent;
   let isPaused = false;
 
-  // Parámetros de permanencia (Sprint 2 - Karime: 3 segundos sin prisa)
-  const DWELL_TIME_MS = 3000;
+  // Estado del temporizador de mirada
+  let activeTarget = null;
+  let activeRing = null;
+  let activeRadii = { inner: 0.50, outer: 0.70 };
   let gazeStartTime = null;
   let gazeRaf = null;
   let currentStage = '0%';
-  let isTargetHovered = false;
 
   // Retroalimentación auditiva accesible (Web Audio API)
   function playConfirmationSound() {
@@ -74,38 +89,48 @@
     } catch (_) {}
   }
 
-  // Color base estable del punto fijo objetivo (naranja cálido original)
-  const TARGET_BASE_COLOR = '#e59b3d';
-  const CONFIRM_COLOR = '#1E7B3A'; // Verde de éxito según sistema visual WCAG
-
-  // Actualiza el anillo de carga amarillo (#F5B301) sobre el punto fijo objetivo
-  function setTargetRingProgress(progress, ringColor = '#F5B301') {
-    if (!targetProgressRing) return;
+  // Actualiza el anillo de carga amarillo (#F5B301) sobre cualquier objeto enfocado
+  function setRingProgress(ringEl, progress, color = '#F5B301', rInner = 0.50, rOuter = 0.70) {
+    if (!ringEl) return;
     if (progress <= 0) {
-      targetProgressRing.setAttribute('visible', 'false');
-      targetProgressRing.setAttribute('geometry', 'primitive: ring; radiusInner: 0.50; radiusOuter: 0.70; thetaStart: 90; thetaLength: 0.001');
+      ringEl.setAttribute('visible', 'false');
+      ringEl.setAttribute('geometry', `primitive: ring; radiusInner: ${rInner}; radiusOuter: ${rOuter}; thetaStart: 90; thetaLength: 0.001`);
       return;
     }
-    targetProgressRing.setAttribute('visible', 'true');
+    ringEl.setAttribute('visible', 'true');
     const p = Math.min(1.0, Math.max(0.002, progress));
-    const angle = -(p * 360); // sentido horario desde arriba (thetaStart=90)
-    targetProgressRing.setAttribute('geometry', `primitive: ring; radiusInner: 0.50; radiusOuter: 0.70; thetaStart: 90; thetaLength: ${angle}`);
-    targetProgressRing.setAttribute('material', `color: ${ringColor}; shader: flat; side: double; opacity: 0.95`);
+    const angle = -(p * 360);
+    ringEl.setAttribute('geometry', `primitive: ring; radiusInner: ${rInner}; radiusOuter: ${rOuter}; thetaStart: 90; thetaLength: ${angle}`);
+    ringEl.setAttribute('material', `color: ${color}; shader: flat; side: double; opacity: 0.95`);
   }
 
-  function startGaze() {
-    if (isPaused || isTargetHovered) return;
-    isTargetHovered = true;
+  function startGaze(el) {
+    const action = el.getAttribute('data-action') || 'target';
+    // Si está pausado, solo permitimos mirar el botón de Pausa para reanudar
+    if (isPaused && action !== 'pause') return;
+    if (activeTarget) return;
+
+    activeTarget = el;
+    if (action === 'target') {
+      activeRing = targetProgressRing;
+      activeRadii = { inner: 0.50, outer: 0.70 };
+      eventLine('Mirada fija sobre el punto central — iniciando carga de 3 s');
+    } else if (action === 'pause') {
+      activeRing = pauseProgressRing;
+      activeRadii = { inner: 0.11, outer: 0.17 };
+      eventLine('Mirada fija sobre botón [Pausa] — iniciando carga de 3 s');
+    } else if (action === 'exit') {
+      activeRing = exitProgressRing;
+      activeRadii = { inner: 0.11, outer: 0.17 };
+      eventLine('Mirada fija sobre botón [Salir 2D] — iniciando carga de 3 s');
+    }
+
     gazeStartTime = performance.now();
     currentStage = '0%';
-    setTargetRingProgress(0.002, '#F5B301');
-    // El círculo del centro mantiene su color base estable; solo el anillo exterior carga en amarillo
-    target.setAttribute('color', TARGET_BASE_COLOR);
-
-    eventLine('Mirada fija sobre el punto — iniciando carga de anillo amarillo (3.0 s)');
+    setRingProgress(activeRing, 0.002, '#F5B301', activeRadii.inner, activeRadii.outer);
 
     function tick() {
-      if (!isTargetHovered || isPaused) return;
+      if (!activeTarget) return;
 
       const elapsed = performance.now() - gazeStartTime;
       const progress = Math.min(elapsed / DWELL_TIME_MS, 1.0);
@@ -117,14 +142,15 @@
 
       if (stage !== currentStage) {
         currentStage = stage;
-        eventLine(`Carga del punto fijo: ${stage} (${Math.round(elapsed)} ms)`);
+        eventLine(`Carga ${action}: ${stage} (${Math.round(elapsed)} ms)`);
       }
 
-      setTargetRingProgress(progress, '#F5B301');
-      selectionStatus.textContent = `Cargando punto fijo: ${stage} (${Math.round(progress * 100)} %)...`;
+      setRingProgress(activeRing, progress, '#F5B301', activeRadii.inner, activeRadii.outer);
+      const nombreAccion = action === 'target' ? 'punto fijo' : (action === 'pause' ? 'botón Pausa' : 'botón Salir a 2D');
+      selectionStatus.textContent = `Enfocando ${nombreAccion}: etapa ${stage} (${Math.round(progress * 100)} %)...`;
 
       if (progress >= 1.0) {
-        completeGazeSelection();
+        completeGazeSelection(activeTarget, action);
       } else {
         gazeRaf = requestAnimationFrame(tick);
       }
@@ -134,82 +160,115 @@
   }
 
   function cancelGaze() {
-    if (!isTargetHovered) return;
-    isTargetHovered = false;
+    if (!activeTarget) return;
     if (gazeRaf) {
       cancelAnimationFrame(gazeRaf);
       gazeRaf = null;
     }
     const elapsed = gazeStartTime ? Math.round(performance.now() - gazeStartTime) : 0;
-    eventLine(`Mirada retirada a los ${elapsed} ms — carga cancelada, punto en 0 %`);
-    selectionStatus.textContent = 'Mirada retirada. El anillo amarillo de carga se reinició a 0 %.';
+    eventLine(`Mirada retirada a los ${elapsed} ms — carga reiniciada a 0 %`);
+    selectionStatus.textContent = 'Mirada retirada. Anillo reiniciado a 0 %.';
     currentStage = '0%';
-    setTargetRingProgress(0, '#F5B301'); // Oculta completamente el anillo
+
+    // Oculta todos los anillos
+    setRingProgress(targetProgressRing, 0, '#F5B301', 0.50, 0.70);
+    if (pauseProgressRing) setRingProgress(pauseProgressRing, 0, '#F5B301', 0.11, 0.17);
+    if (exitProgressRing) setRingProgress(exitProgressRing, 0, '#F5B301', 0.11, 0.17);
+
     target.setAttribute('color', TARGET_BASE_COLOR);
-    if (reticleRing) reticleRing.setAttribute('material', 'color: #ffffff');
-    if (centerDot) centerDot.setAttribute('material', 'color: #ffffff');
+    activeTarget = null;
+    activeRing = null;
   }
 
-  function completeGazeSelection() {
+  function completeGazeSelection(el, action) {
     if (gazeRaf) cancelAnimationFrame(gazeRaf);
     gazeRaf = null;
-    isTargetHovered = false;
 
-    selectionCount++;
-    // Confirmación visual en verde de éxito (#1E7B3A)
-    setTargetRingProgress(1.0, CONFIRM_COLOR);
-    target.setAttribute('color', CONFIRM_COLOR);
-    if (reticleRing) reticleRing.setAttribute('material', `color: ${CONFIRM_COLOR}`);
-    if (centerDot) centerDot.setAttribute('material', `color: ${CONFIRM_COLOR}`);
-
+    setRingProgress(activeRing, 1.0, CONFIRM_COLOR, activeRadii.inner, activeRadii.outer);
     playConfirmationSound();
-    selectionStatus.textContent = `✓ Selección #${selectionCount} COMPLETADA: el punto fijo cargó al 100% por permanencia de 3 s.`;
-    eventLine(`✓ Selección #${selectionCount} COMPLETADA: anillo lleno y confirmado a los 3000 ms.`);
 
-    // Tras 600 ms de confirmación verde, regresa el punto a su color base y oculta el anillo para la siguiente selección
-    setTimeout(() => {
-      setTargetRingProgress(0, '#F5B301');
-      target.setAttribute('color', TARGET_BASE_COLOR);
-      if (reticleRing) reticleRing.setAttribute('material', 'color: #ffffff');
-      if (centerDot) centerDot.setAttribute('material', 'color: #ffffff');
-    }, 600);
+    if (action === 'target') {
+      selectionCount++;
+      target.setAttribute('color', CONFIRM_COLOR);
+      selectionStatus.textContent = `✓ Selección #${selectionCount} COMPLETADA: punto fijo confirmado a los 3.0 s.`;
+      eventLine(`✓ Selección #${selectionCount} completada en el punto fijo.`);
+
+      setTimeout(() => {
+        setRingProgress(targetProgressRing, 0, '#F5B301', 0.50, 0.70);
+        target.setAttribute('color', TARGET_BASE_COLOR);
+        activeTarget = null;
+      }, 600);
+    } else if (action === 'pause') {
+      selectionStatus.textContent = '✓ Control Pausa confirmado con la mirada.';
+      eventLine('✓ Control Pausa activado por mirada.');
+
+      setTimeout(() => {
+        setRingProgress(pauseProgressRing, 0, '#F5B301', 0.11, 0.17);
+        activeTarget = null;
+        togglePause();
+      }, 400);
+    } else if (action === 'exit') {
+      selectionStatus.textContent = '✓ Salida confirmada por mirada. Regresando al modo web 2D...';
+      eventLine('✓ Salida a 2D confirmada por mirada.');
+
+      setTimeout(() => {
+        window.location.href = '/explorar';
+      }, 500);
+    }
   }
 
-  // Eventos sobre el punto objetivo
-  target.addEventListener('mouseenter', startGaze);
-  target.addEventListener('mouseleave', cancelGaze);
-
-  // Soporte directo por clic o toque en el punto (accesibilidad en pantalla 2D)
-  target.addEventListener('click', () => {
-    selectionCount++;
-    target.setAttribute('color', CONFIRM_COLOR);
-    playConfirmationSound();
-    selectionStatus.textContent = `Selección #${selectionCount} activada por clic/toque en el punto.`;
-    eventLine(`Selección #${selectionCount} por interacción táctil/ratón.`);
-    setTimeout(() => {
-      target.setAttribute('color', TARGET_BASE_COLOR);
-    }, 500);
-  });
-
-  // Botón Pausar mirilla
-  if (pauseButton) {
-    pauseButton.addEventListener('click', () => {
-      isPaused = !isPaused;
-      if (isPaused) {
-        cancelGaze();
+  function togglePause() {
+    isPaused = !isPaused;
+    if (isPaused) {
+      cancelGaze();
+      if (pauseButton) {
         pauseButton.textContent = 'Reanudar mirilla';
         pauseButton.style.background = '#e59b3d';
         pauseButton.style.color = '#fff';
-        selectionStatus.textContent = 'Mirilla en PAUSA: permanencia desactivada para descanso visual.';
-        eventLine('Mirilla pausada.');
-      } else {
+      }
+      if (pause3DLabel) {
+        pause3DLabel.setAttribute('value', '▶ Seguir');
+      }
+      selectionStatus.textContent = 'Mirilla en PAUSA: permanencia desactivada para descanso visual.';
+      eventLine('Mirilla pausada.');
+    } else {
+      if (pauseButton) {
         pauseButton.textContent = 'Pausar mirilla';
         pauseButton.style.background = '';
         pauseButton.style.color = '';
-        selectionStatus.textContent = 'Mirilla activa: enfoca el punto durante 3 s para que cargue su anillo amarillo.';
-        eventLine('Mirilla reanudada.');
+      }
+      if (pause3DLabel) {
+        pause3DLabel.setAttribute('value', '|| Pausa');
+      }
+      selectionStatus.textContent = 'Mirilla activa: enfoca el punto o un botón durante 3 s para seleccionarlo.';
+      eventLine('Mirilla reanudada.');
+    }
+  }
+
+  // Conectar eventos sobre todos los objetos seleccionables (.selectable)
+  const selectableEls = document.querySelectorAll('.selectable');
+  selectableEls.forEach((el) => {
+    el.addEventListener('mouseenter', () => startGaze(el));
+    el.addEventListener('mouseleave', cancelGaze);
+    el.addEventListener('click', () => {
+      const action = el.getAttribute('data-action') || 'target';
+      if (action === 'target') {
+        selectionCount++;
+        target.setAttribute('color', CONFIRM_COLOR);
+        playConfirmationSound();
+        selectionStatus.textContent = `Selección #${selectionCount} por clic/toque directo.`;
+        setTimeout(() => target.setAttribute('color', TARGET_BASE_COLOR), 500);
+      } else if (action === 'pause') {
+        togglePause();
+      } else if (action === 'exit') {
+        window.location.href = '/explorar';
       }
     });
+  });
+
+  // Botón Pausar mirilla de la interfaz 2D
+  if (pauseButton) {
+    pauseButton.addEventListener('click', togglePause);
   }
 
   // Sensores de orientación física (móvil)
