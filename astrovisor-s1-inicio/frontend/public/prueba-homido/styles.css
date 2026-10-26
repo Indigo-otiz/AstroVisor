@@ -22,12 +22,70 @@ button:focus-visible,.button:focus-visible { outline: 3px solid #df932b; outline
 .scene-host.stereo-active { position: fixed; inset: 0; width: 100vw; height: 100dvh; min-height: 0; max-height: none; border: 0; border-radius: 0; z-index: 900; }
 .scene-host.stereo-active a-scene { width:100%;height:100%; }
 #exitButton[hidden] { display: none; }
-body.stereo-mode #exitButton { display: block; position: fixed; top: 8px; right: 8px; z-index: 1000; font-size: .95rem; background: #fff; }
+body.stereo-mode #exitButton { display: none; } /* Reemplazado por el botón Salir del HUD accesible */
 #log { max-height: 270px; overflow: auto; white-space: pre-wrap; overflow-wrap: anywhere; background: #f6f7f9; color: #15243b; padding: 0.75rem; min-height: 80px; }
 
+/* Barra de controles HUD flotante sobre el visor (Diseño oficial de Karime: Págs. 11-12) */
+.scene-hud {
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  right: 14px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  pointer-events: none;
+  z-index: 800;
+}
+
+.hud-btn {
+  pointer-events: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: rgba(11, 21, 48, 0.88);
+  color: #FFFFFF;
+  border: 2px solid #FFFFFF;
+  border-radius: 10px;
+  padding: 0.55rem 1.15rem;
+  font-size: 1rem;
+  font-weight: 700;
+  text-decoration: none;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(6px);
+  min-height: 48px;
+  transition: background 0.18s, transform 0.15s, border-color 0.18s;
+}
+
+.hud-btn:hover {
+  background: #1F4E8C;
+  transform: translateY(-1px);
+}
+
+.hud-btn:active {
+  transform: translateY(1px);
+}
+
+.hud-btn:focus-visible {
+  outline: 3px solid #F5B301;
+  outline-offset: 3px;
+}
+
+.hud-btn.is-paused {
+  background: #E59B3D;
+  border-color: #FFF4CF;
+  color: #11213B;
+}
+
+.hud-btn.hud-exit:hover {
+  background: #8B2020;
+  border-color: #FFB3B3;
+}
+
 @media (max-width: 650px) {
-  main{padding:.85rem}
-  .actions button,.actions .button{width:100%;text-align:center;}
-  .scene-host{height:55vh;min-height:300px;}
-  body.stereo-mode #exitButton{width:auto;}
+  main { padding: 0.85rem; }
+  .actions button, .actions .button { width: 100%; text-align: center; }
+  .scene-host { height: 58vh; min-height: 320px; }
+  .hud-btn { padding: 0.45rem 0.85rem; font-size: 0.92rem; min-height: 44px; }
 }

@@ -45,6 +45,18 @@
       <p class="scene-help">En computadora: arrastra con el mouse para centrar la mirilla sobre el punto. En teléfono: mueve el dispositivo para explorar. Mantén la vista fija en el punto naranja y observa cómo carga su anillo amarillo.</p>
       
       <div class="scene-host" id="sceneHost">
+        <!-- Barra de controles HUD accesibles del visor (Págs. 11-12 de Karime) -->
+        <div class="scene-hud" aria-label="Controles del visor">
+          <button id="hudPauseBtn" class="hud-btn" type="button" aria-label="Pausar o reanudar mirilla">
+            <span id="hudPauseIcon" aria-hidden="true">⏸</span>
+            <span id="hudPauseText">Pausa</span>
+          </button>
+          <a id="hudExitBtn" href="/explorar" class="hud-btn hud-exit" aria-label="Salir de la experiencia inmersiva a modo web 2D">
+            <span aria-hidden="true">🚪</span>
+            <span>Salir</span>
+          </a>
+        </div>
+
         <!-- Escena A-Frame 3D -->
         <a-scene id="testScene" embedded vr-mode-ui="enabled: false" renderer="antialias: true; colorManagement: true;">
           <a-assets>

@@ -4,6 +4,7 @@
    - Ficha de información accesible con diseño oficial de Karime (Págs. 13-15 y 18).
    - Integrada 100% DENTRO DE LA ESCENA 3D en alta definición sobre lienzo accesible.
    - Botón "Escuchar", ficha de biblioteca "Dato de muestra" y "← Volver al recorrido" operable por mirada o toque.
+   - Controles HUD accesibles sobre el visor: [⏸ Pausa] y [🚪 Salir] (Págs. 11-12).
 */
 (function () {
   'use strict';
@@ -20,7 +21,7 @@
   };
 
   const browserInfo = `${navigator.userAgent}`;
-  eventLine(`Prueba iniciada | S2: Ficha 3D integrada según diseño oficial de Karime | ${new Date().toISOString()}`);
+  eventLine(`Prueba iniciada | S2: HUD accesible y ficha 3D de Karime | ${new Date().toISOString()}`);
   eventLine(`Navegador: ${browserInfo}`);
   eventLine(`Contexto seguro: ${window.isSecureContext ? 'sí' : 'no'}`);
 
@@ -35,6 +36,12 @@
   const selectionStatus = $('selectionStatus');
   const angles = $('angles');
   const gazeCursor = $('gazeCursor');
+
+  // Controles HUD accesibles del visor (Págs. 11-12)
+  const hudPauseBtn = $('hudPauseBtn');
+  const hudPauseIcon = $('hudPauseIcon');
+  const hudPauseText = $('hudPauseText');
+  const hudExitBtn = $('hudExitBtn');
 
   // Elementos de la escena 3D
   const targetContainer = $('targetContainer');
@@ -284,7 +291,7 @@
 
   function startGaze(el) {
     if (!userReady || isPaused) return;
-    if (activeTarget === el) return; // Ya enfocado
+    if (activeTarget === el) return;
 
     const action = el.getAttribute('data-action') || 'target';
 
@@ -478,7 +485,7 @@
     else scene.addEventListener('loaded', bindSelectableElements, { once: true });
   }
 
-  // Botón Pausar mirilla de la interfaz
+  // Lógica sincronizada para Pausar / Reanudar mirilla (Panel y HUD flotante)
   function togglePause() {
     isPaused = !isPaused;
     if (isPaused) {
@@ -488,13 +495,23 @@
         pauseButton.style.background = '#e59b3d';
         pauseButton.style.color = '#fff';
       }
+      if (hudPauseBtn) {
+        hudPauseBtn.classList.add('is-paused');
+        if (hudPauseIcon) hudPauseIcon.textContent = '▶';
+        if (hudPauseText) hudPauseText.textContent = 'Reanudar';
+      }
       selectionStatus.textContent = 'Mirilla en PAUSA: permanencia desactivada para descanso visual.';
-      eventLine('Mirilla pausada.');
+      eventLine('Mirilla pausada para descanso visual.');
     } else {
       if (pauseButton) {
         pauseButton.textContent = 'Pausar mirilla';
         pauseButton.style.background = '';
         pauseButton.style.color = '';
+      }
+      if (hudPauseBtn) {
+        hudPauseBtn.classList.remove('is-paused');
+        if (hudPauseIcon) hudPauseIcon.textContent = '⏸';
+        if (hudPauseText) hudPauseText.textContent = 'Pausa';
       }
       selectionStatus.textContent = 'Mirilla activa: enfoca el punto durante 3 s para abrir su información.';
       eventLine('Mirilla reanudada.');
@@ -503,6 +520,19 @@
 
   if (pauseButton) {
     pauseButton.addEventListener('click', togglePause);
+  }
+  if (hudPauseBtn) {
+    hudPauseBtn.addEventListener('click', togglePause);
+  }
+
+  // Botón Salir del HUD: sale de pantalla completa/estéreo o regresa a /explorar en 2D
+  if (hudExitBtn) {
+    hudExitBtn.addEventListener('click', (e) => {
+      if (stereoActive) {
+        e.preventDefault();
+        exitStereo();
+      }
+    });
   }
 
   // Sensores de orientación física (móvil)
@@ -627,7 +657,7 @@
   document.addEventListener('keydown', (event) => {
     if (event.key === 'Escape') {
       if (isModalOpen) closeConstellationInfo3D();
-      else exitStereo();
+      else if (stereoActive) exitStereo();
     }
   });
 
