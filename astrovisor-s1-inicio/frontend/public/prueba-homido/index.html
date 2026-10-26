@@ -31,6 +31,7 @@
         <button id="permissionButton" type="button">Solicitar sensores</button>
         <button id="stereoButton" type="button" disabled>Probar vista dividida</button>
         <button id="pauseButton" class="secondary" type="button">Pausar mirilla</button>
+        <button id="showInfoDirectBtn" class="secondary" type="button">Ver ficha de información</button>
         <button id="exitButton" class="secondary" type="button" hidden>Salir de vista dividida</button>
         <a class="button secondary" href="/explorar">Regresar al modo web 2D</a>
       </div>
@@ -45,27 +46,6 @@
       <p class="scene-help">En computadora: arrastra con el mouse para centrar la mirilla sobre el punto. En teléfono: mueve suavemente el dispositivo o desliza el dedo. Mantén la vista fija en el punto naranja y observa cómo carga su anillo amarillo.</p>
       
       <div class="scene-host" id="sceneHost">
-        <!-- Ficha de información de la constelación (Página 18 de Karime: abre al completar los 3s) -->
-        <div class="constellation-info-backdrop" id="constellationInfoModal" role="dialog" aria-modal="true" aria-labelledby="constellationTitle">
-          <div class="constellation-info-card">
-            <span class="badge-sample">Dato de muestra</span>
-            <h2 id="constellationTitle">Orión</h2>
-            <p class="constellation-desc" id="constellationDesc">
-              Orión parece una figura con dos hombros, dos pies y tres estrellas alineadas en el centro que forman su cinturón. Para encontrarla, busca primero esas tres estrellas juntas en el cielo nocturno.
-            </p>
-            <div class="book-box">
-              <p class="book-prompt">Si te interesa saber más, tenemos este libro en la biblioteca:</p>
-              <p class="book-name">Libro de muestra 1 — Guía de constelaciones</p>
-              <p class="book-note">Pídelo en persona en el mostrador de la biblioteca.</p>
-            </div>
-            <div class="card-actions">
-              <button type="button" id="returnToSkyBtn" class="return-btn">
-                ← Volver al recorrido
-              </button>
-            </div>
-          </div>
-        </div>
-
         <a-scene id="testScene" embedded vr-mode-ui="enabled: false" renderer="antialias: true; colorManagement: true;">
           <a-sky color="#071426"></a-sky>
           <a-entity light="type: ambient; intensity: 1.2"></a-entity>
@@ -96,6 +76,27 @@
         </a-scene>
       </div>
     </section>
+
+    <!-- Ficha de información de la constelación (Página 18 de Karime: modal de pantalla completa) -->
+    <div class="constellation-info-backdrop" id="constellationInfoModal" role="dialog" aria-modal="true" aria-labelledby="constellationTitle">
+      <div class="constellation-info-card">
+        <span class="badge-sample">Dato de muestra</span>
+        <h2 id="constellationTitle">Orión</h2>
+        <p class="constellation-desc" id="constellationDesc">
+          Orión parece una figura con dos hombros, dos pies y tres estrellas alineadas en el centro que forman su cinturón. Para encontrarla, busca primero esas tres estrellas juntas en el cielo nocturno.
+        </p>
+        <div class="book-box">
+          <p class="book-prompt">Si te interesa saber más, tenemos este libro en la biblioteca:</p>
+          <p class="book-name">Libro de muestra 1 — Guía de constelaciones</p>
+          <p class="book-note">Pídelo en persona en el mostrador de la biblioteca.</p>
+        </div>
+        <div class="card-actions">
+          <button type="button" id="returnToSkyBtn" class="return-btn">
+            ← Volver al recorrido
+          </button>
+        </div>
+      </div>
+    </div>
 
     <section class="log-panel" aria-labelledby="log-title">
       <h2 id="log-title">Registro de esta sesión</h2>

@@ -25,20 +25,23 @@ button:focus-visible,.button:focus-visible { outline: 3px solid #df932b; outline
 body.stereo-mode #exitButton { display: block; position: fixed; top: 8px; right: 8px; z-index: 1000; font-size: .95rem; background: #fff; }
 #log { max-height: 270px; overflow: auto; white-space: pre-wrap; overflow-wrap: anywhere; background: #f6f7f9; color: #15243b; padding: 0.75rem; min-height: 80px; }
 
-/* Ficha de información de la constelación (Página 18 del diseño) */
+/* Ficha de información de la constelación (Página 18 del diseño - Pantalla completa) */
 .constellation-info-backdrop {
-  display: none; /* OCULTO POR DEFECTO */
-  position: absolute;
-  inset: 0;
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
   background: rgba(7, 20, 38, 0.92);
   align-items: center;
   justify-content: center;
-  z-index: 500;
+  z-index: 999999;
   padding: 1rem;
 }
 
 .constellation-info-backdrop.is-open {
-  display: flex; /* VISIBLE AL COMPLETAR 3s */
+  display: flex !important;
 }
 
 .constellation-info-card {

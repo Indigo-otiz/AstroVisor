@@ -170,21 +170,23 @@
     selectionStatus.textContent = `✓ Selección #${selectionCount} COMPLETADA: abriendo información de Orión...`;
     eventLine(`✓ Selección #${selectionCount} de Orión completada al 100% por permanencia (3000 ms).`);
 
-    // Abre la ficha informativa tras 450 ms de mostrar la confirmación
+    // Abre la ficha informativa de inmediato con un leve destello de confirmación (180 ms)
     setTimeout(() => {
       openConstellationInfo();
       setTargetRingProgress(0, '#F5B301');
       target.setAttribute('color', TARGET_BASE_COLOR);
       if (reticleRing) reticleRing.setAttribute('material', 'color: #ffffff');
       if (centerDot) centerDot.setAttribute('material', 'color: #ffffff');
-    }, 450);
+    }, 180);
   }
 
   function openConstellationInfo() {
     isModalOpen = true;
     if (constellationInfoModal) {
       constellationInfoModal.classList.add('is-open');
+      constellationInfoModal.style.display = 'flex';
     }
+    selectionStatus.textContent = 'Ficha de Orión abierta. Pulsa "Volver al recorrido" para regresar a las constelaciones.';
     eventLine('Ficha de información de Orión abierta.');
   }
 
@@ -192,6 +194,7 @@
     isModalOpen = false;
     if (constellationInfoModal) {
       constellationInfoModal.classList.remove('is-open');
+      constellationInfoModal.style.display = 'none';
     }
     cancelGaze();
     selectionStatus.textContent = 'De vuelta en el cielo nocturno. Apunta a Orión durante 3 s para volver a abrir su información.';
@@ -201,6 +204,12 @@
   // Botón "Volver al recorrido" dentro de la ficha de información
   if (returnToSkyBtn) {
     returnToSkyBtn.addEventListener('click', closeConstellationInfo);
+  }
+
+  // Botón para previsualizar la ficha directamente desde los controles
+  const showInfoDirectBtn = $('showInfoDirectBtn');
+  if (showInfoDirectBtn) {
+    showInfoDirectBtn.addEventListener('click', openConstellationInfo);
   }
 
   // Eventos sobre el punto objetivo
