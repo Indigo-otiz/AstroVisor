@@ -14,19 +14,19 @@
   <header class="site-header">
     <div class="header-content">
       <a href="/visor" class="brand">AstroVisor</a>
-      <span>Sprint 2 — Selección por mirada accesible</span>
+      <span>Experimento técnico de Sprint 1</span>
     </div>
   </header>
   <main id="main">
     <h1>Prueba técnica de visor Homido</h1>
-    <p class="lead">Selección por mirada con retroalimentación accesible. Al enfocar el punto fijo de la constelación durante 3 segundos, se carga su anillo amarillo (#F5B301) y se abre la ficha blanca accesible con su historia y libro recomendado directamente dentro del visor 3D.</p>
+    <p class="lead">Una escena para comprobar sensores, seguimiento de la vista, retícula accesible y presentación estereoscópica.</p>
     <div class="notice" role="note">
-      <strong>Prueba con precaución.</strong> Si aparece mareo o fatiga visual, retira el visor o pulsa el botón de Pausa. Siéntate y mantén el entorno despejado.
+      <strong>Prueba con precaución.</strong> Si aparece mareo, incomodidad o fatiga visual, retira el visor o pulsa el botón de Pausa. Siéntate, mantén el entorno despejado y solicita ayuda si la necesitas.
     </div>
 
     <section aria-labelledby="control-title" class="controls-panel">
       <h2 id="control-title">Controles de la prueba</h2>
-      <p>Abre esta página en el teléfono mediante HTTPS para activar sensores. También puedes probar en la computadora arrastrando con el mouse.</p>
+      <p>Primero abre esta página en el teléfono mediante HTTPS. Autoriza los sensores si el navegador lo solicita; después prueba el modo 2D y, por último, la vista dividida.</p>
       <div class="actions">
         <button id="permissionButton" type="button">Solicitar sensores</button>
         <button id="stereoButton" type="button" disabled>Probar vista dividida</button>
@@ -41,8 +41,8 @@
     </section>
 
     <section aria-labelledby="scene-title">
-      <h2 id="scene-title">Escena inmersiva 3D</h2>
-      <p class="scene-help">En computadora: arrastra con el mouse para centrar la mirilla sobre el punto. En teléfono: mueve el dispositivo para explorar. Mantén la vista fija en el punto naranja y observa cómo carga su anillo amarillo. En las esquinas superiores del cielo verás los botones 3D de Pausa (izquierda) y Salir (derecha).</p>
+      <h2 id="scene-title">Escena de demostración</h2>
+      <p class="scene-help">En computadora: arrastra la vista con el mouse. En teléfono: mueve suavemente el dispositivo o desliza el dedo. Centra la mirilla sobre el punto naranja de Orión durante 3 segundos para abrir su información sin tocar la pantalla.</p>
       
       <div class="scene-host" id="sceneHost">
         <!-- Escena A-Frame 3D -->
@@ -54,27 +54,8 @@
 
           <a-sky color="#071426"></a-sky>
           <a-entity light="type: ambient; intensity: 1.2"></a-entity>
-
-          <!-- Botones 3D integrados DENTRO DE LA INMERSIÓN EN LAS ESQUINAS SUPERIORES (Págs. 11-12 de Karime) -->
-          <a-entity id="hudControls3D">
-            <!-- Esquina superior izquierda 3D: Pausa / Reanudar mirilla (orientado hacia el usuario) -->
-            <a-plane id="pauseBtn3D" class="selectable" data-action="pause" position="-2.3 2.7 -3.0" rotation="20 37 0" width="1.20" height="0.46" color="#FFFFFF" material="shader: flat">
-              <a-plane id="pauseBtn3DInner" position="0 0 0.005" width="1.14" height="0.40" color="#1F4E8C" material="shader: flat"></a-plane>
-              <a-ring position="0 0 0.01" radius-inner="0.08" radius-outer="0.12" color="#FFFFFF" material="shader: flat; side: double; opacity: 0.35"></a-ring>
-              <a-ring id="pauseProgressRing" visible="false" position="0 0 0.02" radius-inner="0.08" radius-outer="0.12" theta-start="90" theta-length="0.001" color="#F5B301" material="shader: flat; side: double; opacity: 0.95"></a-ring>
-              <a-text id="pause3DText" value="||  Pausa" align="center" position="0 0 0.03" color="#FFFFFF" width="3.2"></a-text>
-            </a-plane>
-
-            <!-- Esquina superior derecha 3D: Salir a modo web 2D (orientado hacia el usuario) -->
-            <a-plane id="exitBtn3D" class="selectable" data-action="exit" position="2.3 2.7 -3.0" rotation="20 -37 0" width="1.20" height="0.46" color="#FFFFFF" material="shader: flat">
-              <a-plane id="exitBtn3DInner" position="0 0 0.005" width="1.14" height="0.40" color="#8B2020" material="shader: flat"></a-plane>
-              <a-ring position="0 0 0.01" radius-inner="0.08" radius-outer="0.12" color="#FFFFFF" material="shader: flat; side: double; opacity: 0.35"></a-ring>
-              <a-ring id="exitProgressRing" visible="false" position="0 0 0.02" radius-inner="0.08" radius-outer="0.12" theta-start="90" theta-length="0.001" color="#F5B301" material="shader: flat; side: double; opacity: 0.95"></a-ring>
-              <a-text value="Salir" align="center" position="0 0 0.03" color="#FFFFFF" width="3.2"></a-text>
-            </a-plane>
-          </a-entity>
           
-          <!-- Punto fijo de la constelación de Orión con aro de carga progresiva amarilla -->
+          <!-- Punto fijo de la constelación de Orión con aro de carga progresiva amarilla (#F5B301) -->
           <a-entity id="targetContainer" position="0 1.6 -4">
             <!-- Esfera / punto fijo central -->
             <a-sphere class="selectable" id="target" data-action="target" radius="0.42" color="#e59b3d" material="shader: flat"></a-sphere>
@@ -84,12 +65,12 @@
             <a-ring id="targetProgressRing" visible="false" position="0 0 0.02" radius-inner="0.50" radius-outer="0.70" theta-start="90" theta-length="0.001" color="#F5B301" material="shader: flat; side: double; opacity: 0.95"></a-ring>
           </a-entity>
 
-          <!-- Ficha informativa de Orión DENTRO DE LA ESCENA 3D (Diseño oficial de Karime: Págs. 13-15 y 18) -->
+          <!-- Ficha informativa de Orión DENTRO DE LA ESCENA 3D (Págs. 13-15 y 18) -->
           <a-entity id="infoPanel3D" visible="false" position="0 1.6 -3.0">
             <!-- Tarjeta blanca accesible en alta resolución -->
             <a-plane id="cardPlane" width="3.4" height="2.67" material="shader: flat; src: #cardCanvas; transparent: true"></a-plane>
 
-            <!-- Botón 3D interactivo "Volver al recorrido" como a-plane con geometría directa para raycast -->
+            <!-- Botón 3D interactivo "Volver al recorrido" operable por mirada o toque -->
             <a-plane id="returnBtn3D" class="selectable" data-action="return" position="0 -0.85 0.05" width="2.4" height="0.45" material="shader: flat; opacity: 0.001; transparent: true">
               <!-- Aro guía de fondo -->
               <a-ring position="0 0 0.01" radius-inner="0.10" radius-outer="0.16" color="#1F4E8C" material="shader: flat; side: double; opacity: 0.25"></a-ring>
