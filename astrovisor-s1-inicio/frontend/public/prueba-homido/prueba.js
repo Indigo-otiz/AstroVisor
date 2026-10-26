@@ -3,6 +3,7 @@
    - Anillo de carga sobre el punto de la constelación.
    - Ficha de información accesible con diseño oficial de Karime (Págs. 13-15 y 18).
    - Integrada 100% DENTRO DE LA ESCENA 3D en alta definición sobre lienzo accesible.
+   - Controles 3D del visor abajo del punto: [ || Pausa ] y [ Salir 2D ] (Págs. 11-12).
    - Botón "Escuchar", ficha de biblioteca "Dato de muestra" y "← Volver al recorrido" operable por mirada o toque.
 */
 (function () {
@@ -40,6 +41,13 @@
   const targetContainer = $('targetContainer');
   const target = $('target');
   const targetProgressRing = $('targetProgressRing');
+  const visorControls3D = $('visorControls3D');
+  const pauseBtn3D = $('pauseBtn3D');
+  const pauseProgressRing = $('pauseProgressRing');
+  const pause3DLabel = $('pause3DLabel');
+  const exitBtn3D = $('exitBtn3D');
+  const exitProgressRing = $('exitProgressRing');
+
   const infoPanel3D = $('infoPanel3D');
   const cardPlane = $('cardPlane');
   const returnBtn3D = $('returnBtn3D');
@@ -283,12 +291,14 @@
   }
 
   function startGaze(el) {
-    if (!userReady || isPaused) return;
+    if (!userReady) return;
     const action = el.getAttribute('data-action') || 'target';
 
-    // Reglas de estado: si la ficha está abierta, solo interactúa con return o audio
-    if (isModalOpen && action === 'target') return;
-    if (!isModalOpen && action !== 'target') return;
+    // Reglas de estado: si está en pausa, solo permite mirar a Pausa/Reanudar
+    if (isPaused && action !== 'pause') return;
+    // Si la ficha de información está abierta, solo permite volver o audio
+    if (isModalOpen && action !== 'return' && action !== 'audio') return;
+    if (!isModalOpen && (action === 'return' || action === 'audio')) return;
     if (activeTarget === el) return;
 
     if (gazeRaf) {
@@ -305,6 +315,14 @@
       activeRing = returnProgressRing;
       activeRadii = { inner: 0.10, outer: 0.16 };
       eventLine('Mirada fija sobre [Volver al recorrido] — iniciando carga de 3 s');
+    } else if (action === 'pause') {
+      activeRing = pauseProgressRing;
+      activeRadii = { inner: 0.11, outer: 0.17 };
+      eventLine(`Mirada fija sobre [${isPaused ? 'Seguir' : 'Pausa'}] — iniciando carga de 3 s`);
+    } else if (action === 'exit') {
+      activeRing = exitProgressRing;
+      activeRadii = { inner: 0.11, outer: 0.17 };
+      eventLine('Mirada fija sobre [Salir 2D] — iniciando carga de 3 s');
     } else if (action === 'audio') {
       activeRing = null;
     }
@@ -316,7 +334,7 @@
     }
 
     function tick() {
-      if (!activeTarget || isPaused) return;
+      if (!activeTarget) return;
 
       const elapsed = performance.now() - gazeStartTime;
       const progress = Math.min(elapsed / DWELL_TIME_MS, 1.0);
@@ -334,7 +352,7 @@
       if (activeRing) {
         setRingProgress(activeRing, progress, '#F5B301', activeRadii.inner, activeRadii.outer);
       }
-      selectionStatus.textContent = `Enfocando ${action === 'target' ? 'Orión' : 'Volver al recorrido'}: etapa ${stage} (${Math.round(progress * 100)} %)...`;
+      selectionStatus.textContent = `Enfocando ${action}: etapa ${stage} (${Math.round(progress * 100)} %)...`;
 
       if (progress >= 1.0) {
         completeGazeSelection(activeTarget, action);
@@ -357,11 +375,15 @@
     eventLine(`Mirada retirada a los ${elapsed} ms — carga reiniciada a 0 %`);
     selectionStatus.textContent = isModalOpen
       ? 'Ficha 3D de Orión abierta. Enfoca "← Volver al recorrido" o pulsa sobre él.'
-      : 'Mirada retirada. Anillo reiniciado a 0 %.';
+      : isPaused
+        ? 'Mirilla en PAUSA. Enfoca [▶ Seguir] para continuar.'
+        : 'Mirada retirada. Anillo reiniciado a 0 %.';
     currentStage = '0%';
 
     setRingProgress(targetProgressRing, 0, '#F5B301', 0.50, 0.70);
     setRingProgress(returnProgressRing, 0, '#F5B301', 0.10, 0.16);
+    setRingProgress(pauseProgressRing, 0, '#F5B301', 0.11, 0.17);
+    setRingProgress(exitProgressRing, 0, '#F5B301', 0.11, 0.17);
     target.setAttribute('color', TARGET_BASE_COLOR);
 
     activeTarget = null;
@@ -402,6 +424,22 @@
         closeConstellationInfo3D();
         setRingProgress(returnProgressRing, 0, '#F5B301', 0.10, 0.16);
       }, 100);
+    } else if (action === 'pause') {
+      activeTarget = null;
+      activeRing = null;
+      setTimeout(() => {
+        setRingProgress(pauseProgressRing, 0, '#F5B301', 0.11, 0.17);
+        togglePause();
+      }, 120);
+    } else if (action === 'exit') {
+      selectionStatus.textContent = '✔ Salida confirmada por mirada. Regresando al modo web 2D...';
+      eventLine('✔ Salida a 2D confirmada por mirada.');
+      activeTarget = null;
+      activeRing = null;
+      setTimeout(() => {
+        if (stereoActive) exitStereo();
+        window.location.href = '/explorar';
+      }, 300);
     } else if (action === 'audio') {
       audioNoticeActive = !audioNoticeActive;
       drawConstellationCard(audioNoticeActive);
@@ -412,8 +450,9 @@
 
   function openConstellationInfo3D() {
     isModalOpen = true;
-    if (infoPanel3D) infoPanel3D.setAttribute('visible', 'true');
+    if (visorControls3D) visorControls3D.setAttribute('visible', 'false');
     if (targetContainer) targetContainer.setAttribute('visible', 'false');
+    if (infoPanel3D) infoPanel3D.setAttribute('visible', 'true');
     drawConstellationCard(audioNoticeActive);
 
     // Refrescar raycaster para que detecte de inmediato a returnBtn3D
@@ -429,6 +468,7 @@
     isModalOpen = false;
     if (infoPanel3D) infoPanel3D.setAttribute('visible', 'false');
     if (targetContainer) targetContainer.setAttribute('visible', 'true');
+    if (visorControls3D) visorControls3D.setAttribute('visible', 'true');
     cancelGaze();
 
     if (gazeCursor && gazeCursor.components && gazeCursor.components.raycaster) {
@@ -449,6 +489,13 @@
     } else if (action === 'return' && isModalOpen) {
       playConfirmationSound();
       closeConstellationInfo3D();
+    } else if (action === 'pause') {
+      playConfirmationSound();
+      togglePause();
+    } else if (action === 'exit') {
+      playConfirmationSound();
+      if (stereoActive) exitStereo();
+      window.location.href = '/explorar';
     } else if (action === 'audio' && isModalOpen) {
       playConfirmationSound();
       audioNoticeActive = !audioNoticeActive;
@@ -477,7 +524,7 @@
     else scene.addEventListener('loaded', bindSelectableElements, { once: true });
   }
 
-  // Botón Pausar mirilla de los controles del panel
+  // Sincronizar estado de Pausar / Reanudar (Panel 2D y botones 3D)
   function togglePause() {
     isPaused = !isPaused;
     if (isPaused) {
@@ -487,6 +534,12 @@
         pauseButton.style.background = '#e59b3d';
         pauseButton.style.color = '#fff';
       }
+      if (pause3DLabel) {
+        pause3DLabel.setAttribute('value', '▶ Seguir');
+      }
+      if (pauseBtn3D) {
+        pauseBtn3D.setAttribute('color', '#E59B3D');
+      }
       selectionStatus.textContent = 'Mirilla en PAUSA: permanencia desactivada para descanso visual.';
       eventLine('Mirilla pausada.');
     } else {
@@ -495,7 +548,13 @@
         pauseButton.style.background = '';
         pauseButton.style.color = '';
       }
-      selectionStatus.textContent = 'Mirilla activa: enfoca el punto durante 3 s para abrir su información.';
+      if (pause3DLabel) {
+        pause3DLabel.setAttribute('value', '|| Pausa');
+      }
+      if (pauseBtn3D) {
+        pauseBtn3D.setAttribute('color', '#1B2A5A');
+      }
+      selectionStatus.textContent = 'Mirilla activa: enfoca el punto o un botón durante 3 s para seleccionarlo.';
       eventLine('Mirilla reanudada.');
     }
   }
