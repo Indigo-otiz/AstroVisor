@@ -6,7 +6,7 @@
   <meta name="theme-color" content="#142033" />
   <title>Prueba técnica Homido — AstroVisor</title>
   <link rel="stylesheet" href="./styles.css" />
-  <!-- Versión fija de A-Frame: el modo estereoscópico se construye aparte. -->
+  <!-- Versión fija de A-Frame -->
   <script src="https://aframe.io/releases/1.8.0/aframe.min.js"></script>
   <script defer src="./prueba.js"></script>
 </head>
@@ -19,8 +19,10 @@
   </header>
   <main id="main">
     <h1>Prueba técnica de visor Homido</h1>
-    <p class="lead">Una escena mínima para comprobar sensores, seguimiento de la vista, retícula y presentación estereoscópica. No es la experiencia final de la biblioteca.</p>
-    <div class="notice" role="note"><strong>Prueba con precaución.</strong> Si aparece mareo, incomodidad o doble imagen, retira el visor y detén la prueba. Siéntate, mantén el entorno despejado y solicita ayuda si la necesitas.</div>
+    <p class="lead">Una escena para comprobar sensores, seguimiento de la vista, retícula accesible y presentación estereoscópica.</p>
+    <div class="notice" role="note">
+      <strong>Prueba con precaución.</strong> Si aparece mareo, incomodidad o fatiga visual, retira el visor o pulsa el botón de Pausa. Siéntate, mantén el entorno despejado y solicita ayuda si la necesitas.
+    </div>
 
     <section aria-labelledby="control-title" class="controls-panel">
       <h2 id="control-title">Controles de la prueba</h2>
@@ -28,28 +30,87 @@
       <div class="actions">
         <button id="permissionButton" type="button">Solicitar sensores</button>
         <button id="stereoButton" type="button" disabled>Probar vista dividida</button>
+        <button id="pauseButton" class="secondary" type="button">Pausar mirilla</button>
         <button id="exitButton" class="secondary" type="button" hidden>Salir de vista dividida</button>
         <a class="button secondary" href="/explorar">Regresar al modo web 2D</a>
       </div>
-      <p class="status" id="orientationStatus" role="status" aria-live="polite">Sensores: aún no comprobados.</p>
-      <p class="status" id="stereoStatus" role="status" aria-live="polite">Vista estereoscópica: no iniciada.</p>
-      <p class="status" id="selectionStatus" role="status" aria-live="polite">Selección: apunta al círculo central y mantén la mirada durante 1.8 segundos.</p>
+      <p class="status" id="orientationStatus" role="status" aria-live="polite">Sensores: listos para comprobar.</p>
+      <p class="status" id="stereoStatus" role="status" aria-live="polite">Vista estereoscópica: modo 2D activo.</p>
+      <p class="status" id="selectionStatus" role="status" aria-live="polite">Selección: apunta al punto fijo de Orión durante 3 segundos para abrir su información.</p>
       <p class="small" id="angles">Ángulos de orientación: sin datos.</p>
     </section>
 
     <section aria-labelledby="scene-title">
       <h2 id="scene-title">Escena de demostración</h2>
-      <p class="scene-help">En computadora: arrastra la vista con el mouse. En teléfono: mueve suavemente el dispositivo (si hay sensores disponibles), o desliza el dedo. Centra la retícula sobre el círculo naranja para seleccionarlo sin tocar la pantalla.</p>
+      <p class="scene-help">En computadora: arrastra la vista con el mouse. En teléfono: mueve suavemente el dispositivo o desliza el dedo. Centra la mirilla sobre el punto naranja de Orión durante 3 segundos para abrir su información sin tocar la pantalla.</p>
+      
       <div class="scene-host" id="sceneHost">
+        <!-- Escena A-Frame 3D -->
         <a-scene id="testScene" embedded vr-mode-ui="enabled: false" renderer="antialias: true; colorManagement: true;">
+          <a-assets>
+            <!-- Canvas de alta resolución para renderizar la tarjeta accesible de Karime en 3D -->
+            <canvas id="cardCanvas" width="1400" height="1100"></canvas>
+          </a-assets>
+
           <a-sky color="#071426"></a-sky>
           <a-entity light="type: ambient; intensity: 1.2"></a-entity>
-          <a-sphere class="selectable" id="target" position="0 1.6 -4" radius="0.42" color="#e59b3d" material="shader: flat"></a-sphere>
-          <a-ring position="0 1.6 -4.02" radius-inner="0.55" radius-outer="0.57" color="#f5e4c0" material="shader: flat; side: double"></a-ring>
+          
+          <!-- Punto fijo de la constelación de Orión con aro de carga progresiva amarilla (#F5B301) -->
+          <a-entity id="targetContainer" position="0 1.6 -4">
+            <!-- Esfera / punto fijo central -->
+            <a-sphere class="selectable" id="target" data-action="target" radius="0.42" color="#e59b3d" material="shader: flat"></a-sphere>
+            <!-- Aro base neutro de fondo -->
+            <a-ring id="targetBaseRing" position="0 0 -0.02" radius-inner="0.52" radius-outer="0.68" color="#FFF4CF" material="shader: flat; side: double; opacity: 0.35"></a-ring>
+            <!-- Aro de carga amarilla (#F5B301) que se llena de 0° a 360° sobre el punto fijo (oculto en reposo) -->
+            <a-ring id="targetProgressRing" visible="false" position="0 0 0.02" radius-inner="0.50" radius-outer="0.70" theta-start="90" theta-length="0.001" color="#F5B301" material="shader: flat; side: double; opacity: 0.95"></a-ring>
+          </a-entity>
+
+          <!-- Controles 3D del visor: Pausa y Salir (activables con la mirada durante 3 s o por clic/toque) -->
+          <a-entity id="visorControls3D" position="0 0.65 -3.5">
+            <!-- Botón 3D Pausa -->
+            <a-plane id="pauseBtn3D" class="selectable" position="-0.95 0 0" data-action="pause" width="0.88" height="0.36" color="#1B2A5A" material="shader: flat; opacity: 0.92">
+              <a-ring position="0 0 0.01" radius-inner="0.12" radius-outer="0.16" color="#FFFFFF" material="shader: flat; side: double; opacity: 0.35"></a-ring>
+              <a-ring id="pauseProgressRing" visible="false" position="0 0 0.02" radius-inner="0.11" radius-outer="0.17" theta-start="90" theta-length="0.001" color="#F5B301" material="shader: flat; side: double; opacity: 0.95"></a-ring>
+              <a-text id="pause3DLabel" value="|| Pausa" align="center" position="0 0 0.03" color="#FFFFFF" width="3.2"></a-text>
+            </a-plane>
+
+            <!-- Botón 3D Salir a Modo 2D -->
+            <a-plane id="exitBtn3D" class="selectable" position="0.95 0 0" data-action="exit" width="0.88" height="0.36" color="#4A2030" material="shader: flat; opacity: 0.92">
+              <a-ring position="0 0 0.01" radius-inner="0.12" radius-outer="0.16" color="#FFFFFF" material="shader: flat; side: double; opacity: 0.35"></a-ring>
+              <a-ring id="exitProgressRing" visible="false" position="0 0 0.02" radius-inner="0.11" radius-outer="0.17" theta-start="90" theta-length="0.001" color="#F5B301" material="shader: flat; side: double; opacity: 0.95"></a-ring>
+              <a-text value="Salir 2D" align="center" position="0 0 0.03" color="#FFFFFF" width="3.2"></a-text>
+            </a-plane>
+          </a-entity>
+
+          <!-- Ficha informativa de Orión DENTRO DE LA ESCENA 3D (Págs. 13-15 y 18) -->
+          <a-entity id="infoPanel3D" visible="false" position="0 1.6 -3.0">
+            <!-- Tarjeta blanca accesible en alta resolución -->
+            <a-plane id="cardPlane" width="3.4" height="2.67" material="shader: flat; src: #cardCanvas; transparent: true"></a-plane>
+
+            <!-- Botón 3D interactivo "Volver al recorrido" operable por mirada o toque -->
+            <a-plane id="returnBtn3D" class="selectable" data-action="return" position="0 -0.85 0.05" width="2.4" height="0.45" material="shader: flat; opacity: 0.001; transparent: true">
+              <!-- Aro guía de fondo -->
+              <a-ring position="0 0 0.01" radius-inner="0.10" radius-outer="0.16" color="#1F4E8C" material="shader: flat; side: double; opacity: 0.25"></a-ring>
+              <!-- Aro de carga amarilla (#F5B301) sobre el botón de regreso al enfocarlo -->
+              <a-ring id="returnProgressRing" visible="false" position="0 0 0.02" radius-inner="0.10" radius-outer="0.16" theta-start="90" theta-length="0.001" color="#F5B301" material="shader: flat; side: double; opacity: 0.95"></a-ring>
+            </a-plane>
+
+            <!-- Botón 3D interactivo "Escuchar" -->
+            <a-plane id="audioBtn3D" class="selectable" data-action="audio" position="-1.20 0.31 0.05" width="0.8" height="0.28" material="shader: flat; opacity: 0.001; transparent: true"></a-plane>
+          </a-entity>
+
+          <!-- Cámara con mirilla central (retícula ligera y visible) -->
           <a-entity id="cameraRig" camera="active: true" look-controls="magicWindowTrackingEnabled: true; touchEnabled: true; mouseEnabled: true" position="0 1.6 0">
-            <a-entity id="gazeCursor" cursor="fuse: true; fuseTimeout: 1800; rayOrigin: entity" raycaster="objects: .selectable; far: 25" geometry="primitive: ring; radiusInner: 0.017; radiusOuter: 0.027" material="color: #ffffff; shader: flat; opacity: 0.95" position="0 0 -1.2"
-              animation__fusing="property: scale; startEvents: fusing; from: 1 1 1; to: 0.6 0.6 0.6; dur: 1800"
-              animation__reset="property: scale; startEvents: mouseleave, click; to: 1 1 1; dur: 160"></a-entity>
+            <a-entity id="reticleGroup" position="0 0 -1.2">
+              <!-- Halo oscuro exterior para contraste universal -->
+              <a-ring radius-inner="0.016" radius-outer="0.026" color="#0B1530" material="shader: flat; side: double; opacity: 0.55"></a-ring>
+              <!-- Aro mirilla blanco -->
+              <a-ring id="reticleRing" radius-inner="0.018" radius-outer="0.024" color="#ffffff" material="shader: flat; side: double; opacity: 0.85"></a-ring>
+              <!-- Mirilla central: núcleo blanco -->
+              <a-circle id="centerDot" radius="0.005" color="#ffffff" material="shader: flat"></a-circle>
+              <!-- Raycaster de detección de mirada -->
+              <a-entity id="gazeCursor" cursor="fuse: false; rayOrigin: entity" raycaster="objects: .selectable; far: 25"></a-entity>
+            </a-entity>
           </a-entity>
         </a-scene>
       </div>
