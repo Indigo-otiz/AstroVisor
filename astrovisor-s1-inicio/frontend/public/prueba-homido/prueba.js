@@ -1,8 +1,8 @@
 /* AstroVisor — Sprint 2: Selección por mirada accesible (Karime)
    - Retícula y permanencia de 3 segundos sin prisa (#F5B301).
    - Anillo de carga sobre el punto de la constelación.
-   - Panel de información de la constelación integrado DENTRO DE LA ESCENA 3D (Pág. 18).
-   - Botón 3D "Volver al recorrido" operable por mirada o toque directo.
+   - Ficha de información accesible con diseño oficial de Karime (Págs. 13-15 y 18).
+   - Botón "Escuchar", ficha de biblioteca "Dato de muestra" y "← Volver al recorrido".
 */
 (function () {
   'use strict';
@@ -19,7 +19,7 @@
   };
 
   const browserInfo = `${navigator.userAgent}`;
-  eventLine(`Prueba iniciada | S2: Panel de información integrado en escena 3D | ${new Date().toISOString()}`);
+  eventLine(`Prueba iniciada | S2: Ficha accesible según diseño de Karime | ${new Date().toISOString()}`);
   eventLine(`Navegador: ${browserInfo}`);
   eventLine(`Contexto seguro: ${window.isSecureContext ? 'sí' : 'no'}`);
 
@@ -38,15 +38,19 @@
   const targetContainer = $('targetContainer');
   const target = $('target');
   const targetProgressRing = $('targetProgressRing');
-  const infoPanel3D = $('infoPanel3D');
-  const returnBtn3D = $('returnBtn3D');
-  const returnProgressRing = $('returnProgressRing');
   const reticleRing = $('reticleRing');
   const centerDot = $('centerDot');
 
+  // Elementos de la ficha modal accesible (Diseño de Karime Págs. 13-15)
+  const constellationModal = $('constellationModal');
+  const returnFromModalBtn = $('returnFromModalBtn');
+  const closeXBtn = $('closeXBtn');
+  const listenAudioBtn = $('listenAudioBtn');
+  const audioNotice = $('audioNotice');
+
   // Constantes visuales
   const TARGET_BASE_COLOR = '#e59b3d';
-  const CONFIRM_COLOR = '#1E7B3A'; // Verde de éxito según WCAG
+  const CONFIRM_COLOR = '#1E7B3A'; // Verde de éxito según WCAG AAA
   const DWELL_TIME_MS = 3000;      // 3 segundos sin prisa (para adultos mayores)
 
   let orientationEvents = 0;
@@ -111,31 +115,19 @@
   }
 
   function startGaze(el) {
-    if (!userReady || isPaused || activeTarget) return;
-
-    const action = el.getAttribute('data-action') || 'target';
-
-    // Si el panel de información está abierto, solo se permite mirar el botón de volver
-    if (isModalOpen && action !== 'return') return;
-    if (!isModalOpen && action === 'return') return;
+    if (!userReady || isPaused || activeTarget || isModalOpen) return;
 
     activeTarget = el;
-    if (action === 'target') {
-      activeRing = targetProgressRing;
-      activeRadii = { inner: 0.50, outer: 0.70 };
-      eventLine('Mirada fija sobre Orión — iniciando carga de 3 s');
-    } else if (action === 'return') {
-      activeRing = returnProgressRing;
-      activeRadii = { inner: 0.09, outer: 0.15 };
-      eventLine('Mirada fija sobre [Volver al recorrido] — iniciando carga de 3 s');
-    }
+    activeRing = targetProgressRing;
+    activeRadii = { inner: 0.50, outer: 0.70 };
+    eventLine('Mirada fija sobre Orión — iniciando carga de 3 s');
 
     gazeStartTime = performance.now();
     currentStage = '0%';
     setRingProgress(activeRing, 0.002, '#F5B301', activeRadii.inner, activeRadii.outer);
 
     function tick() {
-      if (!activeTarget || isPaused) return;
+      if (!activeTarget || isPaused || isModalOpen) return;
 
       const elapsed = performance.now() - gazeStartTime;
       const progress = Math.min(elapsed / DWELL_TIME_MS, 1.0);
@@ -147,14 +139,14 @@
 
       if (stage !== currentStage) {
         currentStage = stage;
-        eventLine(`Carga ${action}: ${stage} (${Math.round(elapsed)} ms)`);
+        eventLine(`Carga Orión: ${stage} (${Math.round(elapsed)} ms)`);
       }
 
       setRingProgress(activeRing, progress, '#F5B301', activeRadii.inner, activeRadii.outer);
-      selectionStatus.textContent = `Enfocando ${action === 'target' ? 'Orión' : 'Volver al recorrido'}: etapa ${stage} (${Math.round(progress * 100)} %)...`;
+      selectionStatus.textContent = `Enfocando Orión: etapa ${stage} (${Math.round(progress * 100)} %)...`;
 
       if (progress >= 1.0) {
-        completeGazeSelection(activeTarget, action);
+        completeGazeSelection(activeTarget);
       } else {
         gazeRaf = requestAnimationFrame(tick);
       }
@@ -164,89 +156,101 @@
   }
 
   function cancelGaze() {
-    if (!activeTarget) return;
     if (gazeRaf) {
       cancelAnimationFrame(gazeRaf);
       gazeRaf = null;
     }
+    if (!activeTarget) return;
+
     const elapsed = gazeStartTime ? Math.round(performance.now() - gazeStartTime) : 0;
     eventLine(`Mirada retirada a los ${elapsed} ms — carga reiniciada a 0 %`);
     selectionStatus.textContent = isModalOpen
-      ? 'Panel de información abierto. Enfoca "Volver al recorrido" o pulsa sobre él.'
+      ? 'Ficha de Orión abierta. Pulsa "← Volver al recorrido" para regresar.'
       : 'Mirada retirada. Anillo reiniciado a 0 %.';
     currentStage = '0%';
 
     setRingProgress(targetProgressRing, 0, '#F5B301', 0.50, 0.70);
-    if (returnProgressRing) setRingProgress(returnProgressRing, 0, '#F5B301', 0.09, 0.15);
     target.setAttribute('color', TARGET_BASE_COLOR);
 
     activeTarget = null;
     activeRing = null;
   }
 
-  function completeGazeSelection(el, action) {
+  function completeGazeSelection(el) {
     if (gazeRaf) cancelAnimationFrame(gazeRaf);
     gazeRaf = null;
 
     setRingProgress(activeRing, 1.0, CONFIRM_COLOR, activeRadii.inner, activeRadii.outer);
     playConfirmationSound();
 
-    if (action === 'target') {
-      selectionCount++;
-      target.setAttribute('color', CONFIRM_COLOR);
-      selectionStatus.textContent = `✓ Selección #${selectionCount} COMPLETADA: abriendo información de Orión en el visor 3D...`;
-      eventLine(`✓ Selección #${selectionCount} completada: abriendo ficha 3D de Orión.`);
+    selectionCount++;
+    target.setAttribute('color', CONFIRM_COLOR);
+    selectionStatus.textContent = `✔ Selección #${selectionCount} COMPLETADA: abriendo información de Orión...`;
+    eventLine(`✔ Selección #${selectionCount} completada: abriendo ficha accesible de Orión.`);
 
-      setTimeout(() => {
-        openConstellationInfo3D();
-        setRingProgress(targetProgressRing, 0, '#F5B301', 0.50, 0.70);
-        target.setAttribute('color', TARGET_BASE_COLOR);
-        activeTarget = null;
-      }, 350);
-    } else if (action === 'return') {
-      selectionStatus.textContent = '✓ Volviendo al cielo nocturno...';
-      eventLine('✓ Cerrando ficha 3D y volviendo a las constelaciones.');
-
-      setTimeout(() => {
-        closeConstellationInfo3D();
-        setRingProgress(returnProgressRing, 0, '#F5B301', 0.09, 0.15);
-        activeTarget = null;
-      }, 300);
-    }
+    setTimeout(() => {
+      openConstellationModal();
+      setRingProgress(targetProgressRing, 0, '#F5B301', 0.50, 0.70);
+      target.setAttribute('color', TARGET_BASE_COLOR);
+      activeTarget = null;
+    }, 350);
   }
 
-  function openConstellationInfo3D() {
+  function openConstellationModal() {
     isModalOpen = true;
-    if (infoPanel3D) infoPanel3D.setAttribute('visible', 'true');
-    if (targetContainer) targetContainer.setAttribute('visible', 'false');
-    selectionStatus.textContent = 'Panel informativo 3D abierto. Toca con el dedo o enfoca "← Volver al recorrido" para regresar.';
-    eventLine('Panel informativo 3D de Orión abierto dentro de la escena.');
+    if (constellationModal) {
+      constellationModal.classList.add('is-visible');
+      constellationModal.setAttribute('aria-hidden', 'false');
+    }
+    selectionStatus.textContent = 'Ficha de Orión abierta. Lee la historia accesible o pulsa "← Volver al recorrido".';
+    eventLine('Ficha accesible de Orión abierta (conforme a Págs. 13-15 del diseño de Karime).');
   }
 
-  function closeConstellationInfo3D() {
+  function closeConstellationModal() {
     isModalOpen = false;
-    if (infoPanel3D) infoPanel3D.setAttribute('visible', 'false');
-    if (targetContainer) targetContainer.setAttribute('visible', 'true');
+    if (constellationModal) {
+      constellationModal.classList.remove('is-visible');
+      constellationModal.setAttribute('aria-hidden', 'true');
+    }
     cancelGaze();
     selectionStatus.textContent = 'De vuelta en el cielo nocturno. Enfoca el punto de nuevo durante 3 s para abrir su información.';
-    eventLine('Regresando a las constelaciones (Visor: 0 %).');
+    eventLine('Ficha cerrada. De vuelta en el cielo nocturno (Visor: 0 %).');
   }
 
-  // Conectar eventos sobre todos los objetos seleccionables (.selectable)
+  // Conectar botones de la ficha informativa de Karime
+  if (returnFromModalBtn) {
+    returnFromModalBtn.addEventListener('click', () => {
+      playConfirmationSound();
+      closeConstellationModal();
+    });
+  }
+
+  if (closeXBtn) {
+    closeXBtn.addEventListener('click', () => {
+      closeConstellationModal();
+    });
+  }
+
+  if (listenAudioBtn) {
+    listenAudioBtn.addEventListener('click', () => {
+      if (audioNotice) {
+        audioNotice.hidden = !audioNotice.hidden;
+      }
+      eventLine('Botón "Escuchar" pulsado: alternando aviso accesible de narración.');
+    });
+  }
+
+  // Conectar eventos sobre el objeto de la constelación (.selectable)
   const selectableEls = document.querySelectorAll('.selectable');
   selectableEls.forEach((el) => {
     el.addEventListener('mouseenter', () => startGaze(el));
     el.addEventListener('mouseleave', cancelGaze);
     el.addEventListener('click', () => {
       userReady = true;
-      const action = el.getAttribute('data-action') || 'target';
-      if (action === 'target') {
+      if (!isModalOpen) {
         selectionCount++;
         playConfirmationSound();
-        openConstellationInfo3D();
-      } else if (action === 'return') {
-        playConfirmationSound();
-        closeConstellationInfo3D();
+        openConstellationModal();
       }
     });
   });
@@ -397,7 +401,7 @@
   exitButton.addEventListener('click', exitStereo);
   document.addEventListener('keydown', (event) => {
     if (event.key === 'Escape') {
-      if (isModalOpen) closeConstellationInfo3D();
+      if (isModalOpen) closeConstellationModal();
       else exitStereo();
     }
   });

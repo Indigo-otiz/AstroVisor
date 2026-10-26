@@ -19,7 +19,7 @@
   </header>
   <main id="main">
     <h1>Prueba técnica de visor Homido</h1>
-    <p class="lead">Selección por mirada con retroalimentación accesible. Al enfocar el punto fijo de la constelación durante 3 segundos, se carga su anillo amarillo (#F5B301) y se abre la ficha 3D con su historia y libro de muestra dentro del visor.</p>
+    <p class="lead">Selección por mirada con retroalimentación accesible. Al enfocar el punto fijo de la constelación durante 3 segundos, se carga su anillo amarillo (#F5B301) y se abre la ficha con su historia y libro recomendado.</p>
     <div class="notice" role="note">
       <strong>Prueba con precaución.</strong> Si aparece mareo o fatiga visual, retira el visor o pulsa el botón de Pausa. Siéntate y mantén el entorno despejado.
     </div>
@@ -36,15 +36,62 @@
       </div>
       <p class="status" id="orientationStatus" role="status" aria-live="polite">Sensores: listos para comprobar.</p>
       <p class="status" id="stereoStatus" role="status" aria-live="polite">Vista estereoscópica: modo 2D activo.</p>
-      <p class="status" id="selectionStatus" role="status" aria-live="polite">Selección: apunta al punto fijo de Orión durante 3 segundos para abrir su información en 3D.</p>
+      <p class="status" id="selectionStatus" role="status" aria-live="polite">Selección: apunta al punto fijo de Orión durante 3 segundos para abrir su información.</p>
       <p class="small" id="angles">Ángulos de orientación: sin datos.</p>
     </section>
 
     <section aria-labelledby="scene-title">
-      <h2 id="scene-title">Escena inmersiva 3D</h2>
-      <p class="scene-help">En computadora: arrastra con el mouse para centrar la mirilla sobre el punto. En teléfono: mueve el dispositivo para explorar. Mantén la vista fija en el punto naranja y observa cómo carga su anillo amarillo.</p>
+      <h2 id="scene-title">Escena inmersiva</h2>
+      <p class="scene-help">En computadora: arrastra con el mouse para centrar la mirilla sobre el punto. En teléfono: mueve suavemente el dispositivo o desliza el dedo. Mantén la vista fija en el punto naranja y observa cómo carga su anillo amarillo.</p>
       
       <div class="scene-host" id="sceneHost">
+        <!-- Ficha de Información de la Constelación (Figma de Karime: Págs. 13-15) -->
+        <div class="constellation-modal-overlay" id="constellationModal" aria-hidden="true">
+          <div class="constellation-modal-card" role="dialog" aria-modal="true" aria-labelledby="cardTitle">
+            <header class="modal-card-header">
+              <span class="badge-muestra">Dato de muestra</span>
+              <button type="button" id="closeXBtn" class="close-x-btn" aria-label="Cerrar ficha">×</button>
+            </header>
+            
+            <h2 id="cardTitle">Orión</h2>
+            <p class="constellation-story">
+              Orión parece una figura con dos hombros, dos pies y tres estrellas alineadas en el centro que forman su cinturón. Para encontrarla, busca primero esas tres estrellas juntas en el cielo nocturno.
+            </p>
+
+            <!-- Botón Escuchar (Páginas 8 y 14 del documento de Karime) -->
+            <div class="audio-section">
+              <button type="button" id="listenAudioBtn" class="audio-btn">
+                <span>▶</span> Escuchar
+              </button>
+              <p id="audioNotice" class="audio-notice" hidden>
+                ℹ️ La narración aún no está disponible. Puedes leer el texto.
+              </p>
+            </div>
+
+            <!-- Bloque de Libro recomendado (Páginas 13 y 18 del documento de Karime) -->
+            <div class="book-card-box">
+              <p class="book-intro-text">Si te interesa saber más, tenemos este libro en la biblioteca:</p>
+              <div class="book-item">
+                <div class="book-cover-placeholder">📖</div>
+                <div class="book-info">
+                  <span class="badge-mini">Dato de muestra</span>
+                  <p class="book-name">Libro de muestra 1 — Guía de constelaciones</p>
+                  <p class="book-author">Autor de muestra</p>
+                </div>
+              </div>
+              <p class="book-shelf-instruction">Pídelo en persona en el mostrador de la biblioteca.</p>
+            </div>
+
+            <!-- Botón Volver al recorrido -->
+            <div class="modal-card-actions">
+              <button type="button" id="returnFromModalBtn" class="return-main-btn">
+                ← Volver al recorrido
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Escena A-Frame 3D -->
         <a-scene id="testScene" embedded vr-mode-ui="enabled: false" renderer="antialias: true; colorManagement: true;">
           <a-sky color="#071426"></a-sky>
           <a-entity light="type: ambient; intensity: 1.2"></a-entity>
@@ -57,36 +104,6 @@
             <a-ring id="targetBaseRing" position="0 0 -0.02" radius-inner="0.52" radius-outer="0.68" color="#FFF4CF" material="shader: flat; side: double; opacity: 0.35"></a-ring>
             <!-- Aro de carga amarilla (#F5B301) que se llena de 0° a 360° sobre el punto fijo (oculto en reposo) -->
             <a-ring id="targetProgressRing" visible="false" position="0 0 0.02" radius-inner="0.50" radius-outer="0.70" theta-start="90" theta-length="0.001" color="#F5B301" material="shader: flat; side: double; opacity: 0.95"></a-ring>
-          </a-entity>
-
-          <!-- Panel informativo 3D de la constelación (Página 18 de Karime: DENTRO DE LA ESCENA 3D) -->
-          <a-entity id="infoPanel3D" visible="false" position="0 1.6 -3.2">
-            <!-- Fondo oscuro del panel -->
-            <a-plane width="3.2" height="2.2" color="#0B1530" material="shader: flat; opacity: 0.95"></a-plane>
-            <!-- Borde del panel en acento amarillo #F5B301 -->
-            <a-ring position="0 0 0.01" radius-inner="1.58" radius-outer="1.60" color="#F5B301" material="shader: flat; opacity: 0.85"></a-ring>
-            
-            <!-- Insignia: Dato de muestra -->
-            <a-plane position="-0.85 0.85 0.02" width="0.85" height="0.18" color="#4A3F99" material="shader: flat"></a-plane>
-            <a-text value="Dato de muestra" position="-0.85 0.85 0.03" align="center" color="#FFFFFF" width="2.4"></a-text>
-            
-            <!-- Título: Orión -->
-            <a-text value="Orión" position="-1.35 0.58 0.02" align="left" color="#FFFFFF" width="4.6"></a-text>
-            
-            <!-- Descripción / Historia -->
-            <a-text value="Orión parece una figura con dos hombros, dos pies y tres estrellas alineadas en el centro que forman su cinturón. Para encontrarla, busca primero esas tres estrellas juntas en el cielo nocturno." position="-1.35 0.22 0.02" align="left" color="#FFF4CF" width="2.9" wrap-count="38"></a-text>
-            
-            <!-- Bloque de Libro recomendado -->
-            <a-plane position="0 -0.28 0.02" width="2.8" height="0.48" color="#1B2A5A" material="shader: flat; opacity: 0.9"></a-plane>
-            <a-text value="Si te interesa saber más, tenemos este libro en la biblioteca:\nLibro de muestra 1 — Guía de constelaciones\nPídelo en persona en el mostrador de la biblioteca." position="-1.25 -0.28 0.03" align="left" color="#FFFFFF" width="2.6" wrap-count="45"></a-text>
-            
-            <!-- Botón 3D: Volver al recorrido -->
-            <a-entity id="returnBtn3D" class="selectable" position="0 -0.78 0.03" data-action="return">
-              <a-plane width="1.8" height="0.32" color="#1a4077" material="shader: flat"></a-plane>
-              <a-ring position="0 0 0.01" radius-inner="0.10" radius-outer="0.14" color="#FFFFFF" material="shader: flat; side: double; opacity: 0.4"></a-ring>
-              <a-ring id="returnProgressRing" visible="false" position="0 0 0.02" radius-inner="0.09" radius-outer="0.15" theta-start="90" theta-length="0.001" color="#F5B301" material="shader: flat; side: double; opacity: 0.95"></a-ring>
-              <a-text value="← Volver al recorrido" align="center" position="0 0 0.04" color="#FFFFFF" width="3.2"></a-text>
-            </a-entity>
           </a-entity>
 
           <!-- Cámara con mirilla central (retícula ligera y visible) -->
