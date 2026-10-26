@@ -1,8 +1,8 @@
 /* AstroVisor — Sprint 2: Selección por mirada accesible (Karime)
    - Retícula y permanencia de 3 segundos sin prisa (#F5B301).
    - Anillo de carga sobre el punto de la constelación.
-   - Al completar los 3 s, se abre la ficha de información de la constelación con libro recomendado (Pág. 18 de Karime).
-   - Botón "Volver al recorrido" para regresar a las constelaciones en 0 %.
+   - Panel de información de la constelación integrado DENTRO DE LA ESCENA 3D (Pág. 18).
+   - Botón 3D "Volver al recorrido" operable por mirada o toque directo.
 */
 (function () {
   'use strict';
@@ -19,7 +19,7 @@
   };
 
   const browserInfo = `${navigator.userAgent}`;
-  eventLine(`Prueba iniciada | S2: Selección por mirada e información de constelación | ${new Date().toISOString()}`);
+  eventLine(`Prueba iniciada | S2: Panel de información integrado en escena 3D | ${new Date().toISOString()}`);
   eventLine(`Navegador: ${browserInfo}`);
   eventLine(`Contexto seguro: ${window.isSecureContext ? 'sí' : 'no'}`);
 
@@ -33,12 +33,16 @@
   const stereoStatus = $('stereoStatus');
   const selectionStatus = $('selectionStatus');
   const angles = $('angles');
+
+  // Elementos de la escena 3D
+  const targetContainer = $('targetContainer');
   const target = $('target');
   const targetProgressRing = $('targetProgressRing');
+  const infoPanel3D = $('infoPanel3D');
+  const returnBtn3D = $('returnBtn3D');
+  const returnProgressRing = $('returnProgressRing');
   const reticleRing = $('reticleRing');
   const centerDot = $('centerDot');
-  const constellationInfoModal = $('constellationInfoModal');
-  const returnToSkyBtn = $('returnToSkyBtn');
 
   // Constantes visuales
   const TARGET_BASE_COLOR = '#e59b3d';
@@ -54,11 +58,19 @@
   let isPaused = false;
   let isModalOpen = false;
 
+  // Evita que se autodispare el punto al cargar la página antes de que el usuario empiece a interactuar
+  let userReady = false;
+  setTimeout(() => { userReady = true; }, 1200);
+  window.addEventListener('mousemove', () => { userReady = true; }, { once: true });
+  window.addEventListener('touchstart', () => { userReady = true; }, { once: true });
+
   // Estado del temporizador de mirada
+  let activeTarget = null;
+  let activeRing = null;
+  let activeRadii = { inner: 0.50, outer: 0.70 };
   let gazeStartTime = null;
   let gazeRaf = null;
   let currentStage = '0%';
-  let isTargetHovered = false;
 
   // Retroalimentación auditiva accesible (Web Audio API)
   function playConfirmationSound() {
@@ -83,33 +95,47 @@
     } catch (_) {}
   }
 
-  // Actualiza el anillo de carga amarillo (#F5B301) sobre el punto de la constelación
-  function setTargetRingProgress(progress, ringColor = '#F5B301') {
-    if (!targetProgressRing) return;
+  // Actualiza el anillo de carga amarillo (#F5B301) sobre cualquier objeto enfocado
+  function setRingProgress(ringEl, progress, color = '#F5B301', rInner = 0.50, rOuter = 0.70) {
+    if (!ringEl) return;
     if (progress <= 0) {
-      targetProgressRing.setAttribute('visible', 'false');
-      targetProgressRing.setAttribute('geometry', 'primitive: ring; radiusInner: 0.50; radiusOuter: 0.70; thetaStart: 90; thetaLength: 0.001');
+      ringEl.setAttribute('visible', 'false');
+      ringEl.setAttribute('geometry', `primitive: ring; radiusInner: ${rInner}; radiusOuter: ${rOuter}; thetaStart: 90; thetaLength: 0.001`);
       return;
     }
-    targetProgressRing.setAttribute('visible', 'true');
+    ringEl.setAttribute('visible', 'true');
     const p = Math.min(1.0, Math.max(0.002, progress));
-    const angle = -(p * 360); // sentido horario desde arriba (thetaStart=90)
-    targetProgressRing.setAttribute('geometry', `primitive: ring; radiusInner: 0.50; radiusOuter: 0.70; thetaStart: 90; thetaLength: ${angle}`);
-    targetProgressRing.setAttribute('material', `color: ${ringColor}; shader: flat; side: double; opacity: 0.95`);
+    const angle = -(p * 360);
+    ringEl.setAttribute('geometry', `primitive: ring; radiusInner: ${rInner}; radiusOuter: ${rOuter}; thetaStart: 90; thetaLength: ${angle}`);
+    ringEl.setAttribute('material', `color: ${color}; shader: flat; side: double; opacity: 0.95`);
   }
 
-  function startGaze() {
-    if (isPaused || isTargetHovered || isModalOpen) return;
-    isTargetHovered = true;
+  function startGaze(el) {
+    if (!userReady || isPaused || activeTarget) return;
+
+    const action = el.getAttribute('data-action') || 'target';
+
+    // Si el panel de información está abierto, solo se permite mirar el botón de volver
+    if (isModalOpen && action !== 'return') return;
+    if (!isModalOpen && action === 'return') return;
+
+    activeTarget = el;
+    if (action === 'target') {
+      activeRing = targetProgressRing;
+      activeRadii = { inner: 0.50, outer: 0.70 };
+      eventLine('Mirada fija sobre Orión — iniciando carga de 3 s');
+    } else if (action === 'return') {
+      activeRing = returnProgressRing;
+      activeRadii = { inner: 0.09, outer: 0.15 };
+      eventLine('Mirada fija sobre [Volver al recorrido] — iniciando carga de 3 s');
+    }
+
     gazeStartTime = performance.now();
     currentStage = '0%';
-    setTargetRingProgress(0.002, '#F5B301');
-    target.setAttribute('color', TARGET_BASE_COLOR);
-
-    eventLine('Mirada fija sobre Orión — iniciando carga de permanencia (3.0 s)');
+    setRingProgress(activeRing, 0.002, '#F5B301', activeRadii.inner, activeRadii.outer);
 
     function tick() {
-      if (!isTargetHovered || isPaused || isModalOpen) return;
+      if (!activeTarget || isPaused) return;
 
       const elapsed = performance.now() - gazeStartTime;
       const progress = Math.min(elapsed / DWELL_TIME_MS, 1.0);
@@ -121,14 +147,14 @@
 
       if (stage !== currentStage) {
         currentStage = stage;
-        eventLine(`Carga de Orión: ${stage} (${Math.round(elapsed)} ms)`);
+        eventLine(`Carga ${action}: ${stage} (${Math.round(elapsed)} ms)`);
       }
 
-      setTargetRingProgress(progress, '#F5B301');
-      selectionStatus.textContent = `Enfocando Orión: etapa ${stage} (${Math.round(progress * 100)} %)...`;
+      setRingProgress(activeRing, progress, '#F5B301', activeRadii.inner, activeRadii.outer);
+      selectionStatus.textContent = `Enfocando ${action === 'target' ? 'Orión' : 'Volver al recorrido'}: etapa ${stage} (${Math.round(progress * 100)} %)...`;
 
       if (progress >= 1.0) {
-        completeGazeSelection();
+        completeGazeSelection(activeTarget, action);
       } else {
         gazeRaf = requestAnimationFrame(tick);
       }
@@ -138,90 +164,94 @@
   }
 
   function cancelGaze() {
-    if (!isTargetHovered) return;
-    isTargetHovered = false;
+    if (!activeTarget) return;
     if (gazeRaf) {
       cancelAnimationFrame(gazeRaf);
       gazeRaf = null;
     }
     const elapsed = gazeStartTime ? Math.round(performance.now() - gazeStartTime) : 0;
     eventLine(`Mirada retirada a los ${elapsed} ms — carga reiniciada a 0 %`);
-    selectionStatus.textContent = 'Mirada retirada. El anillo amarillo se reinició a 0 %.';
+    selectionStatus.textContent = isModalOpen
+      ? 'Panel de información abierto. Enfoca "Volver al recorrido" o pulsa sobre él.'
+      : 'Mirada retirada. Anillo reiniciado a 0 %.';
     currentStage = '0%';
-    setTargetRingProgress(0, '#F5B301');
+
+    setRingProgress(targetProgressRing, 0, '#F5B301', 0.50, 0.70);
+    if (returnProgressRing) setRingProgress(returnProgressRing, 0, '#F5B301', 0.09, 0.15);
     target.setAttribute('color', TARGET_BASE_COLOR);
-    if (reticleRing) reticleRing.setAttribute('material', 'color: #ffffff');
-    if (centerDot) centerDot.setAttribute('material', 'color: #ffffff');
+
+    activeTarget = null;
+    activeRing = null;
   }
 
-  function completeGazeSelection() {
+  function completeGazeSelection(el, action) {
     if (gazeRaf) cancelAnimationFrame(gazeRaf);
     gazeRaf = null;
-    isTargetHovered = false;
 
-    selectionCount++;
-    // Confirmación visual en verde de éxito (#1E7B3A)
-    setTargetRingProgress(1.0, CONFIRM_COLOR);
-    target.setAttribute('color', CONFIRM_COLOR);
-    if (reticleRing) reticleRing.setAttribute('material', `color: ${CONFIRM_COLOR}`);
-    if (centerDot) centerDot.setAttribute('material', `color: ${CONFIRM_COLOR}`);
-
+    setRingProgress(activeRing, 1.0, CONFIRM_COLOR, activeRadii.inner, activeRadii.outer);
     playConfirmationSound();
-    selectionStatus.textContent = `✓ Selección #${selectionCount} COMPLETADA: abriendo información de Orión...`;
-    eventLine(`✓ Selección #${selectionCount} de Orión completada al 100% por permanencia (3000 ms).`);
 
-    // Abre la ficha informativa de inmediato con un leve destello de confirmación (180 ms)
-    setTimeout(() => {
-      openConstellationInfo();
-      setTargetRingProgress(0, '#F5B301');
-      target.setAttribute('color', TARGET_BASE_COLOR);
-      if (reticleRing) reticleRing.setAttribute('material', 'color: #ffffff');
-      if (centerDot) centerDot.setAttribute('material', 'color: #ffffff');
-    }, 180);
+    if (action === 'target') {
+      selectionCount++;
+      target.setAttribute('color', CONFIRM_COLOR);
+      selectionStatus.textContent = `✓ Selección #${selectionCount} COMPLETADA: abriendo información de Orión en el visor 3D...`;
+      eventLine(`✓ Selección #${selectionCount} completada: abriendo ficha 3D de Orión.`);
+
+      setTimeout(() => {
+        openConstellationInfo3D();
+        setRingProgress(targetProgressRing, 0, '#F5B301', 0.50, 0.70);
+        target.setAttribute('color', TARGET_BASE_COLOR);
+        activeTarget = null;
+      }, 350);
+    } else if (action === 'return') {
+      selectionStatus.textContent = '✓ Volviendo al cielo nocturno...';
+      eventLine('✓ Cerrando ficha 3D y volviendo a las constelaciones.');
+
+      setTimeout(() => {
+        closeConstellationInfo3D();
+        setRingProgress(returnProgressRing, 0, '#F5B301', 0.09, 0.15);
+        activeTarget = null;
+      }, 300);
+    }
   }
 
-  function openConstellationInfo() {
+  function openConstellationInfo3D() {
     isModalOpen = true;
-    if (constellationInfoModal) {
-      constellationInfoModal.classList.add('is-open');
-      constellationInfoModal.style.display = 'flex';
-    }
-    selectionStatus.textContent = 'Ficha de Orión abierta. Pulsa "Volver al recorrido" para regresar a las constelaciones.';
-    eventLine('Ficha de información de Orión abierta.');
+    if (infoPanel3D) infoPanel3D.setAttribute('visible', 'true');
+    if (targetContainer) targetContainer.setAttribute('visible', 'false');
+    selectionStatus.textContent = 'Panel informativo 3D abierto. Toca con el dedo o enfoca "← Volver al recorrido" para regresar.';
+    eventLine('Panel informativo 3D de Orión abierto dentro de la escena.');
   }
 
-  function closeConstellationInfo() {
+  function closeConstellationInfo3D() {
     isModalOpen = false;
-    if (constellationInfoModal) {
-      constellationInfoModal.classList.remove('is-open');
-      constellationInfoModal.style.display = 'none';
-    }
+    if (infoPanel3D) infoPanel3D.setAttribute('visible', 'false');
+    if (targetContainer) targetContainer.setAttribute('visible', 'true');
     cancelGaze();
-    selectionStatus.textContent = 'De vuelta en el cielo nocturno. Apunta a Orión durante 3 s para volver a abrir su información.';
+    selectionStatus.textContent = 'De vuelta en el cielo nocturno. Enfoca el punto de nuevo durante 3 s para abrir su información.';
     eventLine('Regresando a las constelaciones (Visor: 0 %).');
   }
 
-  // Botón "Volver al recorrido" dentro de la ficha de información
-  if (returnToSkyBtn) {
-    returnToSkyBtn.addEventListener('click', closeConstellationInfo);
-  }
-
-  // Botón para previsualizar la ficha directamente desde los controles
-  const showInfoDirectBtn = $('showInfoDirectBtn');
-  if (showInfoDirectBtn) {
-    showInfoDirectBtn.addEventListener('click', openConstellationInfo);
-  }
-
-  // Eventos sobre el punto objetivo
-  target.addEventListener('mouseenter', startGaze);
-  target.addEventListener('mouseleave', cancelGaze);
-
-  // Soporte directo por clic o toque en el punto (accesibilidad en pantalla 2D)
-  target.addEventListener('click', () => {
-    completeGazeSelection();
+  // Conectar eventos sobre todos los objetos seleccionables (.selectable)
+  const selectableEls = document.querySelectorAll('.selectable');
+  selectableEls.forEach((el) => {
+    el.addEventListener('mouseenter', () => startGaze(el));
+    el.addEventListener('mouseleave', cancelGaze);
+    el.addEventListener('click', () => {
+      userReady = true;
+      const action = el.getAttribute('data-action') || 'target';
+      if (action === 'target') {
+        selectionCount++;
+        playConfirmationSound();
+        openConstellationInfo3D();
+      } else if (action === 'return') {
+        playConfirmationSound();
+        closeConstellationInfo3D();
+      }
+    });
   });
 
-  // Botón Pausar mirilla
+  // Botón Pausar mirilla de la interfaz
   function togglePause() {
     isPaused = !isPaused;
     if (isPaused) {
@@ -252,6 +282,7 @@
   const listenOrientation = (event) => {
     if ([event.alpha, event.beta, event.gamma].every((v) => v == null)) return;
     orientationEvents++;
+    userReady = true;
     const now = Date.now();
     if (now - lastUpdate > 400) {
       lastUpdate = now;
@@ -260,12 +291,6 @@
       status.textContent = `Sensores: recibidos ${orientationEvents} eventos. Mueve el teléfono para orientar.`;
     }
     if (orientationEvents === 1) eventLine('Se recibió el primer evento de orientación con datos.');
-    if (lastSample && orientationEvents > 2 && Math.abs((event.beta ?? 0) - (lastSample.beta ?? 0)) > 8) {
-      if (!window.__astroOrientationVariationLogged) {
-        window.__astroOrientationVariationLogged = true;
-        eventLine('Variación de ángulo detectada.');
-      }
-    }
     lastSample = { beta: event.beta };
   };
   window.addEventListener('deviceorientation', listenOrientation);
@@ -372,7 +397,7 @@
   exitButton.addEventListener('click', exitStereo);
   document.addEventListener('keydown', (event) => {
     if (event.key === 'Escape') {
-      if (isModalOpen) closeConstellationInfo();
+      if (isModalOpen) closeConstellationInfo3D();
       else exitStereo();
     }
   });

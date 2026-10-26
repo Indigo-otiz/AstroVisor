@@ -19,7 +19,7 @@
   </header>
   <main id="main">
     <h1>Prueba técnica de visor Homido</h1>
-    <p class="lead">Selección por mirada con retroalimentación accesible. Al enfocar el punto de la constelación durante 3 segundos, se carga su anillo amarillo (#F5B301) y se abre la ficha con su historia y libro recomendado.</p>
+    <p class="lead">Selección por mirada con retroalimentación accesible. Al enfocar el punto fijo de la constelación durante 3 segundos, se carga su anillo amarillo (#F5B301) y se abre la ficha 3D con su historia y libro de muestra dentro del visor.</p>
     <div class="notice" role="note">
       <strong>Prueba con precaución.</strong> Si aparece mareo o fatiga visual, retira el visor o pulsa el botón de Pausa. Siéntate y mantén el entorno despejado.
     </div>
@@ -31,19 +31,18 @@
         <button id="permissionButton" type="button">Solicitar sensores</button>
         <button id="stereoButton" type="button" disabled>Probar vista dividida</button>
         <button id="pauseButton" class="secondary" type="button">Pausar mirilla</button>
-        <button id="showInfoDirectBtn" class="secondary" type="button">Ver ficha de información</button>
         <button id="exitButton" class="secondary" type="button" hidden>Salir de vista dividida</button>
         <a class="button secondary" href="/explorar">Regresar al modo web 2D</a>
       </div>
       <p class="status" id="orientationStatus" role="status" aria-live="polite">Sensores: listos para comprobar.</p>
       <p class="status" id="stereoStatus" role="status" aria-live="polite">Vista estereoscópica: modo 2D activo.</p>
-      <p class="status" id="selectionStatus" role="status" aria-live="polite">Selección: apunta al punto fijo de Orión durante 3 segundos para abrir su información.</p>
+      <p class="status" id="selectionStatus" role="status" aria-live="polite">Selección: apunta al punto fijo de Orión durante 3 segundos para abrir su información en 3D.</p>
       <p class="small" id="angles">Ángulos de orientación: sin datos.</p>
     </section>
 
     <section aria-labelledby="scene-title">
-      <h2 id="scene-title">Escena de demostración</h2>
-      <p class="scene-help">En computadora: arrastra con el mouse para centrar la mirilla sobre el punto. En teléfono: mueve suavemente el dispositivo o desliza el dedo. Mantén la vista fija en el punto naranja y observa cómo carga su anillo amarillo.</p>
+      <h2 id="scene-title">Escena inmersiva 3D</h2>
+      <p class="scene-help">En computadora: arrastra con el mouse para centrar la mirilla sobre el punto. En teléfono: mueve el dispositivo para explorar. Mantén la vista fija en el punto naranja y observa cómo carga su anillo amarillo.</p>
       
       <div class="scene-host" id="sceneHost">
         <a-scene id="testScene" embedded vr-mode-ui="enabled: false" renderer="antialias: true; colorManagement: true;">
@@ -53,11 +52,41 @@
           <!-- Punto fijo de la constelación de Orión con aro de carga progresiva amarilla -->
           <a-entity id="targetContainer" position="0 1.6 -4">
             <!-- Esfera / punto fijo central -->
-            <a-sphere class="selectable" id="target" radius="0.42" color="#e59b3d" material="shader: flat"></a-sphere>
+            <a-sphere class="selectable" id="target" data-action="target" radius="0.42" color="#e59b3d" material="shader: flat"></a-sphere>
             <!-- Aro base neutro de fondo -->
             <a-ring id="targetBaseRing" position="0 0 -0.02" radius-inner="0.52" radius-outer="0.68" color="#FFF4CF" material="shader: flat; side: double; opacity: 0.35"></a-ring>
             <!-- Aro de carga amarilla (#F5B301) que se llena de 0° a 360° sobre el punto fijo (oculto en reposo) -->
             <a-ring id="targetProgressRing" visible="false" position="0 0 0.02" radius-inner="0.50" radius-outer="0.70" theta-start="90" theta-length="0.001" color="#F5B301" material="shader: flat; side: double; opacity: 0.95"></a-ring>
+          </a-entity>
+
+          <!-- Panel informativo 3D de la constelación (Página 18 de Karime: DENTRO DE LA ESCENA 3D) -->
+          <a-entity id="infoPanel3D" visible="false" position="0 1.6 -3.2">
+            <!-- Fondo oscuro del panel -->
+            <a-plane width="3.2" height="2.2" color="#0B1530" material="shader: flat; opacity: 0.95"></a-plane>
+            <!-- Borde del panel en acento amarillo #F5B301 -->
+            <a-ring position="0 0 0.01" radius-inner="1.58" radius-outer="1.60" color="#F5B301" material="shader: flat; opacity: 0.85"></a-ring>
+            
+            <!-- Insignia: Dato de muestra -->
+            <a-plane position="-0.85 0.85 0.02" width="0.85" height="0.18" color="#4A3F99" material="shader: flat"></a-plane>
+            <a-text value="Dato de muestra" position="-0.85 0.85 0.03" align="center" color="#FFFFFF" width="2.4"></a-text>
+            
+            <!-- Título: Orión -->
+            <a-text value="Orión" position="-1.35 0.58 0.02" align="left" color="#FFFFFF" width="4.6"></a-text>
+            
+            <!-- Descripción / Historia -->
+            <a-text value="Orión parece una figura con dos hombros, dos pies y tres estrellas alineadas en el centro que forman su cinturón. Para encontrarla, busca primero esas tres estrellas juntas en el cielo nocturno." position="-1.35 0.22 0.02" align="left" color="#FFF4CF" width="2.9" wrap-count="38"></a-text>
+            
+            <!-- Bloque de Libro recomendado -->
+            <a-plane position="0 -0.28 0.02" width="2.8" height="0.48" color="#1B2A5A" material="shader: flat; opacity: 0.9"></a-plane>
+            <a-text value="Si te interesa saber más, tenemos este libro en la biblioteca:\nLibro de muestra 1 — Guía de constelaciones\nPídelo en persona en el mostrador de la biblioteca." position="-1.25 -0.28 0.03" align="left" color="#FFFFFF" width="2.6" wrap-count="45"></a-text>
+            
+            <!-- Botón 3D: Volver al recorrido -->
+            <a-entity id="returnBtn3D" class="selectable" position="0 -0.78 0.03" data-action="return">
+              <a-plane width="1.8" height="0.32" color="#1a4077" material="shader: flat"></a-plane>
+              <a-ring position="0 0 0.01" radius-inner="0.10" radius-outer="0.14" color="#FFFFFF" material="shader: flat; side: double; opacity: 0.4"></a-ring>
+              <a-ring id="returnProgressRing" visible="false" position="0 0 0.02" radius-inner="0.09" radius-outer="0.15" theta-start="90" theta-length="0.001" color="#F5B301" material="shader: flat; side: double; opacity: 0.95"></a-ring>
+              <a-text value="← Volver al recorrido" align="center" position="0 0 0.04" color="#FFFFFF" width="3.2"></a-text>
+            </a-entity>
           </a-entity>
 
           <!-- Cámara con mirilla central (retícula ligera y visible) -->
@@ -76,27 +105,6 @@
         </a-scene>
       </div>
     </section>
-
-    <!-- Ficha de información de la constelación (Página 18 de Karime: modal de pantalla completa) -->
-    <div class="constellation-info-backdrop" id="constellationInfoModal" role="dialog" aria-modal="true" aria-labelledby="constellationTitle">
-      <div class="constellation-info-card">
-        <span class="badge-sample">Dato de muestra</span>
-        <h2 id="constellationTitle">Orión</h2>
-        <p class="constellation-desc" id="constellationDesc">
-          Orión parece una figura con dos hombros, dos pies y tres estrellas alineadas en el centro que forman su cinturón. Para encontrarla, busca primero esas tres estrellas juntas en el cielo nocturno.
-        </p>
-        <div class="book-box">
-          <p class="book-prompt">Si te interesa saber más, tenemos este libro en la biblioteca:</p>
-          <p class="book-name">Libro de muestra 1 — Guía de constelaciones</p>
-          <p class="book-note">Pídelo en persona en el mostrador de la biblioteca.</p>
-        </div>
-        <div class="card-actions">
-          <button type="button" id="returnToSkyBtn" class="return-btn">
-            ← Volver al recorrido
-          </button>
-        </div>
-      </div>
-    </div>
 
     <section class="log-panel" aria-labelledby="log-title">
       <h2 id="log-title">Registro de esta sesión</h2>
