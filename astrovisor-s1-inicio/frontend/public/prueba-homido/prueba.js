@@ -74,6 +74,10 @@
     } catch (_) {}
   }
 
+  // Color base estable del punto fijo objetivo (naranja cálido original)
+  const TARGET_BASE_COLOR = '#e59b3d';
+  const CONFIRM_COLOR = '#1E7B3A'; // Verde de éxito según sistema visual WCAG
+
   // Actualiza el anillo de carga amarillo (#F5B301) sobre el punto fijo objetivo
   function setTargetRingProgress(progress, ringColor = '#F5B301') {
     if (!targetProgressRing) return;
@@ -95,9 +99,8 @@
     gazeStartTime = performance.now();
     currentStage = '0%';
     setTargetRingProgress(0.002, '#F5B301');
-    target.setAttribute('color', '#F5B301'); // Ilumina el punto fijo en amarillo indicando inicio de carga
-    if (reticleRing) reticleRing.setAttribute('material', 'color: #F5B301');
-    if (centerDot) centerDot.setAttribute('material', 'color: #F5B301');
+    // El círculo del centro mantiene su color base estable; solo el anillo exterior carga en amarillo
+    target.setAttribute('color', TARGET_BASE_COLOR);
 
     eventLine('Mirada fija sobre el punto — iniciando carga de anillo amarillo (3.0 s)');
 
@@ -142,7 +145,7 @@
     selectionStatus.textContent = 'Mirada retirada. El anillo amarillo de carga se reinició a 0 %.';
     currentStage = '0%';
     setTargetRingProgress(0, '#F5B301'); // Oculta completamente el anillo
-    target.setAttribute('color', selectionCount % 2 ? '#62bda1' : '#e59b3d');
+    target.setAttribute('color', TARGET_BASE_COLOR);
     if (reticleRing) reticleRing.setAttribute('material', 'color: #ffffff');
     if (centerDot) centerDot.setAttribute('material', 'color: #ffffff');
   }
@@ -153,23 +156,23 @@
     isTargetHovered = false;
 
     selectionCount++;
-    // Confirmación visual en verde de éxito (#1E7B3A y #62bda1)
-    setTargetRingProgress(1.0, '#1E7B3A');
-    const confirmedColor = selectionCount % 2 ? '#62bda1' : '#4bb392';
-    target.setAttribute('color', confirmedColor);
-    if (reticleRing) reticleRing.setAttribute('material', 'color: #1E7B3A');
-    if (centerDot) centerDot.setAttribute('material', 'color: #1E7B3A');
+    // Confirmación visual en verde de éxito (#1E7B3A)
+    setTargetRingProgress(1.0, CONFIRM_COLOR);
+    target.setAttribute('color', CONFIRM_COLOR);
+    if (reticleRing) reticleRing.setAttribute('material', `color: ${CONFIRM_COLOR}`);
+    if (centerDot) centerDot.setAttribute('material', `color: ${CONFIRM_COLOR}`);
 
     playConfirmationSound();
     selectionStatus.textContent = `✓ Selección #${selectionCount} COMPLETADA: el punto fijo cargó al 100% por permanencia de 3 s.`;
     eventLine(`✓ Selección #${selectionCount} COMPLETADA: anillo lleno y confirmado a los 3000 ms.`);
 
-    // Oculta el anillo de carga tras 500 ms de confirmación para permitir nueva selección limpia
+    // Tras 600 ms de confirmación verde, regresa el punto a su color base y oculta el anillo para la siguiente selección
     setTimeout(() => {
       setTargetRingProgress(0, '#F5B301');
+      target.setAttribute('color', TARGET_BASE_COLOR);
       if (reticleRing) reticleRing.setAttribute('material', 'color: #ffffff');
       if (centerDot) centerDot.setAttribute('material', 'color: #ffffff');
-    }, 550);
+    }, 600);
   }
 
   // Eventos sobre el punto objetivo
@@ -179,10 +182,13 @@
   // Soporte directo por clic o toque en el punto (accesibilidad en pantalla 2D)
   target.addEventListener('click', () => {
     selectionCount++;
-    target.setAttribute('color', selectionCount % 2 ? '#62bda1' : '#e59b3d');
+    target.setAttribute('color', CONFIRM_COLOR);
     playConfirmationSound();
     selectionStatus.textContent = `Selección #${selectionCount} activada por clic/toque en el punto.`;
     eventLine(`Selección #${selectionCount} por interacción táctil/ratón.`);
+    setTimeout(() => {
+      target.setAttribute('color', TARGET_BASE_COLOR);
+    }, 500);
   });
 
   // Botón Pausar mirilla
