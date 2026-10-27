@@ -6,10 +6,13 @@ import VisorView from '../views/VisorView.vue'
 import AdminAccesoView from '../views/AdminAccesoView.vue'
 import AdminPanelView from '../views/AdminPanelView.vue'
 
-// Sprint 1: no hay autenticación implementada. NUNCA usar esta función
-// como una supuesta garantía de seguridad. La autorización real va en Express.
-function isAdminAuthenticated() {
-  return false
+function checkAdminAuth() {
+  try {
+    const session = localStorage.getItem('astrovisor_admin_session')
+    return Boolean(session && JSON.parse(session)?.id)
+  } catch {
+    return false
+  }
 }
 
 const routes = [
@@ -22,10 +25,18 @@ const routes = [
   { path: '/:pathMatch(.*)*', redirect: '/' },
 ]
 
-const router = createRouter({ history: createWebHistory(), routes, scrollBehavior: (_to, _from, saved) => saved ?? { top: 0 } })
+const router = createRouter({
+  history: createWebHistory(),
+  routes,
+  scrollBehavior: (_to, _from, saved) => saved ?? { top: 0 },
+})
+
 router.beforeEach((to) => {
-  if (to.meta.requiresAdmin && !isAdminAuthenticated()) {
-    return { name: 'admin-acceso' }
+  if (to.meta.requiresAdmin) {
+    const isAuthenticated = checkAdminAuth()
+    if (!isAuthenticated) {
+      return { name: 'admin-acceso' }
+    }
   }
 })
 
