@@ -72,11 +72,37 @@
   let isModalOpen = false;
   let audioNoticeActive = false;
 
-  // Evita que se autodispare el punto al cargar la página antes de que el usuario empiece a interactuar
+  let cancelGraceTimer = null;
+
+  function checkCurrentFocus() {
+    if (!userReady || isPaused || activeTarget) return;
+    if (!gazeCursor || !gazeCursor.components || !gazeCursor.components.raycaster) return;
+    const intersectedEls = gazeCursor.components.raycaster.intersectedEls;
+    if (intersectedEls && intersectedEls.length > 0) {
+      for (let i = 0; i < intersectedEls.length; i++) {
+        const el = intersectedEls[i];
+        if (el && el.classList && el.classList.contains('selectable')) {
+          startGaze(el);
+          break;
+        }
+      }
+    }
+  }
+
+  // Evita que se autodispare el punto en los primeros instantes mientras el usuario acomoda el visor
   let userReady = false;
-  setTimeout(() => { userReady = true; }, 1000);
-  window.addEventListener('mousemove', () => { userReady = true; }, { once: true });
-  window.addEventListener('touchstart', () => { userReady = true; }, { once: true });
+  setTimeout(() => {
+    userReady = true;
+    checkCurrentFocus();
+  }, 600);
+  window.addEventListener('mousemove', () => {
+    userReady = true;
+    checkCurrentFocus();
+  }, { once: true });
+  window.addEventListener('touchstart', () => {
+    userReady = true;
+    checkCurrentFocus();
+  }, { once: true });
 
   // Estado del temporizador de mirada
   let activeTarget = null;
@@ -291,6 +317,10 @@
   }
 
   function startGaze(el) {
+    if (cancelGraceTimer) {
+      clearTimeout(cancelGraceTimer);
+      cancelGraceTimer = null;
+    }
     if (!userReady) return;
     const action = el.getAttribute('data-action') || 'target';
 
@@ -299,7 +329,12 @@
     // Si la ficha de información está abierta, solo permite volver o audio
     if (isModalOpen && action !== 'return' && action !== 'audio') return;
     if (!isModalOpen && (action === 'return' || action === 'audio')) return;
-    if (activeTarget === el) return;
+
+    // Si ya estamos enfocando un objetivo con la misma acción (ej. el punto y su aro colisionador), mantenemos la carga sin resetear
+    if (activeTarget) {
+      const activeAction = activeTarget.getAttribute('data-action') || 'target';
+      if (activeAction === action) return;
+    }
 
     if (gazeRaf) {
       cancelAnimationFrame(gazeRaf);
@@ -310,6 +345,7 @@
     if (action === 'target') {
       activeRing = targetProgressRing;
       activeRadii = { inner: 0.50, outer: 0.70 };
+      target.setAttribute('color', '#F5B301'); // Ilumina en amarillo cálido al iniciar enfoque
       eventLine('Mirada fija sobre Orión — iniciando carga de 3 s');
     } else if (action === 'return') {
       activeRing = returnProgressRing;
@@ -364,7 +400,20 @@
     gazeRaf = requestAnimationFrame(tick);
   }
 
+  function requestCancelGaze() {
+    if (cancelGraceTimer) return;
+    // Margen de gracia accesible de 280 ms para amortiguar parpadeos y microtemblores involuntarios de cabeza
+    cancelGraceTimer = setTimeout(() => {
+      cancelGraceTimer = null;
+      cancelGaze();
+    }, 280);
+  }
+
   function cancelGaze() {
+    if (cancelGraceTimer) {
+      clearTimeout(cancelGraceTimer);
+      cancelGraceTimer = null;
+    }
     if (gazeRaf) {
       cancelAnimationFrame(gazeRaf);
       gazeRaf = null;
@@ -510,13 +559,26 @@
     selectableEls.forEach((el) => {
       // Eventos estándar de A-Frame cursor
       el.addEventListener('mouseenter', () => startGaze(el));
-      el.addEventListener('mouseleave', cancelGaze);
+      el.addEventListener('mouseleave', requestCancelGaze);
       // Eventos directos del raycaster para máxima fiabilidad en WebGL
       el.addEventListener('raycaster-intersected', () => startGaze(el));
-      el.addEventListener('raycaster-intersected-cleared', cancelGaze);
+      el.addEventListener('raycaster-intersected-cleared', requestCancelGaze);
       // Eventos de clic / toque táctil
       el.addEventListener('click', () => handleSelectableClick(el));
     });
+
+    if (gazeCursor) {
+      gazeCursor.addEventListener('raycaster-intersection', (evt) => {
+        if (!userReady || isPaused || activeTarget) return;
+        const els = evt.detail && evt.detail.els;
+        if (els && els.length > 0) {
+          startGaze(els[0]);
+        }
+      });
+      gazeCursor.addEventListener('raycaster-intersection-cleared', () => {
+        requestCancelGaze();
+      });
+    }
   }
 
   if (scene) {
@@ -561,6 +623,21 @@
 
   if (pauseButton) {
     pauseButton.addEventListener('click', togglePause);
+  }
+
+  const reticleToggleButton = $('reticleToggleButton');
+  const reticleGroup = $('reticleGroup');
+  let reticleVisible = true;
+
+  if (reticleToggleButton && reticleGroup) {
+    reticleToggleButton.addEventListener('click', () => {
+      reticleVisible = !reticleVisible;
+      reticleGroup.setAttribute('visible', reticleVisible ? 'true' : 'false');
+      reticleToggleButton.textContent = reticleVisible
+        ? 'Ocultar mirilla guía'
+        : 'Mostrar mirilla guía';
+      eventLine(reticleVisible ? 'Mirilla visual activada como guía.' : 'Modo mirada pura activo (sin puntito en pantalla).');
+    });
   }
 
   // Sensores de orientación física (móvil)
@@ -678,7 +755,10 @@
     stereoButton.disabled = true;
     stereoStatus.textContent = 'Vista dividida ACTIVADA: gira el teléfono a horizontal.';
     eventLine('Vista dividida activada.');
-    window.dispatchEvent(new Event('resize'));
+    requestAnimationFrame(() => {
+      if (scene && scene.resize) scene.resize();
+      window.dispatchEvent(new Event('resize'));
+    });
   });
 
   exitButton.addEventListener('click', exitStereo);

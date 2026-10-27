@@ -8,7 +8,7 @@
   <link rel="stylesheet" href="./styles.css" />
   <!-- Versión fija de A-Frame -->
   <script src="https://aframe.io/releases/1.8.0/aframe.min.js"></script>
-  <script defer src="./prueba.js"></script>
+  <script defer src="./prueba.js?v=2.4"></script>
 </head>
 <body>
   <header class="site-header">
@@ -31,6 +31,7 @@
         <button id="permissionButton" type="button">Solicitar sensores</button>
         <button id="stereoButton" type="button" disabled>Probar vista dividida</button>
         <button id="pauseButton" class="secondary" type="button">Pausar mirilla</button>
+        <button id="reticleToggleButton" class="secondary" type="button">Ocultar mirilla guía</button>
         <button id="exitButton" class="secondary" type="button" hidden>Salir de vista dividida</button>
         <a class="button secondary" href="/explorar">Regresar al modo web 2D</a>
       </div>
@@ -60,7 +61,9 @@
             <!-- Esfera / punto fijo central -->
             <a-sphere class="selectable" id="target" data-action="target" radius="0.42" color="#e59b3d" material="shader: flat"></a-sphere>
             <!-- Aro base neutro de fondo -->
-            <a-ring id="targetBaseRing" position="0 0 -0.02" radius-inner="0.52" radius-outer="0.68" color="#FFF4CF" material="shader: flat; side: double; opacity: 0.35"></a-ring>
+            <a-circle id="targetHitArea" class="selectable" data-action="target" radius="0.80" position="0 0 -0.04" material="shader: flat; opacity: 0.001; transparent: true"></a-circle>
+            <!-- Aro base neutro de fondo -->
+            <a-ring id="targetBaseRing" class="selectable" data-action="target" position="0 0 -0.02" radius-inner="0.52" radius-outer="0.68" color="#FFF4CF" material="shader: flat; side: double; opacity: 0.35"></a-ring>
             <!-- Aro de carga amarilla (#F5B301) que se llena de 0° a 360° sobre el punto fijo (oculto en reposo) -->
             <a-ring id="targetProgressRing" visible="false" position="0 0 0.02" radius-inner="0.50" radius-outer="0.70" theta-start="90" theta-length="0.001" color="#F5B301" material="shader: flat; side: double; opacity: 0.95"></a-ring>
           </a-entity>
@@ -101,6 +104,7 @@
 
           <!-- Cámara con mirilla central (retícula ligera y visible) -->
           <a-entity id="cameraRig" camera="active: true" look-controls="magicWindowTrackingEnabled: true; touchEnabled: true; mouseEnabled: true" position="0 1.6 0">
+            <a-entity id="gazeCursor" cursor="fuse: false; rayOrigin: entity" raycaster="objects: .selectable; far: 25" position="0 0 -1.2"></a-entity>
             <a-entity id="reticleGroup" position="0 0 -1.2">
               <!-- Halo oscuro exterior para contraste universal -->
               <a-ring radius-inner="0.016" radius-outer="0.026" color="#0B1530" material="shader: flat; side: double; opacity: 0.55"></a-ring>
@@ -108,8 +112,8 @@
               <a-ring id="reticleRing" radius-inner="0.018" radius-outer="0.024" color="#ffffff" material="shader: flat; side: double; opacity: 0.85"></a-ring>
               <!-- Mirilla central: núcleo blanco -->
               <a-circle id="centerDot" radius="0.005" color="#ffffff" material="shader: flat"></a-circle>
-              <!-- Raycaster de detección de mirada -->
-              <a-entity id="gazeCursor" cursor="fuse: false; rayOrigin: entity" raycaster="objects: .selectable; far: 25"></a-entity>
+
+
             </a-entity>
           </a-entity>
         </a-scene>
