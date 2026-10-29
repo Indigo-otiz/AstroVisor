@@ -9,7 +9,9 @@ import AdminPanelView from '../views/AdminPanelView.vue'
 function checkAdminAuth() {
   try {
     const session = localStorage.getItem('astrovisor_admin_session')
-    return Boolean(session && JSON.parse(session)?.id)
+    if (!session) return false
+    const parsed = JSON.parse(session)
+    return Boolean(parsed?.token || parsed?.user?.id || parsed?.id)
   } catch {
     return false
   }

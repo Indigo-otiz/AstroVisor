@@ -1,26 +1,23 @@
-# Decisiones de diseño: autenticación administrativa y conexión con Supabase
+# Decisiones de diseño: autenticación y permisos verificados en Express
 
-## Arquitectura de autenticación
+## Arquitectura de autenticación en Express
 
-1. **Cliente Supabase en Frontend (`frontend/src/services/supabaseClient.js`)**:
-   - Se inicializa con `createClient(supabaseUrl, supabaseAnonKey)`.
-   - Las claves se leen de `import.meta.env.VITE_SUPABASE_URL` y `import.meta.env.VITE_SUPABASE_ANON_KEY`.
-   - Si no están configuradas en `.env`, el cliente emite una advertencia clara sin tumbar la aplicación.
+1. **Endpoints de Autenticación en Express (`backend/src/index.js`)**:
+   - `POST /api/admin/login`: Recibe `{ usuario, contrasena }`. Valida los datos y consulta la tabla `admin` en Supabase (o credenciales maestras configuradas en servidor). Si coincide, genera un token de sesión seguro usando `node:crypto` y lo registra en el almacén de sesiones activas del servidor.
+   - `GET /api/admin/sesion`: Endpoint protegido por el middleware de autorización; devuelve la información del administrador actual si el token es válido.
+   - `POST /api/admin/logout`: Invalida el token en el servidor Express.
 
-2. **Gestión de estado con Composable (`frontend/src/composables/useAuth.js`)**:
-   - Mantiene una referencia reactiva `user`, `session`, `loading` e `isAdmin`.
-   - Escucha los cambios de sesión con `supabase.auth.onAuthStateChange`.
-   - Provee métodos `login(email, password)`, `logout()` y `checkAdminRole(userId)`.
+2. **Middleware de Autorización en Servidor (`backend/src/middleware/auth.js`)**:
+   - Extrae el encabezado `Authorization: Bearer <token>`.
+   - Verifica la validez y expiración del token de sesión generado por Express.
+   - Si el token es ausente, expirado o inválido, responde inmediatamente con `HTTP 401 Unauthorized` (`{ error: 'Acceso no autorizado' }`).
+   - Si es válido, inyecta `req.admin = sesion.admin` y permite el paso con `next()`.
 
-3. **Control de acceso en Vue Router (`frontend/src/router/index.js`)**:
-   - El guard `router.beforeEach` consulta la sesión activa de Supabase antes de permitir el acceso a rutas marcadas con `meta: { requiresAdmin: true }`.
-   - Si el usuario no está autenticado o no es administrador, redirige a `/admin/acceso`.
+3. **Integración con Supabase**:
+   - El servidor Express utiliza el cliente o API REST de Supabase con las credenciales de entorno para consultar `admin` y `fichas_libros`.
+   - Mantiene la compatibilidad con el esquema de tablas existente.
 
-4. **Modelo de datos en Supabase (PostgreSQL + RLS)**:
-   - Tabla `public.admin_profiles`:
-     - `id`: UUID clave primaria foránea a `auth.users(id) on delete cascade`.
-     - `email`: TEXT NOT NULL.
-     - `role`: TEXT NOT NULL DEFAULT 'admin'.
-     - `created_at`: TIMESTAMPTZ DEFAULT now().
-   - Habilitación de Row Level Security (RLS) para que sólo usuarios autenticados con rol de administrador puedan consultar o modificar datos administrativos.
-
+4. **Consumo en Frontend (`frontend/src/composables/useAuth.js`)**:
+   - El frontend envía la solicitud de login a `POST /api/admin/login` hacia Express.
+   - Guarda el token emitido por Express en `localStorage` y lo adjunta en los encabezados de peticiones protegidas.
+   - El guard de Vue Router valida la existencia y vigencia de la sesión contra el servidor.

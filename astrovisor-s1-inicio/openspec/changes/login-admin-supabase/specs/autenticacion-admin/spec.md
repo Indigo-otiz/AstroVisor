@@ -1,41 +1,40 @@
-# Autenticación y acceso administrativo
+# Autenticación y permisos administrativos en Express
 
 ## Purpose
-Permitir que el personal administrativo autorizado inicie sesión mediante Supabase Auth con correo y contraseña, protegiendo las pantallas y acciones de administración frente a usuarios anónimos o no autorizados.
+Permitir que el personal administrativo autorizado acceda a recursos y vistas protegidas mediante credenciales y permisos verificados directamente por el servidor Express, denegando todo acceso no autorizado mediante respuestas HTTP 401.
 
 ## ADDED Requirements
 
-### Requirement: Formulario de inicio de sesión administrativo
-La pantalla `/admin/acceso` SHALL proveer un formulario con campos para correo electrónico y contraseña, junto con un botón para iniciar sesión.
+### Requirement: Verificación de credenciales en servidor Express
+El servidor Express SHALL exponer un endpoint `POST /api/admin/login` que valide el usuario y la contraseña enviados, consultando la base de datos de administradores y respondiendo con un token de sesión si son válidas.
 
-#### Scenario: Intento de inicio de sesión válido
-- **WHEN** el administrador introduce credenciales válidas y envía el formulario
-- **THEN** la aplicación consulta `supabase.auth.signInWithPassword`
-- **AND** redirige exitosamente al usuario hacia `/admin`.
+#### Scenario: Credenciales válidas procesadas por el servidor
+- **WHEN** un cliente envía `POST /api/admin/login` con credenciales de administrador correctas
+- **THEN** el servidor Express responde con código HTTP 200
+- **AND** entrega un token de sesión y los datos del administrador autenticado.
 
 #### Scenario: Credenciales inválidas o incompletas
-- **WHEN** el usuario envía el formulario con campos vacíos o credenciales incorrectas
-- **THEN** la aplicación no realiza la redirección
-- **AND** muestra un mensaje descriptivo de error sin desvelar datos confidenciales.
+- **WHEN** un cliente envía `POST /api/admin/login` con usuario o contraseña erróneos o faltantes
+- **THEN** el servidor Express responde con código HTTP 401
+- **AND** no emite ningún token de sesión.
 
-### Requirement: Protección de la ruta del panel administrativo
-La aplicación SHALL restringir el acceso a `/admin` y requerir una sesión autenticada activa en Supabase.
+### Requirement: Protección y denegación de rutas administrativas en Express
+El servidor Express SHALL interceptar todas las solicitudes a rutas `/api/admin/*` mediante un middleware de autorización que requiera un token de sesión válido emitido por el servidor.
 
-#### Scenario: Acceso directo sin autenticación previa
-- **WHEN** un visitante no autenticado navega directamente a `/admin`
-- **THEN** el guard de Vue Router intercepta la navegación
-- **AND** redirige al usuario hacia `/admin/acceso`.
+#### Scenario: Intento de acceso sin token de sesión
+- **WHEN** una solicitud HTTP se dirige a un recurso protegido bajo `/api/admin/*` sin encabezado de autorización
+- **THEN** el servidor responde inmediatamente con código HTTP 401
+- **AND** bloquea el procesamiento del recurso solicitado.
 
-#### Scenario: Acceso con sesión administrativa confirmada
-- **WHEN** un usuario con sesión autenticada navega a `/admin`
-- **THEN** se permite la visualización del panel administrativo
-- **AND** se muestra el correo de la cuenta activa.
+#### Scenario: Solicitud con token de sesión administrativo válido
+- **WHEN** una solicitud HTTP incluye un encabezado `Authorization: Bearer <token>` válido y activo
+- **THEN** el servidor autoriza la solicitud
+- **AND** permite acceder a la información o acción administrativa solicitada.
 
-### Requirement: Cierre de sesión administrativo
-El panel administrativo SHALL proveer una acción de cierre de sesión (*Cerrar sesión*).
+### Requirement: Cierre e invalidación de sesión en el servidor
+El servidor Express SHALL permitir cerrar sesión mediante `POST /api/admin/logout`, invalidando el token para peticiones futuras.
 
-#### Scenario: Cierre de sesión exitoso
-- **WHEN** el administrador activa la acción de cerrar sesión
-- **THEN** la aplicación llama a `supabase.auth.signOut`
-- **AND** redirige a `/admin/acceso`, revocando el acceso inmediato a `/admin`.
-
+#### Scenario: Cierre de sesión administrativo
+- **WHEN** el administrador envía `POST /api/admin/logout` con su token de sesión
+- **THEN** el servidor invalida el token
+- **AND** peticiones subsecuentes con ese token reciben HTTP 401.

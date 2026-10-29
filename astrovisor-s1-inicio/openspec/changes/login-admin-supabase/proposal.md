@@ -1,23 +1,23 @@
-# Propuesta: autenticación administrativa y conexión con Supabase
+# Propuesta: autenticación administrativa y permisos verificados en servidor Express con Supabase
 
 ## Why
-El panel de administración `/admin` y el acceso `/admin/acceso` actualmente están bloqueados y sin autenticación real. Se requiere conectar con Supabase para permitir que los administradores autorizados inicien sesión mediante credenciales seguras (correo y contraseña), persistan su sesión y accedan al panel de gestión, manteniendo el rol protegido tanto en frontend como en base de datos.
+El panel de administración `/admin` y los endpoints `/api/admin/*` requieren autenticación y autorización real verificada por el servidor Express para garantizar que ningún usuario no autenticado acceda a recursos administrativos, cumpliendo con la historia de usuario de S2 donde las credenciales y permisos son validados en el backend.
 
 ## What Changes
-- Configurar el cliente oficial `@supabase/supabase-js` en el frontend Vue 3 con variables de entorno (`VITE_SUPABASE_URL` y `VITE_SUPABASE_ANON_KEY`).
-- Implementar un formulario funcional de Login en `AdminAccesoView.vue` con estados de carga, validación de correo y contraseña, y manejo de errores.
-- Crear un composable de autenticación `useAuth.js` que gestione la sesión reactiva de Supabase, verificación de rol de administrador y cierre de sesión (*sign out*).
-- Actualizar el guard de navegación en `router/index.js` para proteger la ruta `/admin` basándose en el estado de autenticación real de Supabase.
-- Proveer el script SQL para la base de datos de Supabase que modela la tabla de perfiles de administradores (`admin_users` / `perfiles`) vinculada con `auth.users` y políticas de seguridad Row Level Security (RLS).
-- Actualizar el panel `/admin` (`AdminPanelView.vue`) para mostrar los datos del usuario logueado, opciones de gestión y botón de cerrar sesión.
+- Implementar en el servidor Express los endpoints de autenticación: `POST /api/admin/login`, `POST /api/admin/logout` y `GET /api/admin/sesion`.
+- Verificar credenciales de administrador en el servidor Express consultando la tabla `admin` de Supabase (o credenciales seguras del entorno en caso de modo desconectado).
+- Emitir tokens de sesión criptográficos generados por el servidor Express al autenticarse exitosamente.
+- Crear middleware de autorización en Express (`verificarAdmin`) que proteja todas las rutas bajo `/api/admin/*`, respondiendo con HTTP 401 si no se envía un token válido.
+- Adaptar el composable de autenticación del frontend (`useAuth.js`) para autenticar contra la API de Express (`POST /api/admin/login`) y almacenar el token de sesión emitido por el servidor.
+- Mantener la integración con las tablas de Supabase (`fichas_libros`, `temas_astronomicos`, `admin`).
+- Agregar pruebas unitarias automatizadas en Express para validar inicio de sesión exitoso, rechazo de credenciales incorrectas y denegación HTTP 401 sin token.
 
-Fuera de alcance: registro abierto para visitantes (los visitantes no requieren cuenta) y préstamos físicos de libros de la biblioteca.
+Fuera de alcance: cuentas públicas para visitantes y préstamos físicos de libros de la biblioteca.
 
 ## Capabilities
 ### New Capabilities
-- `autenticacion-admin`: Inicio de sesión seguro, control de sesión reactiva y cierre de sesión de administradores vía Supabase Auth.
-- `gestion-acceso-admin`: Protección de rutas y consulta de perfil administrativo en Supabase PostgreSQL con RLS.
+- `autenticacion-admin`: Verificación de credenciales en servidor Express y emisión de tokens de sesión administrativa.
+- `gestion-acceso-admin`: Protección de rutas `/api/admin/*` mediante middleware de Express y denegación de accesos no autorizados.
 
 ## Impact
-Afecta a `frontend/src/views/AdminAccesoView.vue`, `frontend/src/views/AdminPanelView.vue`, `frontend/src/router/index.js`, crea `frontend/src/services/supabaseClient.js` y `frontend/src/composables/useAuth.js`, agrega dependencia `@supabase/supabase-js`, e incorpora archivo `.env` para credenciales de Supabase.
-
+Afecta a `backend/src/index.js`, crea `backend/src/middleware/auth.js` y `backend/test/auth.test.js`, y actualiza `frontend/src/composables/useAuth.js`.

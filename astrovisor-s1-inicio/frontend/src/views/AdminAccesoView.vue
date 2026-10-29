@@ -4,13 +4,17 @@ import { useRouter } from 'vue-router'
 import { useAuth } from '../composables/useAuth.js'
 
 const router = useRouter()
-const { signIn, isAuthenticated, userDisplayName, loading, isSupabaseConfigured } = useAuth()
+const { signIn, signOut, isAuthenticated, userDisplayName, loading, isSupabaseConfigured } = useAuth()
 
 const username = ref('')
 const password = ref('')
 const showPassword = ref(false)
 const errorMessage = ref('')
 const isSubmitting = ref(false)
+
+async function handleLogout() {
+  await signOut()
+}
 
 async function handleSubmit() {
   errorMessage.value = ''
@@ -113,7 +117,12 @@ async function handleSubmit() {
 
         <div v-if="isAuthenticated" class="active-session-box">
           <p>Sesión activa como: <strong>{{ userDisplayName }}</strong></p>
-          <RouterLink to="/admin" class="btn-submit">Ir al Panel</RouterLink>
+          <div style="display: flex; flex-direction: column; gap: 0.6rem; margin-top: 1.2rem;">
+            <RouterLink to="/admin" class="btn-submit">Ir al Panel</RouterLink>
+            <button type="button" class="btn-action outline" @click="handleLogout">
+              Cerrar sesión
+            </button>
+          </div>
         </div>
 
         <form v-else @submit.prevent="handleSubmit" class="auth-form" novalidate>
