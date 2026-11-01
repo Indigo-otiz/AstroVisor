@@ -1,6 +1,8 @@
 /* Carga y adaptación de los datos de constelaciones para la escena Homido.
    Mismo contrato que /api/contenidos/recorridos (ver content/README.md); no lo modifica. */
 
+import { audioDe } from '../../audio/narration.js'
+
 export const URL_API = '/api/contenidos/recorridos'
 export const URL_RESPALDO = new URL('../data/recorridos-demo.json', import.meta.url).href
 
@@ -50,7 +52,7 @@ export async function cargarDatos({ fetchFn = globalThis.fetch, timeoutMs = 3000
 /* --- Adaptadores: único lugar que conoce la forma de libros[] y multimedia[] ---
    SUPUESTOS PENDIENTES DE CONFIRMAR (el contrato actual solo exige arreglos):
    - libros[i]      = { titulo: string, autor?: string }                       (Karime / Carlos)
-   - multimedia[i]  = { tipo: 'audio', url: string, ... }                      (Luis / Carlos) */
+   - multimedia[i]  = { tipo: 'audio', src: '/audio/<id>.wav', transcripcion, ... } (Luis; lo valida audioDe) */
 
 export function adaptarLibro(ficha) {
   const libro = ficha.libros.find((l) => l && typeof l.titulo === 'string' && l.titulo.trim())
@@ -58,8 +60,9 @@ export function adaptarLibro(ficha) {
   return { titulo: libro.titulo.trim(), autor: typeof libro.autor === 'string' ? libro.autor.trim() : '' }
 }
 
+/** Misma regla que el reproductor de Luis (public/audio/narration.js): una sola definición de "audio válido". */
 export function adaptarAudio(ficha) {
-  return ficha.multimedia.find((m) => m && m.tipo === 'audio' && typeof m.url === 'string' && m.url) ?? null
+  return audioDe(ficha)
 }
 
 /** Texto breve para el visor. `historiaVisor` es opcional; el texto completo `historia` no se altera. */

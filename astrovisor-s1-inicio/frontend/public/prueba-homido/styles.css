@@ -11,7 +11,7 @@ h2 { font-size: 1.3rem; margin-bottom: 0.5rem; }
 .notice { padding: 1rem; border: 1px solid #a7aab1; background: #fff; border-radius: 0.4rem; }
 .controls-panel, .log-panel { margin: 1.4rem 0; padding: 1rem; background: #fff; border: 1px solid #cfd7e0; border-radius: 0.4rem; }
 .actions { display: flex; gap: 0.65rem; flex-wrap: wrap; align-items: center; }
-button, .button { padding: 0.7rem 1rem; font-size: 1rem; font-weight: 600; cursor: pointer; color: #fff; background: #1a4077; border: 2px solid #1a4077; border-radius: 0.35rem; text-decoration: none; min-height: 44px; }
+button, .button { padding: 0.7rem 1rem; font-size: 1.125rem; font-weight: 600; cursor: pointer; color: #fff; background: #1a4077; border: 2px solid #1a4077; border-radius: 0.35rem; text-decoration: none; min-height: 48px; }
 button.secondary,.button.secondary { background: #fff; color: #1a4077; }
 button:disabled { cursor: not-allowed; opacity: 0.5; }
 button:focus-visible,.button:focus-visible { outline: 3px solid #df932b; outline-offset: 3px; }
@@ -24,6 +24,15 @@ button:focus-visible,.button:focus-visible { outline: 3px solid #df932b; outline
 #exitButton[hidden] { display: none; }
 body.stereo-mode #exitButton { display: block; position: fixed; top: 8px; right: 8px; z-index: 1000; font-size: .95rem; background: #fff; }
 #log { max-height: 270px; overflow: auto; white-space: pre-wrap; overflow-wrap: anywhere; background: #f6f7f9; color: #15243b; padding: 0.75rem; min-height: 80px; }
+[hidden] { display: none !important; }
+.reading-panel { margin-block: 2rem; }
+#storyCard { margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid #cfd7e0; }
+#storyText, #transcriptText { max-width: 70ch; font-size: 1.25rem; }
+.reading-panel summary { min-height: 48px; padding-block: 12px; cursor: pointer; color: #1a4077; text-decoration: underline; text-underline-offset: 4px; }
+.reading-panel summary:focus-visible { outline: 3px solid #df932b; outline-offset: 3px; }
+.reading-panel dt { font-weight: 700; margin-top: 12px; }
+.reading-panel dd { margin-left: 0; overflow-wrap: anywhere; }
+::selection { background: #f5e4c0; color: #11213b; }
 @media (max-width: 650px) { main{padding:.85rem} .actions button,.actions .button{width:100%;text-align:center;} .scene-host{height:55vh;min-height:280px;} body.stereo-mode #exitButton{width:auto;} }
 body.stereo-mode { overflow: hidden; overscroll-behavior: none; }
 .scene-host.stereo-active { touch-action: none; }

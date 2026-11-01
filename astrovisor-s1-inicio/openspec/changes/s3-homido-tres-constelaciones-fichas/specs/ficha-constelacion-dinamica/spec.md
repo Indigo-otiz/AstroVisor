@@ -24,7 +24,7 @@ La ficha SHALL reservar una zona de referencia bibliográfica alimentada por `li
 - **THEN** se muestra "Referencia bibliográfica: pendiente" y no un título inventado como real
 
 ### Requirement: Ranura de narración de audio
-El botón "Escuchar" SHALL emitir el evento `astrovisor:audio-solicitado` con el id y el audio asociado (o `null`). Sin oyente o sin audio SHALL mostrar "La narración aún no está disponible. Puedes leer el texto."
+El botón de narración SHALL emitir `astrovisor:audio-solicitado` y SHALL mostrar el estado real confirmado por el reproductor de Luis (`window.astrovisorVisor.estadoNarracion`); SHALL mostrar "Reproduciendo" solo cuando el reproductor lo confirme y "La narración aún no está disponible. Puedes leer el texto." sin audio. Pausar la mirada SHALL NOT pausar la narración.
 
 #### Scenario: Sin módulo de audio
 - **WHEN** se pulsa "Escuchar" y no hay audio

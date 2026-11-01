@@ -46,7 +46,7 @@ Agregar una constelación = un objeto en `figuras.js` + un registro en el JSON. 
 
 **D6. Ranuras de integración (sin inventar formatos):**
 - *Bibliografía (Karime):* `adaptarLibro(ficha)` lee `ficha.libros[0]`; si es `{titulo, autor}` (supuesto **por confirmar**) lo muestra; con arreglo vacío muestra "Referencia bibliográfica: pendiente — Dato de muestra". Cuando Karime fije la forma, solo cambia ese adaptador.
-- *Audio (Luis):* "Escuchar" emite `CustomEvent('astrovisor:audio-solicitado', {detail:{id, audio}})` en `window`; `audio` es la primera entrada de audio de `ficha.multimedia` o `null`. Luis puede responder con `astrovisor:audio-estado` (`reproduciendo|pausado|error`). Sin oyente se muestra el aviso actual. No se implementa reproductor.
+- *Audio (Luis):* integrado con su reproductor (`audio/narration.js` vía `narraciones.js`, PR #2): la escena emite `astrovisor:ficha-abierta/-cerrada`, `astrovisor:audio-solicitado` y `astrovisor:salida-visor`, y recibe el estado real por `window.astrovisorVisor.estadoNarracion`. No hay segundo reproductor ni se cancela el evento. La pausa de mirada es independiente de la pausa de narración.
 
 **D7. Disposición 3D para Homido.** Tres constelaciones a ~4 m, a −42°, 0° y +42° de azimut, a la altura de los ojos; cada una con un área de mirada circular (radio ≈ 1 m) sin traslape. Silueta y color distintos (Orión blanco-azulado, Osa Mayor ámbar, Escorpio rojo-coral) **y rótulo de texto grande** (el color no es la única señal). Pausa/Salir debajo del centro como hoy. La ficha reemplaza al recorrido (se ocultan las constelaciones) como hoy.
 

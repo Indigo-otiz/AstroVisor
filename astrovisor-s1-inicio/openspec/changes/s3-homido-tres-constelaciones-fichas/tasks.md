@@ -20,8 +20,8 @@ Revisión: 3 de noviembre de 2026. **[I]** independiente · **[D]** depende de o
 ## 3. Ranuras de integración
 - [x] 3.1 [I] Evento `astrovisor:audio-solicitado` / `-estado` y aviso sin audio.
 - [ ] 3.2 [D: Karime] Confirmar forma de `libros[]` y texto final → ajustar `adaptarLibro`.
-- [ ] 3.3 [D: Luis] Conectar su reproductor al evento de audio.
-- [ ] 3.4 [D: Carlos] Confirmar forma de `multimedia[]` y si el contrato se amplía.
+- [x] 3.3 [D: Luis] Reproductor de Luis (PR #2) integrado: contrato `astrovisorVisor` + eventos; verificado en Chrome de escritorio; falta prueba física.
+- [ ] 3.4 [D: Carlos] `multimedia[]` real = `{tipo:'audio', src, transcripcion, …}` (según `audio/narration.js`); pendiente que Carlos confirme que el contrato no cambia.
 
 ## 4. Verificación y evidencia
 

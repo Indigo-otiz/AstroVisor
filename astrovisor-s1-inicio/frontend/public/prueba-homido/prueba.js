@@ -3,7 +3,8 @@
    - Selección por mirada de 3 s con anillo #F5B301, confirmación verde, cancelación y gracia (js/gaze-dwell.js).
    - Pausa (de la MIRADA) y Salir a 2D siempre disponibles, también con la ficha abierta.
    - Clic/toque equivalen a la selección por mirada para pruebas fuera del visor.
-   - Interfaz preliminar de audio: evento `astrovisor:audio-solicitado` (ver docs/PRUEBA-S3-HOMIDO.md).
+   - Audio: el reproductor ES el de Luis (audio/narration.js, vía narraciones.js). Contrato: window.astrovisorVisor y eventos
+     astrovisor:ficha-abierta/-cerrada/audio-solicitado/salida-visor (ver docs/PRUEBA-S3-HOMIDO.md).
 */
 import { cargarDatos, adaptarAudio } from './js/datos.js';
 import { FIGURAS, posicionEnEsfera, frenteDeCamara } from './js/figuras.js';
@@ -13,7 +14,7 @@ import { crearEstado } from './js/visor-estado.js';
 import { registrarCielo } from './js/cielo.js';
 import { vistasOjos } from './js/estereo.js';
 import { leerParametros, iniciarDiagnostico } from './js/diagnostico.js';
-import { calcularLayout, dibujarFicha, zonaAMundo, AVISO_SIN_AUDIO, PLANO_ALTO } from './js/ficha-canvas.js';
+import { calcularLayout, dibujarFicha, zonaAMundo, presentarAudio, PLANO_ALTO } from './js/ficha-canvas.js';
 
 (function () {
   'use strict';
@@ -64,7 +65,8 @@ import { calcularLayout, dibujarFicha, zonaAMundo, AVISO_SIN_AUDIO, PLANO_ALTO }
   let lastUpdate = 0;
   let stereoActive = false;
   let stereoComponent;
-  let audioAviso = null;
+  let narracion = null; // último estado REAL del reproductor (narraciones.js); null = sin reproductor/audio
+  let sincronizando = false; // true mientras narraciones.js nos abre/cierra la ficha (no se le devuelve el evento)
   let layoutActual = null;
   let userReady = false; // evita autodisparos mientras la persona acomoda el visor
 
@@ -182,7 +184,7 @@ import { calcularLayout, dibujarFicha, zonaAMundo, AVISO_SIN_AUDIO, PLANO_ALTO }
   /** Dibuja la ficha y coloca las zonas de mirada desde el MISMO layout. */
   function pintarFicha(ficha) {
     const ctx = cardCanvas.getContext('2d');
-    layoutActual = calcularLayout(ctx, ficha, { aviso: audioAviso });
+    layoutActual = calcularLayout(ctx, ficha, (({ aviso, etiqueta }) => ({ aviso, etiquetaAudio: etiqueta }))(presentarAudio(narracion)));
     if (layoutActual.desborda) eventLine(`Aviso: el contenido de ${ficha.id} no cabe completo en la ficha.`);
     dibujarFicha(ctx, layoutActual);
     actualizarTextura();
@@ -229,7 +231,7 @@ import { calcularLayout, dibujarFicha, zonaAMundo, AVISO_SIN_AUDIO, PLANO_ALTO }
     if (!ficha || !estado.abrirFicha(id)) return;
     dwell.cancelar();
     constelaciones.forEach((c) => c.resaltar(false));
-    audioAviso = null;
+    if (!sincronizando) narracion = null; // hasta que el reproductor confirme el audio de ESTA ficha (si nos abre él, su estado ya llegó)
     selectionCount++;
     // La ficha y sus controles aparecen frente a donde mira la persona (las constelaciones están a ±40°)
     const frente = frenteAlFrente(3.0);
@@ -243,12 +245,13 @@ import { calcularLayout, dibujarFicha, zonaAMundo, AVISO_SIN_AUDIO, PLANO_ALTO }
     refrescarRaycaster();
     selectionStatus.textContent = `✔ Selección #${selectionCount} completada. ${mensajeEnReposo()}`;
     eventLine(`✔ Selección #${selectionCount}: ficha de ${ficha.titulo} abierta.`);
+    if (!sincronizando) window.dispatchEvent(new CustomEvent('astrovisor:ficha-abierta', { detail: ficha }));
   }
 
   function cerrarFicha() {
     if (!estado.volver()) return;
     dwell.cancelar();
-    audioAviso = null;
+    if (!sincronizando) narracion = null;
     activarGrupo(infoPanel3D, false);
     activarGrupo(constelacionesEl, true);
     visorControls3D.setAttribute('position', POS_CONTROLES.recorrido);
@@ -256,31 +259,36 @@ import { calcularLayout, dibujarFicha, zonaAMundo, AVISO_SIN_AUDIO, PLANO_ALTO }
     refrescarRaycaster();
     selectionStatus.textContent = mensajeEnReposo();
     eventLine('Regreso al recorrido de constelaciones.');
+    if (!sincronizando) window.dispatchEvent(new Event('astrovisor:ficha-cerrada'));
   }
 
-  // Interfaz preliminar con el módulo de audio (Luis): ver docs/PRUEBA-S3-HOMIDO.md.
-  // Quien reproduzca la narración debe llamar a evt.preventDefault() para indicar que atiende la solicitud.
+  // Audio: el reproductor es el de Luis (narraciones.js). Aquí solo se SOLICITA la acción (Escuchar/Pausar/Reanudar
+  // según su estado) y se MUESTRA el estado que él confirma; no se reproduce nada desde la escena.
   function pedirAudio() {
     const ficha = fichas.get(estado.fichaId);
     if (!ficha) return;
-    const detail = { id: ficha.id, titulo: ficha.titulo, audio: adaptarAudio(ficha) };
-    const atendido = !window.dispatchEvent(new CustomEvent('astrovisor:audio-solicitado', { detail, cancelable: true }));
-    audioAviso = atendido ? null : AVISO_SIN_AUDIO;
-    eventLine(`Botón Escuchar: audio ${detail.audio ? 'asociado' : 'no disponible'}, ${atendido ? 'atendido por el módulo de audio' : 'sin módulo de audio'}.`);
-    pintarFicha(ficha);
+    window.dispatchEvent(new CustomEvent('astrovisor:audio-solicitado', { detail: { id: ficha.id, titulo: ficha.titulo, audio: adaptarAudio(ficha) } }));
+    eventLine(`Botón de narración: solicitud enviada al reproductor (${adaptarAudio(ficha) ? 'audio asociado' : 'sin audio asociado'}).`);
   }
 
-  const MENSAJES_AUDIO = {
-    reproduciendo: 'Reproduciendo la narración.',
-    pausado: 'Narración en pausa.',
-    error: 'No se pudo reproducir la narración.',
+  function sincronizar(accion) {
+    sincronizando = true;
+    try { accion(); } finally { sincronizando = false; }
+  }
+
+  // Contrato con narraciones.js (Luis). La pausa de la mirada NO toca la narración.
+  window.astrovisorVisor = {
+    constelaciones() {}, // el recorrido ya se construye con cargarDatos(); se acepta la llamada por compatibilidad
+    abrir: (historia) => sincronizar(() => {
+      if (estado.modo === 'ficha' && estado.fichaId !== historia?.id) cerrarFicha();
+      abrirFicha(historia?.id);
+    }),
+    cerrar: () => sincronizar(() => { if (estado.modo === 'ficha') cerrarFicha(); }),
+    estadoNarracion(nuevo) {
+      narracion = nuevo;
+      if (estado.modo === 'ficha') pintarFicha(fichas.get(estado.fichaId));
+    },
   };
-  window.addEventListener('astrovisor:audio-estado', (evt) => {
-    const d = evt.detail || {};
-    if (estado.modo !== 'ficha' || d.id !== estado.fichaId) return;
-    audioAviso = MENSAJES_AUDIO[d.estado] ?? null;
-    pintarFicha(fichas.get(d.id));
-  });
 
   function alternarPausa() {
     const pausado = estado.alternarPausa();
@@ -300,6 +308,7 @@ import { calcularLayout, dibujarFicha, zonaAMundo, AVISO_SIN_AUDIO, PLANO_ALTO }
   }
 
   function salir() {
+    window.dispatchEvent(new Event('astrovisor:salida-visor'));
     selectionStatus.textContent = '✔ Salida confirmada. Regresando al modo web 2D...';
     eventLine('✔ Salida a 2D.');
     setTimeout(() => {
@@ -502,6 +511,8 @@ import { calcularLayout, dibujarFicha, zonaAMundo, AVISO_SIN_AUDIO, PLANO_ALTO }
   else scene.addEventListener('loaded', onSceneReady, { once: true });
 
   async function exitStereo() {
+    if (estado.modo === 'ficha') cerrarFicha();
+    window.dispatchEvent(new Event('astrovisor:salida-visor'));
     if (!stereoActive) return;
     stereoActive = false;
     if (stereoComponent) stereoComponent.enabledStereo = false;

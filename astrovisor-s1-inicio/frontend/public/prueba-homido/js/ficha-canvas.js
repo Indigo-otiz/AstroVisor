@@ -8,6 +8,22 @@ export const PLANO_ANCHO = 3.2 // metros en la escena
 export const PLANO_ALTO = (PLANO_ANCHO * CANVAS.alto) / CANVAS.ancho
 
 export const AVISO_SIN_AUDIO = 'La narración aún no está disponible. Puedes leer el texto.'
+/** Traduce el estado REAL del reproductor (audio/narration.js, vía window.astrovisorVisor.estadoNarracion) a lo que muestra la ficha. */
+const MENSAJES_NARRACION = {
+  cargando: 'Cargando narración…',
+  reproduciendo: 'Reproduciendo narración.',
+  pausado: 'En pausa. Reanudar continúa la narración.',
+  listo: 'Elige Escuchar para comenzar.',
+  finalizado: 'Finalizó. Puedes escucharla de nuevo.',
+  bloqueado: 'Retira el visor y toca Activar audio.',
+  error: 'Audio no disponible. Puedes leer en modo web 2D.',
+}
+export function presentarAudio(narracion) {
+  if (!narracion || !narracion.recurso) return { etiqueta: 'Escuchar narración', aviso: AVISO_SIN_AUDIO }
+  const etiqueta = narracion.puedePausar ? 'Pausar narración' : narracion.puedeReanudar ? 'Reanudar narración' : 'Escuchar narración'
+  return { etiqueta, aviso: MENSAJES_NARRACION[narracion.estado] ?? narracion.mensaje ?? null }
+}
+
 export const BIBLIO_PENDIENTE = 'Aún no hay un libro verificado para esta constelación. La referencia se agregará cuando esté disponible.'
 
 const FUENTE = 'system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif'
@@ -36,7 +52,7 @@ export function ajustarLineas(ctx, texto, anchoMax) {
   return lineas
 }
 
-export function calcularLayout(ctx, ficha, { aviso = null } = {}) {
+export function calcularLayout(ctx, ficha, { aviso = null, etiquetaAudio = 'Escuchar narración' } = {}) {
   const { ancho: W, alto: H } = CANVAS
   const anchoUtil = W - 2 * MARGEN
   const yBotonVolver = H - MARGEN - ALTO_BOTON
@@ -85,7 +101,7 @@ export function calcularLayout(ctx, ficha, { aviso = null } = {}) {
     // Audio: botón + aviso de estado
     const audio = { x: MARGEN, y, w: 460, h: 84 }
     zonas.audio = audio
-    items.push({ k: 'boton', rect: audio, fill: '#1F4E8C', texto: '▶  Escuchar narración', font: fuente(TAM.boton - 4, true), color: '#FFFFFF', padIzq: audio.h })
+    items.push({ k: 'boton', rect: audio, fill: '#1F4E8C', texto: `▶  ${etiquetaAudio}`, font: fuente(TAM.boton - 4, true), color: '#FFFFFF', padIzq: audio.h })
     if (aviso) {
       const caja = { x: audio.x + audio.w + 24, y, w: anchoUtil - audio.w - 24, h: 84 }
       const lineasAviso = medir(TAM.aviso, false, aviso, caja.w - 32)

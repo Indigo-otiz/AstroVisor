@@ -51,7 +51,12 @@ test('adaptarLibro/adaptarAudio no inventan recursos', () => {
   assert.equal(adaptarAudio(demo[0]), null)
   assert.deepEqual(adaptarLibro({ libros: [{ titulo: ' Atlas ', autor: 'A. B.' }] }), { titulo: 'Atlas', autor: 'A. B.' })
   assert.equal(adaptarAudio({ multimedia: [{ tipo: 'video', url: 'x' }] }), null)
-  assert.equal(adaptarAudio({ multimedia: [{ tipo: 'audio', url: '/a.mp3' }] }).url, '/a.mp3')
+  // Contrato real de Luis: multimedia[].src con metadatos completos (la misma regla que audioDe).
+  assert.equal(adaptarAudio({ multimedia: [{ tipo: 'audio', url: '/a.mp3' }] }), null)
+  const real = JSON.parse(readFileSync(new URL('../../content/recorridos.json', import.meta.url), 'utf8'))
+  for (const [id, wav] of [['orion', '/audio/orion-kokoro-v1.wav'], ['osa-mayor', '/audio/osa-mayor-kokoro-v1.wav'], ['escorpio', '/audio/escorpio-kokoro-v1.wav']]) {
+    assert.equal(adaptarAudio(real.find((r) => r.id === id)).src, wav)
+  }
 })
 
 test('resumirParaVisor corta por oraciones y nunca modifica el texto original', () => {

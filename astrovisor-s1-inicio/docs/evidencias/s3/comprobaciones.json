@@ -1,0 +1,72 @@
+[
+  {
+    "botones": [
+      {
+        "alto": 80,
+        "ancho": 182.71250915527344,
+        "texto": "Escuchar"
+      }
+    ],
+    "caso": "texto-200-simulado-360",
+    "documento": 345,
+    "raiz": "36px",
+    "viewport": [
+      360,
+      800
+    ]
+  },
+  {
+    "ancho": 360,
+    "caso": "wav-404-inducido",
+    "documento": 345,
+    "estado": "No pudimos reproducir el audio. Puedes leer la historia o volver a intentar con Escuchar.",
+    "historia": 373
+  },
+  {
+    "botones": [
+      "Escuchar",
+      "Activar audio"
+    ],
+    "caso": "NotAllowedError-inducido",
+    "estado": "El navegador bloqueó el audio. Toca Activar audio o Escuchar y vuelve a intentarlo.",
+    "historia": 373
+  },
+  {
+    "caso": "metadatos-invalidos-inducidos",
+    "controles": 0,
+    "estado": "Audio no disponible. Puedes leer la historia.",
+    "historia": 373
+  },
+  {
+    "caso": "AFrame-ausente-inducido",
+    "diagnostico": "A-Frame no pudo cargarse. Revisa la conexión a Internet.",
+    "estado": "Reproduciendo narración.",
+    "historia": 396
+  },
+  {
+    "caso": "API-detenida-inducido",
+    "estado": "No pudimos cargar las historias. Vuelve a intentar o regresa al modo web 2D.",
+    "reintento": true
+  },
+  {
+    "caso": "recuperacion-API-real",
+    "constelaciones": [
+      "Orión",
+      "Osa Mayor",
+      "Escorpio"
+    ],
+    "estado": "Puedes elegir con estos botones o con la mirada en la escena."
+  },
+  {
+    "caso": "navegacion-SPA-otra-ficha",
+    "estado": "Escucha la historia a tu ritmo.",
+    "tiempo": "0:00 / 0:27",
+    "titulo": "Osa Mayor · AstroVisor"
+  },
+  {
+    "caso": "historial-adelante",
+    "estado": "Escucha la historia a tu ritmo.",
+    "tiempo": "0:00 / 0:27",
+    "titulo": "Osa Mayor · AstroVisor"
+  }
+]

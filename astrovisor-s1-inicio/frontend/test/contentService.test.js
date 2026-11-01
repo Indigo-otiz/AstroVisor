@@ -2,6 +2,7 @@ import test from 'node:test'
 import assert from 'node:assert/strict'
 import { readFile } from 'node:fs/promises'
 import { cargarRecorridos } from '../src/services/contentService.js'
+import { audioDe } from '../public/audio/narration.js'
 
 const datos = JSON.parse(
   await readFile(new URL('../../content/recorridos.json', import.meta.url), 'utf8'),
@@ -51,4 +52,12 @@ test('una solicitud nueva se recupera de una respuesta fallida', async (t) => {
   )
   await assert.rejects(cargarRecorridos())
   assert.deepEqual(await cargarRecorridos(), datos)
+})
+
+test('metadatos de audio inválidos no invalidan una historia legible', async (t) => {
+  const conAudioInvalido = [{ ...datos[0], multimedia: [{ tipo: 'audio', src: 'https://externo/invalido.wav' }] }]
+  t.mock.method(globalThis, 'fetch', async () => new Response(JSON.stringify(conAudioInvalido)))
+  const historias = await cargarRecorridos()
+  assert.equal(historias[0].historia, datos[0].historia)
+  assert.equal(audioDe(historias[0]), null)
 })

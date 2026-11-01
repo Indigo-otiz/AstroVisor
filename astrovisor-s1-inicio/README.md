@@ -52,6 +52,12 @@ npm run build
 
 `test:web` ejecuta las pruebas de consumo de la API con el runner de Node: contrato real, HTTP/red/JSON fallidos, campos inválidos, lista vacía y recuperación. Las condiciones de fallo de esas pruebas son simuladas. Ver [registro de pruebas S2](docs/PRUEBA-S2.md) para la revisión en navegador, capturas y revisión cruzada pendiente.
 
+## Narraciones Sprint 3
+
+Orión, Osa Mayor y Escorpio tienen WAV con voz sintética femenina Kokoro ef_dora, elegida por Luis, y transcripciones. La voz usa fonética latinoamericana y nivel de audio ajustado sin saturación. En `/explorar/:id` se puede Escuchar, Pausar y Reanudar; en `/visor` se accede a fichas y controles por retícula dentro de la escena experimental. Antes de ponerse el visor, tocar **Activar audio**. Cerrar, cambiar constelación o salir detienen la narración. La lectura web funciona sin visor ni sonido.
+
+**S3 cerrado el 31 de octubre de 2026:** Luis confirmó las pruebas en iPhone 13 Chrome/Safari y «oppo 15a» con «google», declaró autoría colectiva del equipo para los guiones e identificó a **Índigo Ortiz** como revisor. Las confirmaciones reportadas y las verificaciones técnicas se distinguen en el [registro de cierre y evidencias](docs/PRUEBA-S3.md). Video sigue pospuesto hasta después del hito 3D del 3 de noviembre. Los créditos distinguen material provisional y voz sintética.
+
 ## Alcance de Sprint 1
 - Proyecto Vue/Vite/Router y Express, instalable y documentado.
 - Contenidos JSON aislados en `content/` detrás de la API de consulta.

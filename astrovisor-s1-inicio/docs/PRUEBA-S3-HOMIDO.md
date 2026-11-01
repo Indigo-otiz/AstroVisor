@@ -161,21 +161,25 @@ prueba-homido/
 - La historia se acorta por oraciones (máx. 360 caracteres) solo en el visor; el texto completo del JSON no se modifica y sigue siendo el que usa el modo 2D. No se reduce la tipografía. Un campo opcional `historiaVisor` (no forma parte del contrato) puede sustituir ese resumen.
 - `comoReconocerla` no se muestra en el visor (decisión de la primera versión).
 
-## Interfaz preliminar de audio (para Luis)
+## Integración con el reproductor de Luis (PR #2 integrada)
 
-Al activar «Escuchar narración» la página emite en `window`:
+Hay **un solo reproductor**: `public/audio/narration.js` (`crearNarrador`), manejado por `prueba-homido/narraciones.js`. La escena 3D no reproduce nada: solicita acciones y **muestra el estado que el reproductor confirma**.
 
-```js
-new CustomEvent('astrovisor:audio-solicitado', {
-  cancelable: true,
-  detail: { id: 'orion', titulo: 'Orión', audio: null /* o la entrada de ficha.multimedia con tipo:'audio' */ },
-})
-```
+**Visor → narraciones** (eventos en `window`):
 
-- Si un módulo atiende la solicitud debe llamar `evt.preventDefault()`; entonces la ficha no muestra el aviso «La narración aún no está disponible».
-- El módulo de audio puede informar su estado: `window.dispatchEvent(new CustomEvent('astrovisor:audio-estado', { detail: { id, estado } }))` con `estado` = `reproduciendo | pausado | error` (otro valor limpia el aviso). Solo se atiende si esa ficha está abierta.
-- **Suposición pendiente de confirmar con Carlos/Luis:** `multimedia[i] = { tipo: 'audio', url: '…' }`. Si el contrato usa otra forma, solo cambia `adaptarAudio()` en `js/datos.js`.
-- Pausar/detener la narración es responsabilidad del módulo de audio; la Pausa del visor no la controla.
+| Evento | Cuándo | `detail` |
+|---|---|---|
+| `astrovisor:ficha-abierta` | se abre una ficha por mirada o clic | la ficha del JSON (con `multimedia[]`) |
+| `astrovisor:ficha-cerrada` | «Volver al recorrido» | — |
+| `astrovisor:audio-solicitado` | botón de narración de la ficha 3D | `{ id, titulo, audio }` — narraciones.js hace Escuchar / Pausar / Reanudar según su estado; no hace falta `preventDefault()` |
+| `astrovisor:salida-visor` | Salir a 2D / salir de vista dividida | — (detiene el audio y cierra la ficha) |
+
+**Narraciones → visor** (`window.astrovisorVisor`, expuesto por `prueba.js`): `constelaciones(historias)` (compatibilidad, no-op: el recorrido se construye con `cargarDatos()`), `abrir(historia)`, `cerrar()` y `estadoNarracion(estado)`. Con `abrir/cerrar` la ficha 3D se sincroniza con los botones 2D sin devolver el evento. `estadoNarracion` pinta en la ficha 3D el texto del estado real (`reproduciendo` solo cuando el reproductor lo confirma) y la etiqueta del botón (Escuchar / Pausar / Reanudar narración).
+
+- Contrato de datos: `multimedia[i].src` (`/audio/<id>.wav` + transcripción y créditos); `adaptarAudio()` reutiliza `audioDe()` de Luis. Los WAV y `content/recorridos.json` reales se usan cuando la API responde; el respaldo local es solo demostración y no trae audio.
+- **Dos pausas independientes:** «Pausar mirada» solo desactiva la selección por mirada (se quitó de `narraciones.js` el vínculo `astrovisor:mirilla-pausa → narrador.pausar()`); la narración se pausa solo desde la ficha.
+- Cerrar la ficha, cambiar de constelación, salir a 2D o salir de la vista dividida detienen la narración (`narrador.seleccionar(null/otro)`).
+- Pendiente: el desbloqueo del audio requiere un gesto del usuario («Activar audio» antes de ponerse el visor); no se verificó en iPhone/Android/Homido.
 
 ## Referencias bibliográficas (para Karime)
 
@@ -197,7 +201,7 @@ Con la escena servida por HTTP local y la API sin responder (404):
 - Carga sin excepciones; datos desde el respaldo local; registro: «Recorrido listo con 3 constelaciones».
 - Pausa activa 4.5 s mirando una constelación: no se abrió ninguna ficha.
 - Selección por mirada real (3 s, 33/66/100 %) de Escorpio, Orión y Osa Mayor: cada una abrió su ficha; «Volver al recorrido» restauró el recorrido y se pudo elegir otra sin recargar. Tras cada ciclo solo las constelaciones, Pausa y Salir quedan como objetivos del raycaster (fichas ocultas no son objetivos).
-- «Escuchar» sin módulo: aviso de narración no disponible; con un oyente que llama `preventDefault()`: sin aviso y evento con `{id, titulo, audio:null}`; `astrovisor:audio-estado` actualiza el aviso.
+- (Reemplazado tras integrar la PR #2) La integración con el reproductor real se verifica abajo, en «Integración con el reproductor de Luis».
 - Pausa con la ficha abierta: botón cambia a «Reanudar mirada».
 - Se descubrieron y corrigieron durante esta verificación: etiquetas `a-text` con artefactos (se pasaron a canvas), etiquetas que compartían textura, y fichas que aparecían a 40° de donde miraba la persona.
 
@@ -226,3 +230,7 @@ Chrome headless, render por software. Escritorio: las tres constelaciones se abr
 - La historia se acorta con una regla simple por oraciones; la redacción para visor definitiva depende del contenido final.
 - La separación de las constelaciones (±40°, 4 m) y el tamaño del texto de la ficha son parámetros en `js/figuras.js` y `js/ficha-canvas.js`; probablemente necesiten ajuste tras la prueba física.
 - El dwell se duplica respecto a `src/services/gazeController.js` (que la escena no usa); unificarlos queda como deuda técnica.
+
+### Integración con el reproductor de Luis (Chrome de escritorio, 31-oct-2026; NO es prueba física)
+
+Servidor local con la API real (`content/recorridos.json`) y los WAV reales; Chrome 156 headless con la escena 3D. Resultado: 16/16 comprobaciones correctas — Orión por selección reproduce `orion-kokoro-v1.wav`; Pausar/Reanudar desde la ficha; la pausa de mirada no altera el audio; cerrar la ficha detiene; Osa Mayor usa su WAV; cambiar a Escorpio no superpone; salir y salir de la vista dividida detienen y cierran la ficha; «Reproduciendo» solo tras confirmación del reproductor; sin API la escena usa el respaldo y avisa «Audio no disponible» sin errores JS. Pruebas automáticas: `frontend/test/homido-integracion-audio.test.js`. **Sin verificar:** audio en iPhone/Safari, Android y Homido físico (el desbloqueo exige gesto del usuario).
