@@ -1,11 +1,21 @@
-/* AstroVisor — Sprint 2: Selección por mirada accesible (Karime)
-   - Retícula y permanencia de 3 segundos sin prisa (#F5B301).
-   - Anillo de carga sobre el punto de la constelación.
-   - Ficha de información accesible con diseño oficial de Karime (Págs. 13-15 y 18).
-   - Integrada 100% DENTRO DE LA ESCENA 3D en alta definición sobre lienzo accesible.
-   - Controles 3D del visor abajo del punto: [ || Pausa ] y [ Salir 2D ] (Págs. 11-12).
-   - Botón "Escuchar", ficha de biblioteca "Dato de muestra" y "← Volver al recorrido" operable por mirada o toque.
+/* AstroVisor — Sprint 3: recorrido Homido con tres constelaciones y ficha dinámica.
+   - Constelaciones generadas desde datos (js/datos.js + js/figuras.js); ficha única (js/ficha-canvas.js).
+   - Selección por mirada de 3 s con anillo #F5B301, confirmación verde, cancelación y gracia (js/gaze-dwell.js).
+   - Pausa (de la MIRADA) y Salir a 2D siempre disponibles, también con la ficha abierta.
+   - Clic/toque equivalen a la selección por mirada para pruebas fuera del visor.
+   - Audio: el reproductor ES el de Luis (audio/narration.js, vía narraciones.js). Contrato: window.astrovisorVisor y eventos
+     astrovisor:ficha-abierta/-cerrada/audio-solicitado/salida-visor (ver docs/PRUEBA-S3-HOMIDO.md).
 */
+import { cargarDatos, adaptarAudio } from './js/datos.js';
+import { FIGURAS, posicionEnEsfera, frenteDeCamara } from './js/figuras.js';
+import { crearConstelacion, crearAnillo, actualizarAnillo, vincularEtiqueta, COLOR_CONFIRMADO } from './js/escena-constelaciones.js';
+import { crearDwell } from './js/gaze-dwell.js';
+import { crearEstado } from './js/visor-estado.js';
+import { registrarCielo } from './js/cielo.js';
+import { vistasOjos } from './js/estereo.js';
+import { leerParametros, iniciarDiagnostico } from './js/diagnostico.js';
+import { calcularLayout, dibujarFicha, zonaAMundo, presentarAudio, PLANO_ALTO } from './js/ficha-canvas.js';
+
 (function () {
   'use strict';
   const $ = (id) => document.getElementById(id);
@@ -20,9 +30,8 @@
     }
   };
 
-  const browserInfo = `${navigator.userAgent}`;
-  eventLine(`Prueba iniciada | Selección por mirada accesible | ${new Date().toISOString()}`);
-  eventLine(`Navegador: ${browserInfo}`);
+  eventLine(`Prueba iniciada | Recorrido de tres constelaciones | ${new Date().toISOString()}`);
+  eventLine(`Navegador: ${navigator.userAgent}`);
   eventLine(`Contexto seguro: ${window.isSecureContext ? 'sí' : 'no'}`);
 
   const permissionButton = $('permissionButton');
@@ -37,162 +46,36 @@
   const angles = $('angles');
   const gazeCursor = $('gazeCursor');
 
-  // Elementos de la escena 3D
-  const targetContainer = $('targetContainer');
-  const target = $('target');
-  const targetProgressRing = $('targetProgressRing');
+  const constelacionesEl = $('constelaciones');
   const visorControls3D = $('visorControls3D');
   const pauseBtn3D = $('pauseBtn3D');
-  const pauseProgressRing = $('pauseProgressRing');
-  const pause3DLabel = $('pause3DLabel');
   const exitBtn3D = $('exitBtn3D');
-  const exitProgressRing = $('exitProgressRing');
-
   const infoPanel3D = $('infoPanel3D');
   const cardPlane = $('cardPlane');
-  const returnBtn3D = $('returnBtn3D');
-  const returnProgressRing = $('returnProgressRing');
-  const audioBtn3D = $('audioBtn3D');
-  const reticleRing = $('reticleRing');
-  const centerDot = $('centerDot');
   const cardCanvas = $('cardCanvas');
 
-  // Constantes visuales
-  const TARGET_BASE_COLOR = '#e59b3d';
-  const CONFIRM_COLOR = '#1E7B3A'; // Verde de éxito según WCAG AAA
-  const DWELL_TIME_MS = 3000;      // 3 segundos sin prisa (para adultos mayores)
+  const etiquetaPausa = vincularEtiqueta($('pause3DLabel'), 'Pausar mirada', { ancho: 1.2, alto: 0.3 });
+  vincularEtiqueta($('exit3DLabel'), 'Salir a 2D', { ancho: 1.2, alto: 0.3 });
 
+  const estado = crearEstado();
+  const fichas = new Map(); // id -> ficha del JSON
+  const constelaciones = new Map(); // id -> { el, resaltar }
+  let selectionCount = 0;
   let orientationEvents = 0;
   let lastUpdate = 0;
-  let lastSample;
-  let selectionCount = 0;
   let stereoActive = false;
   let stereoComponent;
-  let isPaused = false;
-  let isModalOpen = false;
-  let audioNoticeActive = false;
-  let catalogo = [];
-  let recorridoActual = { id: 'orion', titulo: 'Orión', resumen: 'Una historia entre las estrellas.', historia: 'La historia se está cargando. Puedes volver a intentarlo en el modo web 2D.', multimedia: [] };
-  let audioEstado = { estado: 'no-disponible', mensaje: 'Cargando narraciones…' };
-  let ultimaDireccionSeleccionada = null;
-  let cursorConectado = false;
+  let narracion = null; // último estado REAL del reproductor (narraciones.js); null = sin reproductor/audio
+  let sincronizando = false; // true mientras narraciones.js nos abre/cierra la ficha (no se le devuelve el evento)
+  let layoutActual = null;
+  let userReady = false; // evita autodisparos mientras la persona acomoda el visor
 
-  function evento(nombre, detalle) {
-    window.dispatchEvent(new CustomEvent(nombre, { detail: detalle }));
-  }
-  function puntoDe(el) {
-    return el?.closest('[data-constelacion]') || targetContainer;
-  }
-  function restaurarPuntos() {
-    document.querySelectorAll('[data-constelacion]').forEach((grupo) => {
-      grupo.querySelector('a-sphere')?.setAttribute('color', TARGET_BASE_COLOR);
-      setRingProgress(grupo.querySelector('[data-progreso]'), 0);
-    });
-  }
-  function sincronizarSeleccionables() {
-    document.querySelectorAll('[data-action]').forEach((el) => {
-      const action = el.getAttribute('data-action');
-      const visible = isModalOpen ? (action === 'return' || action === 'audio') : (action !== 'return' && action !== 'audio');
-      const disponible = action !== 'audio' || !!(audioEstado.puedeEscuchar || audioEstado.puedePausar || audioEstado.puedeReanudar);
-      el.classList.toggle('selectable', visible && disponible);
-    });
-    gazeCursor?.components?.raycaster?.refreshObjects();
-  }
-  function catalogar(historias) {
-    catalogo = historias;
-    if (!scene?.hasLoaded || !window.AFRAME) return;
-    const extra = $('additionalConstellations');
-    extra.replaceChildren();
-    targetContainer.dataset.constelacion = 'orion';
-    targetProgressRing.dataset.progreso = '';
-    for (const [indice, historia] of historias.filter((x) => x.id !== 'orion').entries()) {
-      const grupo = targetContainer.cloneNode(true);
-      grupo.id = `punto-${historia.id}`;
-      grupo.dataset.constelacion = historia.id;
-      grupo.setAttribute('visible', true);
-      grupo.setAttribute('position', `${indice === 0 ? -2.6 : 2.6} 1.6 -4.5`);
-      grupo.querySelectorAll('[id]').forEach((el) => { el.id = `${historia.id}-${el.id}`; });
-      grupo.querySelectorAll('[data-conectado]').forEach((el) => el.removeAttribute('data-conectado'));
-      grupo.querySelectorAll('[data-etiqueta]').forEach((el) => el.remove());
-      extra.append(grupo);
-      etiquetar(grupo, historia.titulo);
-    }
-    if (!targetContainer.querySelector('[data-etiqueta]')) etiquetar(targetContainer, 'Orión');
-    if (isModalOpen) {
-      recorridoActual = historias.find((x) => x.id === recorridoActual.id) || recorridoActual;
-      evento('astrovisor:ficha-abierta', recorridoActual);
-      drawConstellationCard();
-    }
-    bindSelectableElements();
-    sincronizarSeleccionables();
-  }
-  function etiquetar(grupo, titulo) {
-    const canvas = document.createElement('canvas');
-    canvas.width = 512; canvas.height = 96;
-    const ctx = canvas.getContext('2d');
-    ctx.font = 'bold 44px Arial'; ctx.fillStyle = '#fff4cf'; ctx.textAlign = 'center';
-    ctx.fillText(titulo, 256, 60);
-    const THREE = window.AFRAME.THREE;
-    const textura = new THREE.CanvasTexture(canvas);
-    textura.colorSpace = THREE.SRGBColorSpace;
-    const mesh = new THREE.Mesh(new THREE.PlaneGeometry(1.7, .32), new THREE.MeshBasicMaterial({ map: textura, transparent: true, depthWrite: false }));
-    const etiqueta = document.createElement('a-entity');
-    etiqueta.dataset.etiqueta = ''; etiqueta.setAttribute('position', '0 .9 0');
-    grupo.append(etiqueta); etiqueta.setObject3D('mesh', mesh);
-  }
-  window.astrovisorVisor = {
-    constelaciones: catalogar,
-    abrir: (historia) => openConstellationInfo3D(historia),
-    cerrar: closeConstellationInfo3D,
-    estadoNarracion(estado) { audioEstado = estado; drawConstellationCard(); sincronizarSeleccionables(); },
-  };
-  let ultimoEstadoAudio;
-  window.addEventListener('astrovisor:narracion', (event) => {
-    const clave = `${event.detail.title}:${event.detail.state}`;
-    if (clave !== ultimoEstadoAudio) { ultimoEstadoAudio = clave; eventLine(`Narración | ${event.detail.title || 'sin ficha'} | ${event.detail.state}`); }
-  });
+  // Geometría de la escena (m): la ficha termina en y=0.9 y los controles quedan debajo, sin tocarla
+  const FICHA_BASE_Y = 0.9;
+  const POS_CONTROLES = { recorrido: '0 0.45 -3.5' };
+  const POS_CONTROLES_Y = 0.45;
 
-  let cancelGraceTimer = null;
-
-  function checkCurrentFocus() {
-    if (!userReady || isPaused || activeTarget) return;
-    if (!gazeCursor || !gazeCursor.components || !gazeCursor.components.raycaster) return;
-    const intersectedEls = gazeCursor.components.raycaster.intersectedEls;
-    if (intersectedEls && intersectedEls.length > 0) {
-      for (let i = 0; i < intersectedEls.length; i++) {
-        const el = intersectedEls[i];
-        if (el && el.classList && el.classList.contains('selectable')) {
-          startGaze(el);
-          break;
-        }
-      }
-    }
-  }
-
-  // Evita que se autodispare el punto en los primeros instantes mientras el usuario acomoda el visor
-  let userReady = false;
-  setTimeout(() => {
-    userReady = true;
-    checkCurrentFocus();
-  }, 600);
-  window.addEventListener('mousemove', () => {
-    userReady = true;
-    checkCurrentFocus();
-  }, { once: true });
-  window.addEventListener('touchstart', () => {
-    userReady = true;
-    checkCurrentFocus();
-  }, { once: true });
-
-  // Estado del temporizador de mirada
-  let activeTarget = null;
-  let activeRing = null;
-  let activeRadii = { inner: 0.50, outer: 0.70 };
-  let gazeStartTime = null;
-  let gazeRaf = null;
-  let currentStage = '0%';
-
-  // Retroalimentación auditiva accesible (Web Audio API)
+  // --- Retroalimentación auditiva (Web Audio) ---
   function playConfirmationSound() {
     try {
       const AudioCtx = window.AudioContext || window.webkitAudioContext;
@@ -200,14 +83,11 @@
       const ctx = new AudioCtx();
       const osc = ctx.createOscillator();
       const gain = ctx.createGain();
-
       osc.type = 'sine';
       osc.frequency.setValueAtTime(587.33, ctx.currentTime);
       osc.frequency.exponentialRampToValueAtTime(880, ctx.currentTime + 0.16);
-
       gain.gain.setValueAtTime(0.14, ctx.currentTime);
       gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.28);
-
       osc.connect(gain);
       gain.connect(ctx.destination);
       osc.start();
@@ -215,532 +95,318 @@
     } catch (_) {}
   }
 
-  // Utilidades de dibujo para la tarjeta accesible en alta resolución (1400x1100 px)
-  function roundRect(ctx, x, y, width, height, radius, fill, stroke, strokeWidth = 1) {
-    ctx.beginPath();
-    ctx.moveTo(x + radius, y);
-    ctx.lineTo(x + width - radius, y);
-    ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
-    ctx.lineTo(x + width, y + height - radius);
-    ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
-    ctx.lineTo(x + radius, y + height);
-    ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
-    ctx.lineTo(x, y + radius);
-    ctx.quadraticCurveTo(x, y, x + radius, y);
-    ctx.closePath();
-    if (fill) {
-      ctx.fillStyle = fill;
-      ctx.fill();
-    }
-    if (stroke && strokeWidth > 0) {
-      ctx.strokeStyle = stroke;
-      ctx.lineWidth = strokeWidth;
-      ctx.stroke();
+  // --- Objetivos de mirada: cada elemento con data-action; elementos con la misma acción+id comparten carga ---
+  function objetivoDe(el) {
+    const accion = el.getAttribute('data-action');
+    if (!accion) return null;
+    const id = el.getAttribute('data-id') || '';
+    const ringId = el.getAttribute('data-ring');
+    return { key: `${accion}:${id}`, accion, id, el, anillo: ringId ? $(ringId) : null };
+  }
+
+  function nombreDe(t) {
+    if (t.accion === 'constelacion') return fichas.get(t.id)?.titulo || t.id;
+    return { volver: '← Volver al recorrido', audio: 'Escuchar narración', pausa: estado.pausado ? 'Reanudar mirada' : 'Pausar mirada', salir: 'Salir a 2D' }[t.accion] || t.accion;
+  }
+
+  function mensajeEnReposo() {
+    if (estado.pausado) return 'Mirada en PAUSA. Enfoca "Reanudar mirada" para continuar, o "Salir a 2D" para salir.';
+    if (estado.modo === 'ficha') return `Ficha de ${fichas.get(estado.fichaId)?.titulo ?? ''} abierta. Enfoca "← Volver al recorrido" durante 3 s o tócalo.`;
+    return 'Mirada activa: enfoca una constelación o un botón durante 3 s para seleccionarlo.';
+  }
+
+  const dwell = crearDwell({
+    puedeEnfocar: (t) => userReady && estado.permitido(t.accion, 'mirada'),
+    onInicio: (t) => {
+      eventLine(`Mirada fija sobre [${nombreDe(t)}] — iniciando carga de 3 s`);
+      if (t.accion === 'constelacion') constelaciones.get(t.id)?.resaltar(true);
+    },
+    onEtapa: (etapa, t, ms) => eventLine(`Carga ${t.accion}: ${etapa} (${Math.round(ms)} ms)`),
+    onProgreso: (p, etapa, t) => {
+      actualizarAnillo(t.anillo, p);
+      selectionStatus.textContent = `Enfocando ${nombreDe(t)}: etapa ${etapa} (${Math.round(p * 100)} %)...`;
+    },
+    onCancelar: (t, ms) => {
+      eventLine(`Mirada retirada a los ${ms} ms — carga reiniciada a 0 %`);
+      actualizarAnillo(t.anillo, 0);
+      if (t.accion === 'constelacion') constelaciones.get(t.id)?.resaltar(false);
+      selectionStatus.textContent = mensajeEnReposo();
+    },
+    onConfirmar: (t) => {
+      actualizarAnillo(t.anillo, 1, COLOR_CONFIRMADO);
+      playConfirmationSound();
+      setTimeout(() => {
+        ejecutar(t, 'mirada');
+        actualizarAnillo(t.anillo, 0);
+      }, 100);
+    },
+  });
+
+  // --- Acciones (las mismas para mirada y para clic/toque) ---
+  function ejecutar(t, via) {
+    if (!estado.permitido(t.accion, via)) return;
+    if (t.accion === 'constelacion') abrirFicha(t.id);
+    else if (t.accion === 'volver') cerrarFicha();
+    else if (t.accion === 'audio') pedirAudio();
+    else if (t.accion === 'pausa') alternarPausa();
+    else if (t.accion === 'salir') salir();
+  }
+
+  /** Muestra/oculta un grupo y solo hace "selectable" lo visible, para que el raycaster no vea objetos ocultos. */
+  function activarGrupo(grupo, activo) {
+    grupo.setAttribute('visible', activo ? 'true' : 'false');
+    grupo.querySelectorAll('[data-action]').forEach((el) => el.classList.toggle('selectable', activo));
+  }
+
+  function refrescarRaycaster() {
+    const rc = gazeCursor && gazeCursor.components && gazeCursor.components.raycaster;
+    if (rc) rc.refreshObjects();
+    // La retícula puede quedar ya sobre un objetivo sin generar un evento nuevo
+    setTimeout(comprobarFoco, 250);
+  }
+
+  function comprobarFoco() {
+    if (!userReady || estado.pausado || dwell.activo) return;
+    const rc = gazeCursor && gazeCursor.components && gazeCursor.components.raycaster;
+    const els = rc && rc.intersectedEls;
+    if (!els) return;
+    for (const el of els) {
+      const t = el && el.getAttribute && objetivoDe(el);
+      if (t && el.classList.contains('selectable') && dwell.enfocar(t)) break;
     }
   }
 
-  function renderWrappedText(ctx, text, x, y, maxWidth, lineHeight) {
-    const words = text.split(' ');
-    let line = '';
-    for (let n = 0; n < words.length; n++) {
-      const testLine = line + words[n] + ' ';
-      const metrics = ctx.measureText(testLine);
-      if (metrics.width > maxWidth && n > 0) {
-        ctx.fillText(line.trim(), x, y);
-        line = words[n] + ' ';
-        y += lineHeight;
-      } else {
-        line = testLine;
-      }
-    }
-    ctx.fillText(line.trim(), x, y);
-    return y + lineHeight;
+  function actualizarTextura() {
+    const mesh = cardPlane && cardPlane.getObject3D('mesh');
+    if (mesh && mesh.material && mesh.material.map) mesh.material.map.needsUpdate = true;
   }
 
-  // Dibuja la tarjeta blanca de Karime con tipografía y acentos 100% nítidos en el canvas 3D
-  function drawConstellationCard(showNotice = false) {
-    if (!cardCanvas) return;
+  /** Dibuja la ficha y coloca las zonas de mirada desde el MISMO layout. */
+  function pintarFicha(ficha) {
     const ctx = cardCanvas.getContext('2d');
-    if (!ctx) return;
-
-    ctx.clearRect(0, 0, cardCanvas.width, cardCanvas.height);
-    ctx.save();
-
-    // Fondo: tarjeta blanca con esquinas redondeadas y borde sutil
-    roundRect(ctx, 40, 40, 1320, 1020, 32, '#FFFFFF', '#D0D5DD', 4);
-
-    // 1. Cabecera: Etiqueta "Dato de muestra"
-    roundRect(ctx, 80, 80, 220, 46, 10, '#EEECFA', '#C9B8FF', 2);
-    ctx.fillStyle = '#4A3F99';
-    ctx.font = 'bold 22px system-ui, -apple-system, sans-serif';
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.fillText('Dato de muestra', 80 + 110, 80 + 23);
-
-    // Botón X para cerrar en la esquina superior derecha
-    ctx.fillStyle = '#667085';
-    ctx.font = 'bold 36px system-ui, -apple-system, sans-serif';
-    ctx.textAlign = 'center';
-    ctx.fillText('×', 1310, 100);
-
-    // 2. Título de la Constelación y subtítulo
-    ctx.textAlign = 'left';
-    ctx.textBaseline = 'alphabetic';
-    ctx.fillStyle = '#1B2430';
-    ctx.font = 'bold 54px system-ui, -apple-system, sans-serif';
-    ctx.fillText(recorridoActual.titulo, 80, 190);
-
-    ctx.fillStyle = '#4A5565';
-    ctx.font = '24px system-ui, -apple-system, sans-serif';
-    ctx.fillText('Historia y significado accesible', 80, 230);
-
-    // 3. Párrafo de historia (con todos los acentos bien legibles)
-    ctx.fillStyle = '#2D3748';
-    ctx.font = '27px system-ui, -apple-system, sans-serif';
-    const story = `${recorridoActual.resumen} Lee la historia completa y su transcripción en el modo web 2D.`;
-    renderWrappedText(ctx, story, 80, 285, 1220, 42);
-
-    // 4. Botón "▶ Escuchar"
-    roundRect(ctx, 80, 415, 210, 58, 12, '#1F4E8C', null, 0);
-    ctx.fillStyle = '#FFFFFF';
-    ctx.font = 'bold 24px system-ui, -apple-system, sans-serif';
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    const accionAudio = audioEstado.puedePausar ? 'Pausar' : audioEstado.puedeReanudar ? 'Reanudar' : 'Escuchar';
-    ctx.fillText(accionAudio, 80 + 105, 415 + 29);
-
-    // Aviso informativo accesible si se pulsa "Escuchar"
-    if (audioEstado) {
-      roundRect(ctx, 310, 415, 780, 58, 8, '#FFF9E6', '#F5B301', 2);
-      ctx.fillStyle = '#614700';
-      ctx.font = '21px system-ui, -apple-system, sans-serif';
-      ctx.textAlign = 'left';
-      const mensajeAudio = {
-        reproduciendo: 'Reproduciendo narración.', pausado: 'En pausa. Reanudar continúa la narración.',
-        listo: 'Elige Escuchar para comenzar.', cargando: 'Cargando narración…',
-        finalizado: 'Finalizó. Puedes escucharla de nuevo.',
-        bloqueado: 'Retira el visor y toca Activar audio.',
-        error: 'Audio no disponible. Puedes leer en modo web 2D.',
-        'no-disponible': 'Puedes leer la historia en modo web 2D.',
-      }[audioEstado.estado] || audioEstado.mensaje;
-      ctx.fillText(mensajeAudio, 330, 415 + 30);
-    }
-
-    // 5. Caja de Recomendación en biblioteca (Págs. 13-15 de Karime)
-    roundRect(ctx, 80, 500, 1240, 310, 16, '#FAF7F0', '#E2DCD0', 2);
-
-    ctx.fillStyle = '#4A5565';
-    ctx.font = 'bold 24px system-ui, -apple-system, sans-serif';
-    ctx.textAlign = 'left';
-    ctx.fillText('Si te interesa saber más, tenemos este libro en la biblioteca:', 110, 545);
-
-    // Ficha blanca del libro
-    roundRect(ctx, 110, 575, 1180, 145, 12, '#FFFFFF', '#C9CED6', 2);
-
-    // Icono de libro
-    ctx.font = '54px system-ui, -apple-system, sans-serif';
-    ctx.fillText('📖', 140, 665);
-
-    // Etiqueta mini "Dato de muestra"
-    roundRect(ctx, 230, 595, 160, 30, 6, '#EEECFA', '#C9B8FF', 1.5);
-    ctx.fillStyle = '#4A3F99';
-    ctx.font = 'bold 15px system-ui, -apple-system, sans-serif';
-    ctx.textAlign = 'center';
-    ctx.fillText('Dato de muestra', 230 + 80, 595 + 16);
-
-    // Título del libro
-    ctx.fillStyle = '#1F4E8C';
-    ctx.font = 'bold 28px system-ui, -apple-system, sans-serif';
-    ctx.textAlign = 'left';
-    ctx.fillText('Libro de muestra 1 — Guía de constelaciones', 230, 668);
-
-    // Autor
-    ctx.fillStyle = '#718096';
-    ctx.font = '22px system-ui, -apple-system, sans-serif';
-    ctx.fillText('Autor de muestra', 230, 702);
-
-    // Instrucción para el mostrador
-    ctx.fillStyle = '#1E7B3A';
-    ctx.font = 'bold 22px system-ui, -apple-system, sans-serif';
-    ctx.fillText('Pídelo en persona en el mostrador de la biblioteca.', 110, 785);
-
-    // 6. Botón "← Volver al recorrido"
-    roundRect(ctx, 420, 840, 560, 80, 16, '#1F4E8C', null, 0);
-    ctx.fillStyle = '#FFFFFF';
-    ctx.font = 'bold 30px system-ui, -apple-system, sans-serif';
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.fillText('←  Volver al recorrido', 420 + 280, 840 + 40);
-
-    ctx.restore();
-
-    // Notificar a Three.js / WebGL que la textura del plano se actualizó
-    if (cardPlane) {
-      const mesh = cardPlane.getObject3D?.('mesh');
-      if (mesh && mesh.material && mesh.material.map) {
-        mesh.material.map.needsUpdate = true;
-      }
-    }
+    layoutActual = calcularLayout(ctx, ficha, (({ aviso, etiqueta }) => ({ aviso, etiquetaAudio: etiqueta }))(presentarAudio(narracion)));
+    if (layoutActual.desborda) eventLine(`Aviso: el contenido de ${ficha.id} no cabe completo en la ficha.`);
+    dibujarFicha(ctx, layoutActual);
+    actualizarTextura();
+    for (const [nombre, rect] of Object.entries(layoutActual.zonas)) colocarZona(nombre, rect);
   }
 
-  // Inicializar tarjeta en el canvas
-  drawConstellationCard(false);
-  if (scene) {
-    if (scene.hasLoaded) drawConstellationCard(false);
-    else scene.addEventListener('loaded', () => drawConstellationCard(false), { once: true });
+  function colocarZona(nombre, rect) {
+    const accion = nombre; // 'audio' | 'volver'
+    let zona = $(`zona-${accion}`);
+    const m = zonaAMundo(rect);
+    const rout = m.alto * 0.44;
+    const rin = m.alto * 0.3;
+    const xAnillo = -m.ancho / 2 + m.alto / 2;
+    if (!zona) {
+      zona = document.createElement('a-plane');
+      zona.setAttribute('id', `zona-${accion}`);
+      zona.setAttribute('data-action', accion);
+      zona.setAttribute('data-ring', `zona-anillo-${accion}`);
+      zona.setAttribute('material', 'shader: flat; opacity: 0.001; transparent: true');
+      infoPanel3D.appendChild(zona);
+      crearAnillo(document, zona, { id: `zona-anillo-${accion}`, rin, rout, x: xAnillo, z: 0.02 });
+      ligar(zona);
+      zona.classList.toggle('selectable', estado.modo === 'ficha');
+    }
+    zona.setAttribute('position', `${m.x} ${m.y} 0.05`);
+    zona.setAttribute('width', m.ancho);
+    zona.setAttribute('height', m.alto);
+    const anillo = $(`zona-anillo-${accion}`);
+    anillo.setAttribute('data-rin', rin);
+    anillo.setAttribute('data-rout', rout);
+    anillo.setAttribute('position', `${xAnillo} 0 0.02`);
   }
 
-  // Actualiza el anillo de carga amarillo (#F5B301) sobre cualquier objeto enfocado
-  function setRingProgress(ringEl, progress, color = '#F5B301', rInner = 0.50, rOuter = 0.70) {
-    if (!ringEl) return;
-    if (progress <= 0) {
-      ringEl.setAttribute('visible', 'false');
-      ringEl.setAttribute('geometry', `primitive: ring; radiusInner: ${rInner}; radiusOuter: ${rOuter}; thetaStart: 90; thetaLength: 0.001`);
-      return;
-    }
-    ringEl.setAttribute('visible', 'true');
-    const p = Math.min(1.0, Math.max(0.002, progress));
-    const angle = -(p * 360);
-    ringEl.setAttribute('geometry', `primitive: ring; radiusInner: ${rInner}; radiusOuter: ${rOuter}; thetaStart: 90; thetaLength: ${angle}`);
-    ringEl.setAttribute('material', `color: ${color}; shader: flat; side: double; opacity: 0.95`);
+  function frenteAlFrente(distancia) {
+    const camara = scene.camera;
+    if (!camara) return frenteDeCamara(0, -1, distancia);
+    const dir = new AFRAME.THREE.Vector3();
+    camara.getWorldDirection(dir);
+    return frenteDeCamara(dir.x, dir.z, distancia);
   }
 
-  function startGaze(el) {
-    if (cancelGraceTimer) {
-      clearTimeout(cancelGraceTimer);
-      cancelGraceTimer = null;
-    }
-    if (!userReady) return;
-    if (!el.classList.contains('selectable')) return;
-    if (ultimaDireccionSeleccionada && scene.camera) {
-      const direccion = scene.camera.getWorldDirection(new AFRAME.THREE.Vector3());
-      if (direccion.angleTo(ultimaDireccionSeleccionada) < 0.06) return;
-      ultimaDireccionSeleccionada = null;
-    }
-    const action = el.getAttribute('data-action') || 'target';
-
-    // Reglas de estado: si está en pausa, solo permite mirar a Pausa/Reanudar
-    if (isPaused && action !== 'pause') return;
-    // Si la ficha de información está abierta, solo permite volver o audio
-    if (isModalOpen && action !== 'return' && action !== 'audio') return;
-    if (!isModalOpen && (action === 'return' || action === 'audio')) return;
-
-    // Si ya estamos enfocando un objetivo con la misma acción (ej. el punto y su aro colisionador), mantenemos la carga sin resetear
-    if (activeTarget) {
-      const activeAction = activeTarget.getAttribute('data-action') || 'target';
-      if (activeAction === action && (action !== 'target' || puntoDe(activeTarget) === puntoDe(el))) return;
-    }
-
-    if (gazeRaf) {
-      cancelAnimationFrame(gazeRaf);
-      gazeRaf = null;
-    }
-
-    activeTarget = el;
-    if (action === 'target') {
-      const punto = puntoDe(el);
-      activeRing = punto.querySelector('[data-progreso]') || targetProgressRing;
-      activeRadii = { inner: 0.50, outer: 0.70 };
-      punto.querySelector('a-sphere').setAttribute('color', '#F5B301');
-      eventLine(`Mirada fija sobre ${punto.dataset.constelacion || 'orion'} — iniciando carga de 3 s`);
-    } else if (action === 'return') {
-      activeRing = returnProgressRing;
-      activeRadii = { inner: 0.10, outer: 0.16 };
-      eventLine('Mirada fija sobre [Volver al recorrido] — iniciando carga de 3 s');
-    } else if (action === 'pause') {
-      activeRing = pauseProgressRing;
-      activeRadii = { inner: 0.11, outer: 0.17 };
-      eventLine(`Mirada fija sobre [${isPaused ? 'Seguir' : 'Pausa'}] — iniciando carga de 3 s`);
-    } else if (action === 'exit') {
-      activeRing = exitProgressRing;
-      activeRadii = { inner: 0.11, outer: 0.17 };
-      eventLine('Mirada fija sobre [Salir 2D] — iniciando carga de 3 s');
-    } else if (action === 'audio') {
-      activeRing = null;
-    }
-
-    gazeStartTime = performance.now();
-    currentStage = '0%';
-    if (activeRing) {
-      setRingProgress(activeRing, 0.002, '#F5B301', activeRadii.inner, activeRadii.outer);
-    }
-
-    function tick() {
-      if (!activeTarget) return;
-
-      const elapsed = performance.now() - gazeStartTime;
-      const progress = Math.min(elapsed / DWELL_TIME_MS, 1.0);
-
-      let stage = '0%';
-      if (progress >= 1.0) stage = '100%';
-      else if (progress >= 0.66) stage = '66%';
-      else if (progress >= 0.33) stage = '33%';
-
-      if (stage !== currentStage) {
-        currentStage = stage;
-        eventLine(`Carga ${action}: ${stage} (${Math.round(elapsed)} ms)`);
-      }
-
-      if (activeRing) {
-        setRingProgress(activeRing, progress, '#F5B301', activeRadii.inner, activeRadii.outer);
-      }
-      selectionStatus.textContent = `Enfocando ${action}: etapa ${stage} (${Math.round(progress * 100)} %)...`;
-
-      if (progress >= 1.0) {
-        completeGazeSelection(activeTarget, action);
-      } else {
-        gazeRaf = requestAnimationFrame(tick);
-      }
-    }
-
-    gazeRaf = requestAnimationFrame(tick);
+  function abrirFicha(id) {
+    const ficha = fichas.get(id);
+    if (!ficha || !estado.abrirFicha(id)) return;
+    dwell.cancelar();
+    constelaciones.forEach((c) => c.resaltar(false));
+    if (!sincronizando) narracion = null; // hasta que el reproductor confirme el audio de ESTA ficha (si nos abre él, su estado ya llegó)
+    selectionCount++;
+    // La ficha y sus controles aparecen frente a donde mira la persona (las constelaciones están a ±40°)
+    const frente = frenteAlFrente(3.0);
+    infoPanel3D.setAttribute('position', `${frente.x} ${FICHA_BASE_Y + PLANO_ALTO / 2} ${frente.z}`);
+    infoPanel3D.setAttribute('rotation', `0 ${frente.rotY} 0`);
+    pintarFicha(ficha);
+    activarGrupo(constelacionesEl, false);
+    activarGrupo(infoPanel3D, true);
+    visorControls3D.setAttribute('position', `${frente.x} ${POS_CONTROLES_Y} ${frente.z}`);
+    visorControls3D.setAttribute('rotation', `0 ${frente.rotY} 0`);
+    refrescarRaycaster();
+    selectionStatus.textContent = `✔ Selección #${selectionCount} completada. ${mensajeEnReposo()}`;
+    eventLine(`✔ Selección #${selectionCount}: ficha de ${ficha.titulo} abierta.`);
+    if (!sincronizando) window.dispatchEvent(new CustomEvent('astrovisor:ficha-abierta', { detail: ficha }));
   }
 
-  function requestCancelGaze() {
-    if (cancelGraceTimer) return;
-    // Margen de gracia accesible de 280 ms para amortiguar parpadeos y microtemblores involuntarios de cabeza
-    cancelGraceTimer = setTimeout(() => {
-      cancelGraceTimer = null;
-      cancelGaze();
-    }, 280);
+  function cerrarFicha() {
+    if (!estado.volver()) return;
+    dwell.cancelar();
+    if (!sincronizando) narracion = null;
+    activarGrupo(infoPanel3D, false);
+    activarGrupo(constelacionesEl, true);
+    visorControls3D.setAttribute('position', POS_CONTROLES.recorrido);
+    visorControls3D.setAttribute('rotation', '0 0 0');
+    refrescarRaycaster();
+    selectionStatus.textContent = mensajeEnReposo();
+    eventLine('Regreso al recorrido de constelaciones.');
+    if (!sincronizando) window.dispatchEvent(new Event('astrovisor:ficha-cerrada'));
   }
 
-  function cancelGaze() {
-    if (cancelGraceTimer) {
-      clearTimeout(cancelGraceTimer);
-      cancelGraceTimer = null;
-    }
-    if (gazeRaf) {
-      cancelAnimationFrame(gazeRaf);
-      gazeRaf = null;
-    }
-    if (!activeTarget) return;
-
-    const elapsed = gazeStartTime ? Math.round(performance.now() - gazeStartTime) : 0;
-    eventLine(`Mirada retirada a los ${elapsed} ms — carga reiniciada a 0 %`);
-    selectionStatus.textContent = isModalOpen
-      ? 'Ficha 3D de Orión abierta. Enfoca "← Volver al recorrido" o pulsa sobre él.'
-      : isPaused
-        ? 'Mirilla en PAUSA. Enfoca [▶ Seguir] para continuar.'
-        : 'Mirada retirada. Anillo reiniciado a 0 %.';
-    currentStage = '0%';
-
-    setRingProgress(targetProgressRing, 0, '#F5B301', 0.50, 0.70);
-    setRingProgress(returnProgressRing, 0, '#F5B301', 0.10, 0.16);
-    setRingProgress(pauseProgressRing, 0, '#F5B301', 0.11, 0.17);
-    setRingProgress(exitProgressRing, 0, '#F5B301', 0.11, 0.17);
-    target.setAttribute('color', TARGET_BASE_COLOR);
-    restaurarPuntos();
-
-    activeTarget = null;
-    activeRing = null;
+  // Audio: el reproductor es el de Luis (narraciones.js). Aquí solo se SOLICITA la acción (Escuchar/Pausar/Reanudar
+  // según su estado) y se MUESTRA el estado que él confirma; no se reproduce nada desde la escena.
+  function pedirAudio() {
+    const ficha = fichas.get(estado.fichaId);
+    if (!ficha) return;
+    window.dispatchEvent(new CustomEvent('astrovisor:audio-solicitado', { detail: { id: ficha.id, titulo: ficha.titulo, audio: adaptarAudio(ficha) } }));
+    eventLine(`Botón de narración: solicitud enviada al reproductor (${adaptarAudio(ficha) ? 'audio asociado' : 'sin audio asociado'}).`);
   }
 
-  function completeGazeSelection(el, action) {
-    if (scene.camera) ultimaDireccionSeleccionada = scene.camera.getWorldDirection(new AFRAME.THREE.Vector3());
-    if (gazeRaf) cancelAnimationFrame(gazeRaf);
-    gazeRaf = null;
-
-    if (activeRing) {
-      setRingProgress(activeRing, 1.0, CONFIRM_COLOR, activeRadii.inner, activeRadii.outer);
-    }
-    playConfirmationSound();
-
-    if (action === 'target') {
-      selectionCount++;
-      target.setAttribute('color', CONFIRM_COLOR);
-      const titulo = catalogo.find((x) => x.id === puntoDe(el).dataset.constelacion)?.titulo || 'Orión';
-      selectionStatus.textContent = `✔ Selección #${selectionCount} COMPLETADA: abriendo información de ${titulo} en el visor 3D...`;
-      eventLine(`✔ Selección #${selectionCount} completada: abriendo ficha 3D de ${titulo}.`);
-
-      activeTarget = null;
-      activeRing = null;
-
-      setTimeout(() => {
-        const historia = catalogo.find((x) => x.id === (puntoDe(el).dataset.constelacion || 'orion'));
-        openConstellationInfo3D(historia);
-        setRingProgress(targetProgressRing, 0, '#F5B301', 0.50, 0.70);
-        target.setAttribute('color', TARGET_BASE_COLOR);
-      }, 100);
-    } else if (action === 'return') {
-      selectionStatus.textContent = '✔ Volviendo al cielo nocturno...';
-      eventLine('✔ Cerrando ficha 3D y volviendo a las constelaciones.');
-
-      activeTarget = null;
-      activeRing = null;
-
-      setTimeout(() => {
-        closeConstellationInfo3D();
-        setRingProgress(returnProgressRing, 0, '#F5B301', 0.10, 0.16);
-      }, 100);
-    } else if (action === 'pause') {
-      activeTarget = null;
-      activeRing = null;
-      setTimeout(() => {
-        setRingProgress(pauseProgressRing, 0, '#F5B301', 0.11, 0.17);
-        togglePause();
-      }, 120);
-    } else if (action === 'exit') {
-      selectionStatus.textContent = '✔ Salida confirmada por mirada. Regresando al modo web 2D...';
-      eventLine('✔ Salida a 2D confirmada por mirada.');
-      activeTarget = null;
-      activeRing = null;
-      setTimeout(() => {
-        if (stereoActive) exitStereo();
-        window.location.href = '/explorar';
-      }, 300);
-    } else if (action === 'audio') {
-      activeTarget = null;
-      activeRing = null;
-      evento('astrovisor:audio-solicitado');
-    }
+  function sincronizar(accion) {
+    sincronizando = true;
+    try { accion(); } finally { sincronizando = false; }
   }
 
-  function openConstellationInfo3D(historia = recorridoActual) {
-    cancelGaze();
-    recorridoActual = historia || recorridoActual;
-    isModalOpen = true;
-    if (visorControls3D) visorControls3D.setAttribute('visible', 'false');
-    if (targetContainer) targetContainer.setAttribute('visible', 'false');
-    $('additionalConstellations')?.setAttribute('visible', false);
-    if (infoPanel3D) infoPanel3D.setAttribute('visible', 'true');
-    if (scene.camera && window.AFRAME) {
-      const posicion = scene.camera.getWorldPosition(new AFRAME.THREE.Vector3());
-      const rotacion = scene.camera.getWorldQuaternion(new AFRAME.THREE.Quaternion());
-      infoPanel3D.object3D.position.copy(posicion.add(new AFRAME.THREE.Vector3(0, 0, -3).applyQuaternion(rotacion)));
-      infoPanel3D.object3D.quaternion.copy(rotacion);
-    }
-    evento('astrovisor:ficha-abierta', recorridoActual);
-    drawConstellationCard(audioNoticeActive);
-    sincronizarSeleccionables();
+  // Contrato con narraciones.js (Luis). La pausa de la mirada NO toca la narración.
+  window.astrovisorVisor = {
+    constelaciones() {}, // el recorrido ya se construye con cargarDatos(); se acepta la llamada por compatibilidad
+    abrir: (historia) => sincronizar(() => {
+      if (estado.modo === 'ficha' && estado.fichaId !== historia?.id) cerrarFicha();
+      abrirFicha(historia?.id);
+    }),
+    cerrar: () => sincronizar(() => { if (estado.modo === 'ficha') cerrarFicha(); }),
+    estadoNarracion(nuevo) {
+      narracion = nuevo;
+      if (estado.modo === 'ficha') pintarFicha(fichas.get(estado.fichaId));
+    },
+  };
 
-    // Refrescar raycaster para que detecte de inmediato a returnBtn3D
-    if (gazeCursor && gazeCursor.components && gazeCursor.components.raycaster) {
-      gazeCursor.components.raycaster.refreshObjects();
+  function alternarPausa() {
+    const pausado = estado.alternarPausa();
+    dwell.cancelar();
+    etiquetaPausa.actualizar(pausado ? 'Reanudar mirada' : 'Pausar mirada');
+    pauseBtn3D.setAttribute('color', pausado ? '#B26A00' : '#1B2A5A');
+    if (pauseButton) {
+      pauseButton.textContent = pausado ? 'Reanudar mirilla' : 'Pausar mirilla';
+      pauseButton.style.background = pausado ? '#e59b3d' : '';
+      pauseButton.style.color = pausado ? '#fff' : '';
     }
-
-    selectionStatus.textContent = 'Ficha 3D abierta. Enfoca "← Volver al recorrido" durante 3 s o tócalo para regresar.';
-    eventLine(`Ficha accesible 3D de ${recorridoActual.titulo} abierta dentro de la escena.`);
+    selectionStatus.textContent = pausado
+      ? 'Mirada en PAUSA: la selección por mirada está desactivada. Salir a 2D sigue disponible.'
+      : mensajeEnReposo();
+    eventLine(pausado ? 'Mirada pausada.' : 'Mirada reanudada.');
+    if (!pausado) setTimeout(comprobarFoco, 250);
   }
 
-  function closeConstellationInfo3D() {
-    isModalOpen = false;
-    if (infoPanel3D) infoPanel3D.setAttribute('visible', 'false');
-    if (targetContainer) targetContainer.setAttribute('visible', 'true');
-    $('additionalConstellations')?.setAttribute('visible', true);
-    if (visorControls3D) visorControls3D.setAttribute('visible', 'true');
-    cancelGaze();
-    evento('astrovisor:ficha-cerrada');
-    sincronizarSeleccionables();
-
-    if (gazeCursor && gazeCursor.components && gazeCursor.components.raycaster) {
-      gazeCursor.components.raycaster.refreshObjects();
-    }
-
-    selectionStatus.textContent = 'De vuelta en el cielo nocturno. Enfoca el punto de nuevo durante 3 s para abrir su información.';
-    eventLine('Regresando a las constelaciones (Visor: 0 %).');
-  }
-
-  function handleSelectableClick(el) {
-    if (!el.classList.contains('selectable')) return;
-    userReady = true;
-    const action = el.getAttribute('data-action') || 'target';
-    if (action === 'target' && !isModalOpen) {
-      selectionCount++;
-      playConfirmationSound();
-      openConstellationInfo3D(catalogo.find((x) => x.id === (puntoDe(el).dataset.constelacion || 'orion')));
-    } else if (action === 'return' && isModalOpen) {
-      playConfirmationSound();
-      closeConstellationInfo3D();
-    } else if (action === 'pause') {
-      playConfirmationSound();
-      togglePause();
-    } else if (action === 'exit') {
-      playConfirmationSound();
+  function salir() {
+    window.dispatchEvent(new Event('astrovisor:salida-visor'));
+    selectionStatus.textContent = '✔ Salida confirmada. Regresando al modo web 2D...';
+    eventLine('✔ Salida a 2D.');
+    setTimeout(() => {
       if (stereoActive) exitStereo();
       window.location.href = '/explorar';
-    } else if (action === 'audio' && isModalOpen) {
+    }, 300);
+  }
+
+  // --- Eventos de mirada y de clic/toque sobre cada elemento con data-action ---
+  function soltar(el) {
+    const t = objetivoDe(el);
+    if (t && dwell.activo && dwell.activo.key === t.key) dwell.desenfocar();
+  }
+
+  function ligar(el) {
+    const enfocar = () => { const t = objetivoDe(el); if (t) dwell.enfocar(t); };
+    el.addEventListener('mouseenter', enfocar);
+    el.addEventListener('raycaster-intersected', enfocar);
+    el.addEventListener('mouseleave', () => soltar(el));
+    el.addEventListener('raycaster-intersected-cleared', () => soltar(el));
+    el.addEventListener('click', () => {
+      userReady = true;
+      const t = objetivoDe(el);
+      if (!t || !estado.permitido(t.accion, 'clic')) return;
+      dwell.cancelar();
       playConfirmationSound();
-      evento('astrovisor:audio-solicitado');
-      eventLine('Botón Escuchar pulsado en la tarjeta 3D.');
-    }
-  }
-
-  // Conectar eventos sobre todos los objetos seleccionables (.selectable)
-  function bindSelectableElements() {
-    const selectableEls = document.querySelectorAll('[data-action]');
-    selectableEls.forEach((el) => {
-      if (el.dataset.conectado) return;
-      el.dataset.conectado = 'true';
-      // Eventos estándar de A-Frame cursor
-      el.addEventListener('mouseenter', () => startGaze(el));
-      el.addEventListener('mouseleave', requestCancelGaze);
-      // Eventos directos del raycaster para máxima fiabilidad en WebGL
-      el.addEventListener('raycaster-intersected', () => startGaze(el));
-      el.addEventListener('raycaster-intersected-cleared', requestCancelGaze);
-      // Eventos de clic / toque táctil
-      el.addEventListener('click', () => handleSelectableClick(el));
+      ejecutar(t, 'clic');
     });
+  }
 
-    if (gazeCursor && !cursorConectado) {
-      cursorConectado = true;
-      gazeCursor.addEventListener('raycaster-intersection', (evt) => {
-        if (!userReady || isPaused || activeTarget) return;
-        const els = evt.detail && evt.detail.els;
-        if (els && els.length > 0) {
-          startGaze(els[0]);
-        }
-      });
-      gazeCursor.addEventListener('raycaster-intersection-cleared', () => {
-        requestCancelGaze();
-      });
+  if (gazeCursor) {
+    gazeCursor.addEventListener('raycaster-intersection', (evt) => {
+      if (dwell.activo) return;
+      const els = evt.detail && evt.detail.els;
+      const t = els && els.length ? objetivoDe(els[0]) : null;
+      if (t) dwell.enfocar(t);
+    });
+    gazeCursor.addEventListener('raycaster-intersection-cleared', (evt) => {
+      const activo = dwell.activo;
+      if (!activo) return;
+      const liberados = evt.detail && evt.detail.clearedEls;
+      if (!liberados || liberados.some((el) => objetivoDe(el)?.key === activo.key)) dwell.desenfocar();
+    });
+  }
+
+  ligar(pauseBtn3D);
+  ligar(exitBtn3D);
+
+  setTimeout(() => { userReady = true; comprobarFoco(); }, 600);
+  window.addEventListener('mousemove', () => { userReady = true; comprobarFoco(); }, { once: true });
+  window.addEventListener('touchstart', () => { userReady = true; comprobarFoco(); }, { once: true });
+
+  // --- Datos y construcción de las constelaciones ---
+  async function iniciarContenido() {
+    registrarCielo(AFRAME);
+    const cielo = document.createElement('a-entity');
+    cielo.setAttribute('campo-estelar', '');
+    scene.appendChild(cielo);
+    const horizonte = document.createElement('a-entity');
+    horizonte.setAttribute('horizonte-nocturno', '');
+    scene.appendChild(horizonte);
+    const esperar = scene.hasLoaded ? Promise.resolve() : new Promise((ok) => scene.addEventListener('loaded', ok, { once: true }));
+    let carga;
+    try {
+      carga = await cargarDatos();
+    } catch (error) {
+      selectionStatus.textContent = 'No se pudieron cargar las constelaciones. Usa "Regresar al modo web 2D".';
+      eventLine(`Error al cargar datos: ${error.message}`);
+      return;
     }
+    await esperar;
+    eventLine(carga.fuente === 'api'
+      ? 'Datos de constelaciones: API /api/contenidos/recorridos.'
+      : `Datos de constelaciones: respaldo local de DEMOSTRACIÓN (API no disponible: ${carga.motivo}).`);
+    const lista = carga.datos.filter((f) => {
+      if (FIGURAS[f.id]) return true;
+      eventLine(`Constelación "${f.id}" sin figura 3D definida: omitida del recorrido.`);
+      return false;
+    });
+    lista.forEach((ficha, i) => {
+      fichas.set(ficha.id, ficha);
+      const figura = FIGURAS[ficha.id];
+      const dir = figura.direccion ?? { az: (i * 360) / lista.length, el: 25 };
+      const c = crearConstelacion(document, { ficha, figura, pos: posicionEnEsfera(dir.az, dir.el) });
+      constelaciones.set(ficha.id, c);
+      constelacionesEl.appendChild(c.el);
+      c.el.querySelectorAll('[data-action]').forEach(ligar);
+    });
+    activarGrupo(constelacionesEl, true);
+    activarGrupo(visorControls3D, true);
+    refrescarRaycaster();
+    eventLine(`Recorrido listo con ${lista.length} constelaciones: ${lista.map((f) => f.titulo).join(', ')}.`);
+    selectionStatus.textContent = mensajeEnReposo();
   }
 
-  if (scene) {
-    if (scene.hasLoaded) bindSelectableElements();
-    else scene.addEventListener('loaded', bindSelectableElements, { once: true });
-  }
+  window.AstroVisorHomido = { estado, abrirFicha, cerrarFicha }; // ayuda para depurar en el dispositivo
 
-  // Sincronizar estado de Pausar / Reanudar (Panel 2D y botones 3D)
-  function togglePause() {
-    isPaused = !isPaused;
-    if (isPaused) {
-      evento('astrovisor:mirilla-pausa');
-      cancelGaze();
-      if (pauseButton) {
-        pauseButton.textContent = 'Reanudar mirilla';
-        pauseButton.style.background = '#e59b3d';
-        pauseButton.style.color = '#fff';
-      }
-      if (pause3DLabel) {
-        pause3DLabel.setAttribute('value', '▶ Seguir');
-      }
-      if (pauseBtn3D) {
-        pauseBtn3D.setAttribute('color', '#E59B3D');
-      }
-      selectionStatus.textContent = 'Mirilla en PAUSA: permanencia desactivada para descanso visual.';
-      eventLine('Mirilla pausada.');
-    } else {
-      if (pauseButton) {
-        pauseButton.textContent = 'Pausar mirilla';
-        pauseButton.style.background = '';
-        pauseButton.style.color = '';
-      }
-      if (pause3DLabel) {
-        pause3DLabel.setAttribute('value', '|| Pausa');
-      }
-      if (pauseBtn3D) {
-        pauseBtn3D.setAttribute('color', '#1B2A5A');
-      }
-      selectionStatus.textContent = 'Mirilla activa: enfoca el punto o un botón durante 3 s para seleccionarlo.';
-      eventLine('Mirilla reanudada.');
-    }
-  }
-
-  if (pauseButton) {
-    pauseButton.addEventListener('click', togglePause);
-  }
+  if (pauseButton) pauseButton.addEventListener('click', alternarPausa);
 
   const reticleToggleButton = $('reticleToggleButton');
   const reticleGroup = $('reticleGroup');
@@ -750,9 +416,7 @@
     reticleToggleButton.addEventListener('click', () => {
       reticleVisible = !reticleVisible;
       reticleGroup.setAttribute('visible', reticleVisible ? 'true' : 'false');
-      reticleToggleButton.textContent = reticleVisible
-        ? 'Ocultar mirilla guía'
-        : 'Mostrar mirilla guía';
+      reticleToggleButton.textContent = reticleVisible ? 'Ocultar mirilla guía' : 'Mostrar mirilla guía';
       eventLine(reticleVisible ? 'Mirilla visual activada como guía.' : 'Modo mirada pura activo (sin puntito en pantalla).');
     });
   }
@@ -770,7 +434,6 @@
       status.textContent = `Sensores: recibidos ${orientationEvents} eventos. Mueve el teléfono para orientar.`;
     }
     if (orientationEvents === 1) eventLine('Se recibió el primer evento de orientación con datos.');
-    lastSample = { beta: event.beta };
   };
   window.addEventListener('deviceorientation', listenOrientation);
 
@@ -807,7 +470,6 @@
   AFRAME.registerComponent('experimental-stereo', {
     init() {
       this.stereoCamera = new AFRAME.THREE.StereoCamera();
-      this.stereoCamera.aspect = 0.5;
       this.stereoCamera.eyeSep = 0.064;
       this.enabledStereo = false;
       stereoComponent = this;
@@ -816,45 +478,41 @@
       if (!this.enabledStereo || !this.el.renderer || !this.el.camera) return;
       const renderer = this.el.renderer;
       if (renderer.xr && renderer.xr.isPresenting) return;
-      // setViewport/setScissor ya aplican el pixel ratio del renderer.
-      const size = renderer.getSize(new AFRAME.THREE.Vector2());
-      const fullWidth = size.x, fullHeight = size.y;
-      const half = Math.floor(fullWidth / 2);
+      const size = renderer.getSize(new AFRAME.THREE.Vector2()); // px CSS (ver js/estereo.js)
+      const vistas = vistasOjos(size.x, size.y);
       const camera = this.el.camera;
       camera.updateWorldMatrix(true, false);
+      this.stereoCamera.aspect = vistas.aspecto;
       this.stereoCamera.update(camera);
       renderer.setScissorTest(true);
-      renderer.setViewport(0, 0, half, fullHeight);
-      renderer.setScissor(0, 0, half, fullHeight);
-      renderer.clear(true, true, true);
-      renderer.render(this.el.object3D, this.stereoCamera.cameraL);
-      renderer.setViewport(half, 0, fullWidth - half, fullHeight);
-      renderer.setScissor(half, 0, fullWidth - half, fullHeight);
-      renderer.clear(true, true, true);
-      renderer.render(this.el.object3D, this.stereoCamera.cameraR);
+      for (const [vista, ojo] of [[vistas.izquierdo, this.stereoCamera.cameraL], [vistas.derecho, this.stereoCamera.cameraR]]) {
+        renderer.setViewport(vista.x, vista.y, vista.ancho, vista.alto);
+        renderer.setScissor(vista.x, vista.y, vista.ancho, vista.alto);
+        renderer.clear(true, true, true);
+        renderer.render(this.el.object3D, ojo);
+      }
       renderer.setScissorTest(false);
-      renderer.setViewport(0, 0, fullWidth, fullHeight);
+      renderer.setViewport(0, 0, size.x, size.y);
     },
   });
 
   scene.setAttribute('experimental-stereo', '');
+  iniciarContenido();
+  if (leerParametros(location.search).activo) iniciarDiagnostico({ scene, log: eventLine }); // ?diag=1: modo temporal de aislamiento
 
   function onSceneReady() {
-    catalogar(catalogo);
     if (!stereoComponent) stereoComponent = scene.components['experimental-stereo'];
     stereoButton.disabled = !stereoComponent;
     stereoStatus.textContent = stereoComponent
       ? 'Escena lista. Compatible con 2D y vista dividida Homido.'
       : 'Escena cargada sin componente estéreo.';
-    drawConstellationCard(audioNoticeActive);
-    bindSelectableElements();
   }
   if (scene.hasLoaded) onSceneReady();
   else scene.addEventListener('loaded', onSceneReady, { once: true });
 
   async function exitStereo() {
-    if (isModalOpen) closeConstellationInfo3D();
-    evento('astrovisor:salida-visor');
+    if (estado.modo === 'ficha') cerrarFicha();
+    window.dispatchEvent(new Event('astrovisor:salida-visor'));
     if (!stereoActive) return;
     stereoActive = false;
     if (stereoComponent) stereoComponent.enabledStereo = false;
@@ -864,6 +522,7 @@
     stereoButton.disabled = false;
     stereoStatus.textContent = 'Vista dividida desactivada. Continuando en modo 2D.';
     eventLine('Vista dividida desactivada.');
+    liberarPantalla();
     window.dispatchEvent(new Event('resize'));
   }
 
@@ -877,16 +536,35 @@
     stereoButton.disabled = true;
     stereoStatus.textContent = 'Vista dividida ACTIVADA: gira el teléfono a horizontal.';
     eventLine('Vista dividida activada.');
+    prepararPantallaCompleta();
     requestAnimationFrame(() => {
       if (scene && scene.resize) scene.resize();
       window.dispatchEvent(new Event('resize'));
     });
   });
 
+  // Mejoras para el visor: pantalla completa, horizontal fijo y pantalla encendida (según soporte del navegador)
+  let bloqueoPantalla = null;
+  async function prepararPantallaCompleta() {
+    const intentar = async (nombre, fn) => {
+      try { await fn(); eventLine(`${nombre}: activado.`); } catch (e) { eventLine(`${nombre}: no disponible (${e.name || e.message}).`); }
+    };
+    if (host.requestFullscreen) await intentar('Pantalla completa', () => host.requestFullscreen());
+    if (screen.orientation && screen.orientation.lock) await intentar('Bloqueo horizontal', () => screen.orientation.lock('landscape'));
+    if (navigator.wakeLock) await intentar('Pantalla siempre encendida', async () => { bloqueoPantalla = await navigator.wakeLock.request('screen'); });
+    if (window.innerHeight > window.innerWidth) stereoStatus.textContent = 'Gira el teléfono a horizontal para ver las dos mitades.';
+    window.dispatchEvent(new Event('resize'));
+  }
+  function liberarPantalla() {
+    if (bloqueoPantalla) { bloqueoPantalla.release().catch(() => {}); bloqueoPantalla = null; }
+    if (screen.orientation && screen.orientation.unlock) { try { screen.orientation.unlock(); } catch (_) {} }
+    if (document.fullscreenElement && document.exitFullscreen) document.exitFullscreen().catch(() => {});
+  }
+
   exitButton.addEventListener('click', exitStereo);
   document.addEventListener('keydown', (event) => {
     if (event.key === 'Escape') {
-      if (isModalOpen) closeConstellationInfo3D();
+      if (estado.modo === 'ficha') cerrarFicha();
       else if (stereoActive) exitStereo();
     }
   });

@@ -102,7 +102,7 @@ window.addEventListener('astrovisor:ficha-abierta', (event) => {
 })
 window.addEventListener('astrovisor:ficha-cerrada', () => cerrar({ desdeVisor: true }))
 window.addEventListener('astrovisor:audio-solicitado', controlarAudio)
-window.addEventListener('astrovisor:mirilla-pausa', () => narrador.pausar())
+// La pausa de la mirada ('astrovisor:mirilla-pausa') NO pausa la narración: se controla solo con Pausar/Reanudar de la ficha.
 window.addEventListener('astrovisor:salida-visor', () => cerrar({ desdeVisor: true }))
 $('testScene').addEventListener('exit-vr', () => cerrar())
 $('testScene').addEventListener('loaded', () => {
