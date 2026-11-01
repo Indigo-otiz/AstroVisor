@@ -10,7 +10,7 @@ El 31 de octubre de 2026, Luis expresó «me parece bien, podemos cerrar mi spri
 
 Luis también indicó que el texto fue hecho por el equipo y pidió registrarlo así. Se atribuyen colectivamente los tres guiones al equipo AstroVisor y se documenta su uso en la demostración según la declaración del responsable. No se asigna una licencia pública al texto. Ver [constancia de autoría](../content/AUTORIA.md).
 
-La implementación cuenta con tres WAV reales, transcripciones, controles web/3D, reproducción observada en escritorio, 23 pruebas automatizadas y build correctos. Luis indicó iPhone 13 con Chrome y Safari, y «oppo 15a» con «google». No se corrige silenciosamente el modelo OPPO ni se deduce si «google» significa Chrome u otra aplicación. Las versiones, URL usada y fecha exacta de ejecución no se especificaron. La confirmación de iPhone/Safari cubre la alternativa de navegador requerida por el alcance.
+La implementación cuenta con tres WAV reales, transcripciones, controles web/3D, reproducción observada en escritorio, 33 pruebas automatizadas y build correctos tras integrar main. Luis indicó iPhone 13 con Chrome y Safari, y «oppo 15a» con «google». No se corrige silenciosamente el modelo OPPO ni se deduce si «google» significa Chrome u otra aplicación. Las versiones, URL usada y fecha exacta de ejecución no se especificaron. La confirmación de iPhone/Safari cubre la alternativa de navegador requerida por el alcance.
 
 Luis identificó inicialmente a Luis Alberto Rodríguez como revisor; ese nombre corresponde también al responsable del sprint en el proyecto, por lo que se registra como validación del autor. Ante la aclaración, confirmó que también revisó otro compañero y después lo identificó como **Índigo Ortiz**. Se registra esa revisión cruzada según el reporte de Luis, junto con su conformidad y solicitud de cierre, sin incidencias adicionales comunicadas. La fecha exacta de la revisión de Índigo no fue especificada; la fecha de esta constancia es el 31 de octubre de 2026. [Registro estructurado del reporte](evidencias/s3/validacion-reportada.json). No se atribuyen una revisión formal de GitHub ni pruebas observadas directamente por el agente en esos teléfonos.
 
@@ -68,7 +68,15 @@ Referencias primarias contrastadas: [WebKit sobre gesto directo en iOS](https://
 
 Entorno: Windows, Node v24.20.0, Vue/Vite/Express, navegador Chromium integrado de Codex (Chrome/156.0.0.0 según user agent observado). API en `127.0.0.1:3001`, frontend en `127.0.0.1:5173`, ambos limitados a esta computadora. El build real se verificó mediante el servidor auxiliar local en `127.0.0.1:5174`; también se indujeron condiciones de fallo únicamente en ese auxiliar. No se desplegó el sitio ni se abrió un túnel público.
 
-Rama: `codex/s3-narraciones-audio-visor`. Commit base: `e717955593ac0115b59db617434e546040f6a8d7`; implementación S3 aún sin commit. El [manifiesto de versión](evidencias/s3/version.json) identifica por SHA-256 los archivos actuales y las capturas, sin confundir el commit base con código S3 ya comprometido.
+Rama de implementación: `codex/s3-narraciones-audio-visor`. Primer commit S3: `0bbb9ec`. Se integró `origin/main` en `b4dafa4` antes de publicar el PR, conservando la ficha blanca, la permanencia de 3 segundos, la tolerancia de mirada y los controles de S2, además del acceso administrativo incorporado por el equipo. El [manifiesto de versión](evidencias/s3/version.json) registra una instantánea de archivos por SHA-256 previa al commit de integración; su commit base no se presenta como el commit final del merge.
+
+### Regresión de integración con main (31 de octubre de 2026)
+
+Resultado: **7/7 pruebas backend, 26/26 frontend y build correctos**; comprobación de sintaxis de los dos scripts del visor correcta. Las pruebas de autenticación y mirada incorporadas en main forman parte del total. No se probó una sesión real de Supabase; la verificación de autenticación corresponde a sus pruebas automatizadas.
+
+En escritorio Chrome 156 se comprobó Activar audio, reproducción real de las tres narraciones, pausa/reanudación, cambio Osa Mayor → Escorpio y cierre al salir de la vista dividida. Escuchar se activó con retícula y permanencia de 3 segundos en la ficha blanca de Orión. Se corrigió el cálculo de viewport por ojo para no aplicar dos veces el pixel ratio. [Registro de la sesión](evidencias/s3/integracion-main-registro.txt) y [captura de la ficha integrada](evidencias/s3/integracion-main-estereo.png).
+
+Esta regresión de escritorio es posterior a las confirmaciones físicas y a la revisión cruzada reportadas por Luis; no se atribuye a Índigo una nueva revisión del merge ni una repetición en teléfonos de esta integración. La aceptación reportada se conserva con esa limitación de trazabilidad.
 
 | Comprobación | Resultado actual |
 |---|---|

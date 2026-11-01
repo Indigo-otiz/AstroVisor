@@ -35,3 +35,901 @@ h2 { font-size: 1.35rem; }
 .skip-link { position: absolute; left: -9999px; top: .25rem; background: #fff; color: #111; padding: .6rem; z-index: 20; }
 .skip-link:focus { left: .25rem; }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; transition-duration: .01ms !important; } }
+
+/* ==========================================================================
+   ESTILOS COMPARTIDOS: MÓDULO DE ADMINISTRACIÓN (ASTROVISOR ADMIN)
+   ========================================================================== */
+
+.admin-shell {
+  background: #fcfbf9;
+}
+
+.admin-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+/* --- LOGIN SPLIT SCREEN (AdminAccesoView) --- */
+.login-page-container {
+  display: flex;
+  min-height: 100vh;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+.login-hero-side {
+  flex: 1.1;
+  background: #0b1a30;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem 2rem;
+  overflow: hidden;
+  color: #ffffff;
+}
+
+.sky-background-svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.brand-hero-card {
+  position: relative;
+  z-index: 2;
+  max-width: 480px;
+  width: 100%;
+}
+
+.brand-badge-row {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  margin-bottom: 2rem;
+}
+
+.brand-name {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.star-icon {
+  width: 26px;
+  height: 26px;
+}
+
+.admin-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  background: #e69d13;
+  color: #1a1a1a;
+  font-size: 0.82rem;
+  font-weight: 700;
+  padding: 0.25rem 0.65rem;
+  border-radius: 999px;
+}
+
+.lock-mini {
+  width: 14px;
+  height: 14px;
+}
+
+.hero-callout {
+  display: flex;
+  align-items: stretch;
+  gap: 1.2rem;
+  background: rgba(18, 38, 70, 0.45);
+  backdrop-filter: blur(8px);
+  padding: 1.8rem 1.6rem;
+  border-radius: 0.8rem;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.yellow-accent-bar {
+  width: 4px;
+  background: #e69d13;
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+
+.hero-title {
+  font-size: 2.1rem;
+  font-weight: 700;
+  color: #ffffff;
+  margin: 0 0 0.5rem;
+  font-family: inherit;
+  line-height: 1.15;
+}
+
+.hero-subtitle {
+  color: #cbd5e1;
+  font-size: 1rem;
+  margin: 0;
+  line-height: 1.45;
+}
+
+.login-form-side {
+  flex: 0.9;
+  background: #f8f6f0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem 2rem;
+}
+
+.login-card-floating {
+  background: #ffffff;
+  width: 100%;
+  max-width: 400px;
+  border-radius: 1.2rem;
+  padding: 2.5rem 2.2rem;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
+}
+
+.lock-icon-circle {
+  width: 52px;
+  height: 52px;
+  background: #173868;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1.2rem;
+}
+
+.lock-svg {
+  width: 24px;
+  height: 24px;
+}
+
+.card-title {
+  font-family: "Georgia", serif;
+  font-size: 1.85rem;
+  font-weight: 700;
+  color: #0f1f38;
+  margin: 0 0 0.35rem;
+}
+
+.card-subtitle {
+  color: #64748b;
+  font-size: 0.92rem;
+  margin: 0 0 1.8rem;
+}
+
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.field-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.field-group label {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: #1e293b;
+}
+
+.styled-input {
+  width: 100%;
+  padding: 0.75rem 0.95rem;
+  border: 1.5px solid #cbd5e1;
+  border-radius: 0.5rem;
+  font-size: 0.95rem;
+  font-family: inherit;
+  color: #0f172a;
+  background: #ffffff;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.styled-input:focus {
+  outline: none;
+  border-color: #1e4b8a;
+  box-shadow: 0 0 0 3px rgba(30, 75, 138, 0.15);
+}
+
+.password-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.styled-input.with-toggle {
+  padding-right: 7.2rem;
+}
+
+.toggle-pass-btn {
+  position: absolute;
+  right: 0.35rem;
+  background: #f1f5f9;
+  border: 1px solid #cbd5e1;
+  color: #1e4b8a;
+  font-size: 0.8rem;
+  font-weight: 600;
+  padding: 0.45rem 0.7rem;
+  border-radius: 0.35rem;
+  cursor: pointer;
+}
+
+.toggle-pass-btn:hover {
+  background: #e2e8f0;
+}
+
+.btn-submit {
+  width: 100%;
+  background: #173868;
+  color: #ffffff;
+  border: none;
+  border-radius: 0.5rem;
+  padding: 0.85rem;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 0.4rem;
+  transition: background 0.15s;
+  text-align: center;
+  text-decoration: none;
+  display: block;
+}
+
+.btn-submit:hover:not(:disabled) {
+  background: #10294e;
+}
+
+.btn-submit:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.return-link-container {
+  text-align: center;
+  margin-top: 0.8rem;
+}
+
+.return-link {
+  color: #1e4b8a;
+  font-size: 0.88rem;
+  text-decoration: underline;
+  font-weight: 500;
+}
+
+.return-link:hover {
+  color: #0d274d;
+}
+
+.error-banner {
+  background: #fef2f2;
+  color: #991b1b;
+  border: 1px solid #fecaca;
+  padding: 0.65rem 0.85rem;
+  border-radius: 0.4rem;
+  font-size: 0.88rem;
+}
+
+.env-notice {
+  background: #fffbeb;
+  color: #92400e;
+  border: 1px solid #fde68a;
+  padding: 0.6rem;
+  border-radius: 0.4rem;
+  margin-bottom: 1rem;
+  font-size: 0.82rem;
+}
+
+.active-session-box {
+  text-align: center;
+  background: #f0fdf4;
+  padding: 1.2rem;
+  border-radius: 0.5rem;
+  color: #166534;
+}
+
+/* --- DASHBOARD & EXPERIENCIAS (AdminPanelView) --- */
+.admin-dashboard-wrapper {
+  background: #fcfbf9;
+  min-height: 100vh;
+  width: 100%;
+  font-family: system-ui, -apple-system, sans-serif;
+  color: #1e293b;
+}
+
+.admin-topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.8rem 2.5rem;
+  background: #ffffff;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.topbar-left {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+}
+
+.topbar-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #0f1f38;
+  text-decoration: none;
+}
+
+.topbar-star {
+  width: 22px;
+  height: 22px;
+}
+
+.admin-badge-gold {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  background: #e69d13;
+  color: #1a1a1a;
+  font-size: 0.78rem;
+  font-weight: 700;
+  padding: 0.2rem 0.6rem;
+  border-radius: 999px;
+}
+
+.badge-lock {
+  width: 13px;
+  height: 13px;
+}
+
+.topbar-right {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.tab-experiencias {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.5rem 0.9rem;
+  background: #e0e9f6;
+  color: #173868;
+  font-weight: 600;
+  font-size: 0.88rem;
+  border-radius: 0.4rem;
+}
+
+.tab-icon {
+  width: 18px;
+  height: 18px;
+}
+
+.btn-logout {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.5rem 0.9rem;
+  background: transparent;
+  border: none;
+  color: #475569;
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  border-radius: 0.4rem;
+}
+
+.btn-logout:hover {
+  background: #f1f5f9;
+  color: #b91c1c;
+}
+
+.logout-icon {
+  width: 17px;
+  height: 17px;
+}
+
+.admin-hero-banner {
+  background: #0b1a30;
+  color: #ffffff;
+  padding: 2.5rem 0 3rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.banner-decor-svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.banner-content {
+  position: relative;
+  z-index: 2;
+  max-width: 1100px;
+  margin-inline: auto;
+  padding-inline: 1.5rem;
+}
+
+.welcome-heading {
+  font-family: "Georgia", serif;
+  font-size: 2.2rem;
+  font-weight: 700;
+  margin: 0 0 0.35rem;
+}
+
+.sample-tag {
+  font-family: system-ui, sans-serif;
+  font-size: 0.85rem;
+  font-weight: 400;
+  color: #cbd5e1;
+  margin-left: 0.5rem;
+}
+
+.welcome-subheading {
+  color: #cbd5e1;
+  font-size: 1.05rem;
+  margin: 0;
+}
+
+.admin-body {
+  max-width: 1100px;
+  margin-inline: auto;
+  padding: 2.5rem 1.5rem 4rem;
+  display: flex;
+  flex-direction: column;
+  gap: 3.5rem;
+}
+
+/* CÓMO USAR */
+.how-to-use-section {
+  text-align: center;
+}
+
+.section-title {
+  font-family: "Georgia", serif;
+  font-size: 1.85rem;
+  color: #0f1f38;
+  margin: 0 0 2rem;
+  text-align: left;
+}
+
+.steps-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.step-card {
+  flex: 1;
+  min-width: 220px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.step-number-badge {
+  width: 26px;
+  height: 26px;
+  background: #173868;
+  color: #ffffff;
+  border-radius: 50%;
+  font-size: 0.82rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 0.75rem;
+}
+
+.step-icon-box {
+  width: 76px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 0.75rem;
+}
+
+.step-svg {
+  width: 100%;
+  height: 100%;
+}
+
+.step-title {
+  font-size: 1.02rem;
+  font-weight: 700;
+  color: #0f1f38;
+  margin: 0 0 0.35rem;
+}
+
+.step-desc {
+  font-size: 0.88rem;
+  color: #64748b;
+  margin: 0;
+}
+
+.step-connector {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  width: 60px;
+}
+
+.connector-line {
+  position: absolute;
+  width: 100%;
+  border-top: 2px dashed #e2e8f0;
+}
+
+.connector-diamond {
+  width: 10px;
+  height: 10px;
+  background: #e69d13;
+  transform: rotate(45deg);
+  z-index: 1;
+}
+
+/* EXPERIENCIAS */
+.breadcrumb-nav {
+  font-size: 0.88rem;
+  color: #64748b;
+  margin-bottom: 0.6rem;
+}
+
+.experiences-title {
+  font-family: "Georgia", serif;
+  font-size: 2.1rem;
+  color: #0f1f38;
+  margin: 0 0 0.35rem;
+}
+
+.experiences-subtitle {
+  color: #64748b;
+  font-size: 0.95rem;
+  margin: 0 0 2rem;
+}
+
+.experiences-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
+  gap: 1.8rem;
+}
+
+.exp-card {
+  background: #ffffff;
+  border-radius: 1.2rem;
+  overflow: hidden;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.05);
+  border: 1px solid #e2e8f0;
+  display: flex;
+  flex-direction: column;
+}
+
+.exp-preview-screen {
+  background: #0f1f38;
+  padding: 1.8rem 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.screen-svg {
+  width: 100%;
+  max-width: 180px;
+  height: auto;
+}
+
+.exp-info {
+  padding: 1.8rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.exp-name {
+  font-family: "Georgia", serif;
+  font-size: 1.55rem;
+  color: #0f1f38;
+  margin: 0 0 0.3rem;
+}
+
+.exp-tagline {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #334155;
+  margin: 0 0 0.4rem;
+}
+
+.exp-details {
+  font-size: 0.88rem;
+  color: #64748b;
+  margin: 0 0 1.2rem;
+  flex: 1;
+}
+
+.badge-wrapper {
+  margin-bottom: 1.2rem;
+}
+
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.8rem;
+  font-weight: 700;
+  padding: 0.25rem 0.65rem;
+  border-radius: 999px;
+}
+
+.status-badge.available {
+  background: #dcfce7;
+  color: #15803d;
+}
+
+.status-badge.prep {
+  background: #fef3c7;
+  color: #b45309;
+}
+
+.badge-check {
+  width: 13px;
+  height: 13px;
+}
+
+.btn-action {
+  width: 100%;
+  padding: 0.8rem 1rem;
+  border-radius: 0.5rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  text-align: center;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-block;
+  transition: all 0.15s;
+}
+
+.btn-action.outline {
+  background: #ffffff;
+  border: 1.5px solid #173868;
+  color: #173868;
+}
+
+.btn-action.outline:hover {
+  background: #f0f4f9;
+}
+
+.btn-action.solid {
+  background: #173868;
+  border: 1.5px solid #173868;
+  color: #ffffff;
+}
+
+.btn-action.solid:hover {
+  background: #10294e;
+}
+
+.btn-action.disabled {
+  background: #254b7f;
+  border: 1.5px solid #254b7f;
+  color: #94a3b8;
+  cursor: not-allowed;
+  opacity: 0.85;
+}
+
+/* TRANSICIÓN DE CARGA (Imagen 4) */
+.loading-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(11, 26, 48, 0.7);
+  backdrop-filter: blur(4px);
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+}
+
+.loading-card {
+  background: #ffffff;
+  border-radius: 1.5rem;
+  padding: 3.5rem 3rem;
+  max-width: 480px;
+  width: 100%;
+  text-align: center;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.constellation-spinner {
+  width: 110px;
+  height: 110px;
+  margin-bottom: 1.8rem;
+}
+
+.spinner-svg {
+  width: 100%;
+  height: 100%;
+  animation: rotateSlow 8s linear infinite;
+}
+
+@keyframes rotateSlow {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.pulse-node-1 {
+  animation: pulseNode 1.5s ease-in-out infinite alternate;
+}
+
+.pulse-node-2 {
+  animation: pulseNode 1.5s ease-in-out 0.75s infinite alternate;
+}
+
+@keyframes pulseNode {
+  from { transform: scale(0.9); opacity: 0.8; }
+  to { transform: scale(1.3); opacity: 1; }
+}
+
+.loading-title {
+  font-family: "Georgia", serif;
+  font-size: 2.1rem;
+  color: #0f1f38;
+  margin: 0 0 0.5rem;
+}
+
+.loading-subtitle {
+  color: #64748b;
+  font-size: 1rem;
+  margin: 0 0 1.8rem;
+}
+
+.btn-cancelar-transicion {
+  background: #f1f5f9;
+  border: 1px solid #cbd5e1;
+  color: #475569;
+  padding: 0.55rem 1.2rem;
+  border-radius: 0.4rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.btn-cancelar-transicion:hover {
+  background: #e2e8f0;
+}
+
+/* FICHAS DE LIBROS */
+.books-section {
+  border-top: 1px solid #e2e8f0;
+  padding-top: 2.5rem;
+}
+
+.books-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.btn-refresh {
+  padding: 0.55rem 1.1rem;
+  background: #173868;
+  color: #ffffff;
+  border: none;
+  border-radius: 0.4rem;
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.btn-refresh:hover:not(:disabled) {
+  background: #10294e;
+}
+
+.books-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.2rem;
+}
+
+.book-card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.8rem;
+  padding: 1.4rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+}
+
+.book-pill-id {
+  display: inline-block;
+  background: #f1f5f9;
+  color: #475569;
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 0.15rem 0.5rem;
+  border-radius: 999px;
+  margin-bottom: 0.6rem;
+}
+
+.book-title {
+  font-family: "Georgia", serif;
+  font-size: 1.25rem;
+  color: #0f1f38;
+  margin: 0 0 0.25rem;
+}
+
+.book-author {
+  font-size: 0.88rem;
+  color: #64748b;
+  margin: 0 0 0.6rem;
+}
+
+.book-desc {
+  font-size: 0.85rem;
+  color: #334155;
+  line-height: 1.45;
+  margin: 0 0 0.8rem;
+}
+
+.loan-message {
+  font-size: 0.8rem;
+  color: #1e4b8a;
+  background: #eff6ff;
+  padding: 0.4rem 0.6rem;
+  border-radius: 0.35rem;
+  border: 1px solid #dbeafe;
+}
+
+.empty-books-box {
+  background: #ffffff;
+  border: 2px dashed #cbd5e1;
+  border-radius: 0.8rem;
+  padding: 2.5rem;
+  text-align: center;
+  color: #64748b;
+}
+
+@media (max-width: 860px) {
+  .login-page-container {
+    flex-direction: column;
+  }
+  .login-hero-side {
+    padding: 2.5rem 1.5rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .step-connector {
+    display: none;
+  }
+  .admin-topbar {
+    padding: 0.8rem 1rem;
+  }
+}

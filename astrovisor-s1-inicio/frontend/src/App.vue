@@ -4,6 +4,7 @@ import { useRoute } from 'vue-router'
 import './public.css'
 const route = useRoute()
 const esPublica = computed(() => ['inicio', 'explorar', 'constelacion'].includes(route.name))
+const esAdmin = computed(() => ['admin', 'admin-acceso'].includes(route.name))
 const titulos = {
   inicio: 'Inicio',
   explorar: 'Constelaciones e historias del cielo',
@@ -25,9 +26,11 @@ watch(
 )
 </script>
 <template>
-  <div class="app-shell" :class="{ 'public-shell': esPublica }">
+  <div class="app-shell" :class="{ 'public-shell': esPublica, 'admin-shell': esAdmin }">
     <a class="skip-link" href="#contenido">Saltar al contenido</a>
-    <header class="site-header">
+
+    <!-- Header general: solo se muestra en vistas públicas, no en administración -->
+    <header v-if="!esAdmin" class="site-header">
       <div class="container header-content">
         <RouterLink class="brand" to="/"
           ><svg v-if="esPublica" class="brand-star" viewBox="0 0 32 32" aria-hidden="true">
@@ -44,10 +47,14 @@ watch(
         </nav>
       </div>
     </header>
-    <main id="contenido" class="container main-content">
+
+    <!-- Contenido principal -->
+    <main id="contenido" :class="esAdmin ? 'admin-main' : 'container main-content'">
       <RouterView :key="route.path" />
     </main>
-    <footer class="container site-footer">
+
+    <!-- Footer general: solo en vistas públicas -->
+    <footer v-if="!esAdmin" class="container site-footer">
       <p>Prototipo académico · Contenido de demostración · Material de la biblioteca pendiente.</p>
     </footer>
   </div>

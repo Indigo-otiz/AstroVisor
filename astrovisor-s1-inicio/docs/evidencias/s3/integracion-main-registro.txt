@@ -1,0 +1,36 @@
+[19:47:44] Prueba iniciada | Selección por mirada accesible | 2026-11-01T01:47:44.908Z
+[19:47:44] Navegador: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36
+[19:47:44] Contexto seguro: sí
+[19:47:44] Narración | sin ficha | no-disponible
+[19:47:45] Mirada fija sobre orion — iniciando carga de 3 s
+[19:47:45] Narración | sin ficha | listo
+[19:47:45] Narración | sin ficha | cargando
+[19:47:45] Narración | sin ficha | listo
+[19:47:45] Narración | Orión | listo
+[19:47:45] Mirada retirada a los 353 ms — carga reiniciada a 0 %
+[19:47:45] Ficha accesible 3D de Orión abierta dentro de la escena.
+[19:47:45] Vista dividida activada.
+[19:48:08] Carga audio: 33% (1012 ms)
+[19:48:09] Carga audio: 66% (1993 ms)
+[19:48:10] Carga audio: 100% (3002 ms)
+[19:48:10] Narración | Orión | cargando
+[19:48:10] Narración | Orión | reproduciendo
+[19:48:30] Narración | Orión | finalizado
+[19:48:40] Narración | sin ficha | no-disponible
+[19:48:40] Regresando a las constelaciones (Visor: 0 %).
+[19:48:40] Vista dividida desactivada.
+[19:48:40] Narración | Osa Mayor | listo
+[19:48:40] Ficha accesible 3D de Osa Mayor abierta dentro de la escena.
+[19:48:40] Narración | Osa Mayor | cargando
+[19:48:40] Narración | Osa Mayor | reproduciendo
+[19:48:41] Narración | Escorpio | listo
+[19:48:41] Ficha accesible 3D de Escorpio abierta dentro de la escena.
+[19:48:44] Narración | Escorpio | cargando
+[19:48:44] Narración | Escorpio | reproduciendo
+[19:48:45] Narración | Escorpio | pausado
+[19:48:45] Narración | Escorpio | cargando
+[19:48:45] Narración | Escorpio | reproduciendo
+[19:48:45] Vista dividida activada.
+[19:48:47] Narración | sin ficha | no-disponible
+[19:48:47] Regresando a las constelaciones (Visor: 0 %).
+[19:48:47] Vista dividida desactivada.

@@ -69,6 +69,8 @@ Crear `docs/PRUEBA-S3.md` y `docs/evidencias/s3/` con versión/commit o manifies
 
 ## Migration Plan
 
+Integración previa al merge: main avanzó a `b4dafa4` con la ficha blanca y mirada de S2 y el login administrativo. S3 se adapta mediante un puente de eventos entre esa ficha y el controlador compartido; conserva la tarjeta y los controles de Karime, usa permanencia de 3000 ms y añade los puntos de las tres narraciones. La lectura completa y los créditos siguen disponibles en HTML 2D. La estereoscopía usa dimensiones lógicas del renderer para evitar duplicar el pixel ratio.
+
 Tras la aprobación del plan, crear una rama `codex/s3-narraciones-audio-visor` desde el checkout adecuado antes de editar código. Añadir primero contrato y archivos autorizados; luego controlador compartido, ficha web y escena. Ejecutar pruebas antes de registrar evidencia. Mantener S1/S2 y `DEMO/` sin reescribir su historia.
 
 Rollback: revertir los cambios S3 en su rama, retirar metadatos de audio y recursos añadidos conservando historias y rutas previas. No hay migración de base de datos ni despliegue autorizado en este incremento.

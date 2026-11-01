@@ -1,8 +1,8 @@
 {
-  "fechaUTC": "2026-11-01T01:35:02.585Z",
+  "fechaUTC": "2026-11-01T01:49:29.664Z",
   "zonaFechaLocal": "America/Mexico_City",
   "rama": "codex/s3-narraciones-audio-visor",
-  "commitBase": "e717955593ac0115b59db617434e546040f6a8d7",
+  "commitBase": "0bbb9ecc7608c15fc5d0e4f2cb7a3938b3d0209a",
   "implementacionSinCommit": true,
   "alcance": "Verificación local de implementación; no certifica escucha humana, autoría/permiso documental, móvil/Homido ni revisión de otro integrante.",
   "hashes": [
@@ -18,12 +18,22 @@
     },
     {
       "archivo": "backend/src/index.js",
-      "sha256": "07a20ac0e39ce63f1b13c8d2543ab20d3d617c3dd4c1ddd59472e68b2e2959da",
+      "sha256": "74b36b53939ebb64de98e67d8ba4ba9af0d7e6c8bfb55aff1292fd3a630649ee",
+      "normalizacion": "UTF-8 sin BOM; LF"
+    },
+    {
+      "archivo": "backend/src/middleware/auth.js",
+      "sha256": "7a68b81b3c48d6360c6ef8ca61af9890abb34d0b6d06e14b1f6607a950ce9ff1",
       "normalizacion": "UTF-8 sin BOM; LF"
     },
     {
       "archivo": "backend/src/services/documentRepository.js",
       "sha256": "3f3f86113d5b140b7144a7f62b47054749a6d11a60308de9b84be6eaacd2ef72",
+      "normalizacion": "UTF-8 sin BOM; LF"
+    },
+    {
+      "archivo": "backend/test/auth.test.js",
+      "sha256": "90a5f24c6a8acf97cf0da8ccf28a3c060fcb5d8d0186b35a5e254628306d8f0c",
       "normalizacion": "UTF-8 sin BOM; LF"
     },
     {
@@ -48,7 +58,7 @@
     },
     {
       "archivo": "docs/PRUEBA-S3.md",
-      "sha256": "188879a651b9212cdf858f87391b82167a2fbed0eff6f92bd7041e43cbee4ec2",
+      "sha256": "b3be1b689e61107b734ee56a4e0bb5cab98bff7859a029b2a25427a01539e159",
       "normalizacion": "UTF-8 sin BOM; LF"
     },
     {
@@ -107,6 +117,16 @@
       "normalizacion": "UTF-8 sin BOM; LF"
     },
     {
+      "archivo": "docs/evidencias/s3/integracion-main-estereo.png",
+      "sha256": "f45ac7f59e5800d3b063cf45ff28dd0eb724c6ac31bc53f21f0596213e592590",
+      "normalizacion": "bytes originales"
+    },
+    {
+      "archivo": "docs/evidencias/s3/integracion-main-registro.txt",
+      "sha256": "d5b019279b094bb9214262371ec11a89254515dd5fc75340477358d0b2e3ee65",
+      "normalizacion": "UTF-8 sin BOM; LF"
+    },
+    {
       "archivo": "docs/evidencias/s3/sin-3d-movil.png",
       "sha256": "7cb69d96f699b9ec8a1b9fd89b15439cb4e5a13398dc651378dfe39e9345aa7c",
       "normalizacion": "bytes originales"
@@ -158,7 +178,7 @@
     },
     {
       "archivo": "frontend/package.json",
-      "sha256": "4d29d20cadcd7865d840668e67590d4b87bab619fb06273f0afea59212b369f0",
+      "sha256": "c501e7fffa2f17d5e107b9ededcf59f146ffe83453bbd82f6623298f1b6ac2c9",
       "normalizacion": "UTF-8 sin BOM; LF"
     },
     {
@@ -213,27 +233,27 @@
     },
     {
       "archivo": "frontend/public/prueba-homido/index.html",
-      "sha256": "b8d10149fdb68c47c56e42020ca4e008eb52402ee4897c7596e59a2ebf28581f",
+      "sha256": "6dd54a21be24685b1d7cd234ddfe3085afb995ed7c578d3d3c9d20082b0c3f81",
       "normalizacion": "UTF-8 sin BOM; LF"
     },
     {
       "archivo": "frontend/public/prueba-homido/narraciones.js",
-      "sha256": "603f939d5d38504a94825cc09ce82fe9d0ca948a91843fdd397a205927364c42",
+      "sha256": "f3314d66133b8eaeb9589d58d94e8ad007a777b53189dfa30db3bbf3a84732ed",
       "normalizacion": "UTF-8 sin BOM; LF"
     },
     {
       "archivo": "frontend/public/prueba-homido/prueba.js",
-      "sha256": "8629080fa2d5bbb248a19d9927e6f6cd1184e17dce341d1c32520c8ee506f1a5",
+      "sha256": "7214de28e6dc08527b61c4be139db83d618377832dea115c8374171e356a1eaa",
       "normalizacion": "UTF-8 sin BOM; LF"
     },
     {
       "archivo": "frontend/public/prueba-homido/styles.css",
-      "sha256": "f98fde0ee560cbdb4d1810361517ee26661071185de0682e821c7c7ff4c08bd9",
+      "sha256": "e1dcdec1541fdcb088b22c257c8aefd4078df79d6a155e0e6b76755ba47ded8c",
       "normalizacion": "UTF-8 sin BOM; LF"
     },
     {
       "archivo": "frontend/src/App.vue",
-      "sha256": "161f67f607e82ae5d5e5d4e44125ba4f7bdc0a7dbfad56d75c6f1d726efcc51d",
+      "sha256": "77a8cb0c66a9ce6ea87e3f128d2dfcec0a5c9bf1aecb79935d0940537c6a2a0f",
       "normalizacion": "UTF-8 sin BOM; LF"
     },
     {
@@ -247,8 +267,18 @@
       "normalizacion": "UTF-8 sin BOM; LF"
     },
     {
+      "archivo": "frontend/src/components/GazeReticle.vue",
+      "sha256": "5f8e53bfd528e6b20bc5ef58fbb15e5dd01053c57c7da871616e993c052c9803",
+      "normalizacion": "UTF-8 sin BOM; LF"
+    },
+    {
       "archivo": "frontend/src/components/NarracionAudio.vue",
       "sha256": "05ab359adc6e9a6e114fc97d2a34d179216aabb26abd47efae335880424d0b33",
+      "normalizacion": "UTF-8 sin BOM; LF"
+    },
+    {
+      "archivo": "frontend/src/composables/useAuth.js",
+      "sha256": "7d538fdef7ac9a5182604ded06b1613e22492400c9d81e14e3834c016411ee80",
       "normalizacion": "UTF-8 sin BOM; LF"
     },
     {
@@ -268,7 +298,7 @@
     },
     {
       "archivo": "frontend/src/router/index.js",
-      "sha256": "865c857ceeba85705be4797e4550a0a069939a37883a312bdacd57eceaac360b",
+      "sha256": "e8e8718424af36aa107044468c7063280d73118d5cbcdeb7d7cf766788557c1a",
       "normalizacion": "UTF-8 sin BOM; LF"
     },
     {
@@ -277,18 +307,28 @@
       "normalizacion": "UTF-8 sin BOM; LF"
     },
     {
+      "archivo": "frontend/src/services/gazeController.js",
+      "sha256": "b931c93b3d66da801c158a6238268c57e53da332c581ce7865b554234f1fd51a",
+      "normalizacion": "UTF-8 sin BOM; LF"
+    },
+    {
+      "archivo": "frontend/src/services/supabaseClient.js",
+      "sha256": "a0fd9554a99838934e9b3d33e4976fe3c49c8632a01631742916acd6fbcadd35",
+      "normalizacion": "UTF-8 sin BOM; LF"
+    },
+    {
       "archivo": "frontend/src/styles.css",
-      "sha256": "5ff3160a730d5316c90bcb20663cc462736b868dcdb7ce635f9c35851fc8ebdf",
+      "sha256": "18a02fb725b9b42a81c2344e7626bb1db15019d523f1284aa3d635ad9898c4f1",
       "normalizacion": "UTF-8 sin BOM; LF"
     },
     {
       "archivo": "frontend/src/views/AdminAccesoView.vue",
-      "sha256": "92b0edb5172e8c27c2c1ba77debb8d7ef34b1e8df377894c64552cd6488945cd",
+      "sha256": "da7954cfc474568311ca610109b5a3fb92e561701159174319f58aafe44bea5d",
       "normalizacion": "UTF-8 sin BOM; LF"
     },
     {
       "archivo": "frontend/src/views/AdminPanelView.vue",
-      "sha256": "229e8d57133dbfe524f02ae09b97065bfa1638f4846df35b7d11d1a65bfe3fdb",
+      "sha256": "f163b2a5e14f9e9e4f61a2c8ca04c2ef05b8e943e555272d21d844e04f04e4c1",
       "normalizacion": "UTF-8 sin BOM; LF"
     },
     {
@@ -317,18 +357,23 @@
       "normalizacion": "UTF-8 sin BOM; LF"
     },
     {
+      "archivo": "frontend/test/gazeController.test.js",
+      "sha256": "5f3fc65bcf13eec2bcabdc60137e9c9e736f712fde77e81f26db3a86fb863d7f",
+      "normalizacion": "UTF-8 sin BOM; LF"
+    },
+    {
       "archivo": "frontend/test/narration.test.js",
       "sha256": "16c064ffb0d6a39f4bb4e97760c3a9fdec92b852469d4691b6e8a0dd427b24d8",
       "normalizacion": "UTF-8 sin BOM; LF"
     },
     {
       "archivo": "frontend/vite.config.js",
-      "sha256": "e25e30bfdc3f3d78fb05e29a7988bca03c33452fc37c231a0377c42f6c26ab73",
+      "sha256": "9371c446fab97866396c9e3c9666b09d2edf13b2b61c98865acbb05449b57927",
       "normalizacion": "UTF-8 sin BOM; LF"
     },
     {
       "archivo": "package-lock.json",
-      "sha256": "bec73dd2600a4bcca674813cc41499cf96b96b0c9eee63366bc10da7329ecc3e",
+      "sha256": "24e3d277ce4b0bce388c42f47a34257bf668981d6010b94e079f4f4b08a428bf",
       "normalizacion": "UTF-8 sin BOM; LF"
     },
     {
