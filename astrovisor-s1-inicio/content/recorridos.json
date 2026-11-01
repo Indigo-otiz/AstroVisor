@@ -7,7 +7,22 @@
     "comoReconocerla": "Busca tres estrellas cercanas que parecen formar una línea: representan el cinturón. Imagina después una figura alrededor de ellas. El esquema es una guía de la forma, no un mapa para localizarla en una fecha o lugar concreto.",
     "demostracion": true,
     "libros": [],
-    "multimedia": []
+    "multimedia": [
+      {
+        "tipo": "audio",
+        "src": "/audio/orion-kokoro-v1.wav",
+        "formato": "audio/wav",
+        "transcripcion": "En un relato de la tradición griega, Orión era un cazador que recorría la tierra. Las personas imaginaron su figura entre las estrellas: dos hombros, dos pies y un cinturón en el centro. Contar su historia ayudaba a recordar ese dibujo en el cielo. Esta es una adaptación breve de muestra; otras culturas han encontrado figuras y relatos diferentes en las mismas estrellas.",
+        "autorTexto": "Equipo AstroVisor (autoría colectiva declarada por Luis).",
+        "procedencia": "Guion de demostración elaborado por el equipo AstroVisor, según confirmación de Luis en esta conversación. Ver content/AUTORIA.md.",
+        "voz": "Voz sintética femenina: Kokoro ef_dora (español latinoamericano).",
+        "permisoTexto": "Elaboración propia del equipo AstroVisor; uso en la demostración indicado por Luis, responsable de S3.",
+        "permiso": "Elaboración propia del equipo AstroVisor; uso en la demostración indicado por Luis, responsable de S3. Modelo de voz Kokoro-82M publicado con licencia Apache-2.0.",
+        "estadoDerechos": "declarado-por-equipo",
+        "licenciaVozFuente": "https://huggingface.co/hexgrad/Kokoro-82M",
+        "demostracion": true
+      }
+    ]
   },
   {
     "id": "osa-mayor",
@@ -17,7 +32,22 @@
     "comoReconocerla": "En una parte de esta constelación se distingue una figura de siete estrellas: cuatro parecen formar un recipiente y tres, un mango. Esa figura es solo una parte de la Osa Mayor. Observa el esquema para reconocer su silueta; no indica su posición actual en el cielo.",
     "demostracion": true,
     "libros": [],
-    "multimedia": []
+    "multimedia": [
+      {
+        "tipo": "audio",
+        "src": "/audio/osa-mayor-kokoro-v1.wav",
+        "formato": "audio/wav",
+        "transcripcion": "Una historia de la tradición griega relaciona a la Osa Mayor con Calisto, transformada en una osa y situada en el cielo. Es una de muchas maneras de interpretar estas estrellas. Otras personas han visto en parte de la figura un carro o un cucharón. Esos dibujos compartidos permiten recordar las estrellas y pasar historias de una generación a otra. Este relato es una adaptación de muestra.",
+        "autorTexto": "Equipo AstroVisor (autoría colectiva declarada por Luis).",
+        "procedencia": "Guion de demostración elaborado por el equipo AstroVisor, según confirmación de Luis en esta conversación. Ver content/AUTORIA.md.",
+        "voz": "Voz sintética femenina: Kokoro ef_dora (español latinoamericano).",
+        "permisoTexto": "Elaboración propia del equipo AstroVisor; uso en la demostración indicado por Luis, responsable de S3.",
+        "permiso": "Elaboración propia del equipo AstroVisor; uso en la demostración indicado por Luis, responsable de S3. Modelo de voz Kokoro-82M publicado con licencia Apache-2.0.",
+        "estadoDerechos": "declarado-por-equipo",
+        "licenciaVozFuente": "https://huggingface.co/hexgrad/Kokoro-82M",
+        "demostracion": true
+      }
+    ]
   },
   {
     "id": "escorpio",
@@ -27,6 +57,21 @@
     "comoReconocerla": "Imagina una línea larga que termina en una curva, como la cola de un escorpión. Una de sus estrellas más conocidas es Antares. El esquema representa la figura de manera simplificada y no permite saber si está visible desde tu ubicación.",
     "demostracion": true,
     "libros": [],
-    "multimedia": []
+    "multimedia": [
+      {
+        "tipo": "audio",
+        "src": "/audio/escorpio-kokoro-v1.wav",
+        "formato": "audio/wav",
+        "transcripcion": "Algunos relatos de la tradición griega cuentan que un escorpión se enfrentó a Orión. Quienes narraban la historia imaginaron a ambos entre las estrellas y convirtieron sus figuras en una forma de recordar el cielo. El arco de estrellas de Escorpio recuerda una cola curvada. Esta adaptación breve es contenido de muestra y no representa todas las tradiciones que han interpretado la constelación.",
+        "autorTexto": "Equipo AstroVisor (autoría colectiva declarada por Luis).",
+        "procedencia": "Guion de demostración elaborado por el equipo AstroVisor, según confirmación de Luis en esta conversación. Ver content/AUTORIA.md.",
+        "voz": "Voz sintética femenina: Kokoro ef_dora (español latinoamericano).",
+        "permisoTexto": "Elaboración propia del equipo AstroVisor; uso en la demostración indicado por Luis, responsable de S3.",
+        "permiso": "Elaboración propia del equipo AstroVisor; uso en la demostración indicado por Luis, responsable de S3. Modelo de voz Kokoro-82M publicado con licencia Apache-2.0.",
+        "estadoDerechos": "declarado-por-equipo",
+        "licenciaVozFuente": "https://huggingface.co/hexgrad/Kokoro-82M",
+        "demostracion": true
+      }
+    ]
   }
 ]

@@ -1,0 +1,25 @@
+[
+  {
+    "caso": "orion-pausa-kokoro",
+    "estado": "Narración en pausa. Reanudar continúa donde la dejaste.",
+    "tiempo": "0:17 / 0:20",
+    "voz": "Voz sintética femenina: Kokoro ef_dora (español latinoamericano). · Contenido de demostración."
+  },
+  {
+    "caso": "orion-reanudar-kokoro",
+    "estado": "Reproduciendo narración.",
+    "tiempo": "0:17 / 0:20"
+  },
+  {
+    "caso": "osa-mayor-reproduccion-kokoro",
+    "estado": "Reproduciendo narración.",
+    "tiempo": "0:00 / 0:22",
+    "voz": "Voz sintética femenina: Kokoro ef_dora (español latinoamericano). · Contenido de demostración."
+  },
+  {
+    "caso": "escorpio-reproduccion-kokoro",
+    "estado": "Reproduciendo narración.",
+    "tiempo": "0:00 / 0:21",
+    "voz": "Voz sintética femenina: Kokoro ef_dora (español latinoamericano). · Contenido de demostración."
+  }
+]

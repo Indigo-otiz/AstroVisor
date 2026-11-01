@@ -4,6 +4,7 @@ import { useRoute } from 'vue-router'
 import { useRecorridos } from '../composables/useRecorridos.js'
 import ConstellationArt from '../components/ConstellationArt.vue'
 import ContentState from '../components/ContentState.vue'
+import NarracionAudio from '../components/NarracionAudio.vue'
 const route = useRoute()
 const { recorridos, cargando, error, cargar } = useRecorridos()
 const constelacion = computed(() => recorridos.value.find((x) => x.id === route.params.id))
@@ -46,6 +47,7 @@ watch(tituloPagina, (titulo) => { document.title = `${titulo} · AstroVisor` }, 
             <h2 id="reconocer">Reconoce su figura</h2>
             <p>{{ constelacion.comoReconocerla }}</p>
           </section>
+          <NarracionAudio :key="constelacion.id" :constelacion="constelacion" />
           <RouterLink class="public-button" to="/explorar"
             >Explorar otra constelación
             <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12h15m-6-6 6 6-6 6" /></svg

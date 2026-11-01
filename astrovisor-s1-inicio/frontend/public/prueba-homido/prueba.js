@@ -71,6 +71,86 @@
   let isPaused = false;
   let isModalOpen = false;
   let audioNoticeActive = false;
+  let catalogo = [];
+  let recorridoActual = { id: 'orion', titulo: 'Orión', resumen: 'Una historia entre las estrellas.', historia: 'La historia se está cargando. Puedes volver a intentarlo en el modo web 2D.', multimedia: [] };
+  let audioEstado = { estado: 'no-disponible', mensaje: 'Cargando narraciones…' };
+  let ultimaDireccionSeleccionada = null;
+  let cursorConectado = false;
+
+  function evento(nombre, detalle) {
+    window.dispatchEvent(new CustomEvent(nombre, { detail: detalle }));
+  }
+  function puntoDe(el) {
+    return el?.closest('[data-constelacion]') || targetContainer;
+  }
+  function restaurarPuntos() {
+    document.querySelectorAll('[data-constelacion]').forEach((grupo) => {
+      grupo.querySelector('a-sphere')?.setAttribute('color', TARGET_BASE_COLOR);
+      setRingProgress(grupo.querySelector('[data-progreso]'), 0);
+    });
+  }
+  function sincronizarSeleccionables() {
+    document.querySelectorAll('[data-action]').forEach((el) => {
+      const action = el.getAttribute('data-action');
+      const visible = isModalOpen ? (action === 'return' || action === 'audio') : (action !== 'return' && action !== 'audio');
+      const disponible = action !== 'audio' || !!(audioEstado.puedeEscuchar || audioEstado.puedePausar || audioEstado.puedeReanudar);
+      el.classList.toggle('selectable', visible && disponible);
+    });
+    gazeCursor?.components?.raycaster?.refreshObjects();
+  }
+  function catalogar(historias) {
+    catalogo = historias;
+    if (!scene?.hasLoaded || !window.AFRAME) return;
+    const extra = $('additionalConstellations');
+    extra.replaceChildren();
+    targetContainer.dataset.constelacion = 'orion';
+    targetProgressRing.dataset.progreso = '';
+    for (const [indice, historia] of historias.filter((x) => x.id !== 'orion').entries()) {
+      const grupo = targetContainer.cloneNode(true);
+      grupo.id = `punto-${historia.id}`;
+      grupo.dataset.constelacion = historia.id;
+      grupo.setAttribute('visible', true);
+      grupo.setAttribute('position', `${indice === 0 ? -2.6 : 2.6} 1.6 -4.5`);
+      grupo.querySelectorAll('[id]').forEach((el) => { el.id = `${historia.id}-${el.id}`; });
+      grupo.querySelectorAll('[data-conectado]').forEach((el) => el.removeAttribute('data-conectado'));
+      grupo.querySelectorAll('[data-etiqueta]').forEach((el) => el.remove());
+      extra.append(grupo);
+      etiquetar(grupo, historia.titulo);
+    }
+    if (!targetContainer.querySelector('[data-etiqueta]')) etiquetar(targetContainer, 'Orión');
+    if (isModalOpen) {
+      recorridoActual = historias.find((x) => x.id === recorridoActual.id) || recorridoActual;
+      evento('astrovisor:ficha-abierta', recorridoActual);
+      drawConstellationCard();
+    }
+    bindSelectableElements();
+    sincronizarSeleccionables();
+  }
+  function etiquetar(grupo, titulo) {
+    const canvas = document.createElement('canvas');
+    canvas.width = 512; canvas.height = 96;
+    const ctx = canvas.getContext('2d');
+    ctx.font = 'bold 44px Arial'; ctx.fillStyle = '#fff4cf'; ctx.textAlign = 'center';
+    ctx.fillText(titulo, 256, 60);
+    const THREE = window.AFRAME.THREE;
+    const textura = new THREE.CanvasTexture(canvas);
+    textura.colorSpace = THREE.SRGBColorSpace;
+    const mesh = new THREE.Mesh(new THREE.PlaneGeometry(1.7, .32), new THREE.MeshBasicMaterial({ map: textura, transparent: true, depthWrite: false }));
+    const etiqueta = document.createElement('a-entity');
+    etiqueta.dataset.etiqueta = ''; etiqueta.setAttribute('position', '0 .9 0');
+    grupo.append(etiqueta); etiqueta.setObject3D('mesh', mesh);
+  }
+  window.astrovisorVisor = {
+    constelaciones: catalogar,
+    abrir: (historia) => openConstellationInfo3D(historia),
+    cerrar: closeConstellationInfo3D,
+    estadoNarracion(estado) { audioEstado = estado; drawConstellationCard(); sincronizarSeleccionables(); },
+  };
+  let ultimoEstadoAudio;
+  window.addEventListener('astrovisor:narracion', (event) => {
+    const clave = `${event.detail.title}:${event.detail.state}`;
+    if (clave !== ultimoEstadoAudio) { ultimoEstadoAudio = clave; eventLine(`Narración | ${event.detail.title || 'sin ficha'} | ${event.detail.state}`); }
+  });
 
   let cancelGraceTimer = null;
 
@@ -208,7 +288,7 @@
     ctx.textBaseline = 'alphabetic';
     ctx.fillStyle = '#1B2430';
     ctx.font = 'bold 54px system-ui, -apple-system, sans-serif';
-    ctx.fillText('Orión', 80, 190);
+    ctx.fillText(recorridoActual.titulo, 80, 190);
 
     ctx.fillStyle = '#4A5565';
     ctx.font = '24px system-ui, -apple-system, sans-serif';
@@ -217,7 +297,7 @@
     // 3. Párrafo de historia (con todos los acentos bien legibles)
     ctx.fillStyle = '#2D3748';
     ctx.font = '27px system-ui, -apple-system, sans-serif';
-    const story = 'Orión parece una figura con dos hombros, dos pies y tres estrellas alineadas en el centro que forman su cinturón. Para encontrarla, busca primero esas tres estrellas juntas en el cielo nocturno.';
+    const story = `${recorridoActual.resumen} Lee la historia completa y su transcripción en el modo web 2D.`;
     renderWrappedText(ctx, story, 80, 285, 1220, 42);
 
     // 4. Botón "▶ Escuchar"
@@ -226,15 +306,24 @@
     ctx.font = 'bold 24px system-ui, -apple-system, sans-serif';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-    ctx.fillText('▶  Escuchar', 80 + 105, 415 + 29);
+    const accionAudio = audioEstado.puedePausar ? 'Pausar' : audioEstado.puedeReanudar ? 'Reanudar' : 'Escuchar';
+    ctx.fillText(accionAudio, 80 + 105, 415 + 29);
 
     // Aviso informativo accesible si se pulsa "Escuchar"
-    if (showNotice) {
+    if (audioEstado) {
       roundRect(ctx, 310, 415, 780, 58, 8, '#FFF9E6', '#F5B301', 2);
       ctx.fillStyle = '#614700';
       ctx.font = '21px system-ui, -apple-system, sans-serif';
       ctx.textAlign = 'left';
-      ctx.fillText('ℹ️  La narración aún no está disponible. Puedes leer el texto.', 330, 415 + 30);
+      const mensajeAudio = {
+        reproduciendo: 'Reproduciendo narración.', pausado: 'En pausa. Reanudar continúa la narración.',
+        listo: 'Elige Escuchar para comenzar.', cargando: 'Cargando narración…',
+        finalizado: 'Finalizó. Puedes escucharla de nuevo.',
+        bloqueado: 'Retira el visor y toca Activar audio.',
+        error: 'Audio no disponible. Puedes leer en modo web 2D.',
+        'no-disponible': 'Puedes leer la historia en modo web 2D.',
+      }[audioEstado.estado] || audioEstado.mensaje;
+      ctx.fillText(mensajeAudio, 330, 415 + 30);
     }
 
     // 5. Caja de Recomendación en biblioteca (Págs. 13-15 de Karime)
@@ -287,7 +376,7 @@
 
     // Notificar a Three.js / WebGL que la textura del plano se actualizó
     if (cardPlane) {
-      const mesh = cardPlane.getObject3D('mesh');
+      const mesh = cardPlane.getObject3D?.('mesh');
       if (mesh && mesh.material && mesh.material.map) {
         mesh.material.map.needsUpdate = true;
       }
@@ -322,6 +411,12 @@
       cancelGraceTimer = null;
     }
     if (!userReady) return;
+    if (!el.classList.contains('selectable')) return;
+    if (ultimaDireccionSeleccionada && scene.camera) {
+      const direccion = scene.camera.getWorldDirection(new AFRAME.THREE.Vector3());
+      if (direccion.angleTo(ultimaDireccionSeleccionada) < 0.06) return;
+      ultimaDireccionSeleccionada = null;
+    }
     const action = el.getAttribute('data-action') || 'target';
 
     // Reglas de estado: si está en pausa, solo permite mirar a Pausa/Reanudar
@@ -333,7 +428,7 @@
     // Si ya estamos enfocando un objetivo con la misma acción (ej. el punto y su aro colisionador), mantenemos la carga sin resetear
     if (activeTarget) {
       const activeAction = activeTarget.getAttribute('data-action') || 'target';
-      if (activeAction === action) return;
+      if (activeAction === action && (action !== 'target' || puntoDe(activeTarget) === puntoDe(el))) return;
     }
 
     if (gazeRaf) {
@@ -343,10 +438,11 @@
 
     activeTarget = el;
     if (action === 'target') {
-      activeRing = targetProgressRing;
+      const punto = puntoDe(el);
+      activeRing = punto.querySelector('[data-progreso]') || targetProgressRing;
       activeRadii = { inner: 0.50, outer: 0.70 };
-      target.setAttribute('color', '#F5B301'); // Ilumina en amarillo cálido al iniciar enfoque
-      eventLine('Mirada fija sobre Orión — iniciando carga de 3 s');
+      punto.querySelector('a-sphere').setAttribute('color', '#F5B301');
+      eventLine(`Mirada fija sobre ${punto.dataset.constelacion || 'orion'} — iniciando carga de 3 s`);
     } else if (action === 'return') {
       activeRing = returnProgressRing;
       activeRadii = { inner: 0.10, outer: 0.16 };
@@ -434,12 +530,14 @@
     setRingProgress(pauseProgressRing, 0, '#F5B301', 0.11, 0.17);
     setRingProgress(exitProgressRing, 0, '#F5B301', 0.11, 0.17);
     target.setAttribute('color', TARGET_BASE_COLOR);
+    restaurarPuntos();
 
     activeTarget = null;
     activeRing = null;
   }
 
   function completeGazeSelection(el, action) {
+    if (scene.camera) ultimaDireccionSeleccionada = scene.camera.getWorldDirection(new AFRAME.THREE.Vector3());
     if (gazeRaf) cancelAnimationFrame(gazeRaf);
     gazeRaf = null;
 
@@ -451,14 +549,16 @@
     if (action === 'target') {
       selectionCount++;
       target.setAttribute('color', CONFIRM_COLOR);
-      selectionStatus.textContent = `✔ Selección #${selectionCount} COMPLETADA: abriendo información de Orión en el visor 3D...`;
-      eventLine(`✔ Selección #${selectionCount} completada: abriendo ficha 3D de Orión.`);
+      const titulo = catalogo.find((x) => x.id === puntoDe(el).dataset.constelacion)?.titulo || 'Orión';
+      selectionStatus.textContent = `✔ Selección #${selectionCount} COMPLETADA: abriendo información de ${titulo} en el visor 3D...`;
+      eventLine(`✔ Selección #${selectionCount} completada: abriendo ficha 3D de ${titulo}.`);
 
       activeTarget = null;
       activeRing = null;
 
       setTimeout(() => {
-        openConstellationInfo3D();
+        const historia = catalogo.find((x) => x.id === (puntoDe(el).dataset.constelacion || 'orion'));
+        openConstellationInfo3D(historia);
         setRingProgress(targetProgressRing, 0, '#F5B301', 0.50, 0.70);
         target.setAttribute('color', TARGET_BASE_COLOR);
       }, 100);
@@ -490,19 +590,29 @@
         window.location.href = '/explorar';
       }, 300);
     } else if (action === 'audio') {
-      audioNoticeActive = !audioNoticeActive;
-      drawConstellationCard(audioNoticeActive);
       activeTarget = null;
       activeRing = null;
+      evento('astrovisor:audio-solicitado');
     }
   }
 
-  function openConstellationInfo3D() {
+  function openConstellationInfo3D(historia = recorridoActual) {
+    cancelGaze();
+    recorridoActual = historia || recorridoActual;
     isModalOpen = true;
     if (visorControls3D) visorControls3D.setAttribute('visible', 'false');
     if (targetContainer) targetContainer.setAttribute('visible', 'false');
+    $('additionalConstellations')?.setAttribute('visible', false);
     if (infoPanel3D) infoPanel3D.setAttribute('visible', 'true');
+    if (scene.camera && window.AFRAME) {
+      const posicion = scene.camera.getWorldPosition(new AFRAME.THREE.Vector3());
+      const rotacion = scene.camera.getWorldQuaternion(new AFRAME.THREE.Quaternion());
+      infoPanel3D.object3D.position.copy(posicion.add(new AFRAME.THREE.Vector3(0, 0, -3).applyQuaternion(rotacion)));
+      infoPanel3D.object3D.quaternion.copy(rotacion);
+    }
+    evento('astrovisor:ficha-abierta', recorridoActual);
     drawConstellationCard(audioNoticeActive);
+    sincronizarSeleccionables();
 
     // Refrescar raycaster para que detecte de inmediato a returnBtn3D
     if (gazeCursor && gazeCursor.components && gazeCursor.components.raycaster) {
@@ -510,15 +620,18 @@
     }
 
     selectionStatus.textContent = 'Ficha 3D abierta. Enfoca "← Volver al recorrido" durante 3 s o tócalo para regresar.';
-    eventLine('Ficha accesible 3D de Orión abierta dentro de la escena.');
+    eventLine(`Ficha accesible 3D de ${recorridoActual.titulo} abierta dentro de la escena.`);
   }
 
   function closeConstellationInfo3D() {
     isModalOpen = false;
     if (infoPanel3D) infoPanel3D.setAttribute('visible', 'false');
     if (targetContainer) targetContainer.setAttribute('visible', 'true');
+    $('additionalConstellations')?.setAttribute('visible', true);
     if (visorControls3D) visorControls3D.setAttribute('visible', 'true');
     cancelGaze();
+    evento('astrovisor:ficha-cerrada');
+    sincronizarSeleccionables();
 
     if (gazeCursor && gazeCursor.components && gazeCursor.components.raycaster) {
       gazeCursor.components.raycaster.refreshObjects();
@@ -529,12 +642,13 @@
   }
 
   function handleSelectableClick(el) {
+    if (!el.classList.contains('selectable')) return;
     userReady = true;
     const action = el.getAttribute('data-action') || 'target';
     if (action === 'target' && !isModalOpen) {
       selectionCount++;
       playConfirmationSound();
-      openConstellationInfo3D();
+      openConstellationInfo3D(catalogo.find((x) => x.id === (puntoDe(el).dataset.constelacion || 'orion')));
     } else if (action === 'return' && isModalOpen) {
       playConfirmationSound();
       closeConstellationInfo3D();
@@ -547,16 +661,17 @@
       window.location.href = '/explorar';
     } else if (action === 'audio' && isModalOpen) {
       playConfirmationSound();
-      audioNoticeActive = !audioNoticeActive;
-      drawConstellationCard(audioNoticeActive);
+      evento('astrovisor:audio-solicitado');
       eventLine('Botón Escuchar pulsado en la tarjeta 3D.');
     }
   }
 
   // Conectar eventos sobre todos los objetos seleccionables (.selectable)
   function bindSelectableElements() {
-    const selectableEls = document.querySelectorAll('.selectable');
+    const selectableEls = document.querySelectorAll('[data-action]');
     selectableEls.forEach((el) => {
+      if (el.dataset.conectado) return;
+      el.dataset.conectado = 'true';
       // Eventos estándar de A-Frame cursor
       el.addEventListener('mouseenter', () => startGaze(el));
       el.addEventListener('mouseleave', requestCancelGaze);
@@ -567,7 +682,8 @@
       el.addEventListener('click', () => handleSelectableClick(el));
     });
 
-    if (gazeCursor) {
+    if (gazeCursor && !cursorConectado) {
+      cursorConectado = true;
       gazeCursor.addEventListener('raycaster-intersection', (evt) => {
         if (!userReady || isPaused || activeTarget) return;
         const els = evt.detail && evt.detail.els;
@@ -590,6 +706,7 @@
   function togglePause() {
     isPaused = !isPaused;
     if (isPaused) {
+      evento('astrovisor:mirilla-pausa');
       cancelGaze();
       if (pauseButton) {
         pauseButton.textContent = 'Reanudar mirilla';
@@ -690,6 +807,7 @@
   AFRAME.registerComponent('experimental-stereo', {
     init() {
       this.stereoCamera = new AFRAME.THREE.StereoCamera();
+      this.stereoCamera.aspect = 0.5;
       this.stereoCamera.eyeSep = 0.064;
       this.enabledStereo = false;
       stereoComponent = this;
@@ -698,7 +816,8 @@
       if (!this.enabledStereo || !this.el.renderer || !this.el.camera) return;
       const renderer = this.el.renderer;
       if (renderer.xr && renderer.xr.isPresenting) return;
-      const size = renderer.getDrawingBufferSize(new AFRAME.THREE.Vector2());
+      // setViewport/setScissor ya aplican el pixel ratio del renderer.
+      const size = renderer.getSize(new AFRAME.THREE.Vector2());
       const fullWidth = size.x, fullHeight = size.y;
       const half = Math.floor(fullWidth / 2);
       const camera = this.el.camera;
@@ -721,6 +840,7 @@
   scene.setAttribute('experimental-stereo', '');
 
   function onSceneReady() {
+    catalogar(catalogo);
     if (!stereoComponent) stereoComponent = scene.components['experimental-stereo'];
     stereoButton.disabled = !stereoComponent;
     stereoStatus.textContent = stereoComponent
@@ -733,6 +853,8 @@
   else scene.addEventListener('loaded', onSceneReady, { once: true });
 
   async function exitStereo() {
+    if (isModalOpen) closeConstellationInfo3D();
+    evento('astrovisor:salida-visor');
     if (!stereoActive) return;
     stereoActive = false;
     if (stereoComponent) stereoComponent.enabledStereo = false;

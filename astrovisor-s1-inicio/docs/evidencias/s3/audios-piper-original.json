@@ -1,0 +1,35 @@
+{
+  "generadoUTC": "2026-11-01T00:34:06.130Z",
+  "recursos": [
+    {
+      "id": "orion",
+      "src": "/audio/orion.wav",
+      "bytes": 1223676,
+      "sha256": "a020034c321a631c702472801228ffc010e82b9b119651dab57fc7f1a9ac03f1",
+      "transcripcion": "/audio/orion.txt",
+      "voz": "Piper es_MX-ald-medium",
+      "derechosTexto": "pendiente",
+      "escuchaHumana": "pendiente"
+    },
+    {
+      "id": "osa-mayor",
+      "src": "/audio/osa-mayor.wav",
+      "bytes": 1225840,
+      "sha256": "f839b6d1e347e535133d8963d960b422d10a68e0388bad137cf82eda921cd956",
+      "transcripcion": "/audio/osa-mayor.txt",
+      "voz": "Piper es_MX-ald-medium",
+      "derechosTexto": "pendiente",
+      "escuchaHumana": "pendiente"
+    },
+    {
+      "id": "escorpio",
+      "src": "/audio/escorpio.wav",
+      "bytes": 1174012,
+      "sha256": "9b8606f3159796a242a45abf98b0a9ea46b1b4a6569af00fc2e24a7319e7eee8",
+      "transcripcion": "/audio/escorpio.txt",
+      "voz": "Piper es_MX-ald-medium",
+      "derechosTexto": "pendiente",
+      "escuchaHumana": "pendiente"
+    }
+  ]
+}

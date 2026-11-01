@@ -1,0 +1,19 @@
+[18:46:50] Prueba iniciada | 2026-11-01T00:46:50.199Z
+[18:46:50] Navegador: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36
+[18:46:50] Contexto seguro: sí
+[18:46:50] Modo de entrada: mouse/teclado
+[18:46:50] Narración | sin ficha | no-disponible
+[18:46:50] Escena A-Frame cargada en la página.
+[18:46:50] A-Frame comenzó el renderizado.
+[18:46:51] Narración | sin ficha | listo
+[18:46:51] Narración | sin ficha | cargando
+[18:46:51] Narración | sin ficha | listo
+[18:46:51] Narración | Orión | listo
+[18:46:51] Vista dividida activada (render experimental; aún sin validar ópticamente).
+[18:46:51] Vista dividida en pantalla expandida por CSS; gira el teléfono a horizontal.
+[18:46:57] Narración | Orión | cargando
+[18:46:57] Narración | Orión | reproduciendo
+[18:47:09] Narración | Orión | pausado
+[18:47:23] Narración | Orión | cargando
+[18:47:23] Narración | Orión | reproduciendo
+[18:47:38] Narración | sin ficha | no-disponible
