@@ -1,0 +1,370 @@
+{
+  "fechaUTC": "2026-11-01T01:35:02.585Z",
+  "zonaFechaLocal": "America/Mexico_City",
+  "rama": "codex/s3-narraciones-audio-visor",
+  "commitBase": "e717955593ac0115b59db617434e546040f6a8d7",
+  "implementacionSinCommit": true,
+  "alcance": "Verificación local de implementación; no certifica escucha humana, autoría/permiso documental, móvil/Homido ni revisión de otro integrante.",
+  "hashes": [
+    {
+      "archivo": "README.md",
+      "sha256": "b762751465555e9bab6cdf3d6243424bfe770bf09617ab6cec8ccecc132ef8c4",
+      "normalizacion": "UTF-8 sin BOM; LF"
+    },
+    {
+      "archivo": "backend/package.json",
+      "sha256": "a95f6def9fdacacba1021662d7dc746c5bdda6a133daa571fca6ba385f1e30d7",
+      "normalizacion": "UTF-8 sin BOM; LF"
+    },
+    {
+      "archivo": "backend/src/index.js",
+      "sha256": "07a20ac0e39ce63f1b13c8d2543ab20d3d617c3dd4c1ddd59472e68b2e2959da",
+      "normalizacion": "UTF-8 sin BOM; LF"
+    },
+    {
+      "archivo": "backend/src/services/documentRepository.js",
+      "sha256": "3f3f86113d5b140b7144a7f62b47054749a6d11a60308de9b84be6eaacd2ef72",
+      "normalizacion": "UTF-8 sin BOM; LF"
+    },
+    {
+      "archivo": "backend/test/documentRepository.test.js",
+      "sha256": "d703fe3c1b34a5b26cf033f72c87f79158f9ebac52feaf5c1405e60c19b466b3",
+      "normalizacion": "UTF-8 sin BOM; LF"
+    },
+    {
+      "archivo": "content/AUTORIA.md",
+      "sha256": "a7c65ee3d130ed286a73ed3bd3e37ad79e97874a913f0a0f8eac6b5ef8caced9",
+      "normalizacion": "UTF-8 sin BOM; LF"
+    },
+    {
+      "archivo": "content/README.md",
+      "sha256": "11ae527340f81d4177dd45efc4e954160e369dc3aea027be9872c743fb13be93",
+      "normalizacion": "UTF-8 sin BOM; LF"
+    },
+    {
+      "archivo": "content/recorridos.json",
+      "sha256": "63ed2a1ec16c3dc50a06dd2da0059056b9a16e1d82378ea5b6988ddfc70870e0",
+      "normalizacion": "UTF-8 sin BOM; LF"
+    },
+    {
+      "archivo": "docs/PRUEBA-S3.md",
+      "sha256": "188879a651b9212cdf858f87391b82167a2fbed0eff6f92bd7041e43cbee4ec2",
+      "normalizacion": "UTF-8 sin BOM; LF"
+    },
+    {
+      "archivo": "docs/evidencias/s3/audio-ausente.png",
+      "sha256": "c7712e2d0c616ef1800a51cb88309c66dc0e4790c6aa0749d01e43080bf5d833",
+      "normalizacion": "bytes originales"
+    },
+    {
+      "archivo": "docs/evidencias/s3/audio-bloqueado.png",
+      "sha256": "270009d8c6d4c645ac5fe6f9992f3dd88ada5aff5affd1bd891663d1aa349ec3",
+      "normalizacion": "bytes originales"
+    },
+    {
+      "archivo": "docs/evidencias/s3/audios-piper-original.json",
+      "sha256": "140b55849d301dc8417dec056daf159d47bec2f5c736c9d85f25c3491ff6ab75",
+      "normalizacion": "UTF-8 sin BOM; LF"
+    },
+    {
+      "archivo": "docs/evidencias/s3/audios.json",
+      "sha256": "233a8a424c6013de169af9b8cb025b98962175b3d962eb09388bc8ebb12f5939",
+      "normalizacion": "UTF-8 sin BOM; LF"
+    },
+    {
+      "archivo": "docs/evidencias/s3/comprobaciones-kokoro.json",
+      "sha256": "048e0dfc862cbf5296bf68791d2ea9b629e4a61565e1b4075e195d284f9bcef2",
+      "normalizacion": "UTF-8 sin BOM; LF"
+    },
+    {
+      "archivo": "docs/evidencias/s3/comprobaciones.json",
+      "sha256": "77b70c78f62641322db6b1817e61fa0de212bcf3fd81cd17af2a72b28cc00f06",
+      "normalizacion": "UTF-8 sin BOM; LF"
+    },
+    {
+      "archivo": "docs/evidencias/s3/creditos-movil.png",
+      "sha256": "58c42d3230061ab37d815f4150c17180d6e23cf8252029377cd0fdebbfc96cd6",
+      "normalizacion": "bytes originales"
+    },
+    {
+      "archivo": "docs/evidencias/s3/ficha-escritorio.png",
+      "sha256": "7ca6dc4796ac80713bbcc614dc64f832a5168d189a8c58477d9269a46bc109df",
+      "normalizacion": "bytes originales"
+    },
+    {
+      "archivo": "docs/evidencias/s3/ficha-kokoro.png",
+      "sha256": "9a5ff53f593d2f9790479bf496ea7fa083f8ebdd11b2ae4c75207f958d82dfbd",
+      "normalizacion": "bytes originales"
+    },
+    {
+      "archivo": "docs/evidencias/s3/ficha-movil.png",
+      "sha256": "8086b3231bd6abe6c712a9715bce04c679f1b5fe2712e30b23ab01143652b431",
+      "normalizacion": "bytes originales"
+    },
+    {
+      "archivo": "docs/evidencias/s3/generacion-kokoro.json",
+      "sha256": "0710eedb42e133c2f63011cf04094b749d01adf7ee2058d4d1f2e5ee463d1635",
+      "normalizacion": "UTF-8 sin BOM; LF"
+    },
+    {
+      "archivo": "docs/evidencias/s3/sin-3d-movil.png",
+      "sha256": "7cb69d96f699b9ec8a1b9fd89b15439cb4e5a13398dc651378dfe39e9345aa7c",
+      "normalizacion": "bytes originales"
+    },
+    {
+      "archivo": "docs/evidencias/s3/texto-200-movil.png",
+      "sha256": "1924bcce3cd01a2daad654115edb6254c34c013ab43801b94ae36672405e28de",
+      "normalizacion": "bytes originales"
+    },
+    {
+      "archivo": "docs/evidencias/s3/validacion-reportada.json",
+      "sha256": "0408e70a0052400e6e4952f8b246edcb3592cff541f6b89c5fb674ab339058c7",
+      "normalizacion": "UTF-8 sin BOM; LF"
+    },
+    {
+      "archivo": "docs/evidencias/s3/version-piper-original.json",
+      "sha256": "ef2fd714d962bed9ef3c7a867ac07ce5e6c7434c4bb0db836d811813b26bdc56",
+      "normalizacion": "UTF-8 sin BOM; LF"
+    },
+    {
+      "archivo": "docs/evidencias/s3/visor-ficha-final.png",
+      "sha256": "ef8ed4c8eedea1c32f8eb8765222ae0705a1b0c88b2e55cd70127ae4a816a1bc",
+      "normalizacion": "bytes originales"
+    },
+    {
+      "archivo": "docs/evidencias/s3/visor-mirada.png",
+      "sha256": "c44e315fd80c2cdea94804135a20281b3b4274b48a9cc1e4ce25ca084c0537a8",
+      "normalizacion": "bytes originales"
+    },
+    {
+      "archivo": "docs/evidencias/s3/visor-reanudar.png",
+      "sha256": "30fe056f84d88305a389c84f9119ed432b271e8cbf8f02d9f7043b0048681c16",
+      "normalizacion": "bytes originales"
+    },
+    {
+      "archivo": "docs/evidencias/s3/visor-registro.txt",
+      "sha256": "3235855bdbdcf9ac602e3654174b939de927001eff94a203dfc0e54fb2ca3dc6",
+      "normalizacion": "UTF-8 sin BOM; LF"
+    },
+    {
+      "archivo": "docs/evidencias/s3/voz-MODEL_CARD.txt",
+      "sha256": "1f0694ceb3f1e78c1e2ee0e2d5da40f19f965bc638e1b4fb4fca9bdca420d713",
+      "normalizacion": "UTF-8 sin BOM; LF"
+    },
+    {
+      "archivo": "frontend/index.html",
+      "sha256": "72c1cbdc9620b9ea396b3e30ee4dd94a9ab12bb26b2557d0a0979c210b89049b",
+      "normalizacion": "UTF-8 sin BOM; LF"
+    },
+    {
+      "archivo": "frontend/package.json",
+      "sha256": "4d29d20cadcd7865d840668e67590d4b87bab619fb06273f0afea59212b369f0",
+      "normalizacion": "UTF-8 sin BOM; LF"
+    },
+    {
+      "archivo": "frontend/public/audio/escorpio-kokoro-v1.wav",
+      "sha256": "b8bc6b061256e57739b5644d004eeb8d1d97f4394bf13c0894d6fd2c91ab5d21",
+      "normalizacion": "bytes originales"
+    },
+    {
+      "archivo": "frontend/public/audio/escorpio.txt",
+      "sha256": "259c105f0341647a950e452fe7523f7aaafca3a9ffd3fa5f0a250eebf7c32baa",
+      "normalizacion": "UTF-8 sin BOM; LF"
+    },
+    {
+      "archivo": "frontend/public/audio/escorpio.wav",
+      "sha256": "9b8606f3159796a242a45abf98b0a9ea46b1b4a6569af00fc2e24a7319e7eee8",
+      "normalizacion": "bytes originales"
+    },
+    {
+      "archivo": "frontend/public/audio/narration.js",
+      "sha256": "5c9cf1533271aad785e390fc97f019035fa3c113a45a05ab42205be257e41511",
+      "normalizacion": "UTF-8 sin BOM; LF"
+    },
+    {
+      "archivo": "frontend/public/audio/orion-kokoro-v1.wav",
+      "sha256": "0b85a88e81f0e03379d6963fea7c9630c254ea5bb63f7395796512181cb130ce",
+      "normalizacion": "bytes originales"
+    },
+    {
+      "archivo": "frontend/public/audio/orion.txt",
+      "sha256": "7a83a9940337252d1b4638d0e6803366fd08f3b25b5c60c678b9d82c79101406",
+      "normalizacion": "UTF-8 sin BOM; LF"
+    },
+    {
+      "archivo": "frontend/public/audio/orion.wav",
+      "sha256": "a020034c321a631c702472801228ffc010e82b9b119651dab57fc7f1a9ac03f1",
+      "normalizacion": "bytes originales"
+    },
+    {
+      "archivo": "frontend/public/audio/osa-mayor-kokoro-v1.wav",
+      "sha256": "76f1818fc731e6bb1356e67bf5e2bda687a0f95dda303512da3242419ae8e2e2",
+      "normalizacion": "bytes originales"
+    },
+    {
+      "archivo": "frontend/public/audio/osa-mayor.txt",
+      "sha256": "3910a2c3c73944bf5c14bab3984b124d35518865028879e8e5ba7220f5462724",
+      "normalizacion": "UTF-8 sin BOM; LF"
+    },
+    {
+      "archivo": "frontend/public/audio/osa-mayor.wav",
+      "sha256": "f839b6d1e347e535133d8963d960b422d10a68e0388bad137cf82eda921cd956",
+      "normalizacion": "bytes originales"
+    },
+    {
+      "archivo": "frontend/public/prueba-homido/index.html",
+      "sha256": "b8d10149fdb68c47c56e42020ca4e008eb52402ee4897c7596e59a2ebf28581f",
+      "normalizacion": "UTF-8 sin BOM; LF"
+    },
+    {
+      "archivo": "frontend/public/prueba-homido/narraciones.js",
+      "sha256": "603f939d5d38504a94825cc09ce82fe9d0ca948a91843fdd397a205927364c42",
+      "normalizacion": "UTF-8 sin BOM; LF"
+    },
+    {
+      "archivo": "frontend/public/prueba-homido/prueba.js",
+      "sha256": "8629080fa2d5bbb248a19d9927e6f6cd1184e17dce341d1c32520c8ee506f1a5",
+      "normalizacion": "UTF-8 sin BOM; LF"
+    },
+    {
+      "archivo": "frontend/public/prueba-homido/styles.css",
+      "sha256": "f98fde0ee560cbdb4d1810361517ee26661071185de0682e821c7c7ff4c08bd9",
+      "normalizacion": "UTF-8 sin BOM; LF"
+    },
+    {
+      "archivo": "frontend/src/App.vue",
+      "sha256": "161f67f607e82ae5d5e5d4e44125ba4f7bdc0a7dbfad56d75c6f1d726efcc51d",
+      "normalizacion": "UTF-8 sin BOM; LF"
+    },
+    {
+      "archivo": "frontend/src/components/ConstellationArt.vue",
+      "sha256": "9c46f73b644640483c871d2a4c03a418d018af1fb2d51a85b5037d5d365cade2",
+      "normalizacion": "UTF-8 sin BOM; LF"
+    },
+    {
+      "archivo": "frontend/src/components/ContentState.vue",
+      "sha256": "0d34c326d2d9e3cb28224ead5c8890cba712ccdd57b1328f01dba6666e3f5c16",
+      "normalizacion": "UTF-8 sin BOM; LF"
+    },
+    {
+      "archivo": "frontend/src/components/NarracionAudio.vue",
+      "sha256": "05ab359adc6e9a6e114fc97d2a34d179216aabb26abd47efae335880424d0b33",
+      "normalizacion": "UTF-8 sin BOM; LF"
+    },
+    {
+      "archivo": "frontend/src/composables/useRecorridos.js",
+      "sha256": "bbaefa56f0fe740728411fb6e2187de1ef91e299be690d3832e3c062ce525af1",
+      "normalizacion": "UTF-8 sin BOM; LF"
+    },
+    {
+      "archivo": "frontend/src/main.js",
+      "sha256": "97d1c4a59f294a2218b73604607fab88ef8392a3d490b55b0c298bc9b7e5ef14",
+      "normalizacion": "UTF-8 sin BOM; LF"
+    },
+    {
+      "archivo": "frontend/src/public.css",
+      "sha256": "b36d4ee29d733b275bedf58f4d5119a383647b1d587c5545d1b29b11b157faa9",
+      "normalizacion": "UTF-8 sin BOM; LF"
+    },
+    {
+      "archivo": "frontend/src/router/index.js",
+      "sha256": "865c857ceeba85705be4797e4550a0a069939a37883a312bdacd57eceaac360b",
+      "normalizacion": "UTF-8 sin BOM; LF"
+    },
+    {
+      "archivo": "frontend/src/services/contentService.js",
+      "sha256": "72cff4dd81337e107475c3baa95a3bcf035d803385e4ba3c6061ddb6c40b1657",
+      "normalizacion": "UTF-8 sin BOM; LF"
+    },
+    {
+      "archivo": "frontend/src/styles.css",
+      "sha256": "5ff3160a730d5316c90bcb20663cc462736b868dcdb7ce635f9c35851fc8ebdf",
+      "normalizacion": "UTF-8 sin BOM; LF"
+    },
+    {
+      "archivo": "frontend/src/views/AdminAccesoView.vue",
+      "sha256": "92b0edb5172e8c27c2c1ba77debb8d7ef34b1e8df377894c64552cd6488945cd",
+      "normalizacion": "UTF-8 sin BOM; LF"
+    },
+    {
+      "archivo": "frontend/src/views/AdminPanelView.vue",
+      "sha256": "229e8d57133dbfe524f02ae09b97065bfa1638f4846df35b7d11d1a65bfe3fdb",
+      "normalizacion": "UTF-8 sin BOM; LF"
+    },
+    {
+      "archivo": "frontend/src/views/ConstelacionView.vue",
+      "sha256": "f24b6bbb9f0c090aa475c0682258e27c2cc27b8b16bfda85dd4851b473a95d23",
+      "normalizacion": "UTF-8 sin BOM; LF"
+    },
+    {
+      "archivo": "frontend/src/views/ExplorarView.vue",
+      "sha256": "5b0460eaf8348b9fe993b5ced830c873a326d80993152988eb6680835a7ba041",
+      "normalizacion": "UTF-8 sin BOM; LF"
+    },
+    {
+      "archivo": "frontend/src/views/InicioView.vue",
+      "sha256": "12874c7e4b6150621223fb25958ac71517831b9b5dd340dc9e30c42e3b3fa51f",
+      "normalizacion": "UTF-8 sin BOM; LF"
+    },
+    {
+      "archivo": "frontend/src/views/VisorView.vue",
+      "sha256": "b2d37c3b27ed1379b0bd829103c542029bc0712eee0634c1475de5d928040028",
+      "normalizacion": "UTF-8 sin BOM; LF"
+    },
+    {
+      "archivo": "frontend/test/contentService.test.js",
+      "sha256": "34e02c9384782bfcef13745b7794642edf1a4bbc3295dbffa853aef179e5b8b6",
+      "normalizacion": "UTF-8 sin BOM; LF"
+    },
+    {
+      "archivo": "frontend/test/narration.test.js",
+      "sha256": "16c064ffb0d6a39f4bb4e97760c3a9fdec92b852469d4691b6e8a0dd427b24d8",
+      "normalizacion": "UTF-8 sin BOM; LF"
+    },
+    {
+      "archivo": "frontend/vite.config.js",
+      "sha256": "e25e30bfdc3f3d78fb05e29a7988bca03c33452fc37c231a0377c42f6c26ab73",
+      "normalizacion": "UTF-8 sin BOM; LF"
+    },
+    {
+      "archivo": "package-lock.json",
+      "sha256": "bec73dd2600a4bcca674813cc41499cf96b96b0c9eee63366bc10da7329ecc3e",
+      "normalizacion": "UTF-8 sin BOM; LF"
+    },
+    {
+      "archivo": "package.json",
+      "sha256": "0d3c94fe22d61111d48ef0a49119d1b788d5f0db4d03a0713e8a97d720d4dc9e",
+      "normalizacion": "UTF-8 sin BOM; LF"
+    },
+    {
+      "archivo": "scripts/generar-narraciones-kokoro.py",
+      "sha256": "b058f814ae3ab5c3e0605095cbc633afe6a2da356097a3b07c4ad74bd469f950",
+      "normalizacion": "UTF-8 sin BOM; LF"
+    },
+    {
+      "archivo": "scripts/generar-narraciones.ps1",
+      "sha256": "b6f2a9f5f1b6756f64490f1888582be1e34b69d28780db255bc580e96290fd64",
+      "normalizacion": "UTF-8 sin BOM; LF"
+    },
+    {
+      "archivo": "scripts/manifiesto-s3.mjs",
+      "sha256": "e89b2b94d048fa46c2eced7feea92791d3953b3dccc394da1c92175c907b046f",
+      "normalizacion": "UTF-8 sin BOM; LF"
+    },
+    {
+      "archivo": "scripts/prueba-audio.mjs",
+      "sha256": "5c65aab7374ccf543db9ac2d65106f96a4eec0f671fb62ae5aa1ea0644a3a39b",
+      "normalizacion": "UTF-8 sin BOM; LF"
+    },
+    {
+      "archivo": "scripts/prueba-estados.mjs",
+      "sha256": "be31550d7b9a70eb0d5d5415222bb5165a45f717e4844b2025d7c379bca59525",
+      "normalizacion": "UTF-8 sin BOM; LF"
+    },
+    {
+      "archivo": "scripts/registrar-audios.mjs",
+      "sha256": "89668573c5c4f2d8af11b23419d61a965371921d07d433b0bf7c7837b788523b",
+      "normalizacion": "UTF-8 sin BOM; LF"
+    }
+  ]
+}

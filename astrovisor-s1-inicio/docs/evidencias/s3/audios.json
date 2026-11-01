@@ -1,0 +1,35 @@
+{
+  "generadoUTC": "2026-11-01T01:08:57.091Z",
+  "recursos": [
+    {
+      "id": "orion",
+      "src": "/audio/orion-kokoro-v1.wav",
+      "bytes": 990252,
+      "sha256": "0b85a88e81f0e03379d6963fea7c9630c254ea5bb63f7395796512181cb130ce",
+      "transcripcion": "/audio/orion.txt",
+      "voz": "Voz sintética femenina: Kokoro ef_dora (español latinoamericano).",
+      "derechosTexto": "declarado-por-equipo",
+      "escuchaHumana": "Confirmada por Luis en esta conversación: si ya probe todo; fecha de reporte 2026-10-31, America/Mexico_City."
+    },
+    {
+      "id": "osa-mayor",
+      "src": "/audio/osa-mayor-kokoro-v1.wav",
+      "bytes": 1058860,
+      "sha256": "76f1818fc731e6bb1356e67bf5e2bda687a0f95dda303512da3242419ae8e2e2",
+      "transcripcion": "/audio/osa-mayor.txt",
+      "voz": "Voz sintética femenina: Kokoro ef_dora (español latinoamericano).",
+      "derechosTexto": "declarado-por-equipo",
+      "escuchaHumana": "Confirmada por Luis en esta conversación: si ya probe todo; fecha de reporte 2026-10-31, America/Mexico_City."
+    },
+    {
+      "id": "escorpio",
+      "src": "/audio/escorpio-kokoro-v1.wav",
+      "bytes": 1047596,
+      "sha256": "b8bc6b061256e57739b5644d004eeb8d1d97f4394bf13c0894d6fd2c91ab5d21",
+      "transcripcion": "/audio/escorpio.txt",
+      "voz": "Voz sintética femenina: Kokoro ef_dora (español latinoamericano).",
+      "derechosTexto": "declarado-por-equipo",
+      "escuchaHumana": "Confirmada por Luis en esta conversación: si ya probe todo; fecha de reporte 2026-10-31, America/Mexico_City."
+    }
+  ]
+}

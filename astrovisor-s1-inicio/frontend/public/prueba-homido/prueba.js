@@ -91,6 +91,7 @@
   AFRAME.registerComponent('experimental-stereo', {
     init() {
       this.stereoCamera = new AFRAME.THREE.StereoCamera();
+      this.stereoCamera.aspect = 0.5; // Cada ojo ocupa la mitad del ancho del canvas.
       this.stereoCamera.eyeSep = 0.064; // separación entre ojos ilustrativa, no calibración del visor
       this.enabledStereo = false;
       stereoComponent = this;
@@ -148,6 +149,7 @@
   scene.addEventListener('renderstart', () => eventLine('A-Frame comenzó el renderizado.'));
 
   async function exitStereo() {
+    window.dispatchEvent(new Event('astrovisor:salida-visor'));
     if (!stereoActive) return;
     stereoActive = false;
     if (stereoComponent) stereoComponent.enabledStereo = false;
@@ -174,10 +176,18 @@
     window.dispatchEvent(new Event('resize'));
   });
   exitButton.addEventListener('click', exitStereo);
+  window.addEventListener('astrovisor:solicitar-salida', exitStereo);
   document.addEventListener('keydown', (event) => { if (event.key === 'Escape') exitStereo(); });
   $('copyButton').addEventListener('click', async () => {
     try { await navigator.clipboard.writeText(logs.join('\n')); eventLine('Registro copiado al portapapeles.'); }
     catch { eventLine('No se pudo copiar automáticamente; selecciona el texto del registro.'); }
   });
   $('clearButton').addEventListener('click', () => { logs.length = 0; logEl.textContent = ''; eventLine('Registro reiniciado.'); });
+  let previousNarrationState;
+  window.addEventListener('astrovisor:narracion', (event) => {
+    const stateKey = `${event.detail.title || 'sin ficha'}:${event.detail.state}`;
+    if (stateKey === previousNarrationState) return;
+    previousNarrationState = stateKey;
+    eventLine(`Narración | ${event.detail.title || 'sin ficha'} | ${event.detail.state}`);
+  });
 })();

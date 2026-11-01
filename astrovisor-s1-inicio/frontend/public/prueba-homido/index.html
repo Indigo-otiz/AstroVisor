@@ -9,43 +9,71 @@
   <!-- Versión fija de A-Frame: el modo estereoscópico se construye aparte. -->
   <script src="https://aframe.io/releases/1.8.0/aframe.min.js"></script>
   <script defer src="./prueba.js"></script>
+  <script type="module" src="./narraciones.js"></script>
 </head>
 <body>
   <header class="site-header">
     <div class="header-content">
       <a href="/visor" class="brand">AstroVisor</a>
-      <span>Experimento técnico de Sprint 1</span>
+      <span>Constelaciones e historias del cielo · Demostración</span>
     </div>
   </header>
   <main id="main">
-    <h1>Prueba técnica de visor Homido</h1>
-    <p class="lead">Una escena mínima para comprobar sensores, seguimiento de la vista, retícula y presentación estereoscópica. No es la experiencia final de la biblioteca.</p>
+    <h1>Historias del cielo en el visor</h1>
+    <p class="lead">Elige Orión, Osa Mayor o Escorpio para leer o escuchar su historia. Son relatos de demostración. La vista Homido es experimental y requiere verificación con el visor físico.</p>
     <div class="notice" role="note"><strong>Prueba con precaución.</strong> Si aparece mareo, incomodidad o doble imagen, retira el visor y detén la prueba. Siéntate, mantén el entorno despejado y solicita ayuda si la necesitas.</div>
 
     <section aria-labelledby="control-title" class="controls-panel">
       <h2 id="control-title">Controles de la prueba</h2>
       <p>Primero abre esta página en el teléfono mediante HTTPS. Autoriza los sensores si el navegador lo solicita; después prueba el modo 2D y, por último, la vista dividida.</p>
       <div class="actions">
+        <button id="activateAudio" type="button" disabled>Activar audio</button>
         <button id="permissionButton" type="button">Solicitar sensores</button>
         <button id="stereoButton" type="button" disabled>Probar vista dividida</button>
         <button id="exitButton" class="secondary" type="button" hidden>Salir de vista dividida</button>
         <a class="button secondary" href="/explorar">Regresar al modo web 2D</a>
       </div>
+      <p id="audioPreparation" role="status" aria-live="polite">Cargando narraciones…</p>
+      <p>Antes de colocarte el visor, toca Activar audio. Después podrás elegir Escuchar con la mirada. Si el navegador bloquea el sonido, retira el visor y toca de nuevo el control.</p>
       <p class="status" id="orientationStatus" role="status" aria-live="polite">Sensores: aún no comprobados.</p>
       <p class="status" id="stereoStatus" role="status" aria-live="polite">Vista estereoscópica: no iniciada.</p>
       <p class="status" id="selectionStatus" role="status" aria-live="polite">Selección: apunta al círculo central y mantén la mirada durante 1.8 segundos.</p>
       <p class="small" id="angles">Ángulos de orientación: sin datos.</p>
     </section>
 
+    <section class="reading-panel" aria-labelledby="stories-title">
+      <h2 id="stories-title">Elige una constelación</h2>
+      <p id="storiesStatus" role="status">Cargando historias…</p>
+      <div id="storyChoices" class="actions"></div>
+      <button id="retryStories" type="button" hidden>Volver a cargar historias</button>
+      <article id="storyCard" hidden aria-labelledby="storyTitle">
+        <h2 id="storyTitle" tabindex="-1"></h2>
+        <p id="storyText"></p>
+        <p id="storyOrigin" class="small"></p>
+        <div class="actions">
+          <button id="listenStory" type="button" hidden>Escuchar</button>
+          <button id="closeStory" class="secondary" type="button">Cerrar ficha</button>
+        </div>
+        <p id="storyAudioStatus" role="status" aria-live="polite"></p>
+        <details id="storyTranscript" hidden>
+          <summary>Transcripción y créditos</summary>
+          <p id="transcriptText"></p>
+          <dl id="storyCredits"></dl>
+        </details>
+      </article>
+    </section>
+
     <section aria-labelledby="scene-title">
       <h2 id="scene-title">Escena de demostración</h2>
-      <p class="scene-help">En computadora: arrastra la vista con el mouse. En teléfono: mueve suavemente el dispositivo (si hay sensores disponibles), o desliza el dedo. Centra la retícula sobre el círculo naranja para seleccionarlo sin tocar la pantalla.</p>
+      <p class="scene-help">En computadora: arrastra para mirar. En teléfono: mueve suavemente el dispositivo o desliza el dedo. Mantén la retícula sobre una constelación o un botón durante 1.8 segundos. El círculo naranja permite comprobar la selección por separado.</p>
       <div class="scene-host" id="sceneHost">
         <a-scene id="testScene" embedded vr-mode-ui="enabled: false" renderer="antialias: true; colorManagement: true;">
           <a-sky color="#071426"></a-sky>
           <a-entity light="type: ambient; intensity: 1.2"></a-entity>
-          <a-sphere class="selectable" id="target" position="0 1.6 -4" radius="0.42" color="#e59b3d" material="shader: flat"></a-sphere>
-          <a-ring position="0 1.6 -4.02" radius-inner="0.55" radius-outer="0.57" color="#f5e4c0" material="shader: flat; side: double"></a-ring>
+          <a-entity id="constellationTargets"></a-entity>
+          <a-entity id="narrationCard3D" visible="false"></a-entity>
+          <a-sphere class="selectable" id="target" position="0 -0.1 -4" radius="0.22" color="#e59b3d" material="shader: flat"></a-sphere>
+          <a-ring position="0 -0.1 -4.02" radius-inner="0.3" radius-outer="0.32" color="#f5e4c0" material="shader: flat; side: double"></a-ring>
           <a-entity id="cameraRig" camera="active: true" look-controls="magicWindowTrackingEnabled: true; touchEnabled: true; mouseEnabled: true" position="0 1.6 0">
             <a-entity id="gazeCursor" cursor="fuse: true; fuseTimeout: 1800; rayOrigin: entity" raycaster="objects: .selectable; far: 25" geometry="primitive: ring; radiusInner: 0.017; radiusOuter: 0.027" material="color: #ffffff; shader: flat; opacity: 0.95" position="0 0 -1.2"
               animation__fusing="property: scale; startEvents: fusing; from: 1 1 1; to: 0.6 0.6 0.6; dur: 1800"
