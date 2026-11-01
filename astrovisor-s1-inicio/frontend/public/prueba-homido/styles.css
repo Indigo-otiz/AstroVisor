@@ -25,3 +25,12 @@ button:focus-visible,.button:focus-visible { outline: 3px solid #df932b; outline
 body.stereo-mode #exitButton { display: block; position: fixed; top: 8px; right: 8px; z-index: 1000; font-size: .95rem; background: #fff; }
 #log { max-height: 270px; overflow: auto; white-space: pre-wrap; overflow-wrap: anywhere; background: #f6f7f9; color: #15243b; padding: 0.75rem; min-height: 80px; }
 @media (max-width: 650px) { main{padding:.85rem} .actions button,.actions .button{width:100%;text-align:center;} .scene-host{height:55vh;min-height:280px;} body.stereo-mode #exitButton{width:auto;} }
+body.stereo-mode { overflow: hidden; overscroll-behavior: none; }
+.scene-host.stereo-active { touch-action: none; }
+
+/* Modo ?diag=1 (temporal): panel de aislamiento, oculto en vista dividida */
+.diag-panel { position: fixed; left: 8px; bottom: 8px; z-index: 800; max-width: min(92vw, 420px); max-height: 60vh; overflow: auto; background: rgba(255,255,255,.96); color: #111; border: 2px solid #F5B301; border-radius: 8px; padding: .5rem .7rem; font-size: .85rem; }
+.diag-panel label { display: block; margin: .25rem 0; }
+.diag-panel pre { white-space: pre-wrap; font-size: .75rem; margin: .4rem 0; }
+.diag-panel input[readonly] { width: 100%; font-size: .7rem; }
+body.stereo-mode .diag-panel { display: none; }
