@@ -48,6 +48,21 @@ watch(tituloPagina, (titulo) => { document.title = `${titulo} · AstroVisor` }, 
             <p>{{ constelacion.comoReconocerla }}</p>
           </section>
           <NarracionAudio :key="constelacion.id" :constelacion="constelacion" />
+          <section v-if="constelacion.libros && constelacion.libros.length > 0" aria-labelledby="libro-referencia" class="constelacion-libros">
+            <h2 id="libro-referencia">Referencia bibliográfica</h2>
+            <article v-for="(libro, idx) in constelacion.libros" :key="idx" class="libro-ficha">
+              <p v-if="libro.etiqueta" class="libro-etiqueta">{{ libro.etiqueta }}</p>
+              <h3 class="libro-titulo">{{ libro.titulo }}</h3>
+              <p class="libro-autor">Por: <strong>{{ libro.autor }}</strong><span v-if="libro.anio"> ({{ libro.anio }})</span></p>
+              <p v-if="libro.aclaracion" class="libro-aclaracion">{{ libro.aclaracion }}</p>
+              <p v-if="libro.url" class="libro-enlace-contenedor">
+                <a :href="libro.url" target="_blank" rel="noopener noreferrer" class="libro-enlace">
+                  <span>Consultar libro en línea (acceso público)</span>
+                  <svg viewBox="0 0 24 24" aria-hidden="true" class="libro-enlace-icono"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6m4-3h6v6m-11 5L21 3" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" /></svg>
+                </a>
+              </p>
+            </article>
+          </section>
           <RouterLink class="public-button" to="/explorar"
             >Explorar otra constelación
             <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12h15m-6-6 6 6-6 6" /></svg

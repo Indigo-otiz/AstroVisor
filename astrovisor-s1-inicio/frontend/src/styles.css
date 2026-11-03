@@ -933,3 +933,29 @@ h2 { font-size: 1.35rem; }
     padding: 0.8rem 1rem;
   }
 }
+
+
+.books-title-group {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.badge-postergado {
+  background: #fef3c7;
+  color: #92400e;
+  font-size: 0.78rem;
+  font-weight: 600;
+  padding: 0.25rem 0.65rem;
+  border-radius: 9999px;
+  border: 1px solid #fde68a;
+}
+
+.admin-note {
+  font-size: 0.85rem;
+  color: #64748b;
+  margin-top: -0.8rem;
+  margin-bottom: 1.2rem;
+  line-height: 1.4;
+}

@@ -47,8 +47,9 @@ test('validarRecorridos rechaza ids repetidos y campos vacíos', () => {
 })
 
 test('adaptarLibro/adaptarAudio no inventan recursos', () => {
-  assert.equal(adaptarLibro(demo[0]), null)
-  assert.equal(adaptarAudio(demo[0]), null)
+  assert.equal(adaptarLibro({ libros: [], multimedia: [] }), null)
+  assert.equal(adaptarAudio({ libros: [], multimedia: [] }), null)
+  assert.deepEqual(adaptarLibro(demo[0]), { titulo: 'Star Lore of All Ages', autor: 'William Tyler Olcott' })
   assert.deepEqual(adaptarLibro({ libros: [{ titulo: ' Atlas ', autor: 'A. B.' }] }), { titulo: 'Atlas', autor: 'A. B.' })
   assert.equal(adaptarAudio({ multimedia: [{ tipo: 'video', url: 'x' }] }), null)
   // Contrato real de Luis: multimedia[].src con metadatos completos (la misma regla que audioDe).

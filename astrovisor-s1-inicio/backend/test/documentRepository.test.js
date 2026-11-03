@@ -52,3 +52,17 @@ test('las tres narraciones tienen WAV PCM real y transcripción fiel al guion de
     assert.ok(Math.sqrt(suma / (datos.length / 2)) > 100, 'El archivo no debe ser silencio')
   }
 })
+
+test('el contrato documental incluye libros de demostración reales y coincide con el respaldo del visor', async () => {
+  const recorridos = await obtenerRecorridos()
+  for (const r of recorridos) {
+    assert.ok(r.libros.length >= 1, `${r.id}: debe tener al menos una referencia de libro`)
+    for (const libro of r.libros) {
+      assert.ok(libro.titulo?.trim(), `${r.id}: el libro debe tener título`)
+      assert.ok(libro.autor?.trim(), `${r.id}: el libro debe tener autor`)
+      assert.equal(libro.etiqueta, 'Referencia de demostración')
+    }
+  }
+  const demoJson = JSON.parse(await readFile(new URL('../../frontend/public/prueba-homido/data/recorridos-demo.json', import.meta.url), 'utf8'))
+  assert.deepEqual(demoJson, recorridos, 'El archivo de respaldo local debe ser idéntico al contrato documental canónico')
+})

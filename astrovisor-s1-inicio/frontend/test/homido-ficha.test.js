@@ -67,7 +67,7 @@ test('un texto muy largo se resume para el visor (sin reducir la tipografía) y 
 
 test('sin libros muestra estado pendiente honesto, sin atribuir libros a la biblioteca', () => {
   const { ctx, dibujado } = ctxFalso()
-  dibujarFicha(ctx, calcularLayout(ctx, demo[1]))
+  dibujarFicha(ctx, calcularLayout(ctx, { ...demo[1], libros: [] }))
   const texto = dibujado.join(' ')
   assert.ok(texto.includes('Referencia bibliográfica'))
   assert.ok(texto.includes(BIBLIO_PENDIENTE.split(' ').slice(0, 4).join(' ')))
