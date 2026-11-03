@@ -30,3 +30,10 @@ node scripts/registrar-audios.mjs --kokoro
 La voz usa velocidad 0.96, ajuste de volumen con margen de pico y fundidos de 12 ms, sin música ni reverberación. La salida es WAV PCM16, mono, 24 kHz, sin saturación digital detectada. El registro conserva autoría, procedencia, `permisoTexto`, otros tipos de multimedia y estado de derechos; actualiza únicamente narración y procedencia de voz. El script entrega solo `historia` a la voz; no añade `resumen` ni `comoReconocerla`. `generacion-kokoro.json` identifica configuración, duraciones, nivel y hashes. El registro no sustituye escucha humana, revisión cruzada ni prueba móvil.
 
 La versión inicial usaba Piper es_MX-ald-medium. Se conservan los WAV sin sufijo, el generador PowerShell y `voz-MODEL_CARD.txt` como material previo; ya no son las narraciones activas. Los manifiestos iniciales se conservaron como `audios-piper-original.json` y `version-piper-original.json`; sus capturas y medidas de duración documentan la versión anterior. Ver `docs/PRUEBA-S3.md` para resultados y pendientes.
+
+
+## Bibliografía de demostración S3 (Karime)
+
+Las tres constelaciones (`orion`, `osa-mayor`, `escorpio`) incorporan en el arreglo `libros` obras reales de acceso público en Internet (Project Gutenberg e Internet Archive). Se rotulan expresamente como `Referencia de demostración`.
+
+La biblioteca **no se atribuye como poseedora** de las obras físicas ni se afirma disponibilidad de préstamo. La ficha del visor Homido adapta y muestra el título y autor verificados desde este registro documental. El detalle completo de fuentes, enlaces y condiciones de uso libres de derechos patrimoniales se encuentra en [BIBLIOGRAFIA.md](BIBLIOGRAFIA.md).
