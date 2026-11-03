@@ -338,11 +338,17 @@ onMounted(() => {
       <!-- SECCIÓN LIBROS -->
       <section class="books-section">
         <div class="books-header">
-          <h2 class="experiences-title">Libros</h2>
+          <div class="books-title-group">
+            <h2 class="experiences-title">Libros y Bibliografía</h2>
+            <span class="badge-postergado">Editor CRUD: Pospuesto para después de la Expo</span>
+          </div>
           <button type="button" class="btn-refresh" @click="cargarLibros" :disabled="loadingLibros">
             {{ loadingLibros ? 'Cargando...' : 'Actualizar libros' }}
           </button>
         </div>
+        <p class="admin-note">
+          Nota de arquitectura S3: Las constelaciones públicas y el visor Homido consumen el contrato documental compartido (<code>recorridos.json</code> / API) para funcionar sin depender de red externa.
+        </p>
 
         <div v-if="librosError" class="alert">
           {{ librosError }}
