@@ -3,11 +3,12 @@ import { computed, nextTick, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import './public.css'
 const route = useRoute()
-const esPublica = computed(() => ['inicio', 'explorar', 'constelacion'].includes(route.name))
+const esPublica = computed(() => ['inicio', 'explorar', 'constelacion', 'biblioteca'].includes(route.name))
 const esAdmin = computed(() => ['admin', 'admin-acceso'].includes(route.name))
 const titulos = {
   inicio: 'Inicio',
   explorar: 'Constelaciones e historias del cielo',
+  biblioteca: 'La biblioteca de las estrellas',
   visor: 'Modo Homido',
   'admin-acceso': 'Acceso administrativo',
   admin: 'Panel de administración',
@@ -39,7 +40,7 @@ watch(
         >
         <nav aria-label="Navegación principal" class="nav-links">
           <RouterLink to="/" exact-active-class="nav-current">Inicio</RouterLink>
-          <RouterLink to="/explorar" :class="{ 'nav-current': route.name === 'constelacion' }"
+          <RouterLink to="/explorar" :class="{ 'nav-current': route.name === 'constelacion' || route.name === 'biblioteca' }"
             >Explorar</RouterLink
           >
           <RouterLink to="/visor">Homido</RouterLink>
