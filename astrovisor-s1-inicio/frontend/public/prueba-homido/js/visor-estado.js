@@ -16,7 +16,7 @@ export function crearEstado() {
       if (accion === 'salir' || accion === 'pausa') return true // siempre disponibles
       if (via === 'mirada' && pausado) return false
       if (accion === 'constelacion') return modo === 'recorrido'
-      if (accion === 'volver' || accion === 'audio') return modo === 'ficha'
+      if (['volver', 'audio', 'libros', 'libro', 'volver-ficha', 'volver-libros', 'consultar-libro'].includes(accion)) return modo === 'ficha'
       return false
     },
 

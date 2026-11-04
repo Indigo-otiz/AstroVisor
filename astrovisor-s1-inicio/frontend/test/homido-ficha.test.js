@@ -48,8 +48,9 @@ test('el layout cabe en el lienzo, sin desbordar ni superponer zonas', () => {
     const { ctx } = ctxFalso()
     const l = calcularLayout(ctx, ficha, { aviso: AVISO_SIN_AUDIO })
     assert.equal(l.desborda, false, ficha.id)
-    assert.ok(dentro(l.zonas.audio) && dentro(l.zonas.volver))
+    assert.ok(dentro(l.zonas.audio) && dentro(l.zonas.volver) && dentro(l.zonas.libros))
     assert.equal(solapan(l.zonas.audio, l.zonas.volver), false)
+    assert.equal(solapan(l.zonas.libros, l.zonas.audio), false)
     for (const it of l.items) if (it.rect) assert.ok(dentro(it.rect), `${ficha.id}: caja fuera del lienzo`)
   }
 })
@@ -69,16 +70,18 @@ test('sin libros muestra estado pendiente honesto, sin atribuir libros a la bibl
   const { ctx, dibujado } = ctxFalso()
   dibujarFicha(ctx, calcularLayout(ctx, { ...demo[1], libros: [] }))
   const texto = dibujado.join(' ')
-  assert.ok(texto.includes('Referencia bibliográfica'))
   assert.ok(texto.includes(BIBLIO_PENDIENTE.split(' ').slice(0, 4).join(' ')))
-  assert.ok(!/biblioteca|mostrador|Libro de muestra/i.test(texto))
+  assert.ok(!/signatura|MARC|disponible para préstamo/i.test(texto))
 })
 
-test('con libro verificado lo muestra desde los datos', () => {
+test('con libros invita a explorar la estantería sin atribuir existencias', () => {
   const { ctx, dibujado } = ctxFalso()
-  dibujarFicha(ctx, calcularLayout(ctx, { ...demo[0], libros: [{ titulo: 'Atlas del cielo', autor: 'Autora X' }] }))
+  const l = calcularLayout(ctx, { ...demo[0], libros: [{ titulo: 'Atlas del cielo', autor: 'Autora X' }] })
+  dibujarFicha(ctx, l)
   const texto = dibujado.join(' ')
-  assert.ok(texto.includes('Atlas del cielo') && texto.includes('Autora X'))
+  assert.ok(texto.includes('Ver libros recomendados'))
+  assert.ok(l.zonas.libros)
+  assert.ok(!/signatura|MARC|disponible para préstamo/i.test(texto))
 })
 
 test('el aviso de audio aparece solo cuando se indica', () => {

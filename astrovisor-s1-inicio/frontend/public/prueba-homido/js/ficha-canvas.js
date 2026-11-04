@@ -1,7 +1,7 @@
 /* Ficha única de constelación. `calcularLayout` produce UNA definición (elementos a dibujar + zonas
    interactivas); `dibujarFicha` la pinta y `zonaAMundo` coloca las zonas de mirada en la escena,
    de modo que dibujo y zonas no pueden desalinearse. No usa DOM: recibe un contexto 2D. */
-import { adaptarLibro, historiaParaVisor } from './datos.js'
+import { historiaParaVisor } from './datos.js'
 
 export const CANVAS = { ancho: 1400, alto: 1200 } // fijo: cambiar el tamaño de una textura WebGL es frágil
 export const PLANO_ANCHO = 3.2 // metros en la escena
@@ -24,7 +24,7 @@ export function presentarAudio(narracion) {
   return { etiqueta, aviso: MENSAJES_NARRACION[narracion.estado] ?? narracion.mensaje ?? null }
 }
 
-export const BIBLIO_PENDIENTE = 'Aún no hay un libro verificado para esta constelación. La referencia se agregará cuando esté disponible.'
+export const BIBLIO_PENDIENTE = 'Aún no hay lecturas recomendadas para esta constelación.'
 
 const FUENTE = 'system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif'
 const MARGEN = 70
@@ -86,17 +86,27 @@ export function calcularLayout(ctx, ficha, { aviso = null, etiquetaAudio = 'Escu
     items.push({ k: 'texto', lineas: historia, x: MARGEN, y, lh: 54, font: fuente(TAM.historia), color: '#2D3748', align: 'left', base: 'top' })
     y += historia.length * 54 + 26
 
-    // Referencia bibliográfica (ranura para los datos verificados de Karime)
-    const libro = adaptarLibro(ficha)
-    const cuerpoTexto = libro
-      ? `Para saber más: «${libro.titulo}»${libro.autor ? ` — ${libro.autor}` : ''}`
-      : BIBLIO_PENDIENTE
-    const cuerpo = medir(TAM.cuerpo, Boolean(libro), cuerpoTexto, anchoUtil - 56)
-    const altoBiblio = 28 + 36 + 8 + cuerpo.length * 44 + 28
-    items.push({ k: 'caja', rect: { x: MARGEN, y, w: anchoUtil, h: altoBiblio }, radio: 16, fill: '#FAF7F0', stroke: '#E2DCD0', sw: 2 })
-    items.push({ k: 'texto', lineas: ['Referencia bibliográfica'], x: MARGEN + 28, y: y + 28, lh: 36, font: fuente(TAM.subtitulo, true), color: '#4A5565', align: 'left', base: 'top' })
-    items.push({ k: 'texto', lineas: cuerpo, x: MARGEN + 28, y: y + 28 + 36 + 8, lh: 44, font: fuente(TAM.cuerpo, Boolean(libro)), color: libro ? '#1F4E8C' : '#2D3748', align: 'left', base: 'top' })
-    y += altoBiblio + 24
+    // Invitación al recorrido de lecturas; jamás se muestran existencias no confirmadas.
+    const hayLibro = Array.isArray(ficha.libros) &&
+      ficha.libros.some((l) => typeof l?.titulo === 'string' && l.titulo.trim());
+    const altoLecturas = 160;
+    items.push({ k: 'caja', rect: { x: MARGEN, y, w: anchoUtil, h: altoLecturas },
+      radio: 18, fill: '#FFF3D9', stroke: '#D9A240', sw: 3 });
+    if (hayLibro) {
+      items.push({ k: 'texto', lineas: ['¿Te gustaría descubrir más?'],
+        x: MARGEN + 26, y: y + 20, lh: 35, font: fuente(31, true),
+        color: '#6B470C', align: 'left', base: 'top' });
+      const libros = { x: MARGEN + 24, y: y + 66, w: anchoUtil - 48, h: 78 };
+      zonas.libros = libros;
+      items.push({ k: 'boton', rect: libros, fill: '#1F4E8C',
+        texto: '★  Ver libros recomendados', font: fuente(36, true),
+        color: '#FFFFFF', padIzq: 0 });
+    } else {
+      items.push({ k: 'texto', lineas: medir(TAM.cuerpo, false, BIBLIO_PENDIENTE),
+        x: MARGEN + 26, y: y + 45, lh: 46, font: fuente(TAM.cuerpo),
+        color: '#604B22', align: 'left', base: 'top' });
+    }
+    y += altoLecturas + 22;
 
     // Audio: botón + aviso de estado
     const audio = { x: MARGEN, y, w: 460, h: 84 }
