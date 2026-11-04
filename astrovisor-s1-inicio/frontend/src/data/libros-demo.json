@@ -1,0 +1,65 @@
+[
+  {
+    "id": "star-lore",
+    "titulo": "Star Lore of All Ages",
+    "autor": "William Tyler Olcott",
+    "anio": 1911,
+    "enlacePublico": "https://www.gutenberg.org/ebooks/39064",
+    "portadaIlustrativa": "/libros-demo/star-lore.svg",
+    "tema": "#142a56",
+    "demostracion": true,
+    "marc21": {
+      "campo001": "DEMO-001",
+      "campo003": "DEMO",
+      "signatura852": null,
+      "ubicacion852": null
+    },
+    "recomendaciones": {
+      "orion": "Descubre relatos antiguos sobre las estrellas y por qué imaginamos a Orión en el cielo.",
+      "osa-mayor": "Conoce las leyendas que acompañan a las figuras de la Osa Mayor.",
+      "escorpio": "Explora cómo distintas historias dieron nombre y significado a las constelaciones."
+    }
+  },
+  {
+    "id": "field-stars",
+    "titulo": "A Field Book of the Stars",
+    "autor": "William Tyler Olcott",
+    "anio": 1914,
+    "enlacePublico": "https://archive.org/details/fieldbookofstars00olcorich",
+    "portadaIlustrativa": "/libros-demo/field-stars.svg",
+    "tema": "#22463f",
+    "demostracion": true,
+    "marc21": {
+      "campo001": "DEMO-002",
+      "campo003": "DEMO",
+      "signatura852": null,
+      "ubicacion852": null
+    },
+    "recomendaciones": {
+      "orion": "Observa cómo una guía clásica describe y organiza las estrellas del cielo nocturno.",
+      "osa-mayor": "Continúa la observación de la Osa Mayor con una guía de estrellas.",
+      "escorpio": "Conoce otros dibujos del firmamento y aprende a buscar sus estrellas."
+    }
+  },
+  {
+    "id": "half-hours",
+    "titulo": "Half-Hours with the Stars",
+    "autor": "Richard A. Proctor",
+    "anio": 1887,
+    "enlacePublico": "https://www.gutenberg.org/ebooks/40292",
+    "portadaIlustrativa": "/libros-demo/half-hours.svg",
+    "tema": "#4d2844",
+    "demostracion": true,
+    "marc21": {
+      "campo001": "DEMO-003",
+      "campo003": "DEMO",
+      "signatura852": null,
+      "ubicacion852": null
+    },
+    "recomendaciones": {
+      "orion": "Dedica una lectura corta a reconocer las figuras del cielo y sus relaciones.",
+      "osa-mayor": "Amplía tu recorrido con explicaciones sencillas sobre grupos de estrellas.",
+      "escorpio": "Después de observar Escorpio, sigue explorando el cielo nocturno con esta lectura."
+    }
+  }
+]
