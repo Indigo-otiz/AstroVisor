@@ -10,3 +10,7 @@
 - [ ] Revisar más adelante el diseño con wireframes Figma.
 - [ ] Revisar disponibilidad de identificadores MARC 21 y existencias si la biblioteca facilita datos.
 - [ ] Solicitar aprobación antes de archivar este cambio.
+
+- [x] Implementar invitación, estantería y ficha breve 3D, enlazadas al recorrido web 2D.
+- [ ] Ejecutar pruebas, build y validación OpenSpec después de integrar la estantería 3D.
+- [ ] Probar físicamente la navegación y legibilidad en Homido antes de aprobar el incremento.

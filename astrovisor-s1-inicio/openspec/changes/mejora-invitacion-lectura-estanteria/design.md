@@ -16,3 +16,7 @@ Portadas grandes frontales, botones nativos con objetivo amplio, foco visible, u
 
 ## Riesgos
 La ausencia de un catálogo confirmado impide afirmar propiedad, ubicación o disponibilidad física. Las rutas Vue requieren prueba manual y build; las pruebas de adaptador no sustituyen pruebas en teléfono.
+
+
+## Extensión de libros en Homido
+La ficha de constelación añade una invitación y una zona de mirada sobre «Ver libros recomendados». La estantería 3D utiliza portadas ilustradas en canvas aplicadas a planos A-Frame delante de una repisa sencilla, con el mismo controlador de selección por mirada de 3 s. Una ficha breve permite regresar o abrir la pantalla 2D. El modo de estado principal permanece en `ficha`; una subvista distingue `ficha`, `estanteria` y `detalle`. El reproductor de Luis y el renderer estéreo no se modifican. La navegación se adapta a las rutas propias de cada PR.
