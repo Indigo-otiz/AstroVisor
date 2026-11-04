@@ -19,3 +19,6 @@ Se reutiliza exclusivamente el arreglo `libros[]` de los recorridos servidos por
 - Revisar posteriormente los wireframes de Figma; no forman parte de este incremento.
 
 **Estado:** implementación en borrador. Ninguna de estas pruebas ha sido ejecutada aquí; no se afirma compatibilidad física.
+
+## Comprobación técnica limitada realizada en esta sesión
+Se verificó el análisis sintáctico JavaScript de los módulos nuevos y el controlador mediante V8, y se ejecutaron comprobaciones aisladas de los layouts con contextos de canvas simulados: los tres recorridos incluyen zonas para «libros», «audio» y «volver» sin desbordamiento calculado; los detalles de libros tienen dos botones y tampoco reportan desbordamiento. Se comprobó que la estantería genera tres cubiertas y cuatro objetivos (tres libros y regresar). **Estas comprobaciones no sustituyen** `npm test`, `npm run build`, OpenSpec ni pruebas reales en navegador/Homido.
