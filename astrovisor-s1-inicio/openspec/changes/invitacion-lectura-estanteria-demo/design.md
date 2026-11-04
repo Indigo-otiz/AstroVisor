@@ -16,3 +16,7 @@
 
 ## Verificación
 Tests de catálogo, rutas y enlaces; `npm test` y `npm run build` cuando el entorno lo permita. Inspección manual de teclado y vistas estrechas pendiente de dispositivo.
+
+
+## Extensión de libros en Homido
+La ficha de constelación añade una invitación y una zona de mirada sobre «Ver libros recomendados». La estantería 3D utiliza portadas ilustradas en canvas aplicadas a planos A-Frame delante de una repisa sencilla, con el mismo controlador de selección por mirada de 3 s. Una ficha breve permite regresar o abrir la pantalla 2D. El modo de estado principal permanece en `ficha`; una subvista distingue `ficha`, `estanteria` y `detalle`. El reproductor de Luis y el renderer estéreo no se modifican. La navegación se adapta a las rutas propias de cada PR.

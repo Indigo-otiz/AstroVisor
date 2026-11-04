@@ -27,3 +27,22 @@ El cambio SHALL evitar modificaciones de comportamiento del visor Homido, narrac
 #### Scenario: Regresión
 - **WHEN** se abre una constelación después del cambio
 - **THEN** su historia, reconocimiento y reproductor existente siguen estando disponibles
+
+
+### Requirement: Descubrir libros dentro del visor Homido
+La ficha 3D SHALL ofrecer una invitación a la estantería seleccionable por mirada de tres segundos o toque. La estantería SHALL mostrar como máximo tres cubiertas ilustrativas grandes y una selección claramente identificada.
+
+#### Scenario: Selección de un libro
+- **WHEN** la persona mantiene la mirada sobre una portada durante tres segundos
+- **THEN** se muestra la ficha breve del libro con título, autor, invitación a leer y la aclaración de que la ubicación física no está confirmada.
+
+### Requirement: Consultar la ficha completa en modo web 2D
+El visor SHALL ofrecer el paso a la ficha/estantería web de la rama, conservando los controles de pausa y salida y sin alterar el reproductor de narraciones.
+
+#### Scenario: Continuar en 2D
+- **WHEN** la persona elige «Consultar información en 2D»
+- **THEN** la narración se detiene al cerrar la ficha y se navega a la URL interna asociada al libro.
+
+#### Scenario: Navegación de regreso
+- **WHEN** se elige «Volver a los libros» o «Volver a la constelación»
+- **THEN** aparece la pantalla anterior con sus objetivos de mirada correspondientes.

@@ -9,3 +9,7 @@
 - [ ] 6b. Ejecutar `npm test`, `npm run build` y regresiones en un entorno con dependencias instaladas; no se ha ejecutado desde el conector de GitHub.
 - [ ] 7. Revisar navegación con teclado y teléfonos reales; cotejar el diseño con Figma antes del cierre.
 - [ ] 8. Solicitar aprobación antes de archivar OpenSpec.
+
+- [x] Implementar invitación, estantería y ficha breve 3D, enlazadas al recorrido web 2D.
+- [ ] Ejecutar pruebas, build y validación OpenSpec después de integrar la estantería 3D.
+- [ ] Probar físicamente la navegación y legibilidad en Homido antes de aprobar el incremento.
