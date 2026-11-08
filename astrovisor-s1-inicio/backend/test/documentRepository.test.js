@@ -1,7 +1,15 @@
-import test from 'node:test'
+import test, { after } from 'node:test'
 import assert from 'node:assert/strict'
-import { obtenerRecorridos } from '../src/services/documentRepository.js'
-import { readFile } from 'node:fs/promises'
+import { obtenerRecorridos as leerRecorridos, inicializarCatalogo } from '../src/services/documentRepository.js'
+import { readFile, mkdtemp, rm } from 'node:fs/promises'
+import { tmpdir } from 'node:os'
+import { join, dirname } from 'node:path'
+
+const directorio = await mkdtemp(join(tmpdir(), 'astrovisor-s4-contrato-'))
+assert.equal(dirname(directorio), tmpdir())
+after(() => rm(directorio, { recursive: true, force: true }))
+await inicializarCatalogo({ directorio })
+const obtenerRecorridos = () => leerRecorridos({ directorio })
 
 test('el repositorio documental devuelve recorridos de demostración', async () => {
   const recorridos = await obtenerRecorridos()

@@ -1,5 +1,5 @@
 import express from 'express'
-import { obtenerRecorridos } from './services/documentRepository.js'
+import { obtenerRecorridos, obtenerLibros } from './services/documentRepository.js'
 import { crearSesion, destruirSesion, verificarAdmin } from './middleware/auth.js'
 
 // Cargar variables de entorno si están disponibles en Node
@@ -40,6 +40,18 @@ app.get('/api/contenidos/recorridos', async (_req, res, next) => {
   } catch (err) {
     next(err)
   }
+})
+
+app.get('/api/contenidos/libros', async (req, res, next) => {
+  const id = req.query.constelacionId
+  if (id !== undefined && (typeof id !== 'string' || !/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(id) || id.length > 100)) {
+    return res.status(400).json({ error: 'Identificador de constelación inválido' })
+  }
+  try {
+    const libros = await obtenerLibros({ constelacionId: id })
+    if (id !== undefined && libros.length === 0) return res.status(404).json({ error: 'Constelación no encontrada' })
+    res.json(libros)
+  } catch (err) { next(err) }
 })
 
 // ==========================================

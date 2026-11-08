@@ -10,7 +10,7 @@ El MVP trabajará con recorridos de constelaciones, sujetos a validación de la 
 
 `historia` es una adaptación narrativa de demostración; `comoReconocerla` describe la silueta. Ninguno contiene HTML. Las vistas imprimen estos campos como texto y no los ejecutan. `demostracion` permanece en `true` hasta recibir y revisar contenido autorizado; la interfaz S2 todavía se presenta como demostrativa. Los arrays vacíos no acreditan libros ni audios disponibles.
 
-Para sustituir los textos, editar este documento JSON conservando los campos y ejecutar `npm test`, `npm run test:web` y `npm run build` desde la raíz del proyecto Vue. Consultar nuevamente la API: el adaptador lee el archivo en cada petición. La autorización de nuevos materiales y su procedencia deben documentarse antes de presentarlos como contenido institucional.
+S4 Etapa 1: la API lee el catálogo privado inicializado desde `catalogo-inicial.json`; este `recorridos.json` queda como fixture del contrato anterior, no como fuente de ejecución. `libros-demo.json` sigue temporalmente en la estantería hasta migrar su adaptador a la API. No mantener doble escritura: las pruebas comparan las proyecciones iniciales con ambos fixtures. Configuración, inicialización y límites en [PRUEBA-S4-ETAPA1.md](../docs/PRUEBA-S4-ETAPA1.md). La autorización de materiales y su procedencia siguen siendo necesarias antes de presentarlos como contenido institucional.
 
 ## Narraciones S3
 

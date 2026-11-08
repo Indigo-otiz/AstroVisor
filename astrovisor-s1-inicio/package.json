@@ -7,6 +7,7 @@
     "backend"
   ],
   "scripts": {
+    "init:catalogo": "node scripts/inicializar-catalogo.mjs",
     "test:web": "npm run test --workspace frontend",
     "dev:web": "npm run dev --workspace frontend",
     "dev:api": "npm run dev --workspace backend",
