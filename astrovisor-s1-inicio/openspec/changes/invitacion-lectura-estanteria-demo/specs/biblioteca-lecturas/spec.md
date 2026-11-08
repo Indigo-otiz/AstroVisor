@@ -22,11 +22,15 @@ La experiencia SHALL distinguir referencias públicas y portadas ilustrativas de
 - **THEN** el `001/003` aparece como ejemplo ficticio y la ubicación/signatura `852` indica que no se dispone de esos datos
 
 ### Requirement: Conservar funcionalidades existentes
-El cambio SHALL evitar modificaciones de comportamiento del visor Homido, narración, autenticación y contrato JSON de constelaciones.
+El cambio SHALL añadir navegación bibliográfica en Homido conservando las funciones previas de selección por mirada de tres segundos, pausa/salida, renderizado estéreo y audio. SHALL mantener autenticación y contrato JSON de constelaciones sin cambios por esta extensión.
 
 #### Scenario: Regresión
 - **WHEN** se abre una constelación después del cambio
 - **THEN** su historia, reconocimiento y reproductor existente siguen estando disponibles
+
+#### Scenario: Extensión bibliográfica sin regresión del visor
+- **WHEN** se pasa de ficha a estantería, detalle de libro y regreso o consulta 2D
+- **THEN** se utilizan las nuevas zonas/subvistas y permanecen operativas la mirada previa de 3 s, pausa/salida, renderizado estéreo y detención de audio al salir.
 
 
 ### Requirement: Descubrir libros dentro del visor Homido

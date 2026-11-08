@@ -6,10 +6,10 @@
 - [x] 4. Sustituir referencia bibliográfica en ficha 2D por invitación clara.
 - [x] 5. Añadir rutas de estantería y detalle adaptadas a adultos mayores.
 - [x] 6a. Añadir pruebas de catálogo y rutas.
-- [ ] 6b. Ejecutar `npm test`, `npm run build` y regresiones en un entorno con dependencias instaladas; no se ha ejecutado desde el conector de GitHub.
+- [x] 6b. Ejecutar comprobaciones automatizadas locales tras corregir enlaces: `npm test` 8/8, `npm run test:web` 93/93 y `npm run build` correcto. Evidencia: `docs/evidencias/pr6-validacion.txt`. No incluye navegador ni hardware.
 - [ ] 7. Revisar navegación con teclado y teléfonos reales; cotejar el diseño con Figma antes del cierre.
 - [ ] 8. Solicitar aprobación antes de archivar OpenSpec.
 
 - [x] Implementar invitación, estantería y ficha breve 3D, enlazadas al recorrido web 2D.
-- [ ] Ejecutar pruebas, build y validación OpenSpec después de integrar la estantería 3D.
+- [x] Ejecutar pruebas, build y validación OpenSpec sobre la rama con estantería 3D y enlaces corregidos; validación estricta correcta. Sin merge a main.
 - [ ] Probar físicamente la navegación y legibilidad en Homido antes de aprobar el incremento.

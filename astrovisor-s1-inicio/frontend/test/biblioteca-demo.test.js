@@ -35,3 +35,19 @@ test('las recomendaciones remiten a enlaces públicos, no al inventario de la bi
     assert.ok(!('disponibilidad' in libro))
   }
 })
+
+test('los enlaces aprobados coinciden en catálogo, contrato documental y bibliografía', () => {
+  const recorridos = JSON.parse(readFileSync(new URL('../../content/recorridos.json', import.meta.url), 'utf8'))
+  const bibliografia = readFileSync(new URL('../../content/BIBLIOGRAFIA.md', import.meta.url), 'utf8')
+  const enlaces = {
+    'star-lore': 'https://archive.org/details/starloreofallage00olco',
+    'half-hours': 'https://www.gutenberg.org/ebooks/23300',
+  }
+  for (const libro of catalogo) {
+    const referencia = recorridos.flatMap((r) => r.libros).find((r) => r.titulo === libro.titulo)
+    assert.ok(referencia, libro.titulo)
+    assert.equal(libro.enlacePublico, referencia.url, libro.titulo)
+    assert.ok(bibliografia.includes(libro.enlacePublico), libro.titulo)
+    if (enlaces[libro.id]) assert.equal(libro.enlacePublico, enlaces[libro.id], libro.titulo)
+  }
+})
