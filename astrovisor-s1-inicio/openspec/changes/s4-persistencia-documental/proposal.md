@@ -1,10 +1,12 @@
 # Proposal — S4: persistencia documental
 
-Estado vigente: Etapa 1 publicada como `735fd4b1413e5cd98387e297716f3d4c76cac52d` sobre la base `f1058c9b10641c470d7d3e331a81f327af78fc8c`. El usuario revisó Etapa 2A y autorizó su auditoría final y publicación si no aparecen bloqueantes; autenticación local sin base de datos validada según `docs/PRUEBA-S4-ETAPA2A.md`. CRUD documental, migración de estantería, portadas, exportaciones Homido, alojamiento independiente, merge y archivo OpenSpec continúan fuera de alcance.
+Estado vigente: Etapa 1 publicada como `735fd4b1413e5cd98387e297716f3d4c76cac52d` sobre la base `f1058c9b10641c470d7d3e331a81f327af78fc8c`; Etapa 2A publicada como `3bf81dd03e320b6207d6b053f5ee2862cd325371`. El usuario autorizó publicar exclusivamente Etapa 2B y su corrección tras revisión final sin bloqueantes: guardado seguro, API documental y respaldos privados. Evidencia en `docs/PRUEBA-S4-ETAPA2B.md`. Formularios, migración de estantería, portadas dinámicas, exportaciones Homido, alojamiento independiente, merge y archivo OpenSpec siguen pendientes.
 
 ## Why
 
-La estantería #6 importa un catálogo estático, Homido lee otro contrato y el panel consulta Supabase. El repositorio documental solo lee: actualmente no hay edición JSON persistente. Ver [evidencia de validación](../../../docs/VALIDACION-PR6.md).
+Hallazgo de auditoría corregido con autorización posterior: resultado de restauración confirmado separado del aviso de liberación del lock, sin retirada insegura. Regresión y validaciones locales completadas; commit/push de 2B autorizados expresamente por el usuario, sin merge ni avance de etapa. Evidencia en `docs/PRUEBA-S4-ETAPA2B.md`.
+
+Situación al iniciar S4: la estantería #6 importaba un catálogo estático, Homido leía otro contrato y el panel consultaba Supabase. El repositorio documental solo leía y no había edición JSON persistente. Ver [evidencia de validación](../../../docs/VALIDACION-PR6.md). Etapa 2B añade escritura backend; conectar los lectores y formularios sigue pendiente.
 
 ## What Changes
 

@@ -4,6 +4,7 @@ import { join } from 'node:path'
 import { randomUUID } from 'node:crypto'
 import { validarCatalogo, proyectarRecorridos, proyectarLibros } from './catalogo.js'
 import { rutaPrivada } from './privateStorage.js'
+export { abrirEscritor, restaurarCatalogo, retirarBloqueoAbandonado } from './documentWriter.js'
 
 const semillaPath = fileURLToPath(new URL('../../../content/catalogo-inicial.json', import.meta.url))
 
@@ -11,7 +12,7 @@ export async function leerSemilla() {
   return validarCatalogo(JSON.parse(await readFile(semillaPath, 'utf8')))
 }
 
-/** Única escritura de esta etapa: creación explícita y exclusiva del catálogo. */
+/** Creación explícita y exclusiva: no sustituye un catálogo existente. */
 export async function inicializarCatalogo({ directorio = process.env.ASTROVISOR_DATA_DIR } = {}) {
   const ruta = await rutaPrivada(directorio)
   const semilla = await leerSemilla()

@@ -1,6 +1,8 @@
 # Plan de implementación — S4
 
-Etapa 1 publicada: `735fd4b1413e5cd98387e297716f3d4c76cac52d`. Usuario revisó Etapa 2A y autorizó auditoría final, commit y push si no aparecen bloqueantes. Las tareas no marcadas siguen pendientes; no implementar CRUD documental ni avanzar o archivar automáticamente.
+Etapa 1 publicada: `735fd4b1413e5cd98387e297716f3d4c76cac52d`; Etapa 2A publicada: `3bf81dd03e320b6207d6b053f5ee2862cd325371`. Usuario autorizó publicar exclusivamente Etapa 2B corregida tras revisión final sin bloqueantes: guardado, API documental y respaldos privados. Sin merge ni archivo. Las tareas no marcadas siguen pendientes; no avanzar automáticamente a formularios, lectores, portadas dinámicas ni exports.
+
+Auditoría anterior detuvo publicación por rechazo de restauración después de rename confirmado si falla liberar escritor.lock. Corrección posterior autorizada, implementada y validada; verificaciones repetidas para publicar: ocho regresiones, backend 87/87, web 98/98, build y OpenSpec correctos. Resultado confirmado y limpieza se comunican por separado; caso simultáneo conserva error de operación. Commit/push de 2B autorizados posteriormente, sin merge, archivo ni Etapa 3. Evidencia en `docs/PRUEBA-S4-ETAPA2B.md`.
 
 **Goal:** permitir edición documental autorizada y persistente con lectura pública coherente.
 
@@ -18,10 +20,10 @@ Etapa 1 publicada: `735fd4b1413e5cd98387e297716f3d4c76cac52d`. Usuario revisó E
 - Revisión de auth explícita con responsable; jamás usar fixture de pruebas como identidad de producción.
 - Fixtures y archivos temporales aislados: las pruebas no deben escribir el catálogo real ni consultar Supabase con credenciales reales.
 - No hacer commits de integración, merge, publicación ni archivo OpenSpec sin autorización del usuario.
-- Identidad local seleccionada y autorizada en Etapa 2A; no ampliar a escritura documental ni otras etapas.
+- Identidad local de Etapa 2A conservada; Etapa 2B autoriza únicamente escritura documental y respaldos de secciones 3/4, sin avanzar a otras etapas.
 - Semilla versionada separada del runtime: datos administrados, backups, secretos, lock y temporales externos a Git y raíces públicas; no copiar semilla durante arranque normal.
 
-El plan completo permanece registrado; esta entrega cierra la autenticación de Etapa 2A, además de la lectura/inicialización de Etapa 1. Alojamiento independiente se traslada a 8.6 por decisión posterior del usuario. No se posponen controles de validación, integridad o regresión aplicables a esta etapa. Una prueba no ejecutada continúa pendiente.
+El plan completo permanece registrado; esta entrega ejecuta secciones 3 y 4 como Etapa 2B, tras lectura/inicialización y autenticación ya publicadas. Alojamiento independiente se traslada a 8.6 por decisión posterior del usuario. No se posponen controles de validación, integridad o regresión aplicables a esta etapa. Una prueba no ejecutada continúa pendiente.
 
 ## Foco de revisión
 
@@ -62,22 +64,22 @@ Archivos: `backend/src/services/documentRepository.js`, nuevo `content/catalogo-
 
 ## 3. Guardado exclusivo y recuperación
 
-Archivos: `backend/src/services/documentRepository.js`, `backend/test/documentRepository.test.js`, `.gitignore`, documentación operativa; `<ASTROVISOR_DATA_DIR>/backups/`, temporales y lock solo runtime privado externo. Interfaz: guardar cambios permitidos con revisión base y devolver nueva revisión confirmada; errores tipados para API.
+Archivos: `backend/src/services/documentRepository.js`, `backend/src/services/documentWriter.js`, `backend/test/documentWriter.test.js`, `scripts/recuperar-catalogo.mjs`, `docs/PRUEBA-S4-ETAPA2B.md`; `<ASTROVISOR_DATA_DIR>/backups/`, temporales y locks solo runtime privado externo. `.gitignore` preexistente intacto, sin reglas nuevas. Interfaz: guardar cambios permitidos con revisión base y devolver nueva revisión confirmada; errores tipados para API.
 
-- [ ] 3.1 Añadir pruebas sobre directorio temporal: persistencia en otro proceso, dos editores de igual revisión, segunda instancia, fallo de backup/escritura/rename, JSON corrupto y restauración. Usar inyección mínima de fallo o un fixture de proceso, sin modificar datos reales. Ejecutar y comprobar fallos esperados.
-- [ ] 3.2 Implementar lock de escritor, cola, comparación de revisión dentro del guardado y reemplazo temporal en mismo volumen con flush/cierre; backup antes del cambio, retención de 20 solo tras éxito.
-- [ ] 3.3 Probar interrupción antes/después de rename y conservación de un documento válido; no retirar un lock cuyo propietario sigue activo. Documentar cómo comprobar y recuperar un lock abandonado.
-- [ ] 3.4 Restaurar una copia validada con API detenida y nueva revisión; iniciar proceso nuevo y comprobar textos, relaciones y metadatos. Comprobar que runtime privado no entra en `dist` ni rutas públicas.
-- [ ] 3.5 Ejecutar `npm test`; registrar sistema de archivos probado y límites frente a pérdida de disco/energía. Documentar volumen y copia externa operativa sin conectar servicios nuevos.
+- [x] 3.1 Pruebas aisladas añadidas y observados fallos previos al escritor: otro proceso, dos editores/procesos, backup, escritura parcial/sync/rename, corrupción, hash y restauración. Sin datos reales.
+- [x] 3.2 Lock por vida del escritor más control breve de recuperación, cola y revisión dentro de la sección crítica. Temporal/sync/cierre/rename, respaldo validado previo y retención tras confirmar. Fallos anteriores conservan datos; avisos posteriores no simulan reversión.
+- [x] 3.3 Interrupciones de proceso antes/después de rename comprobadas; lock vivo no se retira y lock abandonado exige PID/host. Control huérfano falla cerrado y exige operación manual offline documentada. No equivale a prueba de corte eléctrico.
+- [x] 3.4 Restauración normal/CLI, evidencia, revisión superior y lectura desde otro proceso comprobadas. Hallazgo de auditoría corregido: rename confirmado + EACCES al liberar comunica confirmada=true, revisión persistida y limpieza pendiente; no elimina lock activo ni reintenta restauración. CLI salida 2 con aviso inequívoco; fallo previo salida 1 y error primario conservado aunque también falle liberar. Ocho regresiones nuevas y suite backend 87/87, web 98/98, build/OpenSpec correctos. Publicación posterior de 2B autorizada, sin ampliación de alcance.
+- [ ] 3.5 Validación local ejecutada: `npm test` 87/87, NTFS de C: identificado y límites de energía/disco documentados. Procedimiento de copia externa documentado, pero destino y copia/restauración externos reales siguen sin configurar/ensayar; no declarar completa la operación de respaldo externo.
 
 ## 4. API administrativa y publicación
 
-Archivos: `backend/src/index.js`, `backend/src/services/documentRepository.js`, `backend/test/auth.test.js`, `backend/test/documentRepository.test.js`. Contratos: tabla de endpoints y estados HTTP de `design.md`.
+Archivos: `backend/src/index.js`, `backend/src/services/catalogoEdicion.js`, `backend/src/services/documentWriter.js`, `backend/test/documentAdmin.test.js`, ajuste de ruta desconocida en `backend/test/auth.test.js`. Contratos: tabla de endpoints y estados HTTP de `design.md` y decisiones acotadas 2B.
 
-- [ ] 4.1 Añadir pruebas de POST/PATCH autorizado y no autorizado, `If-Match` ausente/obsoleto, duplicados, campos prohibidos, contaminación de prototipo, URLs/rutas inválidas, texto excesivo y método/ruta desconocido. Ejecutar y comprobar fallo esperado.
-- [ ] 4.2 Implementar GET público de libros y GET administrativo de catálogo con ETag; POST/PATCH mínimos con validación y whitelist, sin DELETE. Reemplazar respuesta administrativa genérica por 404/405.
-- [ ] 4.3 Probar que leer/guardar no filtra información de cuentas, backups o rutas y que ningún fallo devuelve éxito aparente. Guardar y reiniciar proceso; comprobar API pública contra estado persistido.
-- [ ] 4.4 Bloquear con 409 cambios de historia con audio que carecen de revisión coordinada aprobada; probar que la edición de resumen/libro no altera `multimedia`, autoría ni transcripciones.
+- [x] 4.1 Pruebas HTTP añadidas y observadas inicialmente con 404 por rutas ausentes: POST/PATCH, ausencia de token, If-Match, duplicados, whitelist, prototipos, URLs/rutas, texto y rutas desconocidas. Nuevas pruebas no usan administradores reales.
+- [x] 4.2 GET administrativo/ETag y POST/PATCH mínimos protegidos, 428/412/400/401/404/409/503; API pública de libros conservada. Sin DELETE. 403 reservado: 2A solo emite cuenta con permiso completo. Alta depende de SVG estático correcto existente; falta de portada 409, sin generación dinámica.
+- [x] 4.3 Respuestas sin credenciales/rutas privadas, fallos sin éxito aparente y corrección de falso 503 posrename con regresión. API HTTP anterior detenida, escritor cerrado y proceso nuevo sirve por HTTP el cambio persistido.
+- [x] 4.4 Historia distinta con audio bloqueada con 409; pruebas de resumen/libro/motivos conservan multimedia, transcripciones, metadatos de referencia y los nueve vínculos. SVG aprobados sin cambios.
 
 ## 5. Panel y catálogo público
 

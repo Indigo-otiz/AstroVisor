@@ -4,7 +4,9 @@
 
 Permitir la edición autorizada de contenidos educativos y bibliográficos persistentes, manteniendo relaciones, recursos, metadatos y compatibilidad entre la web y el visor Homido.
 
-Estado vigente: Etapa 1 publicada. Etapa 2A de autenticación local revisada por el usuario, con auditoría final y publicación autorizadas si no aparecen bloqueantes. Requisitos de escritura documental, portadas dinámicas y migración de estantería permanecen pendientes; alojamiento independiente pospuesto y respaldo estático conservado.
+Estado vigente: Etapas 1 y 2A publicadas; publicación de Etapa 2B corregida autorizada tras revisión final sin bloqueantes, exclusivamente escritura documental y respaldos privados. Sin merge ni archivo. Portadas dinámicas, formularios, migración de estantería y exportaciones Homido permanecen pendientes; alojamiento independiente pospuesto y respaldo estático conservado.
+
+Estado del hallazgo: corrección de restauración validada con regresión de confirmación y liberación fallida; autorización posterior de publicación recibida. Evidencia y límites en `docs/PRUEBA-S4-ETAPA2B.md`.
 
 ## ADDED Requirements
 
@@ -20,8 +22,23 @@ El sistema SHALL verificar identidad y permiso administrativo en servidor para t
 - **THEN** el servidor sigue denegando escrituras sin identidad y permiso válidos.
 
 #### Scenario: Revisión de identidad pendiente
-- **WHEN** están autorizadas Etapa 1 y autenticación 2A, pero no la escritura documental
-- **THEN** se conserva autorización efectiva y no se implementan endpoints POST/PATCH de contenido.
+- **WHEN** falta autorización de una etapa posterior a la entrega 2B
+- **THEN** se conserva autorización efectiva y no se amplía a formularios, portadas dinámicas ni exportaciones.
+
+### Requirement: Edición acotada con revisión global
+El sistema SHALL proteger GET de catálogo y POST/PATCH documentales con verificarAdmin. SHALL exigir If-Match fuerte con revisión global y preservar campos no editables. Relaciones SHALL agregarse o actualizar motivos sin eliminar los vínculos existentes durante 2B.
+
+#### Scenario: Alta sin portada disponible
+- **WHEN** se crea un libro sin SVG estático existente y correspondiente a su ID, antes de implementar plantillas dinámicas
+- **THEN** se rechaza con 409 sin guardar una referencia inexistente ni afirmar generación de portada.
+
+#### Scenario: Confirmación y mantenimiento posterior
+- **WHEN** rename confirma el catálogo y luego falla sincronización de directorio o retención
+- **THEN** se devuelve la revisión confirmada con avisos de mantenimiento, sin declarar que el guardado se revirtió; el respaldo público queda pendiente de otra etapa.
+
+#### Scenario: Recuperación concurrente con alta de escritor
+- **WHEN** se intenta retirar un bloqueo abandonado mientras otro proceso intenta adquirir escritor
+- **THEN** ambas operaciones se excluyen mediante control privado y no se retira el bloqueo de un proceso vivo; un control huérfano exige intervención offline.
 
 ### Requirement: Credenciales locales explícitas y comparación segura
 El sistema SHALL verificar hashes de contraseña con sal mediante algoritmo de derivación adecuado y comparación segura. SHALL rechazar configuración ausente o inválida y no SHALL activar cuentas demo por entorno o flags de prueba. Contraseñas, hashes y tokens no SHALL enviarse en URLs ni registrarse en logs.

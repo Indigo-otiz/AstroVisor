@@ -124,10 +124,10 @@ test('límite de intentos precede a la derivación de contraseñas', () => {
   assert.equal(permitidos, 6)
 })
 
-test('HTTP limita login repetido y no ofrece escrituras administrativas', async (t) => {
+test('HTTP limita login repetido y rechaza rutas administrativas desconocidas', async (t) => {
   const { pedir, login } = await entorno(t)
   const { token } = await (await login()).json()
-  assert.equal((await pedir('/api/admin/libros', { method: 'POST', headers: { Authorization: `Bearer ${token}` } })).status, 404)
+  assert.equal((await pedir('/api/admin/desconocido', { method: 'POST', headers: { Authorization: `Bearer ${token}` } })).status, 404)
   for (let i = 0; i < 4; i++) await pedir('/api/admin/login', {
     method: 'POST', headers: { 'Content-Type': 'application/json',
       'X-Forwarded-For': `192.0.2.${i + 1}`, 'X-Real-IP': `192.0.2.${i + 1}`,

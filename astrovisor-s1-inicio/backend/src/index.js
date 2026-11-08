@@ -1,7 +1,8 @@
 import express from 'express'
 import { pathToFileURL } from 'node:url'
 import { resolve } from 'node:path'
-import { obtenerRecorridos, obtenerLibros } from './services/documentRepository.js'
+import { obtenerRecorridos, obtenerLibros, obtenerCatalogo, abrirEscritor } from './services/documentRepository.js'
+import { editarCatalogo } from './services/catalogoEdicion.js'
 import { crearSesion, destruirSesion, verificarAdmin, crearLimitadorLogin } from './middleware/auth.js'
 import { verificarCredenciales } from './services/adminCredentials.js'
 
@@ -13,6 +14,16 @@ if (typeof process.loadEnvFile === 'function') {
 
 export function crearApp() {
   const app = express()
+  let escritor
+  // La entrada ejecutable adquiere al arrancar; los consumidores de crearApp deben inicializar y cerrar explícitamente.
+  app.locals.iniciarEscritor = async () => {
+    if (!escritor) {
+      escritor = abrirEscritor()
+      escritor.catch(() => { escritor = undefined })
+    }
+    return escritor
+  }
+  app.locals.cerrarEscritor = async () => { if (escritor) await (await escritor).cerrar() }
   app.disable('x-powered-by')
   app.use('/api/admin', (req, res, next) => {
     res.set('Cache-Control', 'no-store')
@@ -62,6 +73,32 @@ export function crearApp() {
     destruirSesion(req.headers.authorization.slice(7).trim())
     res.json({ ok: true, mensaje: 'Sesión administrativa cerrada' })
   })
+  const etag = (revision) => `"catalogo-${revision}"`
+  const errorDocumental = (error, res) => res.status(error.status || 503).json({ error: error.status ? error.message : 'Almacenamiento documental no disponible' })
+  app.get('/api/admin/catalogo', verificarAdmin, async (_req, res) => {
+    try {
+      const catalogo = await obtenerCatalogo()
+      res.set('ETag', etag(catalogo.revision)).json(catalogo)
+    } catch { errorDocumental({}, res) }
+  })
+  const guardar = (tipo) => async (req, res) => {
+    const condicion = req.get('If-Match')
+    if (!condicion) return res.status(428).json({ error: 'Se requiere If-Match' })
+    const coincidencia = /^"catalogo-([1-9][0-9]*)"$/.exec(condicion)
+    if (!coincidencia || !Number.isSafeInteger(Number(coincidencia[1]))) return res.status(400).json({ error: 'If-Match inválido' })
+    try {
+      const repositorio = await app.locals.iniciarEscritor()
+      const resultado = await repositorio.guardar({ revision: Number(coincidencia[1]), actor: req.admin.id,
+        cambiar: (catalogo) => editarCatalogo(catalogo, { tipo, id: req.params.id, datos: req.body }) })
+      res.set('ETag', etag(resultado.catalogo.revision)).status(tipo === 'crearLibro' ? 201 : 200).json({
+        ok: true, revision: resultado.catalogo.revision, durabilidadPendiente: resultado.durabilidadPendiente,
+        retencionPendiente: resultado.retencionPendiente, respaldoPublico: 'pendiente',
+      })
+    } catch (error) { errorDocumental(error, res) }
+  }
+  app.post('/api/admin/libros', verificarAdmin, guardar('crearLibro'))
+  app.patch('/api/admin/libros/:id', verificarAdmin, guardar('libro'))
+  app.patch('/api/admin/recorridos/:id', verificarAdmin, guardar('recorrido'))
   app.use('/api/admin', verificarAdmin, (_req, res) => res.status(404).json({ error: 'Recurso administrativo no encontrado' }))
   app.use((err, _req, res, _next) => {
     if (err.type === 'entity.parse.failed') return res.status(400).json({ error: 'JSON inválido' })
@@ -74,6 +111,12 @@ export function crearApp() {
 
 export const app = crearApp()
 if (process.argv[1] && pathToFileURL(resolve(process.argv[1])).href === import.meta.url) {
-  const puerto = Number(process.env.PORT ?? 3001)
-  app.listen(puerto, () => console.log(`API AstroVisor en http://localhost:${puerto}`))
+  try {
+    await app.locals.iniciarEscritor()
+    const puerto = Number(process.env.PORT ?? 3001)
+    const servidor = app.listen(puerto, () => console.log(`API AstroVisor en http://localhost:${puerto}`))
+    for (const señal of ['SIGINT', 'SIGTERM']) process.once(señal, () => {
+      servidor.close(async () => { await app.locals.cerrarEscritor(); process.exit(0) })
+    })
+  } catch { console.error('No se pudo abrir el almacén documental privado'); process.exitCode = 1 }
 }
