@@ -48,20 +48,14 @@ watch(tituloPagina, (titulo) => { document.title = `${titulo} · AstroVisor` }, 
             <p>{{ constelacion.comoReconocerla }}</p>
           </section>
           <NarracionAudio :key="constelacion.id" :constelacion="constelacion" />
-          <section v-if="constelacion.libros && constelacion.libros.length > 0" aria-labelledby="libro-referencia" class="constelacion-libros">
-            <h2 id="libro-referencia">Referencia bibliográfica</h2>
-            <article v-for="(libro, idx) in constelacion.libros" :key="idx" class="libro-ficha">
-              <p v-if="libro.etiqueta" class="libro-etiqueta">{{ libro.etiqueta }}</p>
-              <h3 class="libro-titulo">{{ libro.titulo }}</h3>
-              <p class="libro-autor">Por: <strong>{{ libro.autor }}</strong><span v-if="libro.anio"> ({{ libro.anio }})</span></p>
-              <p v-if="libro.aclaracion" class="libro-aclaracion">{{ libro.aclaracion }}</p>
-              <p v-if="libro.url" class="libro-enlace-contenedor">
-                <a :href="libro.url" target="_blank" rel="noopener noreferrer" class="libro-enlace">
-                  <span>Consultar libro en línea (acceso público)</span>
-                  <svg viewBox="0 0 24 24" aria-hidden="true" class="libro-enlace-icono"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6m4-3h6v6m-11 5L21 3" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" /></svg>
-                </a>
-              </p>
-            </article>
+          <section class="invitacion-lectura" aria-labelledby="invitacion-lectura-titulo">
+            <p class="invitacion-lectura-etiqueta">Tu viaje por las estrellas continúa en los libros</p>
+            <h2 id="invitacion-lectura-titulo">¿Te gustaría conocer más sobre {{ constelacion.titulo }}?</h2>
+            <p>Descubre tres lecturas recomendadas y explora una estantería digital creada para disfrutar con calma.</p>
+            <RouterLink class="public-button" :to="{ name: 'biblioteca', params: { id: constelacion.id } }">
+              Ver libros recomendados sobre {{ constelacion.titulo }}
+            </RouterLink>
+            <p class="invitacion-nota">Las portadas y los datos de catálogo son de demostración; los ejemplares físicos no se han confirmado.</p>
           </section>
           <RouterLink class="public-button" to="/explorar"
             >Explorar otra constelación
@@ -80,3 +74,12 @@ watch(tituloPagina, (titulo) => { document.title = `${titulo} · AstroVisor` }, 
     </p>
   </section>
 </template>
+
+<style scoped>
+.invitacion-lectura { padding: 1.4rem; background: #fff6df; border: 2px solid #d0a348; border-radius: 18px; }
+.invitacion-lectura .invitacion-lectura-etiqueta { color: #775000; font-weight: 700; font-size: .93rem; margin-bottom: .6rem; }
+.invitacion-lectura h2 { font-family: Georgia, 'Times New Roman', serif; margin-bottom: .7rem; }
+.invitacion-lectura p { margin-bottom: 1rem; }
+.invitacion-lectura .public-button { width: 100%; min-height: 58px; text-align: center; }
+.invitacion-lectura .invitacion-nota { font-size: .86rem; color: #4d515d; margin-top: .9rem; margin-bottom: 0; }
+</style>

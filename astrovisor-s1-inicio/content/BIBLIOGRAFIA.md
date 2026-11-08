@@ -19,7 +19,7 @@
 * **Título:** *Star Lore of All Ages: A Collection of Myths, Legends, and Facts Concerning the Constellations of the Northern Hemisphere*
 * **Autor:** William Tyler Olcott
 * **Año de publicación original:** 1911 (G. P. Putnam's Sons, Nueva York / Londres)
-* **Enlace web de acceso público:** https://www.gutenberg.org/ebooks/39064
+* **Enlace web de acceso público:** https://archive.org/details/starloreofallage00olco
 * **Atribución y condiciones de uso:** Dominio público (*Public Domain*). Disponible bajo la licencia de Project Gutenberg sin costo ni restricciones de derechos de autor patrimoniales.
 * **Pertinencia con la ficha:** Contiene el compendio histórico y mitológico clásico de Orión, la leyenda de su combate con el escorpión y su identificación estelar.
 
@@ -41,7 +41,7 @@
 * **Título:** *Half-Hours with the Stars: A Plain and Easy Guide to the Knowledge of the Constellations*
 * **Autor:** Richard A. Proctor
 * **Año de publicación original:** 1887 (W. H. Allen & Co., Londres)
-* **Enlace web de acceso público:** https://www.gutenberg.org/ebooks/40292
+* **Enlace web de acceso público:** https://www.gutenberg.org/ebooks/23300
 * **Atribución y condiciones de uso:** Dominio público (*Public Domain*). Obra clásica de divulgación astronómica libre de derechos de autor.
 * **Pertinencia con la ficha:** Mapas estelares estacionales que ubican a Escorpio, su estrella principal Antares y la relación visual opuesta respecto a Orión.
 

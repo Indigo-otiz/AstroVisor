@@ -15,6 +15,8 @@ import { registrarCielo } from './js/cielo.js';
 import { vistasOjos } from './js/estereo.js';
 import { leerParametros, iniciarDiagnostico } from './js/diagnostico.js';
 import { calcularLayout, dibujarFicha, zonaAMundo, presentarAudio, PLANO_ALTO } from './js/ficha-canvas.js';
+import { crearEstanteria3D, extraerLibros, calcularDetalleLibro } from './js/estanteria-3d.js';
+import { rutaLibro2D } from './js/ruta-libro-2d.js';
 
 (function () {
   'use strict';
@@ -51,6 +53,7 @@ import { calcularLayout, dibujarFicha, zonaAMundo, presentarAudio, PLANO_ALTO } 
   const pauseBtn3D = $('pauseBtn3D');
   const exitBtn3D = $('exitBtn3D');
   const infoPanel3D = $('infoPanel3D');
+  const estanteriaEl = $('estanteria3D');
   const cardPlane = $('cardPlane');
   const cardCanvas = $('cardCanvas');
 
@@ -68,6 +71,9 @@ import { calcularLayout, dibujarFicha, zonaAMundo, presentarAudio, PLANO_ALTO } 
   let narracion = null; // último estado REAL del reproductor (narraciones.js); null = sin reproductor/audio
   let sincronizando = false; // true mientras narraciones.js nos abre/cierra la ficha (no se le devuelve el evento)
   let layoutActual = null;
+  let vistaLectura = 'ficha'; // ficha | estanteria | detalle; modo de visor continúa en 'ficha'
+  let libroSeleccionado = null;
+  let estanteria = null;
   let userReady = false; // evita autodisparos mientras la persona acomoda el visor
 
   // Geometría de la escena (m): la ficha termina en y=0.9 y los controles quedan debajo, sin tocarla
@@ -106,17 +112,29 @@ import { calcularLayout, dibujarFicha, zonaAMundo, presentarAudio, PLANO_ALTO } 
 
   function nombreDe(t) {
     if (t.accion === 'constelacion') return fichas.get(t.id)?.titulo || t.id;
-    return { volver: '← Volver al recorrido', audio: 'Escuchar narración', pausa: estado.pausado ? 'Reanudar mirada' : 'Pausar mirada', salir: 'Salir a 2D' }[t.accion] || t.accion;
+    return { volver: '← Volver al recorrido', audio: 'Escuchar narración', libros: 'Ver libros recomendados', libro: 'Abrir libro', 'volver-ficha': 'Volver a la constelación', 'volver-libros': 'Volver a los libros', 'consultar-libro': 'Consultar libro en 2D', pausa: estado.pausado ? 'Reanudar mirada' : 'Pausar mirada', salir: 'Salir a 2D' }[t.accion] || t.accion;
   }
 
   function mensajeEnReposo() {
     if (estado.pausado) return 'Mirada en PAUSA. Enfoca "Reanudar mirada" para continuar, o "Salir a 2D" para salir.';
+    if (estado.modo === 'ficha' && vistaLectura === 'estanteria') return 'Biblioteca de las estrellas: mira una portada 3 segundos o vuelve a la constelación.';
+    if (estado.modo === 'ficha' && vistaLectura === 'detalle') return 'Libro seleccionado: consulta en 2D o vuelve a los libros con la mirada.';
     if (estado.modo === 'ficha') return `Ficha de ${fichas.get(estado.fichaId)?.titulo ?? ''} abierta. Enfoca "← Volver al recorrido" durante 3 s o tócalo.`;
     return 'Mirada activa: enfoca una constelación o un botón durante 3 s para seleccionarlo.';
   }
 
+  /** La selección de libros comparte la mirada existente, pero solo enfoca la vista activa. */
+  function objetivoEnVista(t) {
+    if (t.accion === 'pausa' || t.accion === 'salir') return true;
+    if (t.accion === 'constelacion') return estado.modo === 'recorrido';
+    if (['audio', 'volver', 'libros'].includes(t.accion)) return vistaLectura === 'ficha';
+    if (['libro', 'volver-ficha'].includes(t.accion)) return vistaLectura === 'estanteria';
+    if (['consultar-libro', 'volver-libros'].includes(t.accion)) return vistaLectura === 'detalle';
+    return false;
+  }
+
   const dwell = crearDwell({
-    puedeEnfocar: (t) => userReady && estado.permitido(t.accion, 'mirada'),
+    puedeEnfocar: (t) => userReady && estado.permitido(t.accion, 'mirada') && objetivoEnVista(t),
     onInicio: (t) => {
       eventLine(`Mirada fija sobre [${nombreDe(t)}] — iniciando carga de 3 s`);
       if (t.accion === 'constelacion') constelaciones.get(t.id)?.resaltar(true);
@@ -144,11 +162,16 @@ import { calcularLayout, dibujarFicha, zonaAMundo, presentarAudio, PLANO_ALTO } 
 
   // --- Acciones (las mismas para mirada y para clic/toque) ---
   function ejecutar(t, via) {
-    if (!estado.permitido(t.accion, via)) return;
+    if (!estado.permitido(t.accion, via) || !objetivoEnVista(t)) return;
     if (t.accion === 'constelacion') abrirFicha(t.id);
     else if (t.accion === 'volver') cerrarFicha();
     else if (t.accion === 'audio') pedirAudio();
     else if (t.accion === 'pausa') alternarPausa();
+    else if (t.accion === 'libros') abrirEstanteria();
+    else if (t.accion === 'libro') abrirDetalleLibro(t.id);
+    else if (t.accion === 'volver-ficha') volverAFicha();
+    else if (t.accion === 'volver-libros') volverAEstanteria();
+    else if (t.accion === 'consultar-libro') consultarLibro2D();
     else if (t.accion === 'salir') salir();
   }
 
@@ -181,14 +204,25 @@ import { calcularLayout, dibujarFicha, zonaAMundo, presentarAudio, PLANO_ALTO } 
     if (mesh && mesh.material && mesh.material.map) mesh.material.map.needsUpdate = true;
   }
 
-  /** Dibuja la ficha y coloca las zonas de mirada desde el MISMO layout. */
-  function pintarFicha(ficha) {
-    const ctx = cardCanvas.getContext('2d');
-    layoutActual = calcularLayout(ctx, ficha, (({ aviso, etiqueta }) => ({ aviso, etiquetaAudio: etiqueta }))(presentarAudio(narracion)));
-    if (layoutActual.desborda) eventLine(`Aviso: el contenido de ${ficha.id} no cabe completo en la ficha.`);
-    dibujarFicha(ctx, layoutActual);
+  /** Reutiliza un único canvas para ficha de constelación y detalle de libro. */
+  function pintarLayout(layout) {
+    layoutActual = layout;
+    dibujarFicha(cardCanvas.getContext('2d'), layout);
     actualizarTextura();
-    for (const [nombre, rect] of Object.entries(layoutActual.zonas)) colocarZona(nombre, rect);
+    infoPanel3D.querySelectorAll('[id^="zona-"][data-action]').forEach((zona) => {
+      zona.classList.remove('selectable');
+      zona.setAttribute('visible', 'false');
+    });
+    for (const [nombre, rect] of Object.entries(layout.zonas)) colocarZona(nombre, rect);
+  }
+
+  function pintarFicha(ficha) {
+    if (vistaLectura !== 'ficha' || !ficha) return;
+    const ctx = cardCanvas.getContext('2d');
+    const audio = presentarAudio(narracion);
+    const layout = calcularLayout(ctx, ficha, { aviso: audio.aviso, etiquetaAudio: audio.etiqueta });
+    if (layout.desborda) eventLine('Aviso: el contenido de ' + ficha.id + ' no cabe completo en la ficha.');
+    pintarLayout(layout);
   }
 
   function colocarZona(nombre, rect) {
@@ -209,6 +243,8 @@ import { calcularLayout, dibujarFicha, zonaAMundo, presentarAudio, PLANO_ALTO } 
       ligar(zona);
       zona.classList.toggle('selectable', estado.modo === 'ficha');
     }
+    zona.setAttribute('visible', 'true');
+    zona.classList.add('selectable');
     zona.setAttribute('position', `${m.x} ${m.y} 0.05`);
     zona.setAttribute('width', m.ancho);
     zona.setAttribute('height', m.alto);
@@ -229,6 +265,9 @@ import { calcularLayout, dibujarFicha, zonaAMundo, presentarAudio, PLANO_ALTO } 
   function abrirFicha(id) {
     const ficha = fichas.get(id);
     if (!ficha || !estado.abrirFicha(id)) return;
+    vistaLectura = 'ficha';
+    libroSeleccionado = null;
+    activarGrupo(estanteriaEl, false);
     dwell.cancelar();
     constelaciones.forEach((c) => c.resaltar(false));
     if (!sincronizando) narracion = null; // hasta que el reproductor confirme el audio de ESTA ficha (si nos abre él, su estado ya llegó)
@@ -252,6 +291,9 @@ import { calcularLayout, dibujarFicha, zonaAMundo, presentarAudio, PLANO_ALTO } 
     if (!estado.volver()) return;
     dwell.cancelar();
     if (!sincronizando) narracion = null;
+    vistaLectura = 'ficha';
+    libroSeleccionado = null;
+    activarGrupo(estanteriaEl, false);
     activarGrupo(infoPanel3D, false);
     activarGrupo(constelacionesEl, true);
     visorControls3D.setAttribute('position', POS_CONTROLES.recorrido);
@@ -260,6 +302,80 @@ import { calcularLayout, dibujarFicha, zonaAMundo, presentarAudio, PLANO_ALTO } 
     selectionStatus.textContent = mensajeEnReposo();
     eventLine('Regreso al recorrido de constelaciones.');
     if (!sincronizando) window.dispatchEvent(new Event('astrovisor:ficha-cerrada'));
+  }
+
+  /** El panel y la estantería siempre se colocan delante de la dirección actual de la mirada. */
+  function colocarVistaFrente(grupo) {
+    const frente = frenteAlFrente(3.0);
+    const y = grupo === estanteriaEl ? 1.9 : FICHA_BASE_Y + PLANO_ALTO / 2;
+    grupo.setAttribute('position', frente.x + ' ' + y + ' ' + frente.z);
+    grupo.setAttribute('rotation', '0 ' + frente.rotY + ' 0');
+    visorControls3D.setAttribute('position', frente.x + ' ' + POS_CONTROLES_Y + ' ' + frente.z);
+    visorControls3D.setAttribute('rotation', '0 ' + frente.rotY + ' 0');
+  }
+
+  function abrirEstanteria() {
+    if (vistaLectura !== 'ficha' || estado.modo !== 'ficha' || !estanteria?.libros.length) return;
+    dwell.cancelar();
+    vistaLectura = 'estanteria';
+    colocarVistaFrente(estanteriaEl);
+    estanteria.mostrar(estado.fichaId);
+    activarGrupo(infoPanel3D, false);
+    activarGrupo(estanteriaEl, true);
+    refrescarRaycaster();
+    selectionStatus.textContent = mensajeEnReposo();
+    eventLine('Estantería 3D de demostración abierta.');
+  }
+
+  function abrirDetalleLibro(id) {
+    if (vistaLectura !== 'estanteria') return;
+    const libro = estanteria?.libros.find((l) => l.id === id);
+    if (!libro) return;
+    dwell.cancelar();
+    libroSeleccionado = libro;
+    vistaLectura = 'detalle';
+    colocarVistaFrente(infoPanel3D);
+    pintarLayout(calcularDetalleLibro(cardCanvas.getContext('2d'), libro));
+    activarGrupo(estanteriaEl, false);
+    activarGrupo(infoPanel3D, true);
+    refrescarRaycaster();
+    selectionStatus.textContent = mensajeEnReposo();
+    eventLine('Libro seleccionado: ' + libro.titulo);
+  }
+
+  function volverAEstanteria() {
+    if (vistaLectura !== 'detalle') return;
+    dwell.cancelar();
+    libroSeleccionado = null;
+    vistaLectura = 'estanteria';
+    colocarVistaFrente(estanteriaEl);
+    activarGrupo(infoPanel3D, false);
+    activarGrupo(estanteriaEl, true);
+    refrescarRaycaster();
+    selectionStatus.textContent = mensajeEnReposo();
+  }
+
+  function volverAFicha() {
+    if (vistaLectura !== 'estanteria') return;
+    dwell.cancelar();
+    vistaLectura = 'ficha';
+    colocarVistaFrente(infoPanel3D);
+    pintarFicha(fichas.get(estado.fichaId));
+    activarGrupo(estanteriaEl, false);
+    activarGrupo(infoPanel3D, true);
+    refrescarRaycaster();
+    selectionStatus.textContent = mensajeEnReposo();
+  }
+
+  function consultarLibro2D() {
+    if (vistaLectura !== 'detalle' || !libroSeleccionado) return;
+    const url = rutaLibro2D(libroSeleccionado);
+    dwell.cancelar();
+    cerrarFicha(); // el evento ficha-cerrada detiene la narración de Luis
+    if (stereoActive) void exitStereo();
+    else window.dispatchEvent(new Event('astrovisor:salida-visor'));
+    eventLine('Consultar libro fuera del visor: ' + url);
+    window.location.href = url;
   }
 
   // Audio: el reproductor es el de Luis (narraciones.js). Aquí solo se SOLICITA la acción (Escuchar/Pausar/Reanudar
@@ -280,13 +396,13 @@ import { calcularLayout, dibujarFicha, zonaAMundo, presentarAudio, PLANO_ALTO } 
   window.astrovisorVisor = {
     constelaciones() {}, // el recorrido ya se construye con cargarDatos(); se acepta la llamada por compatibilidad
     abrir: (historia) => sincronizar(() => {
-      if (estado.modo === 'ficha' && estado.fichaId !== historia?.id) cerrarFicha();
+      if (estado.modo === 'ficha' && (estado.fichaId !== historia?.id || vistaLectura !== 'ficha')) cerrarFicha();
       abrirFicha(historia?.id);
     }),
     cerrar: () => sincronizar(() => { if (estado.modo === 'ficha') cerrarFicha(); }),
     estadoNarracion(nuevo) {
       narracion = nuevo;
-      if (estado.modo === 'ficha') pintarFicha(fichas.get(estado.fichaId));
+      if (estado.modo === 'ficha' && vistaLectura === 'ficha') pintarFicha(fichas.get(estado.fichaId));
     },
   };
 
@@ -332,7 +448,7 @@ import { calcularLayout, dibujarFicha, zonaAMundo, presentarAudio, PLANO_ALTO } 
     el.addEventListener('click', () => {
       userReady = true;
       const t = objetivoDe(el);
-      if (!t || !estado.permitido(t.accion, 'clic')) return;
+      if (!t || !estado.permitido(t.accion, 'clic') || !objetivoEnVista(t)) return;
       dwell.cancelar();
       playConfirmationSound();
       ejecutar(t, 'clic');
@@ -397,6 +513,8 @@ import { calcularLayout, dibujarFicha, zonaAMundo, presentarAudio, PLANO_ALTO } 
       constelacionesEl.appendChild(c.el);
       c.el.querySelectorAll('[data-action]').forEach(ligar);
     });
+    estanteria = crearEstanteria3D(document, estanteriaEl, extraerLibros(lista), ligar);
+    activarGrupo(estanteriaEl, false);
     activarGrupo(constelacionesEl, true);
     activarGrupo(visorControls3D, true);
     refrescarRaycaster();

@@ -23,6 +23,7 @@ test('acciones permitidas según el modo', () => {
   assert.equal(e.permitido('constelacion'), false)
   assert.equal(e.permitido('volver'), true)
   assert.equal(e.permitido('audio'), true)
+  for (const accion of ['libros', 'libro', 'volver-ficha', 'volver-libros', 'consultar-libro']) assert.equal(e.permitido(accion), true, accion)
   assert.equal(e.permitido('pausa'), true)
   assert.equal(e.permitido('salir'), true)
 })
