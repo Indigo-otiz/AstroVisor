@@ -12,8 +12,8 @@ const libroList = ref([])
 const loadingLibros = ref(false)
 const librosError = ref('')
 
-function handleLogout() {
-  signOut()
+async function handleLogout() {
+  await signOut()
   router.push('/admin/acceso')
 }
 

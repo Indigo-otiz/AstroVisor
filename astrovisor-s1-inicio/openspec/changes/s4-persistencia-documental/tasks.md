@@ -1,6 +1,6 @@
 # Plan de implementación — S4
 
-Etapa 1 autorizada: solo infraestructura y lectura, base `f1058c9b10641c470d7d3e331a81f327af78fc8c`. Las tareas no marcadas siguen pendientes. El usuario eligió identidad local con hashes/sesiones Express para después y pospuso alojamiento independiente. No implementar escritura administrativa, avanzar automáticamente ni archivar OpenSpec.
+Etapa 1 publicada: `735fd4b1413e5cd98387e297716f3d4c76cac52d`. Usuario revisó Etapa 2A y autorizó auditoría final, commit y push si no aparecen bloqueantes. Las tareas no marcadas siguen pendientes; no implementar CRUD documental ni avanzar o archivar automáticamente.
 
 **Goal:** permitir edición documental autorizada y persistente con lectura pública coherente.
 
@@ -18,10 +18,10 @@ Etapa 1 autorizada: solo infraestructura y lectura, base `f1058c9b10641c470d7d3e
 - Revisión de auth explícita con responsable; jamás usar fixture de pruebas como identidad de producción.
 - Fixtures y archivos temporales aislados: las pruebas no deben escribir el catálogo real ni consultar Supabase con credenciales reales.
 - No hacer commits de integración, merge, publicación ni archivo OpenSpec sin autorización del usuario.
-- Identidad local seleccionada por el usuario; no implementarla ni modificar auth durante Etapa 1.
+- Identidad local seleccionada y autorizada en Etapa 2A; no ampliar a escritura documental ni otras etapas.
 - Semilla versionada separada del runtime: datos administrados, backups, secretos, lock y temporales externos a Git y raíces públicas; no copiar semilla durante arranque normal.
 
-El plan completo permanece registrado; esta entrega autoriza solo Etapa 1 y las casillas de lectura/inicialización indicadas en sección 2. Alojamiento independiente se traslada a 8.6 por decisión posterior del usuario. No se posponen controles de validación, integridad o regresión aplicables a esta etapa. Una prueba no ejecutada continúa pendiente.
+El plan completo permanece registrado; esta entrega cierra la autenticación de Etapa 2A, además de la lectura/inicialización de Etapa 1. Alojamiento independiente se traslada a 8.6 por decisión posterior del usuario. No se posponen controles de validación, integridad o regresión aplicables a esta etapa. Una prueba no ejecutada continúa pendiente.
 
 ## Foco de revisión
 
@@ -43,10 +43,12 @@ El plan completo permanece registrado; esta entrega autoriza solo Etapa 1 y las 
 
 Archivos: `backend/src/index.js`, `backend/src/middleware/auth.js`, `backend/test/auth.test.js`; `frontend/src/composables/useAuth.js`, `frontend/src/router/index.js`, `frontend/src/views/AdminAccesoView.vue` solo si la transición lo requiere. Interfaz consumida después: sesión Express validada en cada endpoint, identidad administrativa autorizada en servidor.
 
-- [ ] 1.1 Después de 0.5, revisar con responsable el proveedor REST actual y planificar transición a la alternativa seleccionada. Para A: permisos de archivo, scrypt/sal/parámetros calibrados, comparación de hash y rotación/revocación manual. Para B: verificación en servidor y IDs administrativos autorizados, configuración desplegada y migración de cuentas aprobada. No inventar cuentas ni descargar credenciales actuales.
-- [ ] 1.2 Añadir pruebas de token ausente/inválido/expirado, logout, identidad sin permiso, estado local falso, fallo del proveedor y fixture excluido de producción. Ejecutar `npm test`; comprobar fallo esperado de los nuevos casos antes de implementar.
-- [ ] 1.3 Implementar únicamente la alternativa aprobada y comprobación de sesión del panel. Añadir límites de intentos/concurrencia, protección de secretos y revocación efectiva; para A probar que no hay contraseña en claro ni hashes en exports/backups de contenido. No otorgar permisos desde estado local o metadatos editables; documentar HTTPS y transporte/almacenamiento de sesión.
-- [ ] 1.4 Ejecutar pruebas; comprobar que todos los endpoints de escritura quedan detrás de la misma autorización efectiva y que errores del proveedor deniegan acceso. Revisión del responsable de login antes de continuar.
+- [x] 1.1 Inspección del flujo REST y sustitución aprobada por identidad local, sin migrar/descargar cuentas reales; procedimiento de alta/rotación privado documentado. ACL y costo en servidor destino pendientes.
+- [x] 1.2 Pruebas de credenciales/configuración, sin token, token inválido/expirado por HTTP, logout/revocación, estado Vue adulterado y ausencia de fixture automático. Observados fallos previos a implementación y posteriores resultados correctos.
+- [x] 1.3 Scrypt, comparación segura, límites, cuenta explícita y verificación en servidor implementados; adaptado formulario/guard, sin Supabase obligatorio para identidad. Generador sin eco, argumentos o salida de secretos; sin cuentas reales creadas.
+- [x] 1.4a Auditoría final local y regresiones: backend 48/48, web 98/98 por separado, build y OpenSpec estrictos correctos. Integración HTTP aislada: configuración corrupta/inválida, revocación y cabeceras proxy falsificadas. Mirada: diez ejecuciones aisladas correctas; bloqueo controlado reproduce salto de etapa sin modificar módulo ajeno. Evidencia y fallo paralelo previo conservados en el informe.
+- [x] 1.4b Revisión del informe por el usuario y publicación de Etapa 2A autorizadas, condicionadas a auditoría sin bloqueantes; auditoría local sin bloqueantes identificados. No equivale a revisión operativa del despliegue ni autoriza escritura documental.
+- [ ] 1.4c Validación operativa de HTTPS, permisos/ACL, TTY real y costo/límites en servidor destino antes de uso real. No hay endpoints de escritura nuevos.
 
 ## 2. Catálogo único y migración
 

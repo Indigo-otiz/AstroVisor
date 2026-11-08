@@ -1,112 +1,72 @@
 import { ref, computed } from 'vue'
 
 const STORAGE_KEY = 'astrovisor_admin_session'
-
-// Estado reactivo global
 const user = ref(null)
 const token = ref(null)
-const loading = ref(true)
+const loading = ref(false)
 
-// Restaurar sesión guardada en localStorage al arrancar
-function initAuth() {
-  try {
-    const saved = localStorage.getItem(STORAGE_KEY)
-    if (saved) {
-      const parsed = JSON.parse(saved)
-      user.value = parsed.user || parsed
-      token.value = parsed.token || null
-    }
-  } catch (err) {
-    console.error('[AstroVisor Auth] Error al leer sesión guardada:', err)
-    localStorage.removeItem(STORAGE_KEY)
-  } finally {
-    loading.value = false
-  }
+try {
+  localStorage.removeItem(STORAGE_KEY)
+  const saved = JSON.parse(sessionStorage.getItem(STORAGE_KEY) || 'null')
+  if (typeof saved?.token === 'string' && saved.token.length <= 128) token.value = saved.token
+} catch { /* Sin almacenamiento disponible, la sesión solo dura en memoria. */ }
+
+function limpiar() {
+  user.value = null
+  token.value = null
+  try { sessionStorage.removeItem(STORAGE_KEY) } catch {}
 }
-
-initAuth()
+function guardar() {
+  try { sessionStorage.setItem(STORAGE_KEY, JSON.stringify({ token: token.value })) } catch {}
+}
+const usuarioValido = (u) => u && typeof u.id === 'string' && typeof u.usuario === 'string' && typeof u.nombre === 'string'
 
 export function useAuth() {
-  const isAuthenticated = computed(() => Boolean(user.value))
+  const isAuthenticated = computed(() => Boolean(user.value && token.value))
   const userDisplayName = computed(() => user.value?.nombre || user.value?.usuario || 'Administrador')
   const username = computed(() => user.value?.usuario || '')
-  const isSupabaseConfigured = ref(true)
 
-  /**
-   * Inicia sesión autenticando y verificando credenciales en el servidor Express
-   */
-  async function signIn(userIdentifier, password) {
+  async function verificarSesion() {
+    if (!token.value) { limpiar(); return false }
+    const actual = token.value
     loading.value = true
     try {
-      const cleanUser = userIdentifier.trim()
-      const cleanPass = password.trim()
-
-      const respuesta = await fetch('/api/admin/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          usuario: cleanUser,
-          contrasena: cleanPass,
-        }),
-      })
-
+      const respuesta = await fetch('/api/admin/sesion', { headers: { Authorization: `Bearer ${actual}` }, credentials: 'same-origin' })
       const data = await respuesta.json()
+      if (token.value !== actual) return false
+      if (!respuesta.ok || !data.ok || !usuarioValido(data.admin)) { limpiar(); return false }
+      user.value = data.admin
+      return true
+    } catch { if (token.value === actual) limpiar(); return false }
+    finally { loading.value = false }
+  }
 
-      if (!respuesta.ok || !data.ok) {
-        throw new Error(data.error || 'Usuario o contraseña incorrectos.')
-      }
-
-      // Guardar token y usuario devueltos por Express
-      user.value = data.usuario
+  async function signIn(usuario, password) {
+    limpiar()
+    loading.value = true
+    try {
+      const respuesta = await fetch('/api/admin/login', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' }, credentials: 'same-origin',
+        body: JSON.stringify({ usuario: usuario.trim(), contrasena: password }),
+      })
+      const data = await respuesta.json()
+      if (!respuesta.ok || !data.ok) throw new Error(data.error || 'Usuario o contraseña incorrectos.')
+      if (typeof data.token !== 'string' || !/^[a-f0-9]{64}$/.test(data.token) || !usuarioValido(data.usuario)) throw new Error('Respuesta de acceso inválida')
       token.value = data.token
-
-      localStorage.setItem(
-        STORAGE_KEY,
-        JSON.stringify({
-          user: data.usuario,
-          token: data.token,
-        })
-      )
-
+      user.value = data.usuario
+      guardar()
       return data
-    } finally {
-      loading.value = false
-    }
+    } finally { loading.value = false }
   }
 
-  /**
-   * Cierra sesión notificando al servidor Express e invalidando el token
-   */
   async function signOut() {
-    if (token.value) {
-      try {
-        await fetch('/api/admin/logout', {
-          method: 'POST',
-          headers: {
-            Authorization: `Bearer ${token.value}`,
-          },
-        })
-      } catch (err) {
-        console.warn('[AstroVisor Auth] Falló notificación de logout al servidor:', err)
-      }
-    }
-
-    user.value = null
-    token.value = null
-    localStorage.removeItem(STORAGE_KEY)
+    const anterior = token.value
+    limpiar()
+    if (!anterior) return
+    try {
+      await fetch('/api/admin/logout', { method: 'POST', headers: { Authorization: `Bearer ${anterior}` }, credentials: 'same-origin' })
+    } catch { /* La sesión cliente ya fue retirada; servidor conserva su expiración. */ }
   }
 
-  return {
-    user,
-    token,
-    loading,
-    isAuthenticated,
-    userDisplayName,
-    username,
-    isSupabaseConfigured,
-    signIn,
-    signOut,
-  }
+  return { user, token, loading, isAuthenticated, userDisplayName, username, signIn, signOut, verificarSesion }
 }

@@ -1,6 +1,19 @@
 # Design — S4
 
-Estado vigente: solo Etapa 1 autorizada, infraestructura y lectura, base `f1058c9b10641c470d7d3e331a81f327af78fc8c`. Identidad local con hashes/sesiones Express elegida para después; sin cambios de auth ahora. Escritura, portadas dinámicas y publicación de exports no se implementan en esta etapa. El usuario pospuso alojamiento independiente.
+Estado vigente: Etapa 1 publicada como `735fd4b1413e5cd98387e297716f3d4c76cac52d`. Etapa 2A revisada por el usuario, con auditoría final y publicación autorizadas si no aparecen bloqueantes; evidencia en el informe de etapa. Base main original `f1058c9b10641c470d7d3e331a81f327af78fc8c`. Escritura documental, portadas dinámicas, migración de lectores y publicación de exports quedan pendientes.
+
+## Decisiones de Etapa 2A
+
+- Una cuenta administrativa explícita en `ASTROVISOR_ADMIN_FILE`, archivo JSON privado externo al checkout. Sin archivo válido se deniega autenticación con 503, sin defaults ni cuentas activadas por NODE_ENV, npm o argumentos de pruebas.
+- Scrypt nativo asíncrono: N=131072, r=8, p=1, sal aleatoria de 16 bytes, derivado de 64 bytes; parámetros fijos validados y comparación con `timingSafeEqual`. SHA-256 solo resume identificador de usuario/configuración; no sustituye el hash de contraseña. Máximo dos verificaciones costosas simultáneas.
+- Generación exclusivamente local con `npm run configurar:admin`: contraseña oculta en TTY, confirmación, sin argumentos/env de contraseña ni salida de hashes. Publicación exclusiva de archivo completo sin sobrescribir. Archivo solo con identidad, sal, parámetros y hash, permisos 0600 solicitados; ACL Windows bajo control operativo.
+- Sesiones Express en memoria: token aleatorio de 32 bytes, ocho horas, máximo 256; logout/expiración invalidan token. Cada ruta protegida revalida la huella de configuración: rotación o retirada revoca sesiones; reinicio pierde sesiones. No hay CRUD nuevo; rutas administrativas desconocidas ahora responden 404 después de autorización.
+- Login: cinco intentos por IP/15 min antes de derivar, 429 con Retry-After, mapa limitado a 1000 IP. Express mantiene trust proxy desactivado; no confiar en X-Forwarded-For. El límite y las sesiones son de una instancia, no distribuidos.
+- No consultas REST Supabase, contraseñas en URL ni cuenta demo de producción. Rutas admin rechazan query strings y envían Cache-Control no-store. Login/sesión/logout no generan logs de petición; rutas desconocidas pueden registrar estado y marcador de ruta, sin URL cruda, cuerpo o mensaje de error con datos. Configuración ausente, inválida o falla de almacenamiento se deniega con respuesta genérica.
+- Vue conserva formulario y contrato JSON/bearer. No recortar contraseña; token solo en memoria/sessionStorage de pestaña, retirar dato legado de localStorage. No confiar en usuario almacenado: guard async consulta Express. Logout limpia cliente aun si red falla; respuesta tardía de sesión no reabre acceso. Lectura opcional `fichas_libros` del panel queda intacta por estar fuera del alcance.
+- Sin configuración real de cuenta ni cambios de ACL/despliegue en esta entrega. Revisión del informe por el usuario recibida; HTTPS, ACL del archivo, calibración de costo en servidor destino y navegador/TTY físicos siguen pendientes operativos. Riesgo residual: sessionStorage es accesible a JS; esta etapa no migra a cookies HttpOnly ni añade protección global frente a XSS.
+
+Procedimiento, pruebas y límites: [PRUEBA-S4-ETAPA2A.md](../../../docs/PRUEBA-S4-ETAPA2A.md). Las secciones históricas siguientes no autorizan otras etapas.
 
 ## Decisiones de Etapa 1 y registro de ejecución
 

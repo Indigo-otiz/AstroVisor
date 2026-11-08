@@ -1,85 +1,69 @@
 import crypto from 'node:crypto'
+import { leerCredenciales } from '../services/adminCredentials.js'
 
-// Almacén de sesiones activas en el servidor Express
 const sesionesActivas = new Map()
-
-// Duración de la sesión: 8 horas
 const DURACION_SESION_MS = 8 * 60 * 60 * 1000
 
-/**
- * Crea una sesión para un administrador autenticado y devuelve un token criptográfico
- */
-export function crearSesion(adminData) {
+export function crearSesion(admin) {
+  for (const [id, s] of sesionesActivas) if (Date.now() >= s.expiracion) sesionesActivas.delete(id)
+  if (sesionesActivas.size >= 256) throw new Error('Capacidad de sesiones alcanzada')
   const token = crypto.randomBytes(32).toString('hex')
-  const expiracion = Date.now() + DURACION_SESION_MS
-
   sesionesActivas.set(token, {
-    admin: {
-      id: adminData.id,
-      nombre: adminData.nombre,
-      usuario: adminData.usuario,
-    },
-    expiracion,
+    admin: { id: admin.id, nombre: admin.nombre, usuario: admin.usuario },
+    huella: admin.huella,
+    expiracion: Date.now() + DURACION_SESION_MS,
   })
-
   return token
 }
 
-/**
- * Obtiene la sesión activa correspondiente al token
- */
 export function obtenerSesion(token) {
-  if (!token) return null
   const sesion = sesionesActivas.get(token)
   if (!sesion) return null
-
-  // Verificar si expiró
-  if (Date.now() > sesion.expiracion) {
+  if (Date.now() >= sesion.expiracion) {
     sesionesActivas.delete(token)
     return null
   }
-
   return sesion
 }
 
-/**
- * Invalida una sesión en el servidor
- */
-export function destruirSesion(token) {
-  if (token) {
-    sesionesActivas.delete(token)
+export function destruirSesion(token) { sesionesActivas.delete(token) }
+
+export async function verificarAdmin(req, res, next) {
+  const header = req.headers.authorization || ''
+  const token = header.startsWith('Bearer ') ? header.slice(7).trim() : null
+  const sesion = token && obtenerSesion(token)
+  if (!sesion) return res.status(401).json({ error: 'Acceso no autorizado: token ausente, inválido o expirado' })
+  try {
+    const actual = await leerCredenciales()
+    if (sesion.huella !== actual.huella) {
+      destruirSesion(token)
+      return res.status(401).json({ error: 'Sesión administrativa revocada' })
+    }
+    req.admin = sesion.admin
+    next()
+  } catch {
+    destruirSesion(token)
+    res.status(503).json({ error: 'Autenticación administrativa no disponible' })
   }
 }
 
-/**
- * Middleware para proteger rutas administrativas en Express.
- * Deniega con HTTP 401 cualquier solicitud sin token válido.
- */
-export function verificarAdmin(req, res, next) {
-  const authHeader = req.headers.authorization || ''
-  const token = authHeader.startsWith('Bearer ') ? authHeader.slice(7).trim() : null
-
-  if (!token) {
-    return res.status(401).json({
-      error: 'Acceso no autorizado: token de sesión ausente',
-    })
+export function crearLimitadorLogin({ ahora = Date.now } = {}) {
+  const intentos = new Map()
+  const ventana = 15 * 60 * 1000
+  return (req, res, next) => {
+    const tiempo = ahora()
+    for (const [ip, valor] of intentos) if (valor.hasta <= tiempo) intentos.delete(ip)
+    let valor = intentos.get(req.ip)
+    if (!valor) {
+      if (intentos.size >= 1000) return res.status(503).json({ error: 'Autenticación temporalmente ocupada' })
+      valor = { cantidad: 0, hasta: tiempo + ventana }
+      intentos.set(req.ip, valor)
+    }
+    if (valor.cantidad >= 5) {
+      res.set('Retry-After', String(Math.ceil((valor.hasta - tiempo) / 1000)))
+      return res.status(429).json({ error: 'Demasiados intentos. Inténtalo más tarde.' })
+    }
+    valor.cantidad++
+    next()
   }
-
-  const sesion = obtenerSesion(token)
-  if (!sesion) {
-    return res.status(401).json({
-      error: 'Acceso no autorizado: token de sesión inválido o expirado',
-    })
-  }
-
-  req.admin = sesion.admin
-  next()
 }
-
-/**
- * Limpieza de sesiones para pruebas
- */
-export function _resetSesionesParaTest() {
-  sesionesActivas.clear()
-}
-

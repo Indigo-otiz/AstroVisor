@@ -1,6 +1,6 @@
 # Proposal — S4: persistencia documental
 
-Estado vigente: usuario autorizó únicamente Etapa 1 (infraestructura y lectura) sobre `indigo/s4-persistencia-documental`, base `f1058c9b10641c470d7d3e331a81f327af78fc8c`. Eligió identidad local sin base de datos con hashes y sesiones Express para una etapa posterior; no se modifica autenticación ahora. PR #6 ya integrada. Alojamiento independiente y mejoras no esenciales quedan pospuestos. Escritura administrativa, merge y archivo OpenSpec siguen fuera de esta entrega.
+Estado vigente: Etapa 1 publicada como `735fd4b1413e5cd98387e297716f3d4c76cac52d` sobre la base `f1058c9b10641c470d7d3e331a81f327af78fc8c`. El usuario revisó Etapa 2A y autorizó su auditoría final y publicación si no aparecen bloqueantes; autenticación local sin base de datos validada según `docs/PRUEBA-S4-ETAPA2A.md`. CRUD documental, migración de estantería, portadas, exportaciones Homido, alojamiento independiente, merge y archivo OpenSpec continúan fuera de alcance.
 
 ## Why
 

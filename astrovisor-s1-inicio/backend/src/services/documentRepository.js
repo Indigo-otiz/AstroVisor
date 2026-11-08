@@ -1,35 +1,11 @@
 import { readFile, mkdir, open, link, unlink, realpath } from 'node:fs/promises'
 import { fileURLToPath } from 'node:url'
-import { isAbsolute, join, relative, dirname, basename, resolve, sep } from 'node:path'
+import { join } from 'node:path'
 import { randomUUID } from 'node:crypto'
 import { validarCatalogo, proyectarRecorridos, proyectarLibros } from './catalogo.js'
+import { rutaPrivada } from './privateStorage.js'
 
 const semillaPath = fileURLToPath(new URL('../../../content/catalogo-inicial.json', import.meta.url))
-const checkout = fileURLToPath(new URL('../../../../', import.meta.url))
-const dentro = (raiz, ruta) => {
-  const distancia = relative(raiz, ruta)
-  return distancia === '' || (!isAbsolute(distancia) && distancia !== '..' && !distancia.startsWith(`..${sep}`))
-}
-
-async function rutaPrivada(directorio) {
-  if (typeof directorio !== 'string' || !isAbsolute(directorio)) throw new Error('Configura ASTROVISOR_DATA_DIR con un directorio privado absoluto fuera del checkout')
-  const ruta = resolve(directorio)
-  if (dentro(checkout, ruta)) throw new Error('El catálogo de ejecución debe estar fuera del checkout')
-  let ancestro = ruta
-  const pendientes = []
-  while (true) {
-    try {
-      const real = resolve(await realpath(ancestro), ...pendientes)
-      if (dentro(await realpath(checkout), real)) throw new Error('El directorio privado apunta al checkout')
-      return ruta
-    } catch (error) {
-      if (error.code !== 'ENOENT') throw error
-      if (dirname(ancestro) === ancestro) throw error
-      pendientes.unshift(basename(ancestro))
-      ancestro = dirname(ancestro)
-    }
-  }
-}
 
 export async function leerSemilla() {
   return validarCatalogo(JSON.parse(await readFile(semillaPath, 'utf8')))

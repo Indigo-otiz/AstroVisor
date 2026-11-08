@@ -4,7 +4,7 @@
 
 Permitir la edición autorizada de contenidos educativos y bibliográficos persistentes, manteniendo relaciones, recursos, metadatos y compatibilidad entre la web y el visor Homido.
 
-Estado vigente: usuario autorizó Etapa 1, infraestructura/lectura. Identidad local con hashes/sesiones Express seleccionada para después, sin implementarla ahora. Solo semilla, inicialización, validación y proyecciones son parte de esta entrega. Los requisitos de escritura y portadas dinámicas permanecen pendientes; alojamiento independiente pospuesto, manteniendo respaldo estático existente.
+Estado vigente: Etapa 1 publicada. Etapa 2A de autenticación local revisada por el usuario, con auditoría final y publicación autorizadas si no aparecen bloqueantes. Requisitos de escritura documental, portadas dinámicas y migración de estantería permanecen pendientes; alojamiento independiente pospuesto y respaldo estático conservado.
 
 ## ADDED Requirements
 
@@ -20,8 +20,42 @@ El sistema SHALL verificar identidad y permiso administrativo en servidor para t
 - **THEN** el servidor sigue denegando escrituras sin identidad y permiso válidos.
 
 #### Scenario: Revisión de identidad pendiente
-- **WHEN** solo está autorizada Etapa 1 aunque el usuario ya eligió identidad local
-- **THEN** no se modifica autenticación ni se implementan endpoints administrativos de escritura.
+- **WHEN** están autorizadas Etapa 1 y autenticación 2A, pero no la escritura documental
+- **THEN** se conserva autorización efectiva y no se implementan endpoints POST/PATCH de contenido.
+
+### Requirement: Credenciales locales explícitas y comparación segura
+El sistema SHALL verificar hashes de contraseña con sal mediante algoritmo de derivación adecuado y comparación segura. SHALL rechazar configuración ausente o inválida y no SHALL activar cuentas demo por entorno o flags de prueba. Contraseñas, hashes y tokens no SHALL enviarse en URLs ni registrarse en logs.
+
+#### Scenario: Cuenta local y ausencia de configuración
+- **WHEN** se intenta login con credenciales correctas de una configuración privada válida, o falta esa configuración
+- **THEN** el primer caso emite token opaco y el segundo deniega sin crear cuentas ni consultar un proveedor externo.
+
+#### Scenario: Alta inicial sin exposición
+- **WHEN** el operador configura la cuenta desde una terminal interactiva
+- **THEN** la contraseña no se muestra, no viaja como argumento ni se guarda en claro; solo se crea un archivo privado exclusivo con hash/sal y metadatos de identidad.
+
+### Requirement: Sesiones limitadas y revocables en servidor
+El sistema SHALL verificar la sesión opaca y su vigencia antes de conceder acceso administrativo. SHALL invalidarla al expirar, cerrar sesión o cambiar/retirar configuración. SHALL limitar intentos reiterados y trabajo criptográfico concurrente sin confiar en datos del navegador.
+
+#### Scenario: Expiración logout o rotación
+- **WHEN** un cliente presenta un token expirado, cerrado o ligado a configuración anterior
+- **THEN** no accede a rutas protegidas, aunque el navegador conserve usuario o token.
+
+#### Scenario: Intentos reiterados
+- **WHEN** se supera el límite de login por IP durante la ventana indicada
+- **THEN** se rechaza con 429 y tiempo de reintento antes de derivar otra contraseña.
+
+#### Scenario: Cabeceras de proxy falsificadas
+- **WHEN** un cliente cambia X-Forwarded-For, X-Real-IP o Forwarded sin un proxy confiable configurado
+- **THEN** esos valores no cambian la IP usada por el límite de intentos; Express mantiene trust proxy desactivado.
+
+#### Scenario: Configuración corrupta durante una sesión
+- **WHEN** el archivo privado deja de ser JSON válido o declara un hash inválido
+- **THEN** se deniega el login y se invalida la sesión al comprobarla; restaurar el archivo no reactiva el token invalidado.
+
+#### Scenario: Respuesta de sesión tardía
+- **WHEN** una respuesta previa de sesión llega después de cerrar o cambiar sesión cliente
+- **THEN** el navegador descarta esa confirmación y no concede acceso basándose en ella.
 
 ### Requirement: Lectura canónica compatible durante la transición
 El sistema SHALL servir recorridos desde el catálogo privado validado, conservando la selección y forma del contrato anterior. SHALL ofrecer lectura de los tres libros y sus nueve recomendaciones sin duplicarlos en el documento canónico. La transición no SHALL alterar SVG, rutas, estilos ni el respaldo Homido existente.
