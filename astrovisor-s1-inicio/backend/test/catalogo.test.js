@@ -164,10 +164,11 @@ test('JSON malformado produce error de lectura, no reinicialización', async (t)
 })
 
 test('las tres portadas SVG mantienen sus hashes aprobados', async () => {
+  // Bytes LF de los blobs aprobados en main; .gitattributes fija el checkout sin normalizar el hash.
   const hashes = {
-    'star-lore': 'c4266615a052733476739e2b6ff22c43c904499f3b05a76b91e684eaf197b9a4',
-    'field-stars': 'fd1bd898d6bd05f322badc32ca38c8370762e47f5e2204ec3730007b5c823631',
-    'half-hours': 'ee49362effa9a303c4e63adb44c0ae60aee59f1eb3fab2c88602cefc2b98af75',
+    'star-lore': '46094f074bdcdf069d5decab843457c38d9978c0456c0e758c5941bc87cc5faa',
+    'field-stars': 'f241990eb92799a8be18102a724ef2ea4ff524374414e46532e5f6b7d4b0124c',
+    'half-hours': '905e02247d12184d268d75e5362b9dc6f201f3ab022030157241ee060437d276',
   }
   for (const [id, hash] of Object.entries(hashes)) {
     const bytes = await readFile(new URL(`../../frontend/public/libros-demo/${id}.svg`, import.meta.url))
