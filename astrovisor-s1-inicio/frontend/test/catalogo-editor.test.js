@@ -63,6 +63,28 @@ test('guardar usa If-Match exacto, espera confirmación y recarga revisión sin 
   assert.match(e.mensaje.value, /Homido.*pendiente/i)
 })
 
+for (const estado of [
+  { respaldoPublico: 'publicado', revisionPublicada: 2, texto: /Homido tiene publicada la revisión 2/ },
+  { respaldoPublico: 'pendiente', revisionPublicada: 1, texto: /pendiente.*Copia publicada: revisión 1/ },
+  { respaldoPublico: 'publicado', revisionPublicada: 1, texto: /pendiente.*Copia publicada: revisión 1/ },
+]) test(`confirmación distingue respaldo ${estado.respaldoPublico} revisión ${estado.revisionPublicada}`, async t => {
+  const actual = structuredClone(semilla)
+  let escrituras = 0
+  t.mock.method(globalThis, 'fetch', async (_url, options) => {
+    if (options.method === 'PATCH') {
+      escrituras++; actual.revision = 2
+      return new Response(JSON.stringify({ ok: true, revision: 2, respaldoPublico: estado.respaldoPublico, revisionPublicada: estado.revisionPublicada }), { headers: { ETag: '"catalogo-2"' } })
+    }
+    return respuesta(actual)
+  })
+  const e = editorNuevo(); await e.cargar(); e.seleccionarRecorrido('orion')
+  e.borrador.value.resumen = 'Resumen temporal'
+  assert.equal(await e.guardar(), true)
+  assert.equal(escrituras, 1)
+  assert.match(e.mensaje.value, /Guardado confirmado/)
+  assert.match(e.mensaje.value, estado.texto)
+})
+
 test('412 conserva formulario y ETag y exige recarga explícita antes de otro guardado', async (t) => {
   let escrituras = 0
   t.mock.method(globalThis, 'fetch', async (_url, options) => {

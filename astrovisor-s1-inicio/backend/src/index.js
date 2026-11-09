@@ -7,6 +7,7 @@ import { obtenerRecorridos, obtenerLibros, obtenerCatalogo, abrirEscritor } from
 import { editarCatalogo } from './services/catalogoEdicion.js'
 import { crearSesion, destruirSesion, verificarAdmin, crearLimitadorLogin } from './middleware/auth.js'
 import { verificarCredenciales } from './services/adminCredentials.js'
+import { estadoPublicacion } from './services/homidoExport.js'
 
 if (typeof process.loadEnvFile === 'function') {
   try { process.loadEnvFile() } catch {}
@@ -96,7 +97,7 @@ export function crearApp() {
   app.get('/api/admin/catalogo', verificarAdmin, async (_req, res) => {
     try {
       const catalogo = await obtenerCatalogo()
-      res.set('ETag', etag(catalogo.revision)).json({ ...catalogo, libros: catalogo.libros.map((l) => ({ ...l, portadaIlustrativa: rutaPortada(l, catalogo.revision) })) })
+      res.set('ETag', etag(catalogo.revision)).json({ ...catalogo, publicacionHomido: await estadoPublicacion(catalogo.revision), libros: catalogo.libros.map((l) => ({ ...l, portadaIlustrativa: rutaPortada(l, catalogo.revision) })) })
     } catch { errorDocumental({}, res) }
   })
   app.post('/api/admin/portadas/previsualizar', verificarAdmin, async (req, res) => {
@@ -122,7 +123,7 @@ export function crearApp() {
         cambiar: (catalogo) => editarCatalogo(catalogo, { tipo, id: req.params.id, datos: req.body }) })
       res.set('ETag', etag(resultado.catalogo.revision)).status(tipo === 'crearLibro' ? 201 : 200).json({
         ok: true, revision: resultado.catalogo.revision, durabilidadPendiente: resultado.durabilidadPendiente,
-        retencionPendiente: resultado.retencionPendiente, respaldoPublico: 'pendiente',
+        retencionPendiente: resultado.retencionPendiente, ...await estadoPublicacion(resultado.catalogo.revision),
       })
     } catch (error) { errorDocumental(error, res) }
   }

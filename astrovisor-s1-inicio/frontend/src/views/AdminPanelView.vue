@@ -354,7 +354,11 @@ onBeforeUnmount(cancelarPeticiones)
           <p v-if="mensaje" class="admin-note" role="status">{{ mensaje }}</p>
         </div>
         <p v-if="cargando" role="status">Consultando el catálogo…</p>
-        <p v-if="catalogo" class="admin-note">Revisión consultada: {{ catalogo.revision }}. El respaldo estático de Homido no se sincroniza desde este panel.</p>
+        <p v-if="catalogo" class="admin-note">Revisión consultada: {{ catalogo.revision }}.
+          <template v-if="catalogo.publicacionHomido?.respaldoPublico === 'publicado' && catalogo.publicacionHomido.revisionPublicada === catalogo.revision">Respaldo Homido publicado para esta revisión.</template>
+          <template v-else>Respaldo Homido pendiente de sincronización. <span v-if="catalogo.publicacionHomido?.revisionPublicada">Copia publicada: revisión {{ catalogo.publicacionHomido.revisionPublicada }}.</span></template>
+          La exportación se ejecuta por separado en el servidor, no desde este panel.
+        </p>
         <p v-if="borrador" class="admin-note">Termina o cancela esta edición antes de seleccionar otra ficha.</p>
         <p v-if="necesitaRecarga" class="admin-note" role="status">El guardado ya está confirmado. Actualiza el catálogo antes de iniciar otra edición; no repitas la escritura.</p>
         <div v-if="catalogo?.libros.length" class="books-grid">

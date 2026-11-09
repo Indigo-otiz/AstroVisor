@@ -3,6 +3,7 @@
 
 import { audioDe } from '../../audio/narration.js'
 import { idBibliograficoValido } from './ruta-libro-2d.js'
+import { cargarRespaldoPublicado, URL_EXPORTACION } from './respaldo-publicado.js'
 
 export const URL_API = '/api/contenidos/recorridos'
 export const URL_RESPALDO = new URL('../data/recorridos-demo.json', import.meta.url).href
@@ -52,17 +53,33 @@ async function leerJson(fetchFn, url, timeoutMs) {
 }
 
 /** Intenta la API; si falla o es inválida usa el respaldo local de demostración. */
-export async function cargarDatos({ fetchFn = globalThis.fetch, timeoutMs = 3000, urlApi = URL_API, urlRespaldo = URL_RESPALDO } = {}) {
+export async function cargarDatos({ fetchFn = globalThis.fetch, timeoutMs = 3000, urlApi = URL_API, urlRespaldo = URL_RESPALDO, urlExportacion = URL_EXPORTACION } = {}) {
   try {
     const datos = await leerJson(fetchFn, urlApi, timeoutMs)
     const revisiones = new Set(datos.map(r => r.revisionCatalogo))
     const revision = revisiones.size === 1 && Number.isSafeInteger(datos[0].revisionCatalogo) && datos[0].revisionCatalogo > 0 ? datos[0].revisionCatalogo : null
     return { datos, fuente: 'api', motivo: null, revision, aviso: revision ? `Datos de API, revisión ${revision}.` : 'Datos de API sin revisión verificada.' }
   } catch (errorApi) {
+    let carga
+    try {
+      carga = await cargarRespaldoPublicado({ fetchFn, urlExportacion, timeoutMs })
+      validarRecorridos(carga.datos)
+      return carga
+    } catch { carga?.liberar() }
     const datos = await leerJson(fetchFn, urlRespaldo, timeoutMs)
     return { datos: adaptarRespaldoHeredado(datos), fuente: 'local', motivo: errorApi.message, revision: null,
       aviso: 'Respaldo heredado de demostración, sin revisión verificada; no se afirma que esté actualizado.' }
   }
+}
+
+// Escena y narración comparten una sola revisión y los mismos recursos verificados.
+let compartida
+export function cargarDatosCompartidos() {
+  if (!compartida) compartida = cargarDatos().then(carga => {
+    globalThis.window?.addEventListener('pagehide', evento => { if (!evento.persisted) carga.liberar?.() })
+    return carga
+  }).catch(error => { compartida = null; throw error })
+  return compartida
 }
 
 // Compatibilidad exclusiva del respaldo antiguo: firma URL+autor de tres referencias conocidas, nunca título.

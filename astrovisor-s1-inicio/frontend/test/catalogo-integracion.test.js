@@ -113,5 +113,6 @@ test('servicios Vue → Express: edición autorizada, 412, lectura pública y pe
   assert.equal(await nuevo.cargar(), true)
   const esperado = structuredClone(persistido)
   esperado.libros.find((l) => l.id === 'guia-nueva').portadaIlustrativa += '?revision=4'
+  esperado.publicacionHomido = { respaldoPublico: 'pendiente', revisionPublicada: null }
   assert.deepEqual(JSON.parse(JSON.stringify(nuevo.catalogo.value)), esperado)
 })

@@ -1,14 +1,26 @@
 /* Lectura documental; los fixtures de demostración solo se conservan para pruebas. */
+import { cargarRespaldoPublicado } from '../../public/prueba-homido/js/respaldo-publicado.js'
+import { portadaPublicadaValida } from '../../public/prueba-homido/js/paquete-publico.js'
 
 export const CONSTELACIONES_LIBROS = Object.freeze(['orion', 'osa-mayor', 'escorpio'])
 export const nombresConstelacion = Object.freeze({ orion: 'Orión', 'osa-mayor': 'Osa Mayor', escorpio: 'Escorpio' })
 
-export async function listarLibros(idConstelacion, { signal } = {}) {
+export async function listarLibros(idConstelacion, { signal, alUsarRespaldo } = {}) {
   if (!CONSTELACIONES_LIBROS.includes(idConstelacion)) return []
-  const respuesta = await fetch('/api/contenidos/libros', { signal, credentials: 'same-origin', cache: 'no-store' })
-  if (!respuesta.ok) throw new Error(`No pudimos consultar los libros (HTTP ${respuesta.status})`)
-  const catalogo = await respuesta.json()
-  if (!validarCatalogo(catalogo)) throw new Error('Catálogo de libros inválido')
+  let catalogo
+  try {
+    const respuesta = await fetch('/api/contenidos/libros', { signal, credentials: 'same-origin', cache: 'no-store' })
+    if (!respuesta.ok) throw new Error(`No pudimos consultar los libros (HTTP ${respuesta.status})`)
+    catalogo = await respuesta.json()
+    if (!validarCatalogo(catalogo)) throw new Error('Catálogo de libros inválido')
+  } catch (error) {
+    if (signal?.aborted) throw error
+    // El lector 2D usa únicamente el paquete verificado y anuncia su procedencia.
+    if (!alUsarRespaldo) throw error
+    const carga = await cargarRespaldoPublicado({ signal })
+    if (!validarCatalogo(carga.libros) || signal?.aborted) { carga.liberar(); throw error }
+    catalogo = carga.libros; alUsarRespaldo(carga)
+  }
   return catalogo.filter((libro) => typeof libro.recomendaciones?.[idConstelacion] === 'string')
     .map((libro) => ({ ...libro, motivo: libro.recomendaciones[idConstelacion] }))
 }
@@ -24,7 +36,8 @@ export function esLibroValido(libro) {
     return ['titulo', 'autor'].every((k) => typeof libro[k] === 'string' && libro[k].trim())
       && typeof libro.demostracion === 'boolean' && typeof libro.marc21?.campo001 === 'string' && typeof libro.marc21.campo003 === 'string'
       && typeof libro.portadaIlustrativa === 'string' && (/^\/libros-demo\/[a-z0-9-]+\.svg$/.test(libro.portadaIlustrativa)
-        || new RegExp(`^/api/contenidos/libros/${libro.id}/portada\\.svg\\?revision=[1-9][0-9]*$`).test(libro.portadaIlustrativa))
+        || new RegExp(`^/api/contenidos/libros/${libro.id}/portada\\.svg\\?revision=[1-9][0-9]*$`).test(libro.portadaIlustrativa)
+        || portadaPublicadaValida(libro.id, libro.portadaIlustrativa))
       && url.protocol === 'https:' && !url.username && !url.password
   } catch { return false }
 }

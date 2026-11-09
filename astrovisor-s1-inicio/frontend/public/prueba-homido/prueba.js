@@ -6,7 +6,7 @@
    - Audio: el reproductor ES el de Luis (audio/narration.js, vía narraciones.js). Contrato: window.astrovisorVisor y eventos
      astrovisor:ficha-abierta/-cerrada/audio-solicitado/salida-visor (ver docs/PRUEBA-S3-HOMIDO.md).
 */
-import { cargarDatos, adaptarAudio } from './js/datos.js';
+import { cargarDatosCompartidos, adaptarAudio } from './js/datos.js';
 import { FIGURAS, posicionEnEsfera, frenteDeCamara } from './js/figuras.js';
 import { crearConstelacion, crearAnillo, actualizarAnillo, vincularEtiqueta, COLOR_CONFIRMADO } from './js/escena-constelaciones.js';
 import { crearDwell } from './js/gaze-dwell.js';
@@ -321,7 +321,7 @@ import { rutaLibro2D } from './js/ruta-libro-2d.js';
     if (!libros.length) return;
     dwell.cancelar();
     estanteriaEl.replaceChildren();
-    document.querySelectorAll('canvas[data-portada-homido]').forEach(c => c.remove());
+    document.querySelectorAll('[data-portada-homido]').forEach(c => c.remove());
     estanteria = crearEstanteria3D(document, estanteriaEl, libros, ligar);
     vistaLectura = 'estanteria';
     colocarVistaFrente(estanteriaEl);
@@ -495,7 +495,7 @@ import { rutaLibro2D } from './js/ruta-libro-2d.js';
     const esperar = scene.hasLoaded ? Promise.resolve() : new Promise((ok) => scene.addEventListener('loaded', ok, { once: true }));
     let carga;
     try {
-      carga = await cargarDatos();
+      carga = await cargarDatosCompartidos();
     } catch (error) {
       selectionStatus.textContent = 'No se pudieron cargar las constelaciones. Usa "Regresar al modo web 2D".';
       $('fuenteDatos').textContent = 'No hay una fuente de contenidos disponible.';
@@ -505,7 +505,7 @@ import { rutaLibro2D } from './js/ruta-libro-2d.js';
     await esperar;
     eventLine(carga.fuente === 'api'
       ? 'Datos de constelaciones: API /api/contenidos/recorridos.'
-      : `Datos de constelaciones: respaldo local de DEMOSTRACIÓN (API no disponible: ${carga.motivo}).`);
+      : carga.aviso);
     $('fuenteDatos').textContent = carga.aviso;
     const lista = carga.datos.filter((f) => {
       if (FIGURAS[f.id]) return true;

@@ -2,6 +2,7 @@
 import { ajustarLineas, CANVAS } from './ficha-canvas.js';
 import { crearAnillo, vincularEtiqueta } from './escena-constelaciones.js';
 import { idBibliograficoValido } from './ruta-libro-2d.js';
+import { portadaPublicadaValida } from './paquete-publico.js';
 
 const PALETA={orion:['#122B50','#254D78'],'osa-mayor':['#173F3C','#347065'],escorpio:['#4D263B','#7E4456']};
 export function extraerLibros(recorridos,preferido='') {
@@ -34,6 +35,10 @@ export function ajustarTextoCubierta(ctx,texto,ancho,maxLineas,fuentes) {
   return {font:fuentes[fuentes.length-1],lineas:['Texto completo','en la ficha 2D']};
 }
 function cubierta(doc,libro) {
+  if (portadaPublicadaValida(libro.id,libro.portada?.src)) {
+    const imagen=crear(doc,'img',{id:'cubierta-vr-'+libro.id,src:libro.portada.src,'data-portada-homido':''},doc.querySelector('a-assets'));
+    return '#'+imagen.id;
+  }
   const c=doc.createElement('canvas');c.id='cubierta-vr-'+libro.id;c.width=512;c.height=768;
   c.setAttribute('data-portada-homido','');
   const ctx=c.getContext('2d'),color=PALETA[libro.constelacionId]||PALETA.orion;

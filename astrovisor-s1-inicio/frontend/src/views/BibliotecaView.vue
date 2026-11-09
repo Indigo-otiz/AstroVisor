@@ -7,7 +7,7 @@ import { useLibros } from '../composables/useLibros.js'
 const route = useRoute()
 const id = computed(() => String(route.params.id ?? ''))
 const nombre = computed(() => nombresConstelacion[id.value] ?? null)
-const { libros, cargando, error, cargar, cancelar } = useLibros()
+const { libros, cargando, error, aviso, cargar, cancelar } = useLibros()
 const mostrandoDetalle = computed(() => Boolean(route.params.libroId))
 const libro = computed(() => mostrandoDetalle.value ? libros.value.find((l) => l.id === String(route.params.libroId)) : null)
 const titulo = computed(() => cargando.value ? 'Cargando libros' : error.value ? 'No pudimos consultar los libros' : libro.value?.titulo ?? (nombre.value ? `Libros sobre ${nombre.value}` : 'Biblioteca de las estrellas'))
@@ -25,6 +25,7 @@ const rutaEstanteria = computed(() => ({ name: 'biblioteca', params: { id: id.va
 
 <template>
   <section class="biblioteca-page">
+    <p v-if="aviso" class="biblioteca-aviso" role="status">{{ aviso }}</p>
     <RouterLink class="public-back" :to="nombre ? rutaConstelacion : { name: 'explorar' }">
       ← Volver {{ nombre ? `a ${nombre}` : 'a las constelaciones' }}
     </RouterLink>
