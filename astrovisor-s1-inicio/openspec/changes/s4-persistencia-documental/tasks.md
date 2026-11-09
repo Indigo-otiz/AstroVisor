@@ -39,6 +39,7 @@ El plan completo permanece registrado; esta entrega ejecuta secciones 3 y 4 como
 - [ ] 0.2 Completar navegador escritorio/360 px/teclado/200 % y pruebas Homido físicas cuando se disponga del dispositivo; registrar pendientes y aceptación expresa si subsisten.
 - [x] 0.3 PR #6 integrada y rama S4 creada desde `f1058c9b10641c470d7d3e331a81f327af78fc8c`; autorización limitada a Etapa 1.
 - [ ] 0.4 Confirmar rutas externas de runtime/configuración, volumen persistente, un escritor y servidor estático independiente de Express para el respaldo; revisar reglas históricas S1 con el usuario antes de ampliarlas a S4.
+- Etapa 5A: escritorio/360 px/teclado y procesos independientes temporales repetidos. 0.2 y 0.4 parciales: faltan zoom nativo, hardware, destinos/volumen/ACL/alias operativos y revisión histórica S1; no inferir despliegue desde temporales. Matriz en `docs/PRUEBA-S4-ETAPA5A.md`.
 - [x] 0.5 Usuario eligió A: configuración privada con hashes y sesiones Express sin base de datos. Implementación no realizada en Etapa 1.
 
 ## 1. Puerta de seguridad administrativa
@@ -51,6 +52,7 @@ Archivos: `backend/src/index.js`, `backend/src/middleware/auth.js`, `backend/tes
 - [x] 1.4a Auditoría final local y regresiones: backend 48/48, web 98/98 por separado, build y OpenSpec estrictos correctos. Integración HTTP aislada: configuración corrupta/inválida, revocación y cabeceras proxy falsificadas. Mirada: diez ejecuciones aisladas correctas; bloqueo controlado reproduce salto de etapa sin modificar módulo ajeno. Evidencia y fallo paralelo previo conservados en el informe.
 - [x] 1.4b Revisión del informe por el usuario y publicación de Etapa 2A autorizadas, condicionadas a auditoría sin bloqueantes; auditoría local sin bloqueantes identificados. No equivale a revisión operativa del despliegue ni autoriza escritura documental.
 - [ ] 1.4c Validación operativa de HTTPS, permisos/ACL, TTY real y costo/límites en servidor destino antes de uso real. No hay endpoints de escritura nuevos.
+- Etapa 5A repite login, reinicio, rotación/revocación y logout aislados; no ejecuta TTY real, HTTPS/ACL ni capacidad en destino. 1.4c sigue parcial; no se creó identidad institucional.
 
 ## 2. Catálogo único y migración
 
@@ -58,6 +60,7 @@ Archivos: `backend/src/services/documentRepository.js`, nuevo `content/catalogo-
 
 - [x] 2.1 Pruebas de migración y validación: tres libros/constelaciones, nueve relaciones, IDs, metadatos desconocidos, recursos y colisiones. Fallos previos a implementación observados y posterior suite satisfactoria.
 - [ ] 2.2 Completar migración de consumidores/frontend y retirada de fixtures duplicados; copia privada de entradas y backup de migraciones futuras cuando corresponda. No confundir con doble escritura ni con el inicializador de Etapa 1.
+- Auditoría 5A: consumidores migrados a Express/paquete verificado, sin import runtime encontrado de libros-demo.json o supabaseClient. Fixtures necesarios para pruebas/histórico y herramientas manuales S3 conservados; sin doble escritura automática. Nota de content/README actualizada. 2.2 parcial por copia privada de entradas operativas y procedimientos de migraciones futuras no acreditados.
 - [x] 2.2a Semilla unificada e inicializador explícito/exclusivo; rechazo de destino existente válido/corrupto y rutas dentro del checkout. Sin creación automática. Archivo modificado en fixture temporal sobrevive reapertura desde otro proceso y reintento de inicialización.
 - [x] 2.3 Lectura/proyección y validación implementadas; corrupción/ausencia produce error controlado sin reinicializar ni usar semilla silenciosamente. Endpoint nuevo exclusivamente de lectura de libros.
 - [x] 2.4 Proyecciones iniciales iguales a fixtures, metadatos/avisos demo conservados y hashes SVG exactos; suite backend 38/38, web 93/93 y build correcto. Evidencia en `docs/PRUEBA-S4-ETAPA1.md`. No equivale a pruebas de navegador o hardware.
@@ -71,6 +74,7 @@ Archivos: `backend/src/services/documentRepository.js`, `backend/src/services/do
 - [x] 3.3 Interrupciones de proceso antes/después de rename comprobadas; lock vivo no se retira y lock abandonado exige PID/host. Control huérfano falla cerrado y exige operación manual offline documentada. No equivale a prueba de corte eléctrico.
 - [x] 3.4 Restauración normal/CLI, evidencia, revisión superior y lectura desde otro proceso comprobadas. Hallazgo de auditoría corregido: rename confirmado + EACCES al liberar comunica confirmada=true, revisión persistida y limpieza pendiente; no elimina lock activo ni reintenta restauración. CLI salida 2 con aviso inequívoco; fallo previo salida 1 y error primario conservado aunque también falle liberar. Ocho regresiones nuevas y suite backend 87/87, web 98/98, build/OpenSpec correctos. Publicación posterior de 2B autorizada, sin ampliación de alcance.
 - [ ] 3.5 Validación local ejecutada: `npm test` 87/87, NTFS de C: identificado y límites de energía/disco documentados. Procedimiento de copia externa documentado, pero destino y copia/restauración externos reales siguen sin configurar/ensayar; no declarar completa la operación de respaldo externo.
+- Etapa 5A: backend107/107, copia y restauración de backup en otro directorio temporal del mismo NTFS, restauración del ensayo a revisión6 con metadatos intactos y durabilidadPendiente=true. No equivale a destino externo institucional, otro volumen ni resistencia eléctrica; 3.5 permanece parcial.
 
 ## 4. API administrativa y publicación
 
@@ -97,6 +101,7 @@ Archivos: `frontend/src/views/AdminPanelView.vue`, `frontend/src/services/libros
 - Etapa 3B: generador reutilizable por futuro exportador, sin implementarlo. SHA SVG existentes conservados; revisión vigente, 304/409, validación común y caracteres fuera de Latin-1 rechazados. Evidencia en docs/PRUEBA-S4-ETAPA3B.md. Validación física/operativa de 5.5 y tareas 3.5/6 permanecen pendientes.
 - [x] 5.5a Chrome headless 156.0.8078.80: escritorio 1280×900, 360×900 emulado, Tab/Enter/Shift+Tab y retorno de foco, SVG, conflicto y API caída. CSS zoom 200 % sin desbordamiento; no equivale a zoom nativo. Build y web correctos; capturas en informe.
 - [ ] 5.5 Probar escritorio, 360 px, 200 %, Tab/Enter/Shift+Tab, foco y retorno; registrar navegador/viewport y separar emulación de teléfono físico. Ejecutar `npm run test:web` y `npm run build`.
+- Etapa 5A Chrome156: escritorio1280/360, foco abrir/guardar/cancelar, error412 role=alert con borrador conservado y contraste muestreado. Ficha360 sin zoom mide360; zoom CSS200% mide447, hallazgo abierto sin cambio visual. No zoom nativo ni móvil real; 5.5 sigue parcial. Web137/137 y build correctos; capturas en informe5A.
 
 ## 6. Homido y respaldo público
 
@@ -109,14 +114,17 @@ Archivos: `frontend/public/prueba-homido/js/datos.js`, `js/estanteria-3d.js`, `j
 - [x] 6.3 Publicación local por revisión implementada y comprobada: staging externo, lista cerrada, hashes/referencias, directorio y puntero, exclusión entre procesos, rechazo de retroceso, idempotencia y confirmación separada de limpieza. Backend 107/107, web 137/137, build correcto y Chrome SwiftShader sin errores JS. Primeros intentos bloqueados por permisos/límite de revisión automática documentados y posteriores ejecuciones aprobadas. Auditoría final y commit/push exclusivos de 4B autorizados posteriormente por el usuario, sin merge ni archivo. Alojamiento de producción sigue pendiente en 8.6.
 - [x] 6.3b Integración temporal: PATCH confirmado revisión 2, exportación fallida conserva puntero 1, reexportación sin PATCH, reinicio persistente y JSON/SVG/audio con Express detenido. Mensajes del editor publicados/pendientes comprobados; Chrome distingue API revisión 3, paquete anterior revisión 2, histórico no verificado y ausencia total con error. No se promete offline. Evidencia en `docs/PRUEBA-S4-ETAPA4B.md`.
 - [ ] 6.4 Repetir regresiones de audio y salida 2D; probar físicamente Homido/sensores cuando esté disponible y registrar el resultado real. No cerrar verificación física con tests de canvas simulado.
+- Etapa 5A repite software WebGL, paquete con Express detenido, SVG nuevo/audio, pausa de mirada independiente, máximo3, salida2D/Atrás y suites; no hardware/sensores ni escucha humana. 6.4 parcial, sin cambios en controlador o reproductor.
 
 ## 7. Revisión y entrega
 
-- [ ] 7.1 Ejecutar desde raíz `npm test`, `npm run test:web`, `npm run build` y `openspec validate s4-persistencia-documental --strict`; registrar SHA, entorno y resultados, sin ocultar pruebas fallidas.
-- [ ] 7.2 Completar evidencia de guardar → detener → iniciar otro proceso → leer en panel/web/visor; conflicto de dos editores; recuperación y verificación de archivos privados.
+- [x] 7.1 Etapa 5A sobre12546c2301a5c32efc0819b8731fe380412f20bf: Windows10.0.26200.0/Node24.21.0/NTFS, backend107/107, web137/137, build y OpenSpec estricto correctos. Fallo de selector del arnés, desbordamiento CSS y repeticiones registrados. No sustituye validación operativa/física.
+- [x] 7.2 Aceptación5A local: resumen/alta compartida, procesos nuevos con lectura panel/web/visor,412 real conserva borrador, rechazo sin autorización/precondición, exportación fallida conserva publicación3 y restauración privada a revisión6. Metadatos/relaciones comparados y copia temporal restaurada; no datos institucionales. Evidencia detallada en informe5A.
 - [ ] 7.3 Revisar con responsables de auth, contenido/audio y Homido los cambios justificados en sus módulos; documentar aprobaciones realmente recibidas.
-- [ ] 7.4 Documentar límites MVP y pendientes posteriores sin omitir controles obligatorios; no cerrar seguridad, persistencia, integridad o regresión por diferir mejoras visuales.
+- 7.3 parcial: aprobaciones del usuario y revisiones técnicas previas documentadas; no hay nueva aprobación de responsables ajenos acreditada en5A. No se solicita como requisito nuevo ni se inventa su recepción.
+- [x] 7.4 Informe5A registra límites MVP, hallazgo de accesibilidad, riesgos y matriz completa. No declara cerrados3.5/5.5/6.4/8.6 ni acreditados HTTPS/ACL/volumen por esta documentación.
 - [ ] 7.5 Presentar diff y evidencia al usuario; esperar autorización antes de integración o archivo OpenSpec. No marcar S4 terminado con pendientes obligatorios sin resolver.
+- 7.5 parcial: usuario revisó5A y autorizó publicación exclusivamente documental tras auditoría final. Repetición backend107/107, web137/137, build/OpenSpec correctos; cinco capturas inspeccionadas. No autoriza integración/archivo ni cierre de Sprint4. El hallazgo CSS447/360 permanece abierto y las tareas operativas/físicas siguen pendientes.
 
 ## 8. Mejoras posteriores al MVP
 
