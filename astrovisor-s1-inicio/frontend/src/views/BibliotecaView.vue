@@ -1,16 +1,23 @@
 <script setup>
-import { computed, watch } from 'vue'
+import { computed, watch, nextTick, onBeforeUnmount } from 'vue'
 import { useRoute } from 'vue-router'
-import { buscarLibro, listarLibros, nombresConstelacion } from '../services/librosDemoService.js'
+import { nombresConstelacion } from '../services/librosDemoService.js'
+import { useLibros } from '../composables/useLibros.js'
 
 const route = useRoute()
 const id = computed(() => String(route.params.id ?? ''))
 const nombre = computed(() => nombresConstelacion[id.value] ?? null)
-const libros = computed(() => listarLibros(id.value))
+const { libros, cargando, error, cargar, cancelar } = useLibros()
 const mostrandoDetalle = computed(() => Boolean(route.params.libroId))
-const libro = computed(() => mostrandoDetalle.value ? buscarLibro(id.value, String(route.params.libroId)) : null)
-const titulo = computed(() => libro.value?.titulo ?? (nombre.value ? `Libros sobre ${nombre.value}` : 'Biblioteca de las estrellas'))
-watch(titulo, (valor) => { document.title = `${valor} · AstroVisor` }, { immediate: true })
+const libro = computed(() => mostrandoDetalle.value ? libros.value.find((l) => l.id === String(route.params.libroId)) : null)
+const titulo = computed(() => cargando.value ? 'Cargando libros' : error.value ? 'No pudimos consultar los libros' : libro.value?.titulo ?? (nombre.value ? `Libros sobre ${nombre.value}` : 'Biblioteca de las estrellas'))
+watch(() => [route.params.id, route.params.libroId], () => cargar(id.value), { immediate: true })
+watch([titulo, cargando], async ([valor]) => {
+  document.title = `${valor} · AstroVisor`
+  await nextTick()
+  if (!cargando.value && document.activeElement === document.body) document.querySelector('#contenido h1')?.focus({ preventScroll: true })
+}, { immediate: true })
+onBeforeUnmount(cancelar)
 
 const rutaConstelacion = computed(() => ({ name: 'constelacion', params: { id: id.value } }))
 const rutaEstanteria = computed(() => ({ name: 'biblioteca', params: { id: id.value } }))
@@ -22,7 +29,16 @@ const rutaEstanteria = computed(() => ({ name: 'biblioteca', params: { id: id.va
       ← Volver {{ nombre ? `a ${nombre}` : 'a las constelaciones' }}
     </RouterLink>
 
-    <template v-if="nombre && !mostrandoDetalle">
+    <div v-if="cargando" class="public-state" role="status" aria-live="polite">
+      <h1 tabindex="-1">Cargando libros…</h1>
+      <p>Estamos consultando las recomendaciones de lectura.</p>
+    </div>
+    <div v-else-if="error" class="public-state" role="alert">
+      <h1 tabindex="-1">No pudimos consultar los libros</h1>
+      <p>{{ error }}</p>
+      <button class="public-button" type="button" @click="cargar(id)">Volver a intentar</button>
+    </div>
+    <template v-else-if="nombre && !mostrandoDetalle">
       <div class="biblioteca-intro">
         <p class="biblioteca-eyebrow">Una historia lleva a otra</p>
         <h1 tabindex="-1">La biblioteca de las estrellas</h1>
@@ -32,7 +48,8 @@ const rutaEstanteria = computed(() => ({ name: 'biblioteca', params: { id: id.va
         <strong>Libros de demostración.</strong> Son referencias de lectura pública. No hemos confirmado que la biblioteca tenga ejemplares de estos títulos. Las imágenes son portadas ilustrativas, no las originales.
       </p>
 
-      <div class="biblioteca-estanteria">
+      <p v-if="!libros.length" role="status">Todavía no hay libros recomendados para esta constelación. Puedes volver a su historia o consultar más tarde.</p>
+      <div v-else class="biblioteca-estanteria">
         <div class="biblioteca-rejilla">
           <article v-for="item in libros" :key="item.id" class="biblioteca-tarjeta">
             <RouterLink

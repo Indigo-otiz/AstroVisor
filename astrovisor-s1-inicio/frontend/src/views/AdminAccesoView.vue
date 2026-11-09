@@ -2,6 +2,7 @@
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuth } from '../composables/useAuth.js'
+import { hayBorradorPendiente, descartarBorradorPendiente } from '../composables/useEditorCatalogo.js'
 
 const router = useRouter()
 const { signIn, signOut, isAuthenticated, userDisplayName, loading, verificarSesion } = useAuth()
@@ -14,6 +15,7 @@ const errorMessage = ref('')
 const isSubmitting = ref(false)
 
 async function handleLogout() {
+  descartarBorradorPendiente()
   await signOut()
 }
 
@@ -123,6 +125,7 @@ async function handleSubmit() {
         </div>
 
         <form v-else @submit.prevent="handleSubmit" class="auth-form" novalidate>
+          <p v-if="hayBorradorPendiente" role="status">Tu sesión terminó. Hay un borrador solo en memoria de esta pestaña. Inicia sesión con la misma cuenta para recuperarlo; no recargues ni cierres la pestaña.</p>
           <div v-if="errorMessage" class="error-banner" role="alert">
             {{ errorMessage }}
           </div>

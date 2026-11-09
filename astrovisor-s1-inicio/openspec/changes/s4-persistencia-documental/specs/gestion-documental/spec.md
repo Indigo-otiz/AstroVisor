@@ -298,6 +298,30 @@ El panel SHALL comunicar carga, éxito, errores de validación y conflictos con 
 - **WHEN** se rechaza un guardado por revisión obsoleta
 - **THEN** el editor conserva el texto introducido e informa cómo recargar y comparar, sin reemplazarlo silenciosamente.
 
+#### Scenario: Etapa 3A conserva coherencia con portadas estáticas
+- **WHEN** se edita una ficha existente desde el panel antes de implementar portadas dinámicas y el mapeo Homido por ID
+- **THEN** título y autor son de solo lectura con explicación accesible; se permiten año, enlace y motivos existentes, sin alta ni eliminación de libros.
+
+#### Scenario: Guardado confirmado con recarga fallida
+- **WHEN** PATCH devuelve éxito y revisión válida pero falla el GET posterior
+- **THEN** el panel informa que el guardado está confirmado, conserva revisión y borrador, y requiere recarga antes de otra escritura; no afirma sincronización del respaldo Homido.
+
+#### Scenario: API pública no disponible
+- **WHEN** no se puede consultar el catálogo público
+- **THEN** la estantería informa el error y ofrece reintento sin mostrar un catálogo compilado como si estuviera actualizado.
+
+#### Scenario: Sesión administrativa rechazada
+- **WHEN** una operación del editor recibe 401
+- **THEN** se detienen operaciones protegidas y se dirige al acceso existente sin colocar tokens en URLs.
+
+#### Scenario: Recuperación de edición después de autenticarse
+- **WHEN** un 401 interrumpe un formulario no confirmado y la misma identidad vuelve a autenticarse sin recargar la pestaña
+- **THEN** se ofrece recuperación explícita en memoria, sin token ni contraseña en el borrador o almacenamiento del navegador, después de consultar el catálogo; no se envía hasta confirmar guardar y una revisión diferente bloquea el envío conservando el texto.
+
+#### Scenario: Límite de recuperación en memoria
+- **WHEN** se recarga/cierra la pestaña, se cierra sesión explícitamente o se autentica una identidad diferente
+- **THEN** el borrador no se restaura; no se reutilizan tokens almacenados y la interfaz avisa de la pérdida al recargar/cerrar antes de volver a autenticarse.
+
 #### Scenario: Lectura sin dispositivo físico
 - **WHEN** se navega con teclado y viewport de 360 px, incluyendo texto al 200 %
 - **THEN** los libros, controles y mensajes siguen operables y legibles sin superposición.

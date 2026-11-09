@@ -83,12 +83,18 @@ Archivos: `backend/src/index.js`, `backend/src/services/catalogoEdicion.js`, `ba
 
 ## 5. Panel y catálogo público
 
+Etapa 3A autorizada sobre 2B publicada en `38c00eb452e3f24b4bbb2177ce58ce8463d7ace1`. Auditoría final, corrección de borrador ante 401 y commit/push de 3A autorizados por el usuario; sin merge ni archivo. Evidencia: `docs/PRUEBA-S4-ETAPA3A.md`. Este estado sustituye las restricciones históricas de no iniciar formularios/lectores para el alcance explícito de 3A.
+
 Archivos: `frontend/src/views/AdminPanelView.vue`, `frontend/src/services/librosDemoService.js`, `frontend/src/services/contentService.js`, `frontend/src/composables/useRecorridos.js`, `frontend/src/views/BibliotecaView.vue`; tests `biblioteca-demo.test.js`, `contentService.test.js`. Interfaz: misma API documental para editor/lector y revisión devuelta al guardar.
 
-- [ ] 5.1 Añadir pruebas de carga/cancelación/error, catálogo actualizado después del guardado, creación con relación y conflicto que conserva la edición. Ejecutar `npm run test:web` y comprobar fallo nuevo.
-- [ ] 5.2 Retirar lectura directa de `fichas_libros`; reutilizar panel para formulario de campos permitidos, carga, errores y revisión. Mantener datos remotos de Supabase intactos.
-- [ ] 5.3 Sustituir import compilado por carga API; conservar rutas #6 y layout/CSS. Mostrar tipo de portada y estados honestos de demo, sin ubicaciones inventadas.
+- [x] 5.1a Pruebas de carga/cancelación/error, lectura pública tras guardado, If-Match, conflicto con borrador conservado y reinicio en proceso nuevo. Fallos iniciales registrados; resultado final web 115/115; regresión adicional de cancelación después de confirmación/GET fallido.
+- [x] 5.1c Regresiones de 401: borrador solo en memoria, recuperación explícita tras login/GET de misma identidad, revisión cambiada bloquea envío, otra identidad no recupera, token expirado retirado sin reenviar y sin almacenamiento del token en navegador. Chrome aislado confirma flujo sin PATCH automático. Recargar/cerrar pierde sesión y borrador; aviso visible.
+- [ ] 5.1b Creación con relación desde panel: pendiente y fuera de 3A hasta completar portadas dinámicas (5.4).
+- [x] 5.2 Retirar lectura directa de `fichas_libros`; reutilizar panel para formulario de campos permitidos, carga, errores y revisión. Mantener datos remotos de Supabase intactos.
+- [x] 5.3 Sustituir import compilado por carga API; conservar rutas #6 y layout/CSS. Mostrar tipo de portada y estados honestos de demo, sin ubicaciones inventadas.
+- Título y autor en solo lectura en 3A por texto fijo SVG y mapeo Homido por título. Edición solo de año/enlace/motivos y resumen/reconocimiento; sin alta. 400/401/403/404/409/412/428/503 manejados; recarga fallida posterior conserva confirmación, no repite escritura.
 - [ ] 5.4 Implementar plantillas ilustrativas permitidas y endpoint `GET /api/contenidos/libros/:id/portada.svg?revision=N`, compartiendo renderizado con exportador. Probar libro nuevo visible sin build/reinicio, ETag/revalidación, conflicto de revisión, ajuste de texto, escape SVG y rechazo de rutas/markup. No escribir en frontend público ni Git; conservar bytes/estilos de los tres SVG. Mantener originales deshabilitadas en MVP.
+- [x] 5.5a Chrome headless 156.0.8078.80: escritorio 1280×900, 360×900 emulado, Tab/Enter/Shift+Tab y retorno de foco, SVG, conflicto y API caída. CSS zoom 200 % sin desbordamiento; no equivale a zoom nativo. Build y web correctos; capturas en informe.
 - [ ] 5.5 Probar escritorio, 360 px, 200 %, Tab/Enter/Shift+Tab, foco y retorno; registrar navegador/viewport y separar emulación de teléfono físico. Ejecutar `npm run test:web` y `npm run build`.
 
 ## 6. Homido y respaldo público

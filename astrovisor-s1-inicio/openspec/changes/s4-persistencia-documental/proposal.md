@@ -4,6 +4,8 @@ Estado vigente: Etapa 1 publicada como `735fd4b1413e5cd98387e297716f3d4c76cac52d
 
 ## Why
 
+Actualización Etapa 3A: Etapa 2B publicada en `38c00eb452e3f24b4bbb2177ce58ce8463d7ace1`. El usuario autorizó exclusivamente conectar panel y estantería a Express. Auditoría final y publicación de 3A autorizadas, con recuperación de borrador en memoria ante 401 y token solo en memoria; sin merge ni archivo. Formularios de edición limitada y lectura web implementados; creación, portadas dinámicas y sincronización Homido siguen pendientes. Ver `docs/PRUEBA-S4-ETAPA3A.md`. Esta actualización sustituye el estado anterior respecto de formularios y lectura web.
+
 Hallazgo de auditoría corregido con autorización posterior: resultado de restauración confirmado separado del aviso de liberación del lock, sin retirada insegura. Regresión y validaciones locales completadas; commit/push de 2B autorizados expresamente por el usuario, sin merge ni avance de etapa. Evidencia en `docs/PRUEBA-S4-ETAPA2B.md`.
 
 Situación al iniciar S4: la estantería #6 importaba un catálogo estático, Homido leía otro contrato y el panel consultaba Supabase. El repositorio documental solo leía y no había edición JSON persistente. Ver [evidencia de validación](../../../docs/VALIDACION-PR6.md). Etapa 2B añade escritura backend; conectar los lectores y formularios sigue pendiente.

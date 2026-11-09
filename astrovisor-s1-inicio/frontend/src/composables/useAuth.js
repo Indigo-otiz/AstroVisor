@@ -7,17 +7,13 @@ const loading = ref(false)
 
 try {
   localStorage.removeItem(STORAGE_KEY)
-  const saved = JSON.parse(sessionStorage.getItem(STORAGE_KEY) || 'null')
-  if (typeof saved?.token === 'string' && saved.token.length <= 128) token.value = saved.token
+  sessionStorage.removeItem(STORAGE_KEY)
 } catch { /* Sin almacenamiento disponible, la sesión solo dura en memoria. */ }
 
 function limpiar() {
   user.value = null
   token.value = null
   try { sessionStorage.removeItem(STORAGE_KEY) } catch {}
-}
-function guardar() {
-  try { sessionStorage.setItem(STORAGE_KEY, JSON.stringify({ token: token.value })) } catch {}
 }
 const usuarioValido = (u) => u && typeof u.id === 'string' && typeof u.usuario === 'string' && typeof u.nombre === 'string'
 
@@ -54,7 +50,6 @@ export function useAuth() {
       if (typeof data.token !== 'string' || !/^[a-f0-9]{64}$/.test(data.token) || !usuarioValido(data.usuario)) throw new Error('Respuesta de acceso inválida')
       token.value = data.token
       user.value = data.usuario
-      guardar()
       return data
     } finally { loading.value = false }
   }
@@ -68,5 +63,5 @@ export function useAuth() {
     } catch { /* La sesión cliente ya fue retirada; servidor conserva su expiración. */ }
   }
 
-  return { user, token, loading, isAuthenticated, userDisplayName, username, signIn, signOut, verificarSesion }
+  return { user, token, loading, isAuthenticated, userDisplayName, username, signIn, signOut, verificarSesion, invalidarSesion: limpiar }
 }

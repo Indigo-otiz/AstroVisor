@@ -256,6 +256,18 @@ Activos institucionales y originales quedan pendientes para mejoras posteriores;
 
 ## Alcance de entrega
 
+### Corte autorizado de Etapa 3A
+
+- Panel existente → servicio administrativo → Express → JSON privado. `GET /api/admin/catalogo` aporta ETag; PATCH transmite exactamente ese valor y solo campos permitidos. Un 412 conserva selección/borrador y exige recarga explícita para descartar; no reintenta ni sobrescribe automáticamente. Un 401 detiene operaciones y vuelve al acceso existente.
+- Corrección final autorizada de 3A: ante 401, conservar solo borrador no confirmado/selección/identidad/ETag en memoria de la pestaña, retirar token sin reenviarlo y avisar en acceso. Recuperación explícita tras nuevo login de la misma identidad y GET satisfactorio; comparar ETag original con actual, bloquear envío si difieren. Sin envío automático ni copia de credenciales en el borrador. Identidad distinta o logout explícito descartan. Borrador y token se pierden al recargar/cerrar: se elimina la persistencia anterior de tokens en sessionStorage y se limpian claves heredadas. No alterar el contrato de auth Express.
+- El editor permite año, enlace HTTPS y motivos de relaciones existentes; para constelaciones, resumen y cómo reconocerla. Título y autor permanecen en solo lectura: SVG incluyen texto fijo y `ruta-libro-2d.js` identifica libros por títulos. No modificar esos consumidores en 3A. La API 2B no cambia; esta restricción corresponde al panel.
+- Confirmación solo tras PATCH satisfactorio y revisión nueva válida. GET posterior actualiza catálogo; si falla, conservar aviso de guardado confirmado, revisión recibida y borrador, bloqueando otro envío hasta recarga. Avisar siempre que respaldo público Homido sigue pendiente. Pérdida de respuesta de PATCH: resultado no confirmado al cliente, consultar antes de reintentar; revisión optimista del servidor permanece vigente.
+- Estantería → GET público por consulta, sin importar JSON compilado ni fallback silencioso. IDs y rutas se conservan; abortar solicitudes al cambiar ruta/desmontar y descartar respuestas tardías. Distinguir carga, error recuperable, vacío y ficha inexistente. `libros-demo.json` permanece únicamente como fixture de regresión, sin doble escritura.
+- Navegación, selector, SVG y CSS de estantería conservados. Formularios con etiquetas, foco y controles nativos; ajuste responsive local de flex-wrap en barra del panel para evitar el desbordamiento observado a 360 px. No modifica navegación ni estilos globales.
+- Evidencia: pruebas HTTP con directorios/credenciales temporales, reinicio en proceso nuevo y Chrome headless aislado. Zoom CSS 200 % es emulación: zoom nativo, móvil y Homido físicos permanecen pendientes. No cerrar verificación operativa con estas pruebas.
+
+Creación desde panel depende de 5.4; sincronización/exportación Homido depende de sección 6. No se implementan en este corte.
+
 | MVP obligatorio | Mejoras posteriores |
 |---|---|
 | Decisión académica/proveedor, autorización real, validación y gestión segura de sesión antes de escritura | Administración web de cuentas, si llega a solicitarse |

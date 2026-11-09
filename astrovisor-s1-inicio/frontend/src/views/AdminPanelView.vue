@@ -1,18 +1,23 @@
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, onBeforeUnmount, nextTick, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuth } from '../composables/useAuth.js'
-import { supabase, isSupabaseConfigured } from '../services/supabaseClient.js'
+import { useEditorCatalogo } from '../composables/useEditorCatalogo.js'
 
 const router = useRouter()
-const { userDisplayName, username, signOut } = useAuth()
+const { userDisplayName, username, signOut, token, invalidarSesion } = useAuth()
 
 const isIniciando3D = ref(false)
-const libroList = ref([])
-const loadingLibros = ref(false)
-const librosError = ref('')
+const { catalogo, seleccion, borrador, cargando, guardando, error, mensaje, conflicto, necesitaRecarga,
+  libroActual, recorridoActual, cargar, seleccionarLibro, seleccionarRecorrido, cancelarEdicion, guardar, cancelarPeticiones,
+  hayBorradorPendiente, recuperarBorrador, descartarBorradorPendiente } = useEditorCatalogo({
+  obtenerToken: () => token.value,
+  obtenerUsuario: () => username.value,
+  alExpirarSesion: () => { invalidarSesion(); void router.replace({ name: 'admin-acceso' }) },
+})
 
 async function handleLogout() {
+  descartarBorradorPendiente()
   await signOut()
   router.push('/admin/acceso')
 }
@@ -28,32 +33,20 @@ function handleCancelar3D() {
   isIniciando3D.value = false
 }
 
-// Cargar las fichas_libros desde Supabase
-async function cargarLibros() {
-  if (!isSupabaseConfigured) return
-  loadingLibros.value = true
-  librosError.value = ''
-  try {
-    const { data, error } = await supabase
-      .from('fichas_libros')
-      .select('*')
-      .order('id', { ascending: true })
-
-    if (error) {
-      librosError.value = error.message
-    } else {
-      libroList.value = data || []
-    }
-  } catch (err) {
-    librosError.value = err.message || 'Error de conexión'
-  } finally {
-    loadingLibros.value = false
-  }
+const nombreRecorrido = (id) => catalogo.value?.recorridos.find((r) => r.id === id)?.titulo ?? id
+const constelacionesLibro = (id) => catalogo.value?.recorridos.filter((r) => r.libroRefs.some((v) => v.libroId === id)) ?? []
+async function guardarYCentrar() {
+  await guardar(); await nextTick()
+  document.querySelector('#editor-resultados')?.focus()
 }
-
-onMounted(() => {
-  cargarLibros()
-})
+async function cancelarYCentrar() {
+  const anterior = seleccion.value
+  cancelarEdicion(); await nextTick()
+  if (anterior) document.querySelector(`[data-editar="${anterior.tipo}-${anterior.id}"]`)?.focus()
+}
+watch(seleccion, async (actual) => { if (actual) { await nextTick(); document.querySelector('#editor-heading')?.focus() } })
+onMounted(cargar)
+onBeforeUnmount(cancelarPeticiones)
 </script>
 
 <template>
@@ -336,40 +329,108 @@ onMounted(() => {
       </section>
 
       <!-- SECCIÓN LIBROS -->
-      <section class="books-section">
+      <section class="books-section" aria-labelledby="catalogo-heading" :aria-busy="cargando || guardando">
         <div class="books-header">
           <div class="books-title-group">
-            <h2 class="experiences-title">Libros y Bibliografía</h2>
-            <span class="badge-postergado">Editor CRUD: Pospuesto para después de la Expo</span>
+            <h2 id="catalogo-heading" class="experiences-title">Libros y Bibliografía</h2>
+            <span class="badge-postergado">Edición documental</span>
           </div>
-          <button type="button" class="btn-refresh" @click="cargarLibros" :disabled="loadingLibros">
-            {{ loadingLibros ? 'Cargando...' : 'Actualizar libros' }}
+          <button type="button" class="btn-refresh" @click="cargar()" :disabled="cargando || guardando">
+            {{ cargando ? 'Cargando...' : borrador ? 'Recargar catálogo y descartar edición' : 'Actualizar catálogo' }}
           </button>
         </div>
         <p class="admin-note">
-          Nota de arquitectura S3: Las constelaciones públicas y el visor Homido consumen el contrato documental compartido (<code>recorridos.json</code> / API) para funcionar sin depender de red externa.
+          Edita una ficha a la vez. Las referencias son de demostración; no representan préstamos ni disponibilidad de ejemplares.
         </p>
-
-        <div v-if="librosError" class="alert">
-          {{ librosError }}
+        <div v-if="hayBorradorPendiente" role="status" class="admin-note">
+          <p>Hay una edición pendiente de la sesión anterior, solo en memoria de esta pestaña. Puedes recuperarla después de consultar el catálogo. Se pierde al recargar o cerrar la pestaña.</p>
+          <button type="button" class="btn-refresh" :disabled="!catalogo || cargando || guardando || Boolean(borrador)" @click="recuperarBorrador">Recuperar borrador</button>
+          <button type="button" class="btn-refresh" @click="descartarBorradorPendiente">Descartar borrador pendiente</button>
         </div>
 
-        <div v-else-if="libroList.length > 0" class="books-grid">
-          <article v-for="libro in libroList" :key="libro.id" class="book-card">
+        <div id="editor-resultados" tabindex="-1">
+          <p v-if="error" class="alert" role="alert">{{ error }}</p>
+          <p v-if="mensaje" class="admin-note" role="status">{{ mensaje }}</p>
+        </div>
+        <p v-if="cargando" role="status">Consultando el catálogo…</p>
+        <p v-if="catalogo" class="admin-note">Revisión consultada: {{ catalogo.revision }}. El respaldo estático de Homido no se sincroniza desde este panel.</p>
+        <p v-if="borrador" class="admin-note">Termina o cancela esta edición antes de seleccionar otra ficha.</p>
+        <p v-if="necesitaRecarga" class="admin-note" role="status">El guardado ya está confirmado. Actualiza el catálogo antes de iniciar otra edición; no repitas la escritura.</p>
+        <div v-if="catalogo?.libros.length" class="books-grid">
+          <article v-for="libro in catalogo.libros" :key="libro.id" class="book-card">
+            <img class="book-cover" :src="libro.portadaIlustrativa" :alt="`Portada ilustrativa, no original: ${libro.titulo}`" width="112" height="160" />
             <div class="book-pill-id">{{ libro.id }}</div>
             <h3 class="book-title">{{ libro.titulo }}</h3>
-            <p class="book-author">Por: <strong>{{ libro.autor || 'Autor no especificado' }}</strong></p>
-            <p class="book-desc">{{ libro.descripcion || 'Sin descripción' }}</p>
-            <div v-if="libro.mensaje_prestamo" class="loan-message">
-              <span>{{ libro.mensaje_prestamo }}</span>
-            </div>
+            <p class="book-author">Por: <strong>{{ libro.autor }}</strong></p>
+            <p class="book-desc">Relacionada con: {{ constelacionesLibro(libro.id).map((r) => r.titulo).join(', ') }}</p>
+            <p v-if="libro.demostracion" class="book-desc">Referencia de demostración. Portada ilustrativa.</p>
+            <button type="button" class="btn-refresh" :data-editar="`libro-${libro.id}`" :disabled="cargando || guardando || Boolean(borrador) || necesitaRecarga" @click="seleccionarLibro(libro.id)">Editar {{ libro.titulo }}</button>
           </article>
         </div>
 
-        <div v-else class="empty-books-box">
-          <p>No hay libros registrados aún en la tabla <code>fichas_libros</code>.</p>
+        <div v-else-if="catalogo && !cargando" class="empty-books-box">
+          <p>No hay libros en el catálogo consultado.</p>
         </div>
+        <section v-if="catalogo" class="catalogo-constelaciones" aria-labelledby="constelaciones-editor">
+          <h3 id="constelaciones-editor">Constelaciones</h3>
+          <ul><li v-for="r in catalogo.recorridos" :key="r.id">
+            <button type="button" class="btn-refresh" :data-editar="`recorrido-${r.id}`" :disabled="cargando || guardando || Boolean(borrador) || necesitaRecarga" @click="seleccionarRecorrido(r.id)">Editar información de {{ r.titulo }}</button>
+          </li></ul>
+        </section>
+        <form v-if="borrador" class="catalogo-formulario" @submit.prevent="guardarYCentrar">
+          <h3 id="editor-heading" tabindex="-1">Editar {{ libroActual?.titulo ?? recorridoActual?.titulo }}</h3>
+          <fieldset :disabled="guardando || cargando">
+            <legend>{{ seleccion.tipo === 'libro' ? 'Información bibliográfica y motivos de lectura' : 'Información de la constelación' }}</legend>
+            <template v-if="libroActual">
+              <p id="restriccion-portadas" class="admin-note">Título y autor están en solo lectura: las portadas contienen texto fijo y algunos enlaces de Homido dependen del título. Su edición requiere una etapa posterior. No se crean libros nuevos desde este panel.</p>
+              <label for="editor-titulo">Título (solo lectura)</label>
+              <input id="editor-titulo" :value="libroActual.titulo" readonly aria-describedby="restriccion-portadas" />
+              <label for="editor-autor">Autor (solo lectura)</label>
+              <input id="editor-autor" :value="libroActual.autor" readonly aria-describedby="restriccion-portadas" />
+              <label for="editor-anio">Año de publicación</label>
+              <input id="editor-anio" v-model.number="borrador.anio" type="number" min="1" max="9999" :required="libroActual.anio !== undefined" />
+              <label for="editor-enlace">Enlace público de la obra (HTTPS)</label>
+              <input id="editor-enlace" v-model="borrador.enlacePublico" type="url" required maxlength="2048" pattern="https://.+" />
+              <div v-for="relacion in borrador.relaciones" :key="relacion.constelacionId" class="catalogo-motivo">
+                <label :for="`motivo-${relacion.constelacionId}`">Motivo de lectura para {{ nombreRecorrido(relacion.constelacionId) }}</label>
+                <textarea :id="`motivo-${relacion.constelacionId}`" v-model="relacion.motivo" required maxlength="1000" rows="3"></textarea>
+              </div>
+            </template>
+            <template v-else>
+              <label for="editor-resumen">Resumen</label>
+              <textarea id="editor-resumen" v-model="borrador.resumen" required maxlength="1000" rows="4"></textarea>
+              <label for="editor-reconocer">Cómo reconocerla</label>
+              <textarea id="editor-reconocer" v-model="borrador.comoReconocerla" required maxlength="12000" rows="5"></textarea>
+              <p class="admin-note">Esta edición conserva la historia, la narración y sus atribuciones.</p>
+            </template>
+            <p v-if="conflicto || necesitaRecarga" class="admin-note">Tu formulario se conserva. Puedes copiar tu edición antes de usar «Recargar catálogo y descartar edición».</p>
+            <div class="catalogo-acciones">
+              <button type="submit" class="btn-refresh" :disabled="conflicto || necesitaRecarga">{{ guardando ? 'Guardando…' : 'Guardar cambios' }}</button>
+              <button type="button" class="btn-refresh" @click="cancelarYCentrar">Cancelar edición</button>
+            </div>
+          </fieldset>
+        </form>
       </section>
     </main>
   </div>
 </template>
+
+<style scoped>
+.books-grid { grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr)); }
+.book-cover { display: block; object-fit: contain; max-width: 100%; margin-bottom: 1rem; }
+.books-section .btn-refresh { min-height: 48px; white-space: normal; }
+.books-section .btn-refresh:disabled { opacity: .65; cursor: default; }
+.books-section :focus-visible { outline: 3px solid #173868; outline-offset: 3px; }
+.catalogo-constelaciones, .catalogo-formulario { margin-top: 2rem; }
+.catalogo-constelaciones ul { display: flex; flex-wrap: wrap; gap: .75rem; padding: 0; list-style: none; }
+.catalogo-formulario fieldset { min-width: 0; padding: 1.25rem; border: 1px solid #cbd5e1; border-radius: .8rem; background: #fff; }
+.catalogo-formulario legend { padding: 0 .5rem; font-weight: 700; }
+.catalogo-formulario label { display: block; margin: 1rem 0 .4rem; font-weight: 600; }
+.catalogo-formulario input, .catalogo-formulario textarea { display: block; width: 100%; max-width: 100%; min-height: 48px; box-sizing: border-box; padding: .7rem; border: 1px solid #64748b; border-radius: .4rem; font: inherit; color: #0f1f38; background: #fff; }
+.catalogo-formulario input[readonly] { background: #f1f5f9; }
+.catalogo-formulario textarea { resize: vertical; line-height: 1.5; }
+.catalogo-acciones { display: flex; flex-wrap: wrap; gap: .75rem; margin-top: 1.5rem; }
+@media (max-width: 640px) {
+  .admin-topbar, .topbar-left, .topbar-right { flex-wrap: wrap; }
+}
+</style>

@@ -6,7 +6,7 @@ const fuente = new URL('../src/data/libros-demo.json', import.meta.url)
 const catalogo = JSON.parse(readFileSync(fuente, 'utf8'))
 
 test('catálogo de demostración: ids únicos y sin existencias inventadas', () => {
-  assert.equal(validarCatalogo(), true)
+  assert.equal(validarCatalogo(catalogo), true)
   assert.equal(validarCatalogo([{ id: 'libro' }]), false)
   for (const libro of catalogo) {
     assert.equal(libro.demostracion, true)
@@ -16,18 +16,20 @@ test('catálogo de demostración: ids únicos y sin existencias inventadas', () 
     assert.ok(existsSync(new URL('../public' + libro.portadaIlustrativa, import.meta.url)))
   }
 })
-test('cada constelación presenta tres recomendaciones con información de interés', () => {
+test('cada constelación presenta tres recomendaciones con información de interés', async (t) => {
+  t.mock.method(globalThis, 'fetch', async () => new Response(JSON.stringify(catalogo)))
   for (const id of CONSTELACIONES_LIBROS) {
-    const libros = listarLibros(id)
+    const libros = await listarLibros(id)
     assert.equal(libros.length, 3)
     assert.ok(libros.every((libro) => libro.motivo.length >= 20))
-    assert.equal(buscarLibro(id, libros[0].id)?.id, libros[0].id)
+    assert.equal((await buscarLibro(id, libros[0].id))?.id, libros[0].id)
   }
 })
-test('parámetros desconocidos no muestran un libro ajeno', () => {
-  assert.deepEqual(listarLibros('desconocida'), [])
-  assert.equal(buscarLibro('orion', 'no-existe'), null)
-  assert.equal(buscarLibro('sin-constelacion', 'star-lore'), null)
+test('parámetros desconocidos no muestran un libro ajeno', async (t) => {
+  t.mock.method(globalThis, 'fetch', async () => new Response(JSON.stringify(catalogo)))
+  assert.deepEqual(await listarLibros('desconocida'), [])
+  assert.equal(await buscarLibro('orion', 'no-existe'), null)
+  assert.equal(await buscarLibro('sin-constelacion', 'star-lore'), null)
 })
 test('las recomendaciones remiten a enlaces públicos, no al inventario de la biblioteca', () => {
   for (const libro of catalogo) {
