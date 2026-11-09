@@ -1,9 +1,10 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
-import { mkdtemp, writeFile, readFile, rm } from 'node:fs/promises'
+import { mkdtemp, writeFile, readFile, rm, readdir } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
-import { randomBytes } from 'node:crypto'
+import { randomBytes, createHash } from 'node:crypto'
+import { fileURLToPath } from 'node:url'
 import { once } from 'node:events'
 import { spawn } from 'node:child_process'
 import { crearApp } from '../src/index.js'
@@ -12,6 +13,23 @@ import { inicializarCatalogo, obtenerCatalogo } from '../src/services/documentRe
 
 const password = randomBytes(24).toString('hex')
 const config = await crearConfiguracionAdmin('editor-aislado', 'Prueba documental', password)
+const altaDinamica = { id: 'cielo-nuevo', titulo: 'Historias del cielo', autor: 'Equipo de prueba', anio: 2020,
+  enlacePublico: 'https://example.org/obra-temporal', portada: { tipo: 'ilustrativa', plantilla: 'guia', paleta: 'verde' },
+  relaciones: [{ constelacionId: 'orion', motivo: 'Lectura de prueba' }, { constelacionId: 'escorpio', motivo: 'Otra lectura de prueba' }] }
+async function activosPublicos() {
+  const archivos = []
+  for (const nombre of ['public', 'dist']) {
+    const raiz = fileURLToPath(new URL(`../../frontend/${nombre}/`, import.meta.url))
+    let entradas
+    try { entradas = await readdir(raiz, { recursive: true, withFileTypes: true }) }
+    catch (e) { if (e.code === 'ENOENT') continue; throw e }
+    for (const e of entradas.filter((e) => e.isFile())) {
+      const ruta = join(e.parentPath, e.name)
+      archivos.push([ruta, createHash('sha256').update(await readFile(ruta)).digest('hex')])
+    }
+  }
+  return archivos.sort(([a], [b]) => a.localeCompare(b))
+}
 async function entorno(t, preparar) {
   const dir = await mkdtemp(join(tmpdir(), 'astrovisor-s4-admin-'))
   const previo = { ASTROVISOR_DATA_DIR: process.env.ASTROVISOR_DATA_DIR, ASTROVISOR_ADMIN_FILE: process.env.ASTROVISOR_ADMIN_FILE }
@@ -42,6 +60,61 @@ async function entorno(t, preparar) {
   })
   return { datos, pedir, headers, guardar, app, server }
 }
+
+test('alta dinámica, previsualización, revalidación y revisión obsoleta sin modificar SVG iniciales', async (t) => {
+  const activos = await activosPublicos()
+  const { datos, pedir, headers, guardar } = await entorno(t)
+  const original = await obtenerCatalogo({ directorio: datos })
+  const preview = await guardar('/api/admin/portadas/previsualizar', { titulo: altaDinamica.titulo, autor: altaDinamica.autor, portada: altaDinamica.portada }, '"catalogo-1"', 'POST')
+  assert.equal(preview.status, 200); const svg = await preview.text()
+  assert.equal((await obtenerCatalogo({ directorio: datos })).revision, 1)
+  const r = await guardar('/api/admin/libros', altaDinamica, '"catalogo-1"', 'POST')
+  assert.equal(r.status, 201); assert.equal(r.headers.get('etag'), '"catalogo-2"')
+  const c = await obtenerCatalogo({ directorio: datos })
+  assert.deepEqual(c.libros.slice(0, 3), original.libros)
+  for (let i = 0; i < 3; i++) {
+    assert.deepEqual(c.recorridos[i].multimedia, original.recorridos[i].multimedia)
+    assert.deepEqual(c.recorridos[i].libroRefs.slice(0, 3), original.recorridos[i].libroRefs)
+  }
+  const publico = await (await pedir('/api/contenidos/libros')).json()
+  const libro = publico.find((l) => l.id === altaDinamica.id)
+  assert.equal(Object.keys(libro.recomendaciones).length, 2)
+  assert.equal(libro.portadaIlustrativa, '/api/contenidos/libros/cielo-nuevo/portada.svg?revision=2')
+  const portada = await pedir(libro.portadaIlustrativa)
+  assert.equal(portada.status, 200); assert.equal(await portada.text(), svg)
+  assert.match(portada.headers.get('content-type'), /image\/svg\+xml/)
+  assert.equal(portada.headers.get('x-content-type-options'), 'nosniff')
+  assert.equal((await pedir(libro.portadaIlustrativa, { headers: { 'If-None-Match': portada.headers.get('etag') } })).status, 304)
+  const admin = await (await pedir('/api/admin/catalogo', { headers })).json()
+  assert.equal(admin.libros.at(-1).portadaIlustrativa, libro.portadaIlustrativa)
+  assert.deepEqual(await activosPublicos(), activos)
+  await guardar('/api/admin/recorridos/orion', { resumen: 'Revisión siguiente' }, '"catalogo-2"')
+  assert.equal((await pedir(libro.portadaIlustrativa, { headers: { 'If-None-Match': portada.headers.get('etag') } })).status, 409)
+  for (const [ruta, status] of [['cielo-nuevo/portada.svg', 400], ['ausente/portada.svg?revision=3', 404], ['INVALIDO/portada.svg?revision=3', 400], ['cielo-nuevo/portada.svg?revision=3&archivo=x', 400]]) {
+    assert.equal((await pedir('/api/contenidos/libros/' + ruta)).status, status)
+  }
+})
+
+test('alta y preview rechazan sesión, revisión, parámetros y relaciones inválidas sin guardar', async (t) => {
+  const { datos, pedir, guardar } = await entorno(t)
+  for (const ruta of ['/api/admin/libros', '/api/admin/portadas/previsualizar']) {
+    assert.equal((await pedir(ruta, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(altaDinamica) })).status, 401)
+    assert.equal((await guardar(ruta, altaDinamica, null, 'POST')).status, 428)
+    assert.equal((await guardar(ruta, altaDinamica, '"catalogo-9"', 'POST')).status, 412)
+  }
+  for (const cambio of [{ id: '../x' }, { titulo: '<svg onload="x">' }, { portada: { ...altaDinamica.portada, paleta: 'rojo' } }, { portada: { ...altaDinamica.portada, src: '/privado' } }, { relaciones: [{ constelacionId: 'ausente', motivo: 'No' }] }]) {
+    assert.equal((await guardar('/api/admin/libros', { ...altaDinamica, ...cambio }, '"catalogo-1"', 'POST')).status, 400)
+  }
+  for (const titulo of ['\u01c4'.repeat(10), 'W'.repeat(200), '<svg']) {
+    const d = { titulo, autor: altaDinamica.autor, portada: altaDinamica.portada }
+    assert.equal((await guardar('/api/admin/portadas/previsualizar', d, '"catalogo-1"', 'POST')).status, 400)
+    assert.equal((await guardar('/api/admin/libros', { ...altaDinamica, titulo }, '"catalogo-1"', 'POST')).status, 400)
+  }
+  assert.equal((await obtenerCatalogo({ directorio: datos })).revision, 1)
+  assert.equal((await guardar('/api/admin/libros', altaDinamica, '"catalogo-1"', 'POST')).status, 201)
+  assert.equal((await guardar('/api/admin/libros', altaDinamica, '"catalogo-1"', 'POST')).status, 412)
+  assert.equal((await guardar('/api/admin/libros', altaDinamica, '"catalogo-2"', 'POST')).status, 409)
+})
 
 test('GET administrativo exige sesión y devuelve revisión; PATCH persiste y API pública refleja cambio', async (t) => {
   const { datos, pedir, headers, guardar } = await entorno(t)

@@ -1,6 +1,7 @@
 import { statSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import { join } from 'node:path'
+import { generarPortada, rutaPortada } from './portadas.js'
 
 const publicDir = fileURLToPath(new URL('../../../frontend/public/', import.meta.url))
 const ID = /^[a-z0-9]+(?:-[a-z0-9]+)*$/
@@ -46,7 +47,10 @@ export function validarCatalogo(catalogo) {
     exigir(typeof libro.demostracion === 'boolean', 'falta identificación de demostración')
     exigir(objeto(libro.marc21) && texto(libro.marc21.campo001, 200) && texto(libro.marc21.campo003, 200), 'metadatos MARC inválidos')
     exigir(!('recomendaciones' in libro), 'las relaciones pertenecen al recorrido')
-    activo(libro.portadaIlustrativa, /^\/libros-demo\/[a-z0-9-]+\.svg$/)
+    if (libro.portada !== undefined) {
+      generarPortada(libro)
+      exigir(libro.portadaIlustrativa === `/api/contenidos/libros/${libro.id}/portada.svg`, 'ruta dinámica inválida')
+    } else activo(libro.portadaIlustrativa, /^\/libros-demo\/[a-z0-9-]+\.svg$/)
   }
   for (const recorrido of recorridos) {
     exigir(objeto(recorrido) && idValido(recorrido.id) && !idsRecorridos.has(recorrido.id), 'ID de recorrido inválido o duplicado')
@@ -114,7 +118,7 @@ export function proyectarRecorridos({ recorridos, libros }) {
   }))
 }
 
-export function proyectarLibros({ recorridos, libros }, constelacionId) {
+export function proyectarLibros({ recorridos, libros, revision }, constelacionId) {
   return libros.flatMap((libro) => {
     const recomendaciones = Object.fromEntries(recorridos.flatMap((r) => {
       const ref = r.libroRefs.find((l) => l.libroId === libro.id)
@@ -122,7 +126,7 @@ export function proyectarLibros({ recorridos, libros }, constelacionId) {
     }))
     if (constelacionId !== undefined && !Object.hasOwn(recomendaciones, constelacionId)) return []
     const campos = ['id', 'titulo', 'autor', 'anio', 'enlacePublico', 'portadaIlustrativa', 'tema', 'demostracion', 'marc21']
-    return [{ ...Object.fromEntries(campos.filter((c) => Object.hasOwn(libro, c)).map((c) => [c, libro[c]])), recomendaciones,
+    return [{ ...Object.fromEntries(campos.filter((c) => Object.hasOwn(libro, c)).map((c) => [c, libro[c]])), portadaIlustrativa: rutaPortada(libro, revision), recomendaciones,
       ...(constelacionId === undefined ? {} : { motivo: recomendaciones[constelacionId] }) }]
   })
 }

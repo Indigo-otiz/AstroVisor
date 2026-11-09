@@ -1,5 +1,6 @@
 import { lstatSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
+import { configurarPortada } from './portadas.js'
 
 const fallo = (status, mensaje) => Object.assign(new Error(mensaje), { status })
 const idValido = (id) => typeof id === 'string' && id.length <= 100 && /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(id)
@@ -39,7 +40,7 @@ function referencias(catalogo, refs, destino, porLibro) {
 
 export function editarCatalogo(catalogo, { tipo, id, datos }) {
   const nuevo = tipo === 'crearLibro', libro = tipo !== 'recorrido'
-  entrada(datos, libro ? [...camposLibro, 'relaciones', ...(nuevo ? ['id', 'portadaIlustrativa'] : [])]
+  entrada(datos, libro ? [...camposLibro, 'relaciones', ...(nuevo ? ['id', 'portadaIlustrativa', 'portada'] : [])]
     : ['titulo', 'resumen', 'historia', 'comoReconocerla', 'libroRefs'])
   if (!idValido(nuevo ? datos.id : id)) throw fallo(400, 'ID inválido')
   if (libro && Object.hasOwn(datos, 'tema') && (typeof datos.tema !== 'string' || !/^#[0-9a-fA-F]{6}$/.test(datos.tema))) throw fallo(400, 'Color inválido')
@@ -47,11 +48,17 @@ export function editarCatalogo(catalogo, { tipo, id, datos }) {
   if (libro && datos.enlacePublico !== undefined && catalogo.libros.some((l) => l.id !== (nuevo ? datos.id : id) && l.enlacePublico === datos.enlacePublico)) throw fallo(409, 'Referencia bibliográfica duplicada')
   let destino
   if (nuevo) {
-    if (datos.portadaIlustrativa !== `/libros-demo/${datos.id}.svg`) throw fallo(400, 'La portada debe corresponder al ID del libro')
-    try {
-      if (!lstatSync(fileURLToPath(new URL(`../../../frontend/public${datos.portadaIlustrativa}`, import.meta.url))).isFile()) throw new Error()
-    } catch { throw fallo(409, 'Portada ilustrativa estática no disponible; generación dinámica pendiente') }
-    destino = { id: datos.id, portadaIlustrativa: datos.portadaIlustrativa, demostracion: true,
+    let portada
+    if (datos.portada !== undefined) {
+      if (datos.portadaIlustrativa !== undefined) throw fallo(400, 'No se aceptan rutas con una plantilla dinámica')
+      portada = configurarPortada(datos)
+    } else {
+      if (datos.portadaIlustrativa !== `/libros-demo/${datos.id}.svg`) throw fallo(400, 'La portada debe corresponder al ID del libro')
+      try {
+        if (!lstatSync(fileURLToPath(new URL(`../../../frontend/public${datos.portadaIlustrativa}`, import.meta.url))).isFile()) throw new Error()
+      } catch { throw fallo(409, 'Portada ilustrativa estática no disponible') }
+    }
+    destino = { id: datos.id, ...(portada ? { portada } : {}), portadaIlustrativa: portada ? `/api/contenidos/libros/${datos.id}/portada.svg` : datos.portadaIlustrativa, demostracion: true,
       marc21: { campo001: `DEMO-${datos.id}`, campo003: 'DEMO', signatura852: null, ubicacion852: null } }
     catalogo.libros.push(destino)
   } else {

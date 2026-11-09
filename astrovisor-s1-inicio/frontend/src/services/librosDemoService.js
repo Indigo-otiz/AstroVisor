@@ -23,7 +23,8 @@ export function esLibroValido(libro) {
     const url = new URL(libro.enlacePublico)
     return ['titulo', 'autor'].every((k) => typeof libro[k] === 'string' && libro[k].trim())
       && typeof libro.demostracion === 'boolean' && typeof libro.marc21?.campo001 === 'string' && typeof libro.marc21.campo003 === 'string'
-      && typeof libro.portadaIlustrativa === 'string' && /^\/libros-demo\/[a-z0-9-]+\.svg$/.test(libro.portadaIlustrativa)
+      && typeof libro.portadaIlustrativa === 'string' && (/^\/libros-demo\/[a-z0-9-]+\.svg$/.test(libro.portadaIlustrativa)
+        || new RegExp(`^/api/contenidos/libros/${libro.id}/portada\\.svg\\?revision=[1-9][0-9]*$`).test(libro.portadaIlustrativa))
       && url.protocol === 'https:' && !url.username && !url.password
   } catch { return false }
 }

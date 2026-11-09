@@ -170,6 +170,18 @@ El sistema SHALL conservar los tres SVG y el diseño de estantería de PR #6. En
 - **WHEN** un administrador crea un libro sin una portada original autorizada
 - **THEN** puede seleccionar una plantilla ilustrativa del estilo existente y consultar su cubierta tras guardar/recargar, sin recompilar ni reiniciar la aplicación.
 
+#### Scenario: Alta 3B con varias constelaciones
+- **WHEN** una identidad autorizada confirma un libro con plantilla permitida, ID único, enlace HTTPS y motivos en varias constelaciones mediante If-Match vigente
+- **THEN** se guarda una sola ficha demostrativa con MARC simulado y sus relaciones; la web consulta su portada dinámica por ID/revisión, conservando los tres libros y nueve relaciones originales; la exportación Homido sigue pendiente.
+
+#### Scenario: Preview y ajuste comparten validación
+- **WHEN** se previsualiza o registra título/autor con plantilla y paleta
+- **THEN** el mismo renderizador rechaza markup, caracteres fuera del repertorio declarado o texto que no cabe; la previsualización no escribe, usa autorización y revisión y nunca inserta SVG como HTML de la aplicación.
+
+#### Scenario: Revalidación de portada vigente
+- **WHEN** se consulta una portada dinámica con revisión vigente y If-None-Match coincidente
+- **THEN** responde 304; si la revisión solicitada es distinta a la actual, responde 409 antes de cualquier 304 o SVG nuevo.
+
 #### Scenario: Servicio dinámico y exportación
 - **WHEN** se solicita una portada ilustrativa nueva online o desde el paquete estático publicado
 - **THEN** se obtiene el SVG correspondiente a los datos y plantilla de esa revisión, sin depender de un archivo añadido al código frontend.

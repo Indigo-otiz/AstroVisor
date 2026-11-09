@@ -1,6 +1,8 @@
 import express from 'express'
 import { pathToFileURL } from 'node:url'
 import { resolve } from 'node:path'
+import { createHash } from 'node:crypto'
+import { generarPortada, configurarPortada, rutaPortada } from './services/portadas.js'
 import { obtenerRecorridos, obtenerLibros, obtenerCatalogo, abrirEscritor } from './services/documentRepository.js'
 import { editarCatalogo } from './services/catalogoEdicion.js'
 import { crearSesion, destruirSesion, verificarAdmin, crearLimitadorLogin } from './middleware/auth.js'
@@ -53,6 +55,22 @@ export function crearApp() {
       res.json(libros)
     } catch (err) { next(err) }
   })
+  app.get('/api/contenidos/libros/:id/portada.svg', async (req, res) => {
+    res.set({ 'Cache-Control': 'no-cache', 'X-Content-Type-Options': 'nosniff', 'Content-Security-Policy': "default-src 'none'; style-src 'none'; sandbox" })
+    if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(req.params.id) || req.params.id.length > 100
+      || Object.keys(req.query).some((k) => k !== 'revision') || typeof req.query.revision !== 'string' || !/^[1-9][0-9]*$/.test(req.query.revision) || !Number.isSafeInteger(Number(req.query.revision))) return res.status(400).json({ error: 'Identificador o revisión inválidos' })
+    try {
+      const c = await obtenerCatalogo()
+      if (Number(req.query.revision) !== c.revision) return res.status(409).json({ error: 'Revisión obsoleta; consulta de nuevo el catálogo' })
+      const libro = c.libros.find((l) => l.id === req.params.id)
+      if (!libro?.portada?.plantilla) return res.status(404).json({ error: 'Portada dinámica no encontrada' })
+      const svg = generarPortada(libro)
+      const etiqueta = `"portada-${c.revision}-${createHash('sha256').update(svg).digest('hex')}"`
+      res.set('ETag', etiqueta).type('image/svg+xml')
+      if (req.get('If-None-Match')?.split(',').some((v) => v.trim() === '*' || v.trim().replace(/^W\//, '') === etiqueta)) return res.status(304).end()
+      res.send(svg)
+    } catch { res.status(503).json({ error: 'Portada no disponible' }) }
+  })
 
   app.post('/api/admin/login', crearLimitadorLogin(), async (req, res) => {
     const { usuario, contrasena } = req.body || {}
@@ -78,8 +96,20 @@ export function crearApp() {
   app.get('/api/admin/catalogo', verificarAdmin, async (_req, res) => {
     try {
       const catalogo = await obtenerCatalogo()
-      res.set('ETag', etag(catalogo.revision)).json(catalogo)
+      res.set('ETag', etag(catalogo.revision)).json({ ...catalogo, libros: catalogo.libros.map((l) => ({ ...l, portadaIlustrativa: rutaPortada(l, catalogo.revision) })) })
     } catch { errorDocumental({}, res) }
+  })
+  app.post('/api/admin/portadas/previsualizar', verificarAdmin, async (req, res) => {
+    const condicion = req.get('If-Match')
+    if (!condicion) return res.status(428).json({ error: 'Se requiere If-Match' })
+    if (!/^"catalogo-[1-9][0-9]*"$/.test(condicion)) return res.status(400).json({ error: 'If-Match inválido' })
+    try {
+      const c = await obtenerCatalogo()
+      if (condicion !== etag(c.revision)) return res.status(412).json({ error: 'Revisión obsoleta' })
+      if (!req.body || Array.isArray(req.body) || Object.keys(req.body).some((k) => !['titulo', 'autor', 'portada'].includes(k))) return res.status(400).json({ error: 'Datos de portada inválidos' })
+      const portada = configurarPortada(req.body)
+      res.set({ 'X-Content-Type-Options': 'nosniff', 'Content-Security-Policy': "default-src 'none'; sandbox" }).type('image/svg+xml').send(generarPortada({ ...req.body, portada }))
+    } catch (error) { errorDocumental(error, res) }
   })
   const guardar = (tipo) => async (req, res) => {
     const condicion = req.get('If-Match')

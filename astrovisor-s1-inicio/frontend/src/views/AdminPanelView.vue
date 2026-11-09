@@ -10,7 +10,7 @@ const { userDisplayName, username, signOut, token, invalidarSesion } = useAuth()
 const isIniciando3D = ref(false)
 const { catalogo, seleccion, borrador, cargando, guardando, error, mensaje, conflicto, necesitaRecarga,
   libroActual, recorridoActual, cargar, seleccionarLibro, seleccionarRecorrido, cancelarEdicion, guardar, cancelarPeticiones,
-  hayBorradorPendiente, recuperarBorrador, descartarBorradorPendiente } = useEditorCatalogo({
+  hayBorradorPendiente, recuperarBorrador, descartarBorradorPendiente, nuevoLibro, previsualizar, previsualizacion, previsualizando } = useEditorCatalogo({
   obtenerToken: () => token.value,
   obtenerUsuario: () => username.value,
   alExpirarSesion: () => { invalidarSesion(); void router.replace({ name: 'admin-acceso' }) },
@@ -42,7 +42,7 @@ async function guardarYCentrar() {
 async function cancelarYCentrar() {
   const anterior = seleccion.value
   cancelarEdicion(); await nextTick()
-  if (anterior) document.querySelector(`[data-editar="${anterior.tipo}-${anterior.id}"]`)?.focus()
+  if (anterior) document.querySelector(anterior.tipo === 'nuevo' ? '#nuevo-libro' : `[data-editar="${anterior.tipo}-${anterior.id}"]`)?.focus()
 }
 watch(seleccion, async (actual) => { if (actual) { await nextTick(); document.querySelector('#editor-heading')?.focus() } })
 onMounted(cargar)
@@ -342,6 +342,7 @@ onBeforeUnmount(cancelarPeticiones)
         <p class="admin-note">
           Edita una ficha a la vez. Las referencias son de demostración; no representan préstamos ni disponibilidad de ejemplares.
         </p>
+        <button id="nuevo-libro" type="button" class="btn-refresh" :disabled="!catalogo || cargando || guardando || Boolean(borrador) || necesitaRecarga" @click="nuevoLibro">Registrar libro de demostración</button>
         <div v-if="hayBorradorPendiente" role="status" class="admin-note">
           <p>Hay una edición pendiente de la sesión anterior, solo en memoria de esta pestaña. Puedes recuperarla después de consultar el catálogo. Se pierde al recargar o cerrar la pestaña.</p>
           <button type="button" class="btn-refresh" :disabled="!catalogo || cargando || guardando || Boolean(borrador)" @click="recuperarBorrador">Recuperar borrador</button>
@@ -378,22 +379,44 @@ onBeforeUnmount(cancelarPeticiones)
           </li></ul>
         </section>
         <form v-if="borrador" class="catalogo-formulario" @submit.prevent="guardarYCentrar">
-          <h3 id="editor-heading" tabindex="-1">Editar {{ libroActual?.titulo ?? recorridoActual?.titulo }}</h3>
+          <h3 id="editor-heading" tabindex="-1">{{ seleccion.tipo === 'nuevo' ? 'Registrar libro de demostración' : `Editar ${libroActual?.titulo ?? recorridoActual?.titulo}` }}</h3>
           <fieldset :disabled="guardando || cargando">
-            <legend>{{ seleccion.tipo === 'libro' ? 'Información bibliográfica y motivos de lectura' : 'Información de la constelación' }}</legend>
-            <template v-if="libroActual">
-              <p id="restriccion-portadas" class="admin-note">Título y autor están en solo lectura: las portadas contienen texto fijo y algunos enlaces de Homido dependen del título. Su edición requiere una etapa posterior. No se crean libros nuevos desde este panel.</p>
+            <legend>{{ seleccion.tipo !== 'recorrido' ? 'Información bibliográfica y motivos de lectura' : 'Información de la constelación' }}</legend>
+            <template v-if="seleccion.tipo === 'nuevo'">
+              <p class="admin-note">Referencia de demostración: no registra un ejemplar institucional. La portada se genera con título y autor; su publicación para Homido sigue pendiente.</p>
+              <label for="nuevo-id">ID estable (minúsculas, números y guiones)</label>
+              <input id="nuevo-id" v-model="borrador.id" required maxlength="100" pattern="[a-z0-9]+(-[a-z0-9]+)*" aria-describedby="id-ayuda" />
+              <p id="id-ayuda" class="admin-note">Debe ser único. Se usará en el enlace del libro y no podrá editarse después.</p>
+              <label for="nuevo-titulo">Título</label>
+              <input id="nuevo-titulo" v-model="borrador.titulo" required maxlength="200" />
+              <label for="nuevo-autor">Autor</label>
+              <input id="nuevo-autor" v-model="borrador.autor" required maxlength="200" />
+              <label for="nueva-plantilla">Plantilla ilustrativa</label>
+              <select id="nueva-plantilla" v-model="borrador.portada.plantilla"><option value="cielo">Cielo — constelación abierta</option><option value="guia">Guía — recorrido de estrellas</option><option value="relatos">Relatos — trama estelar</option></select>
+              <label for="nueva-paleta">Paleta de la portada</label>
+              <select id="nueva-paleta" v-model="borrador.portada.paleta"><option value="azul">Azul noche</option><option value="verde">Verde profundo</option><option value="violeta">Violeta</option></select>
+              <p class="admin-note">Se admiten letras latinas básicas y Latin-1 (incluidos acentos del español), números y puntuación común. La previsualización comprueba el ajuste: no recorta texto para hacerlo caber.</p>
+              <button type="button" class="btn-refresh" :disabled="previsualizando || conflicto" @click="previsualizar">{{ previsualizando ? 'Generando portada…' : 'Previsualizar portada' }}</button>
+              <figure v-if="previsualizacion" class="portada-preview"><img :src="previsualizacion" :alt="`Previsualización ilustrativa de ${borrador.titulo}; no es una cubierta original`" width="225" height="320" /><figcaption>Portada ilustrativa de demostración. No es la cubierta original.</figcaption></figure>
+            </template>
+            <template v-else-if="libroActual">
+              <p id="restriccion-portadas" class="admin-note">Título y autor están en solo lectura: las portadas originales contienen texto fijo y algunos enlaces de Homido dependen del título. Su edición requiere una etapa posterior.</p>
               <label for="editor-titulo">Título (solo lectura)</label>
               <input id="editor-titulo" :value="libroActual.titulo" readonly aria-describedby="restriccion-portadas" />
               <label for="editor-autor">Autor (solo lectura)</label>
               <input id="editor-autor" :value="libroActual.autor" readonly aria-describedby="restriccion-portadas" />
+            </template>
+            <template v-if="libroActual || seleccion.tipo === 'nuevo'">
               <label for="editor-anio">Año de publicación</label>
-              <input id="editor-anio" v-model.number="borrador.anio" type="number" min="1" max="9999" :required="libroActual.anio !== undefined" />
+              <input id="editor-anio" v-model.number="borrador.anio" type="number" min="1" max="9999" :required="seleccion.tipo === 'nuevo' || libroActual?.anio !== undefined" />
               <label for="editor-enlace">Enlace público de la obra (HTTPS)</label>
               <input id="editor-enlace" v-model="borrador.enlacePublico" type="url" required maxlength="2048" pattern="https://.+" />
               <div v-for="relacion in borrador.relaciones" :key="relacion.constelacionId" class="catalogo-motivo">
+                <label v-if="seleccion.tipo === 'nuevo'" class="catalogo-check"><input v-model="relacion.seleccionada" type="checkbox" /> Asociar con {{ nombreRecorrido(relacion.constelacionId) }}</label>
+                <template v-if="seleccion.tipo !== 'nuevo' || relacion.seleccionada">
                 <label :for="`motivo-${relacion.constelacionId}`">Motivo de lectura para {{ nombreRecorrido(relacion.constelacionId) }}</label>
                 <textarea :id="`motivo-${relacion.constelacionId}`" v-model="relacion.motivo" required maxlength="1000" rows="3"></textarea>
+                </template>
               </div>
             </template>
             <template v-else>
@@ -405,7 +428,7 @@ onBeforeUnmount(cancelarPeticiones)
             </template>
             <p v-if="conflicto || necesitaRecarga" class="admin-note">Tu formulario se conserva. Puedes copiar tu edición antes de usar «Recargar catálogo y descartar edición».</p>
             <div class="catalogo-acciones">
-              <button type="submit" class="btn-refresh" :disabled="conflicto || necesitaRecarga">{{ guardando ? 'Guardando…' : 'Guardar cambios' }}</button>
+              <button type="submit" class="btn-refresh" :disabled="conflicto || necesitaRecarga || (seleccion.tipo === 'nuevo' && (!previsualizacion || previsualizando))">{{ guardando ? 'Guardando…' : seleccion.tipo === 'nuevo' ? 'Confirmar registro' : 'Guardar cambios' }}</button>
               <button type="button" class="btn-refresh" @click="cancelarYCentrar">Cancelar edición</button>
             </div>
           </fieldset>
@@ -420,13 +443,18 @@ onBeforeUnmount(cancelarPeticiones)
 .book-cover { display: block; object-fit: contain; max-width: 100%; margin-bottom: 1rem; }
 .books-section .btn-refresh { min-height: 48px; white-space: normal; }
 .books-section .btn-refresh:disabled { opacity: .65; cursor: default; }
+.books-section .admin-note { margin-top: .75rem; }
 .books-section :focus-visible { outline: 3px solid #173868; outline-offset: 3px; }
 .catalogo-constelaciones, .catalogo-formulario { margin-top: 2rem; }
 .catalogo-constelaciones ul { display: flex; flex-wrap: wrap; gap: .75rem; padding: 0; list-style: none; }
 .catalogo-formulario fieldset { min-width: 0; padding: 1.25rem; border: 1px solid #cbd5e1; border-radius: .8rem; background: #fff; }
 .catalogo-formulario legend { padding: 0 .5rem; font-weight: 700; }
 .catalogo-formulario label { display: block; margin: 1rem 0 .4rem; font-weight: 600; }
-.catalogo-formulario input, .catalogo-formulario textarea { display: block; width: 100%; max-width: 100%; min-height: 48px; box-sizing: border-box; padding: .7rem; border: 1px solid #64748b; border-radius: .4rem; font: inherit; color: #0f1f38; background: #fff; }
+.catalogo-formulario input, .catalogo-formulario textarea, .catalogo-formulario select { display: block; width: 100%; max-width: 100%; min-height: 48px; box-sizing: border-box; padding: .7rem; border: 1px solid #64748b; border-radius: .4rem; font: inherit; color: #0f1f38; background: #fff; }
+.catalogo-formulario .catalogo-check { display: flex; align-items: center; gap: .75rem; min-height: 48px; }
+.catalogo-formulario input[type="checkbox"] { width: 24px; min-height: 24px; height: 24px; flex-shrink: 0; }
+.portada-preview { margin: 1.5rem 0; max-width: 26rem; }
+.portada-preview img { display: block; max-width: 100%; height: auto; }
 .catalogo-formulario input[readonly] { background: #f1f5f9; }
 .catalogo-formulario textarea { resize: vertical; line-height: 1.5; }
 .catalogo-acciones { display: flex; flex-wrap: wrap; gap: .75rem; margin-top: 1.5rem; }

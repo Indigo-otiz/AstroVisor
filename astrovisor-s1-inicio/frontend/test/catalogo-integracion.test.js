@@ -77,8 +77,21 @@ test('servicios Vue → Express: edición autorizada, 412, lectura pública y pe
   assert.equal(antiguo.conflicto.value, true)
   assert.equal(antiguo.borrador.value.comoReconocerla, 'Edición local que se conserva ante conflicto.')
   assert.equal((await cargarRecorridos())[0].resumen, 'Resumen confirmado desde Vue y leído por la API pública.')
+  const alta = useEditorCatalogo({ obtenerToken: () => token })
+  await alta.cargar(); alta.nuevoLibro()
+  Object.assign(alta.borrador.value, { id: 'guia-nueva', titulo: 'Guía del cielo nocturno', autor: 'Equipo temporal', anio: 2020, enlacePublico: 'https://example.org/guia-temporal' })
+  for (const r of alta.borrador.value.relaciones.slice(0, 2)) { r.seleccionada = true; r.motivo = 'Motivo de lectura temporal' }
+  assert.equal(await alta.previsualizar(), true)
+  assert.equal(await alta.guardar(), true)
+  const guia = (await listarLibros('orion')).find((l) => l.id === 'guia-nueva')
+  assert.equal(guia.portadaIlustrativa, '/api/contenidos/libros/guia-nueva/portada.svg?revision=4')
+  const cubierta = await fetch(guia.portadaIlustrativa)
+  assert.equal(cubierta.status, 200); const svg = await cubierta.text()
+  assert.match(svg, /PORTADA ILUSTRATIVA/)
+  assert.ok((await listarLibros('osa-mayor')).some((l) => l.id === 'guia-nueva'))
+  alta.cancelarPeticiones()
   const persistido = await obtenerCatalogo({ directorio: datos })
-  assert.equal(persistido.recorridos.flatMap((r) => r.libroRefs).length, 9)
+  assert.equal(persistido.recorridos.flatMap((r) => r.libroRefs).filter((r) => r.libroId !== 'guia-nueva').length, 9)
   assert.deepEqual(persistido.recorridos.map((r) => r.multimedia), original.recorridos.map((r) => r.multimedia))
   await new Promise((r) => server.close(r)); await app.locals.cerrarEscritor()
   const modulo = new URL('../../backend/src/index.js', import.meta.url).href
@@ -88,6 +101,8 @@ test('servicios Vue → Express: edición autorizada, 412, lectura pública y pe
   const [puerto] = await once(hijo, 'message'); base = `http://127.0.0.1:${puerto}`
   assert.equal((await listarLibros('orion'))[0].anio, 1912)
   assert.equal((await cargarRecorridos())[0].resumen, persistido.recorridos[0].resumen)
+  assert.equal((await listarLibros('orion')).find((l) => l.id === 'guia-nueva').titulo, 'Guía del cielo nocturno')
+  assert.equal(await (await fetch(guia.portadaIlustrativa)).text(), svg)
   let redirecciones = 0
   const expirada = useEditorCatalogo({ obtenerToken: () => token, alExpirarSesion: () => redirecciones++ })
   assert.equal(await expirada.cargar(), false)
@@ -96,5 +111,7 @@ test('servicios Vue → Express: edición autorizada, 412, lectura pública y pe
   await login()
   const nuevo = useEditorCatalogo({ obtenerToken: () => token })
   assert.equal(await nuevo.cargar(), true)
-  assert.deepEqual(JSON.parse(JSON.stringify(nuevo.catalogo.value)), persistido)
+  const esperado = structuredClone(persistido)
+  esperado.libros.find((l) => l.id === 'guia-nueva').portadaIlustrativa += '?revision=4'
+  assert.deepEqual(JSON.parse(JSON.stringify(nuevo.catalogo.value)), esperado)
 })
