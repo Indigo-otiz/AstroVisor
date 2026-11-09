@@ -45,7 +45,7 @@ async function guardar(tipo, id, datos, opciones) {
   if (!opciones.token) throw error(401)
   if (!opciones.etag) throw error(428)
   if (!etagValido(opciones.etag) || !idValido(id) || !datos || typeof datos !== 'object' || Array.isArray(datos)) throw error(400)
-  const permitidos = tipo === 'crear' ? ['id', 'titulo', 'autor', 'anio', 'enlacePublico', 'portada', 'relaciones'] : tipo === 'libros' ? ['anio', 'enlacePublico', 'relaciones'] : ['resumen', 'comoReconocerla']
+  const permitidos = tipo === 'crear' ? ['id', 'titulo', 'autor', 'anio', 'enlacePublico', 'portada', 'relaciones'] : tipo === 'libros' ? ['titulo','autor','portada','anio', 'enlacePublico', 'relaciones'] : ['resumen', 'comoReconocerla']
   if (!Object.keys(datos).length || Object.keys(datos).some((k) => !permitidos.includes(k))) throw error(400)
   const { cuerpo, etag } = await solicitar(tipo === 'crear' ? '/api/admin/libros' : `/api/admin/${tipo}/${id}`, { ...opciones, method: tipo === 'crear' ? 'POST' : 'PATCH', datos })
   if (cuerpo.ok !== true || cuerpo.revision !== Number(opciones.etag.match(/[0-9]+/)[0]) + 1) throw error(0)
@@ -54,6 +54,18 @@ async function guardar(tipo, id, datos, opciones) {
 export const guardarLibro = (id, datos, opciones) => guardar('libros', id, datos, opciones)
 export const guardarRecorrido = (id, datos, opciones) => guardar('recorridos', id, datos, opciones)
 export const crearLibro = (datos, opciones) => guardar('crear', datos.id, datos, opciones)
+
+export async function prepararImagen(file, {token,etag,signal}) {
+  if(!token)throw error(401)
+  if(!etagValido(etag))throw error(428)
+  if(!file||!['image/png','image/jpeg'].includes(file.type)||file.size>2*1024*1024||!file.size)throw error(400,'Elige un PNG o JPEG de hasta 2 MiB.')
+  const r=await fetch('/api/admin/imagenes',{method:'POST',headers:{Authorization:`Bearer ${token}`,'If-Match':etag,'Content-Type':file.type},body:file,signal,cache:'no-store',credentials:'same-origin'})
+  if(!r.ok)throw error(r.status)
+  const data=await r.json(),p=data.recurso
+  if(!p||!['png','jpeg'].includes(p.formato)||!/^data:image\/(png|jpeg);base64,[A-Za-z0-9+/=]+$/.test(data.previsualizacion)||data.previsualizacion.length>3*1024*1024)throw error(0)
+  const bytes=Uint8Array.from(atob(data.previsualizacion.split(',')[1]),c=>c.charCodeAt(0))
+  return {recurso:p,blob:new Blob([bytes],{type:'image/'+p.formato})}
+}
 
 export async function previsualizarPortada(datos, { token, etag, signal }) {
   if (!token) throw error(401)

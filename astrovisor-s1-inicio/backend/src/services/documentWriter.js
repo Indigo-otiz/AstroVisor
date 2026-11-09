@@ -6,6 +6,7 @@ import { setTimeout as esperar } from 'node:timers/promises'
 import { obtenerCatalogo } from './documentRepository.js'
 import { validarCatalogo } from './catalogo.js'
 import { rutaPrivada } from './privateStorage.js'
+import { validarImagenes } from './imageResources.js'
 
 const fallo = (status, mensaje) => Object.assign(new Error(mensaje), { status })
 const noDisponible = () => fallo(503, 'Almacenamiento documental no disponible')
@@ -121,6 +122,7 @@ export async function abrirEscritor({ directorio = process.env.ASTROVISOR_DATA_D
         siguiente.modificadoEn = new Date().toISOString()
         if (actor) siguiente.modificadoPor = actor
         try { validarCatalogo(siguiente) } catch { throw fallo(400, 'Documento o relaciones inválidos') }
+        await validarImagenes(siguiente)
         try { await respaldar(bloqueo.ruta, actual, io); await sustituir(bloqueo.ruta, siguiente, io) }
         catch { throw noDisponible() }
         // shortcut: rename confirma publicación; un fallo de sync/poda posterior se informa, no revierte el guardado.
@@ -178,6 +180,7 @@ export async function restaurarCatalogo({ directorio = process.env.ASTROVISOR_DA
     restaurado.revision = mayor + 1
     restaurado.modificadoEn = new Date().toISOString()
     validarCatalogo(restaurado)
+    await validarImagenes(restaurado)
     await sustituir(bloqueo.ruta, restaurado, fs)
     resultado = { ...noConfirmada, confirmada: true, revisionPersistida: restaurado.revision,
       catalogo: restaurado, durabilidadPendiente: true }

@@ -10,6 +10,25 @@ Estado del hallazgo: corrección de restauración validada con regresión de con
 
 ## ADDED Requirements
 
+### Requirement: Portadas híbridas autorizadas
+El sistema SHALL conservar el contrato schemaVersion1 y los SVG heredados, admitir SVG automáticos y PNG/JPEG normalizados con procedencia, permiso y alternativa obligatorios. SHALL validar contenido y límites, preparar recursos inmutables privados externos antes de asociarlos mediante escritura autorizada con If-Match, y conservar activos referenciados por catálogo y respaldos. Esta autorización de desarrollo no acredita derechos de imágenes concretas.
+
+#### Scenario: Preparación y conflicto
+- **WHEN** se prepara una imagen válida y la asociación recibe412 o falla antes de confirmar
+- **THEN** el catálogo anterior permanece y el recurso queda sin asociar, sin reintento automático ni publicación pública por UUID.
+
+#### Scenario: Edición con portada fija
+- **WHEN** se cambia título o autor conservando un SVG heredado
+- **THEN** el servidor rechaza409; una sustitución explícita por automática o imagen autorizada permite editar sin modificar el SVG antiguo.
+
+#### Scenario: Imagen en paquete anterior
+- **WHEN** un libro cambia de portada y se exporta otra revisión
+- **THEN** la publicación anterior conserva sus propios bytes/hashes/extensión y el lector valida únicamente SVG del generador/heredados o PNG/JPEG normalizados autorizados.
+
+#### Scenario: Subida no autorizada o malformada
+- **WHEN** falta sesión/precondición, el contenido no es PNG/JPEG válido o excede límites de bytes/dimensiones/píxeles
+- **THEN** se rechaza sin asociar ni exponer temporales o rutas privadas.
+
 ### Requirement: Autorización efectiva antes de escribir
 El sistema SHALL verificar identidad y permiso administrativo en servidor para toda operación de escritura. SHALL denegar acceso sin sesión, con sesión expirada o a una identidad sin permiso. La presencia de datos locales del navegador no SHALL conceder autorización.
 
@@ -20,6 +39,10 @@ El sistema SHALL verificar identidad y permiso administrativo en servidor para t
 #### Scenario: Estado local manipulado
 - **WHEN** un cliente altera su almacenamiento local para aparentar ser administrador
 - **THEN** el servidor sigue denegando escrituras sin identidad y permiso válidos.
+
+#### Scenario: Cuerpo comprimido hostil antes de autenticar
+- **WHEN** llega un cuerpo JSON con Content-Encoding gzip o deflate, incluso sin sesión y a una ruta inexistente
+- **THEN** el parser global rechaza415 sin descomprimir, el proceso sigue respondiendo health y mantiene JSON normal, login y escrituras autorizadas con límite64KiB; la carga binaria conserva su rechazo de compresión y límite2MiB.
 
 #### Scenario: Revisión de identidad pendiente
 - **WHEN** falta autorización de una etapa posterior a la entrega 2B

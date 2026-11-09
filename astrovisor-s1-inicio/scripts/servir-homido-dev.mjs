@@ -10,10 +10,10 @@ export async function crearServidorExportaciones(opciones={}) {
     if(!['GET','HEAD'].includes(req.method)){res.writeHead(405);res.end();return}
     try{
       const nombre=decodeURIComponent(new URL(req.url,'http://localhost').pathname).slice(1)
-      if(!/^(ultima\.json|revisiones\/[1-9][0-9]*\/(manifiesto\.json|recorridos-demo\.json|libros\.json|portadas\/[a-z0-9-]+\.svg|audio\/[a-z0-9-]+\.(wav|mp3|ogg|m4a)))$/.test(nombre))throw new Error()
+      if(!/^(ultima\.json|revisiones\/[1-9][0-9]*\/(manifiesto\.json|recorridos-demo\.json|libros\.json|portadas\/[a-z0-9-]+\.(svg|png|jpg)|audio\/[a-z0-9-]+\.(wav|mp3|ogg|m4a)))$/.test(nombre))throw new Error()
       const archivo=join(raiz,nombre),s=await lstat(archivo)
       if(!s.isFile()||s.isSymbolicLink()||s.nlink!==1||await realpath(archivo)!==archivo)throw new Error()
-      const tipo=nombre.endsWith('.svg')?'image/svg+xml':nombre.endsWith('.wav')?'audio/wav':nombre.endsWith('.mp3')?'audio/mpeg':nombre.endsWith('.ogg')?'audio/ogg':nombre.endsWith('.m4a')?'audio/mp4':'application/json'
+      const tipo=nombre.endsWith('.png')?'image/png':nombre.endsWith('.jpg')?'image/jpeg':nombre.endsWith('.svg')?'image/svg+xml':nombre.endsWith('.wav')?'audio/wav':nombre.endsWith('.mp3')?'audio/mpeg':nombre.endsWith('.ogg')?'audio/ogg':nombre.endsWith('.m4a')?'audio/mp4':'application/json'
       res.setHeader('Content-Type',tipo);res.setHeader('Cache-Control',nombre==='ultima.json'?'no-store':'no-cache')
       res.setHeader('Content-Security-Policy',"default-src 'none'; sandbox")
       const b=await readFile(archivo);res.setHeader('Content-Length',b.length);res.writeHead(200);res.end(req.method==='HEAD'?undefined:b)

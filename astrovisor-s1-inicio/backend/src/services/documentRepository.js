@@ -4,6 +4,7 @@ import { join } from 'node:path'
 import { randomUUID } from 'node:crypto'
 import { validarCatalogo, proyectarRecorridos, proyectarLibros } from './catalogo.js'
 import { rutaPrivada } from './privateStorage.js'
+import { validarImagenes } from './imageResources.js'
 export { abrirEscritor, restaurarCatalogo, retirarBloqueoAbandonado } from './documentWriter.js'
 
 const semillaPath = fileURLToPath(new URL('../../../content/catalogo-inicial.json', import.meta.url))
@@ -34,7 +35,9 @@ export async function obtenerCatalogo({ directorio = process.env.ASTROVISOR_DATA
   const ruta = await rutaPrivada(directorio)
   const archivo = join(ruta, 'catalogo.json')
   if (await realpath(archivo) !== join(await realpath(ruta), 'catalogo.json')) throw new Error('No se permiten enlaces para el archivo de catálogo')
-  return validarCatalogo(JSON.parse(await readFile(archivo, 'utf8')))
+  const catalogo = validarCatalogo(JSON.parse(await readFile(archivo, 'utf8')))
+  await validarImagenes(catalogo)
+  return catalogo
 }
 
 export async function obtenerRecorridos(opciones) {

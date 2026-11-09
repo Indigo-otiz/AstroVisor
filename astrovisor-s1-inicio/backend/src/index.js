@@ -8,6 +8,7 @@ import { editarCatalogo } from './services/catalogoEdicion.js'
 import { crearSesion, destruirSesion, verificarAdmin, crearLimitadorLogin } from './middleware/auth.js'
 import { verificarCredenciales } from './services/adminCredentials.js'
 import { estadoPublicacion } from './services/homidoExport.js'
+import { prepararImagen, leerImagen, MAX_IMAGEN } from './services/imageResources.js'
 
 if (typeof process.loadEnvFile === 'function') {
   try { process.loadEnvFile() } catch {}
@@ -40,7 +41,7 @@ export function crearApp() {
     })
     next()
   })
-  app.use(express.json({ limit: '64kb' }))
+  app.use(express.json({ limit: '64kb', inflate: false }))
   app.get('/api/health', (_req, res) => res.json({ estado: 'ok', servicio: 'astrovisor-api' }))
   app.get('/api/contenidos/recorridos', async (_req, res, next) => {
     try { res.json(await obtenerRecorridos()) } catch (err) { next(err) }
@@ -56,7 +57,7 @@ export function crearApp() {
       res.json(libros)
     } catch (err) { next(err) }
   })
-  app.get('/api/contenidos/libros/:id/portada.svg', async (req, res) => {
+  app.get('/api/contenidos/libros/:id/portada.:formato', async (req, res) => {
     res.set({ 'Cache-Control': 'no-cache', 'X-Content-Type-Options': 'nosniff', 'Content-Security-Policy': "default-src 'none'; style-src 'none'; sandbox" })
     if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(req.params.id) || req.params.id.length > 100
       || Object.keys(req.query).some((k) => k !== 'revision') || typeof req.query.revision !== 'string' || !/^[1-9][0-9]*$/.test(req.query.revision) || !Number.isSafeInteger(Number(req.query.revision))) return res.status(400).json({ error: 'Identificador o revisión inválidos' })
@@ -64,12 +65,13 @@ export function crearApp() {
       const c = await obtenerCatalogo()
       if (Number(req.query.revision) !== c.revision) return res.status(409).json({ error: 'Revisión obsoleta; consulta de nuevo el catálogo' })
       const libro = c.libros.find((l) => l.id === req.params.id)
-      if (!libro?.portada?.plantilla) return res.status(404).json({ error: 'Portada dinámica no encontrada' })
-      const svg = generarPortada(libro)
-      const etiqueta = `"portada-${c.revision}-${createHash('sha256').update(svg).digest('hex')}"`
-      res.set('ETag', etiqueta).type('image/svg+xml')
+      const imagen = libro?.portada?.tipo === 'imagen-autorizada'
+      if ((!imagen && !libro?.portada?.plantilla) || req.params.formato !== (imagen ? (libro.portada.formato === 'png' ? 'png' : 'jpg') : 'svg')) return res.status(404).json({ error: 'Portada no encontrada' })
+      const contenido = imagen ? await leerImagen(libro.portada) : generarPortada(libro)
+      const etiqueta = `"portada-${c.revision}-${createHash('sha256').update(contenido).digest('hex')}"`
+      res.set('ETag', etiqueta).type(imagen ? 'image/'+libro.portada.formato : 'image/svg+xml')
       if (req.get('If-None-Match')?.split(',').some((v) => v.trim() === '*' || v.trim().replace(/^W\//, '') === etiqueta)) return res.status(304).end()
-      res.send(svg)
+      res.send(contenido)
     } catch { res.status(503).json({ error: 'Portada no disponible' }) }
   })
 
@@ -94,6 +96,17 @@ export function crearApp() {
   })
   const etag = (revision) => `"catalogo-${revision}"`
   const errorDocumental = (error, res) => res.status(error.status || 503).json({ error: error.status ? error.message : 'Almacenamiento documental no disponible' })
+  app.post('/api/admin/imagenes', verificarAdmin, express.raw({ type: ['image/png','image/jpeg'], limit: MAX_IMAGEN, inflate: false }), async (req,res) => {
+    const condicion=req.get('If-Match')
+    if(!condicion)return res.status(428).json({error:'Se requiere If-Match'})
+    if(!/^"catalogo-[1-9][0-9]*"$/.test(condicion))return res.status(400).json({error:'If-Match inválido'})
+    try {
+      if(condicion!==etag((await obtenerCatalogo()).revision))return res.status(412).json({error:'Revisión obsoleta'})
+      const recurso=await prepararImagen(req.body,req.get('Content-Type'))
+      const bytes=await leerImagen(recurso)
+      res.status(201).json({recurso,previsualizacion:`data:image/${recurso.formato};base64,${bytes.toString('base64')}`,preparada:true,asociada:false})
+    }catch(error){errorDocumental(error,res)}
+  })
   app.get('/api/admin/catalogo', verificarAdmin, async (_req, res) => {
     try {
       const catalogo = await obtenerCatalogo()
@@ -132,6 +145,7 @@ export function crearApp() {
   app.patch('/api/admin/recorridos/:id', verificarAdmin, guardar('recorrido'))
   app.use('/api/admin', verificarAdmin, (_req, res) => res.status(404).json({ error: 'Recurso administrativo no encontrado' }))
   app.use((err, _req, res, _next) => {
+    if (err.type === 'encoding.unsupported') return res.status(415).json({ error: 'No se admiten cuerpos HTTP comprimidos' })
     if (err.type === 'entity.parse.failed') return res.status(400).json({ error: 'JSON inválido' })
     if (err.type === 'entity.too.large') return res.status(413).json({ error: 'Solicitud demasiado grande' })
     console.error('Error API: recurso no disponible')

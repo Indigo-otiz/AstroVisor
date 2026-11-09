@@ -4,7 +4,7 @@ export const portadaPublicadaValida = (id, src) => portadasPublicadas.get(src) =
 export const registrarPortadaPublicada = (id, src) => portadasPublicadas.set(src, id)
 export const retirarPortadaPublicada = src => portadasPublicadas.delete(src)
 const revision = n => Number.isSafeInteger(n) && n > 0
-export const rutaPublicable = r => typeof r === 'string' && /^(recorridos-demo\.json|libros\.json|portadas\/[a-z0-9]+(?:-[a-z0-9]+)*\.svg|audio\/[a-z0-9-]+\.(wav|mp3|m4a|ogg))$/.test(r)
+export const rutaPublicable = r => typeof r === 'string' && /^(recorridos-demo\.json|libros\.json|portadas\/[a-z0-9]+(?:-[a-z0-9]+)*\.(svg|png|jpg)|audio\/[a-z0-9-]+\.(wav|mp3|m4a|ogg))$/.test(r)
 export function validarPuntero(p) {
   exigir(p?.schemaVersion === 1 && revision(p.revision) && p.manifiesto === `revisiones/${p.revision}/manifiesto.json` && /^[a-f0-9]{64}$/.test(p.sha256))
   return p
@@ -26,7 +26,10 @@ export function validarReferenciasPaquete(recorridos, libros, m) {
   const activo = ruta => { exigir(rutaPublicable(ruta) && archivos.has(ruta)); utilizados.add(ruta) }
   for (const l of libros) {
     exigir(typeof l?.id === 'string' && /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(l.id) && !ids.has(l.id) && typeof l.titulo === 'string' && typeof l.autor === 'string')
-    ids.add(l.id); exigir(l.portadaIlustrativa === `portadas/${l.id}.svg`); activo(l.portadaIlustrativa)
+    ids.add(l.id); exigir(new RegExp(`^portadas/${l.id}\\.(svg|png|jpg)$`).test(l.portadaIlustrativa));
+    if(l.portada?.tipo==='imagen-autorizada')exigir(l.portadaIlustrativa===`portadas/${l.id}.${l.portada.formato==='png'?'png':l.portada.formato==='jpeg'?'jpg':'invalido'}`)
+    else exigir(l.portadaIlustrativa.endsWith('.svg'))
+    activo(l.portadaIlustrativa)
   }
   const constelaciones = new Set()
   for (const r of recorridos) {

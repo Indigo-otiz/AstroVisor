@@ -123,14 +123,15 @@ test('GET administrativo exige sesión y devuelve revisión; PATCH persiste y AP
   assert.equal(get.status, 200)
   assert.equal(get.headers.get('etag'), '"catalogo-1"')
   const original = await get.json()
-  const r = await guardar('/api/admin/libros/star-lore', { titulo: 'Título revisado' })
+  const r = await guardar('/api/admin/libros/star-lore', { anio: 1920 })
   assert.equal(r.status, 200)
   assert.equal(r.headers.get('etag'), '"catalogo-2"')
   assert.equal((await r.json()).revision, 2)
   const c = await obtenerCatalogo({ directorio: datos })
   assert.deepEqual(c.recorridos, original.recorridos)
-  assert.equal(c.libros[0].titulo, 'Título revisado')
-  assert.equal((await (await pedir('/api/contenidos/libros')).json())[0].titulo, 'Título revisado')
+  assert.equal(c.libros[0].anio, 1920)
+  assert.equal(c.libros[0].titulo, original.libros[0].titulo)
+  assert.equal((await (await pedir('/api/contenidos/libros')).json())[0].anio, 1920)
   const salida = JSON.stringify(await (await pedir('/api/admin/catalogo', { headers })).json())
   for (const privado of [password, config.admin.scrypt.hash, datos, 'escritor.lock']) assert.ok(!salida.includes(privado))
 })
@@ -148,7 +149,7 @@ test('escritura rechazada sin token y precondiciones ausentes, inválidas u obso
 
 test('dos PATCH con If-Match igual solo confirman uno', async (t) => {
   const { guardar } = await entorno(t)
-  const respuestas = await Promise.all(['Uno', 'Dos'].map((titulo) => guardar('/api/admin/libros/star-lore', { titulo })))
+  const respuestas = await Promise.all([1920, 1921].map((anio) => guardar('/api/admin/libros/star-lore', { anio })))
   assert.deepEqual(respuestas.map((r) => r.status).sort(), [200, 412])
 })
 
@@ -214,7 +215,7 @@ test('respaldo no disponible y catálogo corrupto producen 503 y no éxito de es
   const { guardar, datos, pedir, headers } = await entorno(t)
   await writeFile(join(datos, 'backups'), 'obstáculo')
   const antes = await readFile(join(datos, 'catalogo.json'), 'utf8')
-  const r = await guardar('/api/admin/libros/star-lore', { titulo: 'No confirmado' })
+  const r = await guardar('/api/admin/libros/star-lore', { anio: 1920 })
   assert.equal(r.status, 503)
   assert.ok(!(await r.text()).includes(datos))
   assert.equal(await readFile(join(datos, 'catalogo.json'), 'utf8'), antes)
@@ -225,7 +226,7 @@ test('respaldo no disponible y catálogo corrupto producen 503 y no éxito de es
 
 test('proceso nuevo adquiere escritor y sirve por HTTP el cambio confirmado previamente', { timeout: 15000 }, async (t) => {
   const { guardar, datos, app, server } = await entorno(t)
-  assert.equal((await guardar('/api/admin/libros/star-lore', { titulo: 'Persistido entre procesos' })).status, 200)
+  assert.equal((await guardar('/api/admin/libros/star-lore', { anio: 1920 })).status, 200)
   await new Promise((r) => server.close(r))
   await app.locals.cerrarEscritor()
   const modulo = new URL('../src/index.js', import.meta.url).href
@@ -239,7 +240,7 @@ test('proceso nuevo adquiere escritor y sirve por HTTP el cambio confirmado prev
   const puerto = Number(salida.toString().trim())
   assert.ok(puerto > 0)
   const libros = await (await fetch(`http://127.0.0.1:${puerto}/api/contenidos/libros`)).json()
-  assert.equal(libros[0].titulo, 'Persistido entre procesos')
+  assert.equal(libros[0].anio, 1920)
   const fin = once(hijo, 'exit')
   hijo.stdin.end('cerrar')
   assert.equal((await fin)[0], 0)

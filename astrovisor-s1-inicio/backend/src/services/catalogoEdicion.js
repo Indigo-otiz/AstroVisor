@@ -40,9 +40,10 @@ function referencias(catalogo, refs, destino, porLibro) {
 
 export function editarCatalogo(catalogo, { tipo, id, datos }) {
   const nuevo = tipo === 'crearLibro', libro = tipo !== 'recorrido'
-  entrada(datos, libro ? [...camposLibro, 'relaciones', ...(nuevo ? ['id', 'portadaIlustrativa', 'portada'] : [])]
+  entrada(datos, libro ? [...camposLibro, 'relaciones', 'portada', ...(nuevo ? ['id', 'portadaIlustrativa'] : [])]
     : ['titulo', 'resumen', 'historia', 'comoReconocerla', 'libroRefs'])
   if (!idValido(nuevo ? datos.id : id)) throw fallo(400, 'ID inválido')
+  if (libro && ['titulo','autor'].some(k => Object.hasOwn(datos,k) && (typeof datos[k] !== 'string' || !datos[k].trim() || datos[k].length > 200))) throw fallo(400, 'Título o autor inválidos')
   if (libro && Object.hasOwn(datos, 'tema') && (typeof datos.tema !== 'string' || !/^#[0-9a-fA-F]{6}$/.test(datos.tema))) throw fallo(400, 'Color inválido')
   if (nuevo && catalogo.libros.some((l) => l.id === datos.id)) throw fallo(409, 'ID de libro duplicado')
   if (libro && datos.enlacePublico !== undefined && catalogo.libros.some((l) => l.id !== (nuevo ? datos.id : id) && l.enlacePublico === datos.enlacePublico)) throw fallo(409, 'Referencia bibliográfica duplicada')
@@ -58,12 +59,20 @@ export function editarCatalogo(catalogo, { tipo, id, datos }) {
         if (!lstatSync(fileURLToPath(new URL(`../../../frontend/public${datos.portadaIlustrativa}`, import.meta.url))).isFile()) throw new Error()
       } catch { throw fallo(409, 'Portada ilustrativa estática no disponible') }
     }
-    destino = { id: datos.id, ...(portada ? { portada } : {}), portadaIlustrativa: portada ? `/api/contenidos/libros/${datos.id}/portada.svg` : datos.portadaIlustrativa, demostracion: true,
+    destino = { id: datos.id, ...(portada ? { portada } : {}), portadaIlustrativa: portada ? `/api/contenidos/libros/${datos.id}/portada.${portada.tipo === 'imagen-autorizada' ? (portada.formato === 'png' ? 'png' : 'jpg') : 'svg'}` : datos.portadaIlustrativa, demostracion: true,
       marc21: { campo001: `DEMO-${datos.id}`, campo003: 'DEMO', signatura852: null, ubicacion852: null } }
     catalogo.libros.push(destino)
   } else {
     destino = (libro ? catalogo.libros : catalogo.recorridos).find((v) => v.id === id)
     if (!destino) throw fallo(404, 'Recurso inexistente')
+  }
+  if (libro && !nuevo) {
+    const portada = datos.portada === undefined ? destino.portada : configurarPortada({ ...destino, ...datos })
+    if (!portada && ['titulo','autor'].some(k => Object.hasOwn(datos,k) && datos[k] !== destino[k])) throw fallo(409, 'Sustituye explícitamente la portada estática antes de cambiar título o autor')
+    if (datos.portada !== undefined) {
+      destino.portada = portada
+      destino.portadaIlustrativa = `/api/contenidos/libros/${destino.id}/portada.${portada.tipo === 'imagen-autorizada' ? (portada.formato === 'png' ? 'png' : 'jpg') : 'svg'}`
+    }
   }
   if (!libro && datos.historia !== undefined && datos.historia !== destino.historia && destino.multimedia.some((m) => m.tipo === 'audio')) {
     throw fallo(409, 'Cambio de historia requiere revisión coordinada de narración')

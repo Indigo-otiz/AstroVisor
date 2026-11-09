@@ -24,7 +24,8 @@ test('editor carga catálogo, presenta relaciones y cancelar no escribe', async 
   await carga
   e.seleccionarLibro('star-lore')
   assert.equal(e.borrador.value.relaciones.length, 3)
-  assert.ok(!('titulo' in e.borrador.value) && !('autor' in e.borrador.value))
+  assert.equal(e.borrador.value.titulo, semilla.libros[0].titulo)
+  assert.equal(e.puedeEditarTexto.value, false)
   e.borrador.value.anio = 1912
   e.cancelarEdicion()
   assert.equal(e.borrador.value, null)
@@ -133,11 +134,11 @@ test('una recarga fallida después de persistir conserva confirmación y no repi
   await e.guardar(); assert.equal(escrituras, 1)
 })
 
-test('cliente no escribe sin sesión ni habilita título/autor y rechaza GET sin ETag coherente', async (t) => {
+test('cliente no escribe sin sesión ni permite campos privados y rechaza GET sin ETag coherente', async (t) => {
   let llamadas = 0
   t.mock.method(globalThis, 'fetch', async () => { llamadas++; return new Response(JSON.stringify(semilla)) })
   await assert.rejects(guardarLibro('star-lore', { anio: 1912 }, { token: '', etag: '"catalogo-1"' }), { status: 401 })
-  await assert.rejects(guardarLibro('star-lore', { titulo: 'Otro' }, { token: 'token-aislado', etag: '"catalogo-1"' }), { status: 400 })
+  await assert.rejects(guardarLibro('star-lore', { modificadoPor: 'Otro' }, { token: 'token-aislado', etag: '"catalogo-1"' }), { status: 400 })
   assert.equal(llamadas, 0)
   await assert.rejects(cargarCatalogoAdmin({ token: 'token-aislado' }))
 })

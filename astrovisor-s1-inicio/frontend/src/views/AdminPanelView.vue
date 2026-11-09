@@ -3,6 +3,7 @@ import { ref, onMounted, onBeforeUnmount, nextTick, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuth } from '../composables/useAuth.js'
 import { useEditorCatalogo } from '../composables/useEditorCatalogo.js'
+import { alternativaPortada } from '../services/librosDemoService.js'
 
 const router = useRouter()
 const { userDisplayName, username, signOut, token, invalidarSesion } = useAuth()
@@ -10,7 +11,7 @@ const { userDisplayName, username, signOut, token, invalidarSesion } = useAuth()
 const isIniciando3D = ref(false)
 const { catalogo, seleccion, borrador, cargando, guardando, error, mensaje, conflicto, necesitaRecarga,
   libroActual, recorridoActual, cargar, seleccionarLibro, seleccionarRecorrido, cancelarEdicion, guardar, cancelarPeticiones,
-  hayBorradorPendiente, recuperarBorrador, descartarBorradorPendiente, nuevoLibro, previsualizar, previsualizacion, previsualizando } = useEditorCatalogo({
+  hayBorradorPendiente, recuperarBorrador, descartarBorradorPendiente, nuevoLibro, previsualizar, previsualizacion, previsualizando,subirImagen,puedeEditarTexto,requierePreview } = useEditorCatalogo({
   obtenerToken: () => token.value,
   obtenerUsuario: () => username.value,
   alExpirarSesion: () => { invalidarSesion(); void router.replace({ name: 'admin-acceso' }) },
@@ -363,12 +364,12 @@ onBeforeUnmount(cancelarPeticiones)
         <p v-if="necesitaRecarga" class="admin-note" role="status">El guardado ya está confirmado. Actualiza el catálogo antes de iniciar otra edición; no repitas la escritura.</p>
         <div v-if="catalogo?.libros.length" class="books-grid">
           <article v-for="libro in catalogo.libros" :key="libro.id" class="book-card">
-            <img class="book-cover" :src="libro.portadaIlustrativa" :alt="`Portada ilustrativa, no original: ${libro.titulo}`" width="112" height="160" />
+            <img class="book-cover" :src="libro.portadaIlustrativa" :alt="alternativaPortada(libro)" width="112" height="160" />
             <div class="book-pill-id">{{ libro.id }}</div>
             <h3 class="book-title">{{ libro.titulo }}</h3>
             <p class="book-author">Por: <strong>{{ libro.autor }}</strong></p>
             <p class="book-desc">Relacionada con: {{ constelacionesLibro(libro.id).map((r) => r.titulo).join(', ') }}</p>
-            <p v-if="libro.demostracion" class="book-desc">Referencia de demostración. Portada ilustrativa.</p>
+            <p v-if="libro.demostracion" class="book-desc">Referencia de demostración. {{ libro.portada?.tipo === 'imagen-autorizada' ? 'Imagen con permiso declarado.' : libro.portada?.plantilla ? 'Portada automática.' : 'SVG ilustrativo heredado.' }}</p>
             <button type="button" class="btn-refresh" :data-editar="`libro-${libro.id}`" :disabled="cargando || guardando || Boolean(borrador) || necesitaRecarga" @click="seleccionarLibro(libro.id)">Editar {{ libro.titulo }}</button>
           </article>
         </div>
@@ -387,7 +388,7 @@ onBeforeUnmount(cancelarPeticiones)
           <fieldset :disabled="guardando || cargando">
             <legend>{{ seleccion.tipo !== 'recorrido' ? 'Información bibliográfica y motivos de lectura' : 'Información de la constelación' }}</legend>
             <template v-if="seleccion.tipo === 'nuevo'">
-              <p class="admin-note">Referencia de demostración: no registra un ejemplar institucional. La portada se genera con título y autor; su publicación para Homido sigue pendiente.</p>
+              <p class="admin-note">Referencia de demostración: no registra un ejemplar institucional. La exportación Homido se realiza por separado.</p>
               <label for="nuevo-id">ID estable (minúsculas, números y guiones)</label>
               <input id="nuevo-id" v-model="borrador.id" required maxlength="100" pattern="[a-z0-9]+(-[a-z0-9]+)*" aria-describedby="id-ayuda" />
               <p id="id-ayuda" class="admin-note">Debe ser único. Se usará en el enlace del libro y no podrá editarse después.</p>
@@ -395,20 +396,39 @@ onBeforeUnmount(cancelarPeticiones)
               <input id="nuevo-titulo" v-model="borrador.titulo" required maxlength="200" />
               <label for="nuevo-autor">Autor</label>
               <input id="nuevo-autor" v-model="borrador.autor" required maxlength="200" />
+            </template>
+            <template v-else-if="libroActual">
+              <p id="restriccion-portadas" class="admin-note">El SVG heredado contiene texto fijo. Para cambiar título o autor, sustituye explícitamente la portada. Homido navega por ID.</p>
+              <label for="editor-titulo">Título</label>
+              <input id="editor-titulo" v-model="borrador.titulo" :readonly="!puedeEditarTexto" required maxlength="200" aria-describedby="restriccion-portadas" />
+              <label for="editor-autor">Autor</label>
+              <input id="editor-autor" v-model="borrador.autor" :readonly="!puedeEditarTexto" required maxlength="200" aria-describedby="restriccion-portadas" />
+            </template>
+            <template v-if="seleccion.tipo !== 'recorrido'">
+              <label for="tipo-portada">Tipo de portada</label>
+              <select id="tipo-portada" v-model="borrador.tipoPortada">
+                <option v-if="libroActual && !libroActual.portada" value="heredada">Conservar SVG heredado</option>
+                <option value="ilustrativa">Ilustrativa automática</option>
+                <option value="imagen-autorizada">Imagen propia autorizada (PNG/JPEG)</option>
+              </select>
+              <template v-if="borrador.tipoPortada === 'ilustrativa'">
               <label for="nueva-plantilla">Plantilla ilustrativa</label>
               <select id="nueva-plantilla" v-model="borrador.portada.plantilla"><option value="cielo">Cielo — constelación abierta</option><option value="guia">Guía — recorrido de estrellas</option><option value="relatos">Relatos — trama estelar</option></select>
               <label for="nueva-paleta">Paleta de la portada</label>
               <select id="nueva-paleta" v-model="borrador.portada.paleta"><option value="azul">Azul noche</option><option value="verde">Verde profundo</option><option value="violeta">Violeta</option></select>
               <p class="admin-note">Se admiten letras latinas básicas y Latin-1 (incluidos acentos del español), números y puntuación común. La previsualización comprueba el ajuste: no recorta texto para hacerlo caber.</p>
               <button type="button" class="btn-refresh" :disabled="previsualizando || conflicto" @click="previsualizar">{{ previsualizando ? 'Generando portada…' : 'Previsualizar portada' }}</button>
-              <figure v-if="previsualizacion" class="portada-preview"><img :src="previsualizacion" :alt="`Previsualización ilustrativa de ${borrador.titulo}; no es una cubierta original`" width="225" height="320" /><figcaption>Portada ilustrativa de demostración. No es la cubierta original.</figcaption></figure>
-            </template>
-            <template v-else-if="libroActual">
-              <p id="restriccion-portadas" class="admin-note">Título y autor están en solo lectura: las portadas originales contienen texto fijo y algunos enlaces de Homido dependen del título. Su edición requiere una etapa posterior.</p>
-              <label for="editor-titulo">Título (solo lectura)</label>
-              <input id="editor-titulo" :value="libroActual.titulo" readonly aria-describedby="restriccion-portadas" />
-              <label for="editor-autor">Autor (solo lectura)</label>
-              <input id="editor-autor" :value="libroActual.autor" readonly aria-describedby="restriccion-portadas" />
+              </template>
+              <template v-if="borrador.tipoPortada === 'imagen-autorizada'">
+                <p id="imagen-ayuda" class="admin-note">PNG/JPEG hasta 2 MiB, máximo 4096 px por lado y 8 millones de píxeles. Preparar una imagen no guarda el libro. Si cambias título o autor, revisa la correspondencia de la imagen.</p>
+                <label for="archivo-portada">Preparar o reemplazar imagen</label>
+                <input id="archivo-portada" type="file" accept="image/png,image/jpeg" :disabled="previsualizando || conflicto" aria-describedby="imagen-ayuda" @change="subirImagen($event.target.files?.[0])" />
+                <p v-if="previsualizando" role="status">Preparando imagen…</p>
+                <label for="imagen-procedencia">Procedencia de la imagen</label><textarea id="imagen-procedencia" v-model="borrador.portada.procedencia" required maxlength="1000" rows="2"></textarea>
+                <label for="imagen-permiso">Permiso o autorización de uso</label><textarea id="imagen-permiso" v-model="borrador.portada.permiso" required maxlength="1000" rows="2"></textarea>
+                <label for="imagen-alternativa">Texto alternativo</label><input id="imagen-alternativa" v-model="borrador.portada.textoAlternativo" required maxlength="1000" />
+              </template>
+              <figure v-if="previsualizacion" class="portada-preview"><img :src="previsualizacion" :alt="borrador.tipoPortada === 'imagen-autorizada' ? borrador.portada.textoAlternativo || 'Previsualización de imagen preparada' : `Previsualización ilustrativa de ${borrador.titulo}`" width="225" height="320" /><figcaption>{{ borrador.tipoPortada === 'imagen-autorizada' ? 'Imagen preparada; asociación pendiente de guardar.' : 'Portada ilustrativa, no original.' }}</figcaption></figure>
             </template>
             <template v-if="libroActual || seleccion.tipo === 'nuevo'">
               <label for="editor-anio">Año de publicación</label>
@@ -432,7 +452,7 @@ onBeforeUnmount(cancelarPeticiones)
             </template>
             <p v-if="conflicto || necesitaRecarga" class="admin-note">Tu formulario se conserva. Puedes copiar tu edición antes de usar «Recargar catálogo y descartar edición».</p>
             <div class="catalogo-acciones">
-              <button type="submit" class="btn-refresh" :disabled="conflicto || necesitaRecarga || (seleccion.tipo === 'nuevo' && (!previsualizacion || previsualizando))">{{ guardando ? 'Guardando…' : seleccion.tipo === 'nuevo' ? 'Confirmar registro' : 'Guardar cambios' }}</button>
+              <button type="submit" class="btn-refresh" :disabled="conflicto || necesitaRecarga || previsualizando || (requierePreview && !previsualizacion) || (borrador.tipoPortada === 'imagen-autorizada' && !borrador.portada.recursoId)">{{ guardando ? 'Guardando…' : seleccion.tipo === 'nuevo' ? 'Confirmar registro' : 'Guardar cambios' }}</button>
               <button type="button" class="btn-refresh" @click="cancelarYCentrar">Cancelar edición</button>
             </div>
           </fieldset>

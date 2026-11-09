@@ -1,5 +1,9 @@
 # Proposal — S4: persistencia documental
 
+## Ampliación autorizada — Etapa 5D
+
+El usuario autorizó implementar el MVP híbrido antes pospuesto en8.1: automática SVG, imagen PNG/JPEG autorizada y SVG heredado conservado. Incluye carga autenticada, almacenamiento externo, asociación con If-Match, edición bibliográfica coherente, lectura web/Homido y exportación por revisión. No acredita derechos de imágenes concretas. Sin commit/push/PR/merge/archivo ni cierre S4. Los estados históricos siguientes corresponden a sus etapas, no sustituyen esta autorización.
+
 Estado vigente: Etapa 1 publicada como `735fd4b1413e5cd98387e297716f3d4c76cac52d` sobre la base `f1058c9b10641c470d7d3e331a81f327af78fc8c`; Etapa 2A publicada como `3bf81dd03e320b6207d6b053f5ee2862cd325371`. El usuario autorizó publicar exclusivamente Etapa 2B y su corrección tras revisión final sin bloqueantes: guardado seguro, API documental y respaldos privados. Evidencia en `docs/PRUEBA-S4-ETAPA2B.md`. Formularios, migración de estantería, portadas dinámicas, exportaciones Homido, alojamiento independiente, merge y archivo OpenSpec siguen pendientes.
 
 ## Why

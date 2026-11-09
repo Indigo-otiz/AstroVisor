@@ -1,5 +1,5 @@
 import { ref, computed, watch } from 'vue'
-import { cargarCatalogoAdmin, guardarLibro, guardarRecorrido, crearLibro, previsualizarPortada } from '../services/catalogoAdminService.js'
+import { cargarCatalogoAdmin, guardarLibro, guardarRecorrido, crearLibro, previsualizarPortada, prepararImagen } from '../services/catalogoAdminService.js'
 
 // Solo memoria de esta pestaña: se pierde al recargar o cerrar, sin tokens ni contraseñas.
 const pendiente = ref(null)
@@ -13,13 +13,21 @@ export function useEditorCatalogo({ obtenerToken, obtenerUsuario = () => '', alE
   const previsualizacion = ref(''), previsualizando = ref(false)
   const libroActual = computed(() => seleccion.value?.tipo === 'libro' ? catalogo.value?.libros.find((l) => l.id === seleccion.value.id) : null)
   const recorridoActual = computed(() => seleccion.value?.tipo === 'recorrido' ? catalogo.value?.recorridos.find((r) => r.id === seleccion.value.id) : null)
+  const puedeEditarTexto = computed(() => borrador.value?.tipoPortada !== 'heredada')
+  const portadaCambiada = computed(() => seleccion.value?.tipo === 'nuevo' || (borrador.value && seleccion.value?.tipo === 'libro' && (borrador.value.tipoPortada !== (libroActual.value.portada?.tipo ?? 'heredada') || JSON.stringify(borrador.value.portada) !== JSON.stringify(libroActual.value.portada ?? {}))))
+  const requierePreview = computed(() => borrador.value?.tipoPortada === 'ilustrativa' && (portadaCambiada.value || borrador.value.titulo !== libroActual.value?.titulo || borrador.value.autor !== libroActual.value?.autor))
   let solicitud, previewSolicitud, activo = true
   function limpiarPreview() {
     previewSolicitud?.abort(); previsualizando.value = false
     if (previsualizacion.value) URL.revokeObjectURL(previsualizacion.value)
     previsualizacion.value = ''
   }
-  const detenerPreview = watch(() => [borrador.value?.titulo, borrador.value?.autor, borrador.value?.portada?.plantilla, borrador.value?.portada?.paleta], limpiarPreview, { flush: 'sync' })
+  const detenerPreview = watch(() => [borrador.value?.titulo, borrador.value?.autor, borrador.value?.portada?.plantilla, borrador.value?.portada?.paleta], () => { if(borrador.value?.tipoPortada !== 'imagen-autorizada')limpiarPreview() }, { flush: 'sync' })
+  const detenerModo=watch(()=>[borrador.value,borrador.value?.tipoPortada],([b,tipo],[anterior,antes])=>{
+    if(b!==anterior||!tipo||!antes||tipo===antes)return
+    limpiarPreview()
+    borrador.value.portada=tipo==='ilustrativa'?{tipo:'ilustrativa',plantilla:'cielo',paleta:'azul'}:tipo==='imagen-autorizada'?{tipo,procedencia:'',permiso:'',textoAlternativo:''}:{}
+  },{flush:'sync'})
   function descartar() { limpiarPreview(); seleccion.value = null; borrador.value = null; conflicto.value = false }
   function fallo(e) {
     error.value = e.message
@@ -51,7 +59,7 @@ export function useEditorCatalogo({ obtenerToken, obtenerUsuario = () => '', alE
     const libro = catalogo.value?.libros.find((l) => l.id === id)
     if (!libro) return
     seleccion.value = { tipo: 'libro', id }; error.value = ''; mensaje.value = ''
-    borrador.value = { anio: libro.anio ?? '', enlacePublico: libro.enlacePublico,
+    borrador.value = { titulo:libro.titulo,autor:libro.autor,tipoPortada:libro.portada?.tipo ?? 'heredada',portada:JSON.parse(JSON.stringify(libro.portada ?? {})),anio: libro.anio ?? '', enlacePublico: libro.enlacePublico,
       relaciones: catalogo.value.recorridos.flatMap((r) => {
         const ref = r.libroRefs.find((v) => v.libroId === id)
         return ref ? [{ constelacionId: r.id, motivo: ref.motivo }] : []
@@ -67,22 +75,36 @@ export function useEditorCatalogo({ obtenerToken, obtenerUsuario = () => '', alE
   function nuevoLibro() {
     if (!activo || !catalogo.value || cargando.value || guardando.value || borrador.value || necesitaRecarga.value || sesionExpirada.value) return
     seleccion.value = { tipo: 'nuevo', id: '' }; error.value = ''; mensaje.value = ''
-    borrador.value = { id: '', titulo: '', autor: '', anio: '', enlacePublico: '', portada: { tipo: 'ilustrativa', plantilla: 'cielo', paleta: 'azul' },
+    borrador.value = { id: '', titulo: '', autor: '', anio: '', enlacePublico: '',tipoPortada:'ilustrativa', portada: { tipo: 'ilustrativa', plantilla: 'cielo', paleta: 'azul' },
       relaciones: catalogo.value.recorridos.map((r) => ({ constelacionId: r.id, seleccionada: false, motivo: '' })) }
   }
   async function previsualizar() {
-    if (!activo || seleccion.value?.tipo !== 'nuevo' || cargando.value || guardando.value || conflicto.value || sesionExpirada.value) return false
+    if (!activo || !borrador.value || borrador.value.tipoPortada !== 'ilustrativa' || cargando.value || guardando.value || conflicto.value || sesionExpirada.value) return false
     limpiarPreview()
     const actual = previewSolicitud = new AbortController()
     previsualizando.value = true; error.value = ''
     try {
       const b = borrador.value
-      const blob = await previsualizarPortada({ titulo: b.titulo, autor: b.autor, portada: { ...b.portada } }, { token: obtenerToken(), etag: etag.value, signal: actual.signal })
+      const blob = await previsualizarPortada({ titulo: b.titulo, autor: b.autor, portada: { tipo:'ilustrativa',plantilla:b.portada.plantilla,paleta:b.portada.paleta } }, { token: obtenerToken(), etag: etag.value, signal: actual.signal })
       if (actual.signal.aborted || !activo) return false
       previsualizacion.value = URL.createObjectURL(blob)
       return true
     } catch (e) { if (!actual.signal.aborted) fallo(e); return false }
     finally { if (!actual.signal.aborted) previsualizando.value = false }
+  }
+  async function subirImagen(file) {
+    if(!activo||!borrador.value||borrador.value.tipoPortada!=='imagen-autorizada'||cargando.value||guardando.value||conflicto.value||sesionExpirada.value)return false
+    limpiarPreview();const actual=previewSolicitud=new AbortController()
+    previsualizando.value=true;error.value=''
+    try{
+      const r=await prepararImagen(file,{token:obtenerToken(),etag:etag.value,signal:actual.signal})
+      if(actual.signal.aborted||!activo)return false
+      borrador.value.portada={...borrador.value.portada,...r.recurso}
+      previsualizacion.value=URL.createObjectURL(r.blob)
+      mensaje.value='Imagen preparada; el libro aún no se ha guardado.'
+      return true
+    }catch(e){if(!actual.signal.aborted)fallo(e);return false}
+    finally{if(!actual.signal.aborted)previsualizando.value=false}
   }
   function cancelarEdicion() { if (!guardando.value && !cargando.value) { descartar(); error.value = '' } }
   function recuperarBorrador() {
@@ -101,14 +123,20 @@ export function useEditorCatalogo({ obtenerToken, obtenerUsuario = () => '', alE
   }
   async function guardar() {
     if (!activo || !borrador.value || cargando.value || guardando.value || conflicto.value || necesitaRecarga.value || sesionExpirada.value) return false
-    if (seleccion.value.tipo === 'nuevo' && (!previsualizacion.value || !borrador.value.relaciones.some((r) => r.seleccionada))) { error.value = 'Selecciona al menos una constelación y previsualiza la portada antes de guardar.'; return false }
+    if (previsualizando.value || (requierePreview.value && !previsualizacion.value) || (seleccion.value.tipo === 'nuevo' && !borrador.value.relaciones.some((r) => r.seleccionada))) { error.value = 'Selecciona al menos una constelación y previsualiza la portada antes de guardar.'; return false }
+    if(borrador.value.tipoPortada==='imagen-autorizada'&&(!borrador.value.portada.recursoId||!['procedencia','permiso','textoAlternativo'].every(k=>borrador.value.portada[k]?.trim()))){error.value='Prepara una imagen e indica procedencia, permiso y texto alternativo.';return false}
     if (libroActual.value?.anio !== undefined && borrador.value.anio === '') { error.value = 'Indica el año; este formulario no permite eliminarlo.'; return false }
     const { tipo, id } = seleccion.value
     const b = borrador.value
-    const datos = tipo === 'nuevo' ? { id: b.id, titulo: b.titulo, autor: b.autor, anio: Number(b.anio), enlacePublico: b.enlacePublico, portada: { ...b.portada },
+    const portada=b.tipoPortada==='ilustrativa'?{tipo:'ilustrativa',plantilla:b.portada.plantilla,paleta:b.portada.paleta}:b.portada
+    const datos = tipo === 'nuevo' ? { id: b.id, titulo: b.titulo, autor: b.autor, anio: Number(b.anio), enlacePublico: b.enlacePublico, portada: { ...portada },
       relaciones: b.relaciones.filter((r) => r.seleccionada).map(({ constelacionId, motivo }) => ({ constelacionId, motivo })) } : tipo === 'libro' ? { ...(borrador.value.anio === '' ? {} : { anio: Number(borrador.value.anio) }),
       enlacePublico: borrador.value.enlacePublico, relaciones: borrador.value.relaciones.map((r) => ({ constelacionId: r.constelacionId, motivo: r.motivo })) }
       : { resumen: borrador.value.resumen, comoReconocerla: borrador.value.comoReconocerla }
+    if(tipo==='libro'){
+      for(const k of ['titulo','autor'])if(b[k]!==libroActual.value[k])datos[k]=b[k]
+      if(portadaCambiada.value)datos.portada={...portada}
+    }
     const actual = solicitud = new AbortController()
     guardando.value = true; error.value = ''; mensaje.value = ''
     let confirmado = false
@@ -134,8 +162,8 @@ export function useEditorCatalogo({ obtenerToken, obtenerUsuario = () => '', alE
       return false
     } finally { if (!actual.signal.aborted) guardando.value = false }
   }
-  function cancelarPeticiones() { activo = false; solicitud?.abort(); limpiarPreview(); detenerPreview(); cargando.value = false; guardando.value = false }
+  function cancelarPeticiones() { activo = false; solicitud?.abort(); limpiarPreview(); detenerPreview();detenerModo(); cargando.value = false; guardando.value = false }
   return { catalogo, etag, seleccion, borrador, cargando, guardando, error, mensaje, conflicto, necesitaRecarga, sesionExpirada,
     libroActual, recorridoActual, cargar, seleccionarLibro, seleccionarRecorrido, cancelarEdicion, guardar, cancelarPeticiones,
-    hayBorradorPendiente, recuperarBorrador, descartarBorradorPendiente, nuevoLibro, previsualizar, previsualizacion, previsualizando }
+    hayBorradorPendiente, recuperarBorrador, descartarBorradorPendiente, nuevoLibro, previsualizar, previsualizacion, previsualizando,subirImagen,puedeEditarTexto,requierePreview }
 }

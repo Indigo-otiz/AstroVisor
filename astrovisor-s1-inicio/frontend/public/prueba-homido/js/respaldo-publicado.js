@@ -46,7 +46,7 @@ export async function cargarRespaldoPublicado({ fetchFn = globalThis.fetch, urlE
     const activos = new Map()
     for (const [ruta, contenido] of contenidos) {
       if (ruta.endsWith('.json')) continue
-      const tipo = ruta.endsWith('.svg') ? 'image/svg+xml' : ({ wav: 'audio/wav', mp3: 'audio/mpeg', m4a: 'audio/mp4', ogg: 'audio/ogg' })[ruta.split('.').pop()]
+      const tipo = ({ svg:'image/svg+xml',png:'image/png',jpg:'image/jpeg',wav: 'audio/wav', mp3: 'audio/mpeg', m4a: 'audio/mp4', ogg: 'audio/ogg' })[ruta.split('.').pop()]
       const url = URL.createObjectURL(new Blob([contenido], { type: tipo })); urls.push(url); activos.set(ruta, url)
     }
     for (const l of libros) { l.portadaIlustrativa = activos.get(l.portadaIlustrativa); registrarPortadaPublicada(l.id, l.portadaIlustrativa) }

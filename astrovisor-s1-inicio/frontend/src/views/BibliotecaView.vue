@@ -1,7 +1,7 @@
 <script setup>
 import { computed, watch, nextTick, onBeforeUnmount } from 'vue'
 import { useRoute } from 'vue-router'
-import { nombresConstelacion } from '../services/librosDemoService.js'
+import { nombresConstelacion, alternativaPortada } from '../services/librosDemoService.js'
 import { useLibros } from '../composables/useLibros.js'
 
 const route = useRoute()
@@ -46,7 +46,7 @@ const rutaEstanteria = computed(() => ({ name: 'biblioteca', params: { id: id.va
         <p>¿Te gustaría conocer más sobre {{ nombre }}? Elige un libro y descubre por qué podría interesarte.</p>
       </div>
       <p class="biblioteca-aviso" role="note">
-        <strong>Libros de demostración.</strong> Son referencias de lectura pública. No hemos confirmado que la biblioteca tenga ejemplares de estos títulos. Las imágenes son portadas ilustrativas, no las originales.
+        <strong>Libros de demostración.</strong> Son referencias de lectura pública. No hemos confirmado que la biblioteca tenga ejemplares de estos títulos. Las portadas indican si son ilustrativas o imágenes con permiso declarado.
       </p>
 
       <p v-if="!libros.length" role="status">Todavía no hay libros recomendados para esta constelación. Puedes volver a su historia o consultar más tarde.</p>
@@ -58,7 +58,7 @@ const rutaEstanteria = computed(() => ({ name: 'biblioteca', params: { id: id.va
               :to="{ name: 'libro', params: { id, libroId: item.id } }"
               :aria-label="`Ver información del libro ${item.titulo}`"
             >
-              <img :src="item.portadaIlustrativa" :alt="`Portada ilustrativa, no original: ${item.titulo}`" width="450" height="640" loading="lazy" />
+              <img :src="item.portadaIlustrativa" :alt="alternativaPortada(item)" width="450" height="640" loading="lazy" />
             </RouterLink>
             <h2>{{ item.titulo }}</h2>
             <p class="biblioteca-autor">{{ item.autor }}</p>
@@ -76,8 +76,9 @@ const rutaEstanteria = computed(() => ({ name: 'biblioteca', params: { id: id.va
       <h1 tabindex="-1">{{ libro.titulo }}</h1>
       <div class="biblioteca-detalle">
         <figure class="biblioteca-detalle-portada">
-          <img :src="libro.portadaIlustrativa" :alt="`Portada ilustrativa, no original: ${libro.titulo}`" width="450" height="640" />
-          <figcaption>Ilustración de demostración; no es la cubierta de una edición física.</figcaption>
+          <img :src="libro.portadaIlustrativa" :alt="alternativaPortada(libro)" width="450" height="640" />
+          <figcaption v-if="libro.portada?.tipo === 'imagen-autorizada'">Imagen con permiso declarado. Procedencia: {{ libro.portada.procedencia }}. Permiso: {{ libro.portada.permiso }}.</figcaption>
+          <figcaption v-else>Ilustración de demostración; no es la cubierta de una edición física.</figcaption>
         </figure>
         <div class="biblioteca-detalle-info">
           <p class="biblioteca-autor"><strong>Autor:</strong> {{ libro.autor }} <span v-if="libro.anio">· {{ libro.anio }}</span></p>

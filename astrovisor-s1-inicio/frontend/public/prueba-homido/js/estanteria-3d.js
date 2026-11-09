@@ -35,7 +35,7 @@ export function ajustarTextoCubierta(ctx,texto,ancho,maxLineas,fuentes) {
   return {font:fuentes[fuentes.length-1],lineas:['Texto completo','en la ficha 2D']};
 }
 function cubierta(doc,libro) {
-  if (portadaPublicadaValida(libro.id,libro.portada?.src)) {
+  if (portadaPublicadaValida(libro.id,libro.portada?.src) || (libro.portada?.tipo==='imagen-autorizada' && new RegExp(`^/api/contenidos/libros/${libro.id}/portada\\.(png|jpg)\\?revision=[1-9][0-9]*$`).test(libro.portada.src))) {
     const imagen=crear(doc,'img',{id:'cubierta-vr-'+libro.id,src:libro.portada.src,'data-portada-homido':''},doc.querySelector('a-assets'));
     return '#'+imagen.id;
   }

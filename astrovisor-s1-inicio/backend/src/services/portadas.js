@@ -1,3 +1,4 @@
+import { descriptorValido } from './imageResources.js'
 const fallo = (mensaje) => Object.assign(new Error(mensaje), { status: 400 })
 const paletas = Object.freeze({ azul: '#142a56', verde: '#22463f', violeta: '#4d2844' })
 const figuras = Object.freeze({
@@ -33,10 +34,18 @@ export function generarPortada({ titulo, autor, portada }) {
 }
 
 export function rutaPortada(libro, revision) {
+  if (libro.portada?.tipo === 'imagen-autorizada') return `/api/contenidos/libros/${libro.id}/portada.${libro.portada.formato === 'png' ? 'png' : 'jpg'}${revision ? '?revision='+revision : ''}`
   return libro.portada?.plantilla ? `/api/contenidos/libros/${libro.id}/portada.svg?revision=${revision}` : libro.portadaIlustrativa
 }
 
 export function configurarPortada(datos) {
+  if (datos.portada?.tipo === 'imagen-autorizada') {
+    const p = datos.portada
+    const claves = ['tipo','recursoId','formato','sha256','bytes','ancho','alto','procedencia','permiso','textoAlternativo']
+    if (Object.keys(p).length !== claves.length || Object.keys(p).some(k => !claves.includes(k)) || !descriptorValido(p)
+      || !['procedencia','permiso','textoAlternativo'].every(k => typeof p[k] === 'string' && p[k].trim() && p[k].length <= 1000 && !/[<>\x00-\x1f\x7f]/.test(p[k]))) throw fallo('Imagen o declaración de procedencia/permiso/alternativa inválidos')
+    return { ...p }
+  }
   if (!datos.portada || Object.keys(datos.portada).some((k) => !['tipo', 'plantilla', 'paleta'].includes(k))) throw fallo('Parámetros de portada no permitidos')
   generarPortada(datos)
   return { ...datos.portada, procedencia: 'Plantilla ilustrativa AstroVisor; no cubierta original', textoAlternativo: `Portada ilustrativa, no original: ${datos.titulo}` }

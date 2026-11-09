@@ -1,5 +1,37 @@
 # Design — S4
 
+## Diseño y plan autorizado — Etapa 5D
+
+**Goal:** admitir portadas automáticas, PNG/JPEG autorizados y conservación explícita del SVG heredado sin migración silenciosa.
+
+**Architecture:** conservar schemaVersion1. Ausencia de portada sigue significando SVG heredado; portada ilustrativa mantiene contrato3B; imagen-autorizada añade recursoId UUID, formato png/jpeg, sha256, bytes, ancho/alto y procedencia/permiso/textoAlternativo obligatorios. El servidor comprueba el recurso antes de publicar el JSON, leerlo y restaurarlo. Los recursos se preparan inmutables antes de asociarse, no se borran automáticamente y quedan disponibles para respaldos/revisiones antiguas. No hace falta una transacción distribuida ni rediseñar el escritor.
+
+**Tech Stack:** Express/Vue/JSON y sharp nativo para decodificación completa y normalización PNG/JPEG. Evaluación de dependencia e instalación Windows en informe5D. No implementar decoder artesanal ni aceptar SVG subido. No cloud/galería/recorte/filtros/IA.
+
+**Corrección de seguridad autorizada:** Express4.22.3 conserva su serie; resolución transitiva body-parser1.20.9 y Vite6.4.5 exacto. JSON global64KiB y raw PNG/JPEG2MiB con inflate:false; cuerpos comprimidos415 sin reflejar datos. Regresión en proceso hijo comprueba supervivencia, health, login/escritura/carga y cierre0. Evidencia119/119,143/143 y auditorías npm sin avisos en informe5D; intermitencia Chrome del arnés original pendiente, sin cambios de foco/UI. No publicar todavía ni declarar validación institucional.
+
+**Auditoría posterior de estabilidad autorizada:** el registro reprodujo Enter dirigido a resultados, no al botón, sin excepción del panel/caída de API. Corrección exclusiva del arnés: esperar nuevo-libro habilitado y press Enter sobre el localizador, además de confirmación/foco real al terminar guardados. Caso aislado y dos recorridos completos independientes, incluidos412 y paquete con Express detenido, correctos. La publicación exclusiva de5D fue autorizada posteriormente si cumple estos criterios; evidencia/inventario en informe5D. No modifica diseño del panel ni cierra pendientes institucionales; no se extrapola esa traza a todos los timeouts históricos sin evidencia.
+
+**Storage:** ASTROVISOR_COVERS_DIR absoluto externo al checkout, raíces web, catálogo, configuración y exportación/control. Directorio real, archivos regulares sin symlinks/hardlinks; nombre UUID del servidor y extensión cerrada. Publicar archivo completo con temporal/sync/hardlink exclusivo; catálogo conserva solo descriptor, nunca ruta privada. Sin borrado/GC automático: inventario y cuarentena offline deben considerar catálogo, backups y publicaciones anteriores.
+
+**Upload:** POST /api/admin/imagenes con Bearer, If-Match y cuerpo binario image/png o image/jpeg máximo2MiB. Comparación de revisión para preparación; asociación posterior vuelve a comparar dentro del escritor. Firma+decoder estricto, máximo4096 por eje y8 millones de píxeles, una imagen/página, reencode del formato real sin metadatos; rechazar normalizado mayor2MiB. Limitar procesamientos simultáneos. Respuesta201 solo tras recurso íntegro publicado; descriptor y preview normalizado, sin guardar catálogo. Ante pérdida de respuesta, no repetir una escritura documental automáticamente; un recurso huérfano no confirma un libro.
+
+**Association:** POST/PATCH existentes, If-Match obligatorio; validar descriptor y hash/archivo dentro del guardado exclusivo antes de respaldo/rename. Si falla, catálogo anterior; recurso preparado permanece sin referencia. Restauración comprueba activos, no restaura imágenes desde semilla. Catálogo confirmado nunca implica exportación confirmada. Falta del almacén de imágenes no impide catálogos sin imágenes; sí rechaza catálogo que las referencia.
+
+**Transitions:** PATCH admite portada automática o imagen preparada; conservar heredada omite portada. Cambiar título/autor mientras permanezca SVG fijo devuelve409 también en servidor. Cambio explícito a automática/imagen habilita edición. No regreso automático a heredada después de sustituirla. Imagen conserva bytes al cambiar título/autor; UI pide revisar correspondencia. Plantilla se regenera en memoria con nuevos textos. Originales intactos.
+
+**Readers:** endpoint público por libro/revisión sirve svg/png/jpg según modalidad, MIME/nosniff/ETag/304 y conflicto409; nunca sirve recursos preparados no asociados por UUID público. Proyecciones solo metadatos públicos de portada. Homido usa imagen autorizada online y del paquete, sin tocar mirada/narración. Exportador reutiliza bytes normalizados verificados y extensión real; listas cerradas svg/png/jpg en lectores/servidor, hash/puntero/paquetes inmutables preservados.
+
+**Plan (ejecución en la rama autorizada, sin commits):**
+
+- [x] D1 Pruebas de carga/formatos/límites/almacén e integración; recurso privado y normalización con sharp. Error inicial por módulo ausente registrado, sin confundirlo con una aserción semántica.
+- [x] D2 Fallos HTTP iniciales404/200 observados; asociación, transición heredada, concurrencia, persistencia y recuperación con schema1 comprobados.
+- [x] D3 Formatos mixtos/exportación/puntero/paquete anterior comprobados; regresión roja→verde de separación con argumentos efectivos tras revisión final.
+- [x] D4 Fallos frontend nuevos observados antes de adaptar; servicios/editor, borrador401/412 y confirmación comprobados; formulario existente extendido sin CSS nuevo.
+- [x] D5 Backend118/118, web143/143, build correcto, instalación limpia temporal Windows y Chrome con imágenes sintéticas; informe5D y OpenSpec estricto. Revisión separada de solo lectura y corrección verificada sin re-revisión ni commits por restricción expresa del usuario.
+
+Riesgos: fallos antes/después de confirmar recurso, descriptor manipulado, recurso ausente/corrupto, cambios de revisión tras subir, respuesta perdida y portada fija incoherente. Cada bloque debe demostrar rechazo o estado confirmado sin reintentos de guardado. CRLF/LF anterior permanece pendiente, no modificar sus aserciones. Los pendientes físicos/operativos de S4 permanecen abiertos.
+
 Estado vigente: Etapa 1 publicada como `735fd4b1413e5cd98387e297716f3d4c76cac52d`; Etapa 2A publicada como `3bf81dd03e320b6207d6b053f5ee2862cd325371`. Publicación de Etapa 2B y su corrección autorizada tras revisión final sin bloqueantes: guardado, API documental y respaldos privados. Sin merge ni archivo. Base main original `f1058c9b10641c470d7d3e331a81f327af78fc8c`. Formularios, portadas dinámicas, migración de lectores y exports siguen pendientes.
 
 ## Decisiones de ejecución de Etapa 2B

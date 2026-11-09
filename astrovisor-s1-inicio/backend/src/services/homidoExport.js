@@ -7,6 +7,7 @@ import { obtenerCatalogo } from './documentRepository.js'
 import { proyectarRecorridos, proyectarLibros } from './catalogo.js'
 import { generarPortada } from './portadas.js'
 import { rutaPrivada } from './privateStorage.js'
+import { leerImagen, directorioImagenes } from './imageResources.js'
 import { validarPuntero, validarManifiesto, validarReferenciasPaquete } from '../../../frontend/public/prueba-homido/js/paquete-publico.js'
 
 const publico = fileURLToPath(new URL('../../../frontend/public/', import.meta.url))
@@ -25,6 +26,7 @@ export async function directorioExportacion({ destino=process.env.ASTROVISOR_PUB
     const p=await realFuturo(privada)
     if([real,control].some(r=>dentro(p,r)||dentro(r,p)))throw fallo('Exportaciones y directorios privados deben estar separados')
   }
+  if(process.env.ASTROVISOR_COVERS_DIR)await directorioImagenes({directorio,credenciales,destino})
   return salida
 }
 async function regular(p,io) {
@@ -74,12 +76,13 @@ async function preparar(c,io) {
   }
   for(const l of c.libros) {
     let bytes
-    if(l.portada?.plantilla)bytes=Buffer.from(generarPortada(l))
+    if(l.portada?.tipo==='imagen-autorizada')bytes=await leerImagen(l.portada)
+    else if(l.portada?.plantilla)bytes=Buffer.from(generarPortada(l))
     else {if(!svgPermitidos.has(l.portadaIlustrativa))throw fallo('Portada estática no autorizada');bytes=await copiar(l.portadaIlustrativa)}
-    archivos.set(`portadas/${l.id}.svg`,bytes)
+    archivos.set(`portadas/${l.id}.${l.portada?.tipo==='imagen-autorizada'?(l.portada.formato==='png'?'png':'jpg'):'svg'}`,bytes)
   }
   for(const r of recorridos) {
-    for(const l of r.libros)l.portada={...l.portada,src:`portadas/${l.libroId}.svg`}
+    for(const l of r.libros){const ficha=c.libros.find(x=>x.id===l.libroId);l.portada={...l.portada,src:`portadas/${l.libroId}.${ficha.portada?.tipo==='imagen-autorizada'?(ficha.portada.formato==='png'?'png':'jpg'):'svg'}`}}
     for(const a of r.multimedia) {
       if(!audiosPermitidos.has(a.src))throw fallo('Audio no autorizado para exportación')
       const ruta='audio/'+basename(a.src)
@@ -87,7 +90,7 @@ async function preparar(c,io) {
       a.src=ruta
     }
   }
-  for(const l of libros)l.portadaIlustrativa=`portadas/${l.id}.svg`
+  for(const l of libros){const ficha=c.libros.find(x=>x.id===l.id);l.portadaIlustrativa=`portadas/${l.id}.${ficha.portada?.tipo==='imagen-autorizada'?(ficha.portada.formato==='png'?'png':'jpg'):'svg'}`}
   archivos.set('recorridos-demo.json',json(recorridos));archivos.set('libros.json',json(libros))
   return archivos
 }
