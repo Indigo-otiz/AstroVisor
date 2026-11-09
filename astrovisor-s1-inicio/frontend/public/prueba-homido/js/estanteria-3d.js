@@ -1,38 +1,54 @@
 /* Estantería 3D experimental; utiliza libros[] del API/respaldo sin simular existencias. */
 import { ajustarLineas, CANVAS } from './ficha-canvas.js';
 import { crearAnillo, vincularEtiqueta } from './escena-constelaciones.js';
+import { idBibliograficoValido } from './ruta-libro-2d.js';
 
 const PALETA={orion:['#122B50','#254D78'],'osa-mayor':['#173F3C','#347065'],escorpio:['#4D263B','#7E4456']};
 export function extraerLibros(recorridos,preferido='') {
   if(!Array.isArray(recorridos)) return [];
   const salida=[];
   for(const ficha of recorridos) {
-    const l=Array.isArray(ficha?.libros)?ficha.libros.find(x=>typeof x?.titulo==='string'&&x.titulo.trim()):null;
-    if(!l||!/^[a-z0-9-]+$/.test(ficha.id)) continue;
-    salida.push({id:ficha.id,constelacionId:ficha.id,constelacionTitulo:ficha.titulo,
+    if(!idBibliograficoValido(ficha?.id)||!Array.isArray(ficha.libros)) continue;
+    for(const l of ficha.libros) {
+    if(!idBibliograficoValido(l?.libroId)||l.constelacionId!==ficha.id||typeof l.titulo!=='string'||!l.titulo.trim()) continue;
+    salida.push({...l,id:l.libroId,libroId:l.libroId,constelacionId:ficha.id,constelacionTitulo:ficha.titulo,
       titulo:l.titulo.trim(),autor:typeof l.autor==='string'?l.autor.trim():'Autor no indicado',
-      demostracion:true});
+      demostracion:l.demostracion ?? ficha.demostracion});
+    }
   }
-  return salida.sort((a,b)=>Number(b.id===preferido)-Number(a.id===preferido)).slice(0,3);
+  const comparar=(a,b)=>a<b?-1:a>b?1:0;
+  salida.sort((a,b)=>Number(b.constelacionId===preferido)-Number(a.constelacionId===preferido)||comparar(a.libroId,b.libroId)||comparar(a.constelacionId,b.constelacionId));
+  return [...new Map(salida.map(l=>[l.libroId,null])).keys()].slice(0,3).map(id=>salida.find(l=>l.libroId===id));
 }
 function crear(doc,tag,attrs,padre) {
   const el=doc.createElement(tag);
   Object.entries(attrs).forEach(([k,v])=>el.setAttribute(k,v));
   padre.appendChild(el); return el;
 }
+export function ajustarTextoCubierta(ctx,texto,ancho,maxLineas,fuentes) {
+  for(const font of fuentes) {
+    ctx.font=font;
+    const lineas=ajustarLineas(ctx,texto,ancho);
+    if(lineas.length<=maxLineas&&lineas.every(l=>ctx.measureText(l).width<=ancho)) return {font,lineas};
+  }
+  return {font:fuentes[fuentes.length-1],lineas:['Texto completo','en la ficha 2D']};
+}
 function cubierta(doc,libro) {
   const c=doc.createElement('canvas');c.id='cubierta-vr-'+libro.id;c.width=512;c.height=768;
-  const ctx=c.getContext('2d'),color=PALETA[libro.id]||PALETA.orion;
+  c.setAttribute('data-portada-homido','');
+  const ctx=c.getContext('2d'),color=PALETA[libro.constelacionId]||PALETA.orion;
   const f=ctx.createLinearGradient(0,0,512,768);f.addColorStop(0,color[0]);f.addColorStop(1,color[1]);
   ctx.fillStyle=f;ctx.fillRect(0,0,512,768);ctx.strokeStyle='#E5CC9C';ctx.lineWidth=7;ctx.strokeRect(22,22,468,724);
   ctx.fillStyle='#F7E6B9';ctx.textAlign='center';
   ctx.font='bold 22px system-ui,sans-serif';ctx.fillText('LECTURAS DEL CIELO',256,92);
   ctx.font='48px Georgia,serif';ctx.fillText('✦  ✧  ✦',256,210);
-  ctx.font='bold 49px Georgia,serif';
-  const lineas=ajustarLineas(ctx,libro.titulo,398).slice(0,4),inicio=330-(lineas.length-1)*29;
+  const titulo=ajustarTextoCubierta(ctx,libro.titulo,398,4,[49,44,39,34,29,24].map(n=>'bold '+n+'px Georgia,serif'));
+  ctx.font=titulo.font;
+  const lineas=titulo.lineas,inicio=330-(lineas.length-1)*29;
   lineas.forEach((s,i)=>ctx.fillText(s,256,inicio+i*58));
-  ctx.font='27px system-ui,sans-serif';
-  ajustarLineas(ctx,libro.autor,425).slice(0,2).forEach((s,i)=>ctx.fillText(s,256,585+i*32));
+  const autor=ajustarTextoCubierta(ctx,libro.autor,425,3,[27,24,21,18].map(n=>n+'px system-ui,sans-serif'));
+  ctx.font=autor.font;
+  autor.lineas.forEach((s,i)=>ctx.fillText(s,256,585+i*32));
   ctx.font='bold 21px system-ui,sans-serif';ctx.fillText('CUBIERTA ILUSTRATIVA',256,703);
   doc.querySelector('a-assets').appendChild(c);return '#'+c.id;
 }
@@ -66,7 +82,7 @@ export function crearEstanteria3D(doc,grupo,libros,ligar) {
     ligar(hit);nodos.set(libro.id,nodo);
   }
   return {libros,mostrar(preferido) {
-    const ordenados=[...libros].sort((a,b)=>Number(b.id===preferido)-Number(a.id===preferido));
+    const ordenados=[...libros].sort((a,b)=>Number(b.constelacionId===preferido)-Number(a.constelacionId===preferido));
     const xs=ordenados.length===1?[0]:ordenados.length===2?[-0.65,0.65]:[0,-1.14,1.14];
     ordenados.forEach((l,i)=>nodos.get(l.id).setAttribute('position',xs[i]+' 0 0.07'));
   }};
@@ -79,10 +95,16 @@ export function calcularDetalleLibro(ctx,libro) {
     items.push({k:'texto',lineas,x:90,y,lh:t+14,font:ctx.font,color,align:'left',base:'top'});
     return y+lineas.length*(t+14);
   };
+  const textoAjustado=(s,y,tamanos,color,bold)=>{
+    const ajuste=ajustarTextoCubierta(ctx,s,1200,2,tamanos.map(t=>font(t,bold)));
+    const t=Number(/(\d+)px/.exec(ajuste.font)[1]);
+    items.push({k:'texto',lineas:ajuste.lineas,x:90,y,lh:t+14,font:ajuste.font,color,align:'left',base:'top'});
+    return y+ajuste.lineas.length*(t+14);
+  };
   items.push({k:'caja',rect:{x:20,y:20,w:W-40,h:H-40},radio:30,fill:'#FFFFFF',stroke:'#CED7E1',sw:4});
   let y=texto('LECTURA DE DEMOSTRACIÓN',88,31,'#725113',true);
-  y=texto(libro.titulo,y+30,63,'#142641',true);
-  y=texto(libro.autor,y+15,37,'#3D4D62');
+  y=textoAjustado(libro.titulo,y+30,[63,55,47,39,33],'#142641',true);
+  y=textoAjustado(libro.autor,y+15,[37,33,29,25],'#3D4D62',false);
   y=texto('¿Por qué leerlo?',y+35,42,'#142641',true);
   y=texto('Continúa descubriendo las historias del cielo y las estrellas con esta lectura.',y+20,36);
   const ultimo=texto('La biblioteca aún no ha confirmado un ejemplar físico ni su ubicación.',y+42,31,'#664A13');

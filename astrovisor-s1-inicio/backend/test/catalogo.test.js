@@ -13,6 +13,7 @@ import { leerSemilla, inicializarCatalogo, obtenerCatalogo, obtenerRecorridos, o
 const json = async (ruta) => JSON.parse(await readFile(new URL(ruta, import.meta.url), 'utf8'))
 const recorridos = await json('../../content/recorridos.json')
 const libros = await json('../../frontend/src/data/libros-demo.json')
+const contratoHeredado = datos => datos.map(({ revisionCatalogo, libros, ...r }) => ({ ...r, libros: libros.filter(l => l.referenciaHeredada).map(({ libroId, constelacionId, motivo, demostracion, referenciaHeredada, portada, ...l }) => l) }))
 async function temporal(t) {
   const dir = await mkdtemp(join(tmpdir(), 'astrovisor-s4-'))
   assert.equal(dirname(dir), tmpdir())
@@ -24,7 +25,7 @@ test('semilla unificada: conserva los libros, nueve relaciones y contrato anteri
   const semilla = await leerSemilla()
   assert.deepEqual(semilla, crearCatalogoInicial(recorridos, libros))
   assert.deepEqual(proyectarLibros(semilla), libros)
-  assert.deepEqual(proyectarRecorridos(semilla), recorridos)
+  assert.deepEqual(contratoHeredado(proyectarRecorridos(semilla)), recorridos)
   assert.equal(semilla.recorridos.reduce((n, r) => n + r.libroRefs.length, 0), 9)
   assert.deepEqual(semilla.libros.map((l) => l.id), ['star-lore', 'field-stars', 'half-hours'])
 })
@@ -37,7 +38,10 @@ test('migración conserva metadatos desconocidos y recursos sin duplicar libros'
   l[0].extra = { conservar: 'libro' }
   const catalogo = crearCatalogoInicial(r, l)
   assert.equal(catalogo.libros.length, 3)
-  assert.deepEqual(proyectarRecorridos(catalogo), r)
+  assert.deepEqual(contratoHeredado(proyectarRecorridos(catalogo)), recorridos)
+  assert.deepEqual(catalogo.recorridos[0].extra, r[0].extra)
+  assert.deepEqual(catalogo.recorridos[0].libroRefs[0].referencia.procedenciaExtra, r[0].libros[0].procedenciaExtra)
+  assert.deepEqual(catalogo.recorridos[0].multimedia[0].extra, r[0].multimedia[0].extra)
   assert.deepEqual(catalogo.libros[0].extra, l[0].extra)
   assert.ok(catalogo.libros.every((b) => !('recomendaciones' in b)))
 })
@@ -52,7 +56,7 @@ test('migración rechaza bibliografía ambigua o discrepante', () => {
 test('inicialización explícita, lectura pública y reapertura desde otro proceso', async (t) => {
   const directorio = await temporal(t)
   await inicializarCatalogo({ directorio })
-  assert.deepEqual(await obtenerRecorridos({ directorio }), recorridos)
+  assert.deepEqual(contratoHeredado(await obtenerRecorridos({ directorio })), recorridos)
   assert.deepEqual(await obtenerLibros({ directorio }), libros)
   assert.equal((await obtenerLibros({ directorio, constelacionId: 'orion' })).length, 3)
   const catalogo = await obtenerCatalogo({ directorio })

@@ -106,14 +106,21 @@ export function crearCatalogoInicial(recorridos, librosDemo) {
   return validarCatalogo({ schemaVersion: 1, revision: 1, recorridos: fichas, libros })
 }
 
-/** Mantiene la selección bibliográfica y el contrato público previo de Homido. */
-export function proyectarRecorridos({ recorridos, libros }) {
+const camposPublicos = (objeto, campos) => Object.fromEntries(campos.filter(c => Object.hasOwn(objeto, c)).map(c => [c, objeto[c]]))
+/** Una ficha pública por relación; la bibliografía editable sigue solo en libros[]. */
+export function proyectarRecorridos({ recorridos, libros, revision }) {
   const porId = new Map(libros.map((l) => [l.id, l]))
-  return recorridos.map(({ libroRefs, ...recorrido }) => ({
-    ...recorrido,
-    libros: libroRefs.filter((r) => r.referencia !== undefined).map((r) => {
-      const { titulo, autor, anio, enlacePublico } = porId.get(r.libroId)
-      return { titulo, autor, ...(anio === undefined ? {} : { anio }), url: enlacePublico, ...r.referencia }
+  return recorridos.map((recorrido) => ({
+    ...camposPublicos(recorrido, ['id', 'titulo', 'resumen', 'historia', 'comoReconocerla', 'demostracion', 'historiaVisor']),
+    revisionCatalogo: revision,
+    multimedia: recorrido.multimedia.map(m => camposPublicos(m, ['tipo', 'src', 'formato', 'transcripcion', 'autorTexto', 'procedencia', 'voz', 'permisoTexto', 'permiso', 'estadoDerechos', 'licenciaVozFuente', 'demostracion'])),
+    libros: recorrido.libroRefs.map((r) => {
+      const l = porId.get(r.libroId)
+      return { ...camposPublicos(r.referencia ?? {}, ['licencia', 'etiqueta', 'aclaracion']),
+        libroId: l.id, constelacionId: recorrido.id, titulo: l.titulo, autor: l.autor, ...(l.anio === undefined ? {} : { anio: l.anio }), url: l.enlacePublico,
+        motivo: r.motivo, demostracion: l.demostracion, referenciaHeredada: r.referencia !== undefined,
+        portada: l.portada?.plantilla ? { tipo: 'ilustrativa', origen: 'plantilla', plantilla: l.portada.plantilla, paleta: l.portada.paleta }
+          : { tipo: 'ilustrativa', origen: 'estatica', src: l.portadaIlustrativa } }
     }),
   }))
 }

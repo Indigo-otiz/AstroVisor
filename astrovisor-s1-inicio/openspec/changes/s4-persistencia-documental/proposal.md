@@ -4,6 +4,8 @@ Estado vigente: Etapa 1 publicada como `735fd4b1413e5cd98387e297716f3d4c76cac52d
 
 ## Why
 
+Etapa 4A autorizada sobre `58a77855cf35bac4908c8ec09cab9a2d8d46dd81`: proyección por libroId de todas las relaciones, extracción/navegación Homido y compatibilidad explícita del respaldo heredado. Cierre y commit/push autorizados posteriormente, condicionados a ausencia de bloqueantes; auditoría final local sin bloqueantes identificados. Sin merge/archivo. No implementar exportación, sincronización, alojamiento independiente ni cambios de autenticación. Evidencia en `docs/PRUEBA-S4-ETAPA4A.md`.
+
 Actualización Etapa 3B autorizada sobre `d8f3792aa30c9de8362909131c82bfc030c9f5b3`: alta administrativa de demostración y portadas SVG generadas en memoria, compatibles con catálogo anterior. Auditoría de cierre y commit/push autorizados posteriormente, condicionados a ausencia de bloqueantes; auditoría local sin bloqueantes identificados. Sin merge/archivo. Exportación/sincronización Homido fuera de esta etapa. Evidencia en `docs/PRUEBA-S4-ETAPA3B.md`.
 
 Actualización Etapa 3A: Etapa 2B publicada en `38c00eb452e3f24b4bbb2177ce58ce8463d7ace1`. El usuario autorizó exclusivamente conectar panel y estantería a Express. Auditoría final y publicación de 3A autorizadas, con recuperación de borrador en memoria ante 401 y token solo en memoria; sin merge ni archivo. Formularios de edición limitada y lectura web implementados; creación, portadas dinámicas y sincronización Homido siguen pendientes. Ver `docs/PRUEBA-S4-ETAPA3A.md`. Esta actualización sustituye el estado anterior respecto de formularios y lectura web.

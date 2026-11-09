@@ -246,6 +246,22 @@ El sistema SHALL conservar revisiones válidas previas en almacenamiento adminis
 ### Requirement: Compatibilidad y límites explícitos del respaldo Homido
 El visor SHALL conservar la lectura por API y la conmutación a una copia pública válida cuando falle. La copia SHALL identificar origen y revisión, conservar contratos y metadatos públicos y no presentarse como contenido actualizado si pertenece a una exportación anterior.
 
+#### Scenario: Identidad documental en Etapa 4A
+- **WHEN** se consulta un recorrido con relaciones bibliográficas heredadas o recomendaciones documentales nuevas
+- **THEN** todas se proyectan por libroId/constelacionId con motivo y campos públicos compatibles, sin duplicar bibliografía editable ni publicar metadatos administrativos; la presencia de referencia heredada se declara sin inferir antigüedad de las demás relaciones.
+
+#### Scenario: Libro renombrado o compartido
+- **WHEN** un título cambia manteniendo libroId o un libro pertenece a varias constelaciones
+- **THEN** Homido navega a la ficha por ID y conserva la constelación de origen; los títulos no determinan el destino.
+
+#### Scenario: Selección limitada de cubiertas
+- **WHEN** existen más de tres recomendaciones
+- **THEN** se prioriza la constelación abierta, luego libroId ASCII y constelacionId, se deduplica por libroId y se muestran tres como máximo; textos anchos se ajustan en sus espacios sin recorte silencioso ni modificación del dwell.
+
+#### Scenario: Respaldo anterior sin IDs completos
+- **WHEN** falla la API y se utiliza el JSON heredado sin exportar una revisión nueva
+- **THEN** se resuelven solo tres firmas bibliográficas conocidas por URL+autor, sin usar títulos; lo desconocido no inventa un ID y la interfaz avisa que la revisión no está verificada ni se afirma actualización. La publicación de paquete queda pendiente de Etapa 4B.
+
 #### Scenario: Falla aislada del endpoint
 - **WHEN** el endpoint de recorridos falla, expira o devuelve datos inválidos y el servidor estático independiente responde
 - **THEN** el visor utiliza la última exportación completa publicada e informa origen, fecha y revisión.
