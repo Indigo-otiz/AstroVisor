@@ -1,0 +1,42 @@
+
+> astrovisor@0.1.0 test:web
+> npm run test --workspace frontend
+
+
+> @astrovisor/frontend@0.1.0 test
+> node --test
+
+✔ consume el contrato documental real y transmite la cancelación (38.7801ms)
+✔ rechaza HTTP fallido para mostrar un error recuperable (1.1111ms)
+✔ rechaza red interrumpida para mostrar un error recuperable (0.2841ms)
+✔ rechaza JSON inválido para mostrar un error recuperable (0.7358ms)
+✔ rechaza objeto sin arreglo para mostrar un error recuperable (0.5683ms)
+✔ rechaza historia ausente para mostrar un error recuperable (0.4921ms)
+✔ rechaza IDs repetidos para mostrar un error recuperable (1.429ms)
+✔ rechaza ID incompatible para mostrar un error recuperable (0.5914ms)
+✔ distingue una lista vacía de un fallo (0.6018ms)
+✔ una solicitud nueva se recupera de una respuesta fallida (1.1365ms)
+✔ metadatos de audio inválidos no invalidan una historia legible (0.8119ms)
+✔ GazeController se inicializa en reposo con 3000 ms por defecto (1.2038ms)
+✔ GazeController avanza por las etapas 0%, 33%, 66% y confirma en 100% (160.5368ms)
+✔ GazeController cancela y reinicia a 0% si la mirada se desvía antes de tiempo (62.4103ms)
+✔ GazeController pausa y no inicia mirada mientras esté pausado (0.7482ms)
+✔ GazeController permite fijar estados manuales para revisión (0%, 33%, 66%, 100%) (0.3456ms)
+✔ el audio opcional inválido no sustituye el relato ni habilita una URL externa (3.4788ms)
+✔ pausa conserva posición y reanudar continúa; finalizar permite repetir (3.4152ms)
+✔ rechazo por gesto ofrece recuperación sin anunciar reproducción (1.1939ms)
+✔ fallo del medio conserva lectura y permite intentar de nuevo (0.5902ms)
+✔ un play tardío no deja sonido después de detener (0.6764ms)
+✔ un play tardío no deja sonido después de seleccionar (0.4259ms)
+✔ un play tardío no deja sonido después de destruir (0.3361ms)
+✔ un play tardío no deja sonido después de pausar (0.3832ms)
+✔ resolver el play anterior no pausa la narración nueva (1.8184ms)
+✔ ocultar pausa; pagehide reinicia y destruir retira observadores y listeners (0.6989ms)
+ℹ tests 26
+ℹ suites 0
+ℹ pass 26
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 430.5189

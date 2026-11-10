@@ -1,0 +1,75 @@
+{
+  "fechaUTC": "2026-11-10T15:37:58.844Z",
+  "zona": "America/Mexico_City",
+  "navegador": "157.0.8103.50",
+  "metodo": "Chrome con viewport nativo (sin emulación). Zoom desde controles reales del navegador; DPR relativo al inicial y capturas. Sin CSS zoom/font-size ni cambio de métricas de dispositivo.",
+  "baseline": {
+    "dpr": 1.25,
+    "ancho": 1427,
+    "alto": 788,
+    "anchoExterior": 1442
+  },
+  "casos": [
+    {
+      "ruta": "/",
+      "proyeccion": false,
+      "resultado": "correcto",
+      "dpr": 2.5,
+      "ancho": 713,
+      "alto": 394,
+      "documento": 706,
+      "fuera": []
+    },
+    {
+      "ruta": "/explorar",
+      "proyeccion": false,
+      "resultado": "correcto",
+      "dpr": 2.5,
+      "ancho": 713,
+      "alto": 394,
+      "documento": 706,
+      "fuera": []
+    },
+    {
+      "ruta": "/explorar/orion",
+      "proyeccion": false,
+      "resultado": "correcto",
+      "dpr": 2.5,
+      "ancho": 713,
+      "alto": 394,
+      "documento": 706,
+      "fuera": []
+    },
+    {
+      "ruta": "/",
+      "proyeccion": true,
+      "resultado": "correcto",
+      "dpr": 2.5,
+      "ancho": 713,
+      "alto": 394,
+      "documento": 706,
+      "fuera": []
+    },
+    {
+      "ruta": "/explorar",
+      "proyeccion": true,
+      "resultado": "correcto",
+      "dpr": 2.5,
+      "ancho": 713,
+      "alto": 394,
+      "documento": 706,
+      "fuera": []
+    },
+    {
+      "ruta": "/explorar/orion",
+      "proyeccion": true,
+      "resultado": "correcto",
+      "dpr": 2.5,
+      "ancho": 713,
+      "alto": 394,
+      "documento": 706,
+      "fuera": []
+    }
+  ],
+  "resultado": "correcto"
+}

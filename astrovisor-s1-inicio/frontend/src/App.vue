@@ -1,10 +1,11 @@
 <script setup>
-import { computed, nextTick, watch } from 'vue'
+import { computed, nextTick, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import './public.css'
 const route = useRoute()
 const esPublica = computed(() => ['inicio', 'explorar', 'constelacion'].includes(route.name))
 const esAdmin = computed(() => ['admin', 'admin-acceso'].includes(route.name))
+const presentacion = ref(false)
 const titulos = {
   inicio: 'Inicio',
   explorar: 'Constelaciones e historias del cielo',
@@ -26,7 +27,7 @@ watch(
 )
 </script>
 <template>
-  <div class="app-shell" :class="{ 'public-shell': esPublica, 'admin-shell': esAdmin }">
+  <div class="app-shell" :class="{ 'public-shell': esPublica, 'admin-shell': esAdmin, 'presentation-shell': esPublica && presentacion }">
     <a class="skip-link" href="#contenido">Saltar al contenido</a>
 
     <!-- Header general: solo se muestra en vistas públicas, no en administración -->
@@ -48,8 +49,19 @@ watch(
       </div>
     </header>
 
+    <div v-if="esPublica" class="container presentation-tools">
+      <p id="presentation-help">Texto más grande para compartir las historias en una pantalla.</p>
+      <button
+        class="presentation-toggle"
+        type="button"
+        aria-describedby="presentation-help"
+        :aria-pressed="presentacion"
+        @click="presentacion = !presentacion"
+      >Vista para proyección <span aria-hidden="true">{{ presentacion ? 'Activada' : 'Desactivada' }}</span></button>
+    </div>
+
     <!-- Contenido principal -->
-    <main id="contenido" :class="esAdmin ? 'admin-main' : 'container main-content'">
+    <main id="contenido" tabindex="-1" :class="esAdmin ? 'admin-main' : 'container main-content'">
       <RouterView :key="route.path" />
     </main>
 

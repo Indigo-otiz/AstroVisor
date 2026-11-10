@@ -1,0 +1,17 @@
+
+> astrovisor@0.1.0 build
+> npm run build --workspace frontend
+
+
+> @astrovisor/frontend@0.1.0 build
+> vite build
+
+vite v6.4.4 building for production...
+transforming...
+✓ 84 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                   0.55 kB │ gzip:   0.34 kB
+dist/assets/index-ButWuUIA.css   23.96 kB │ gzip:   5.79 kB
+dist/assets/index-Bv3LUvch.js   359.71 kB │ gzip: 108.27 kB
+✓ built in 2.79s

@@ -1,0 +1,23 @@
+{
+  "fechaConstanciaLocal": "2026-11-10",
+  "zona": "America/Mexico_City",
+  "fuente": "Confirmación de Luis en este chat de S4",
+  "textoOriginal": "el homido el homido y la pantalla ya lo revisamos, funciona correctamente",
+  "estado": "funcionamiento-correcto-reportado",
+  "homido": "Revisado y funcionando correctamente según Luis",
+  "pantalla": "Revisada y funcionando correctamente según Luis",
+  "fechaEjecucion": null,
+  "versionProbada": null,
+  "telefono": null,
+  "computadora": null,
+  "sistemaYNavegador": null,
+  "modeloPantallaOProyector": null,
+  "resolucionLuzYDistancia": null,
+  "urlHTTPS": null,
+  "detalleDeControlesAudioYRetorno2D": null,
+  "videoSinRedEnEquipoDeEnsayo": null,
+  "participantes": null,
+  "revisorIdentificado": null,
+  "evidenciaAdjunta": null,
+  "limite": "La constancia acredita el reporte de funcionamiento correcto de Homido y pantalla. Los detalles no especificados permanecen sin dato; no se atribuyen observación directa del agente, protocolo completo, ensayo cronometrado ni revisión cruzada identificada."
+}

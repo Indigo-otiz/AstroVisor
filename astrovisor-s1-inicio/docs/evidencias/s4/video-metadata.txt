@@ -1,0 +1,14 @@
+[libvpx @ 0000021f206e17c0] v1.14.1
+[aist#0:1/opus @ 0000021f207cedc0] Guessed Channel Layout: stereo
+Input #0, matroska,webm, from 'docs/evidencias/s4/astrovisor-respaldo-s4.webm':
+  Metadata:
+    ENCODER         : Lavf61.1.100
+  Duration: 00:01:43.55, start: 0.000000, bitrate: 1032 kb/s
+  Stream #0:0(eng): Video: vp8 (libvpx), yuv420p(tv), 1280x900, SAR 1:1 DAR 64:45, 1k fps, 1k tbr, 1k tbn (default)
+      Metadata:
+        ALPHA_MODE      : 1
+        DURATION        : 00:01:43.551000000
+  Stream #0:1(eng): Audio: opus, 48000 Hz, stereo (default)
+      Metadata:
+        DURATION        : 00:01:43.535000000
+At least one output file must be specified

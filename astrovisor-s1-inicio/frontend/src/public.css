@@ -84,9 +84,124 @@
   outline: none;
 }
 .public-shell a:focus-visible,
-.public-shell button:focus-visible {
+.public-shell button:focus-visible,
+.public-shell main:focus-visible {
   outline: 3px solid var(--blue);
   outline-offset: 5px;
+}
+
+/* La presentación se elige expresamente; solo afecta al recorrido público 2D. */
+.public-shell .presentation-tools {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px 24px;
+  padding-block: 16px;
+  border-bottom: 1px solid #dedbd3;
+}
+.presentation-tools p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 1rem;
+  max-width: 48ch;
+}
+.presentation-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 4px 12px;
+  font: inherit;
+  font-size: 1rem;
+  font-weight: 650;
+  line-height: 1.5;
+  color: var(--blue);
+  background: transparent;
+  border: 1px solid var(--blue);
+  border-radius: 8px;
+  min-height: 48px;
+  max-width: 100%;
+  padding: 10px 18px;
+  cursor: pointer;
+}
+.presentation-toggle span {
+  font-weight: 400;
+}
+.presentation-toggle:hover {
+  background: #e8edf4;
+}
+.presentation-toggle[aria-pressed='true'] {
+  background: var(--blue);
+  color: white;
+}
+.public-shell.presentation-shell {
+  font-size: 1.3334rem;
+}
+.public-shell.presentation-shell .container {
+  width: min(1440px, calc(100% - 64px));
+}
+.presentation-shell .public-home,
+.presentation-shell .constellation-detail {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 22em), 1fr));
+  gap: 40px;
+}
+.presentation-shell .constellation-grid {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 18em), 1fr));
+  gap: 28px;
+}
+.public-shell.presentation-shell h1 {
+  font-size: clamp(2.25rem, 5vw, 4rem);
+}
+.public-shell.presentation-shell h2 {
+  font-size: 1.35em;
+}
+.presentation-shell .constellation-card-copy h2 {
+  font-size: 1.5em;
+}
+.presentation-shell .detail-reading,
+.presentation-shell .detail-heading,
+.presentation-shell .public-page-intro {
+  max-width: 65ch;
+  min-width: 0;
+}
+.presentation-shell .detail-reading > section {
+  max-width: 60ch;
+}
+.presentation-shell .constellation-card-copy p,
+.presentation-shell .constellation-card-copy .public-text-link,
+.presentation-shell .home-guide p,
+.presentation-shell .narracion .narracion-origen,
+.presentation-shell .narracion-transcripcion dl {
+  font-size: 1em;
+}
+.public-shell.presentation-shell .public-button {
+  font-size: 1em;
+}
+.presentation-shell .public-back,
+.presentation-shell .public-demo,
+.presentation-shell .detail-sky figcaption,
+.presentation-shell .home-intro .home-access,
+.presentation-shell .home-sky p,
+.presentation-shell .home-guide > a,
+.presentation-shell .presentation-tools p,
+.presentation-shell .presentation-toggle {
+  font-size: 0.9167em;
+}
+.public-shell.presentation-shell .site-footer {
+  font-size: 0.9167em;
+}
+.presentation-shell .home-sky .constellation-art {
+  max-width: 480px;
+}
+@media (max-width: 640px) {
+  .public-shell.presentation-shell .container {
+    width: calc(100% - 40px);
+  }
+  .presentation-shell .public-home,
+  .presentation-shell .constellation-detail {
+    gap: 28px;
+  }
 }
 .public-shell a {
   text-underline-offset: 5px;

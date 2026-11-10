@@ -1,0 +1,413 @@
+{
+  "fechaUTC": "2026-11-10T15:51:35.453Z",
+  "fechaLocal": "2026-11-10 09:51:35",
+  "zona": "America/Mexico_City",
+  "rama": "codex/s4-web-computadora-proyeccion",
+  "commitBase": "88667899838cc0c09976383972cadc7f1bf781e1",
+  "cambiosSinCommit": true,
+  "alcance": "Implementación y verificación técnica local S4, incluido zoom nativo 200%. No certifica proyector, red del recinto, Homido físico S4, escucha humana, ensayo o Expo, ni revisión de otro integrante.",
+  "hashes": [
+    {
+      "archivo": "frontend/src/App.vue",
+      "bytes": 3007,
+      "normalizacion": "UTF-8 sin BOM; LF",
+      "sha256": "a722c63be6653f0e144647f4bd5dce50c9a8e2765e6643abd51d2181759a85e3"
+    },
+    {
+      "archivo": "frontend/src/public.css",
+      "bytes": 12540,
+      "normalizacion": "UTF-8 sin BOM; LF",
+      "sha256": "0ef2303511b0d6f6bc50f6feec1e3e37be8d3da6c61aa069f9f3fbe47ca9ee2c"
+    },
+    {
+      "archivo": ".gitignore",
+      "bytes": 103,
+      "normalizacion": "UTF-8 sin BOM; LF",
+      "sha256": "bff5ea97498a4731af79095cc591529c421d5721262f690c98dcaa7db9f916a6"
+    },
+    {
+      "archivo": "docs/GUIA-S4-EXPO.md",
+      "bytes": 9503,
+      "normalizacion": "UTF-8 sin BOM; LF",
+      "sha256": "a47c2e2a4bb3cbab038206f9f82258c6364a5edcb7e6e6ad1d66d263feed0105"
+    },
+    {
+      "archivo": "docs/PRUEBA-S4.md",
+      "bytes": 14504,
+      "normalizacion": "UTF-8 sin BOM; LF",
+      "sha256": "4f360545958e0cffbd4ec882f427771fbe596227f4c5039fd019d94d1a4008ba"
+    },
+    {
+      "archivo": "../entregables/Sprint 4_Luis Rodriguez.md",
+      "bytes": 10021,
+      "normalizacion": "UTF-8 sin BOM; LF",
+      "sha256": "194f8a5ee397f7ed1db032e83c13ec99f9a42460559b38baad2831fc365b7f5c"
+    },
+    {
+      "archivo": "content/AUTORIA.md",
+      "bytes": 1193,
+      "normalizacion": "UTF-8 sin BOM; LF",
+      "sha256": "a7c65ee3d130ed286a73ed3bd3e37ad79e97874a913f0a0f8eac6b5ef8caced9"
+    },
+    {
+      "archivo": "content/recorridos.json",
+      "bytes": 6772,
+      "normalizacion": "UTF-8 sin BOM; LF",
+      "sha256": "63ed2a1ec16c3dc50a06dd2da0059056b9a16e1d82378ea5b6988ddfc70870e0"
+    },
+    {
+      "archivo": "scripts/verificar-s4.cjs",
+      "bytes": 12754,
+      "normalizacion": "UTF-8 sin BOM; LF",
+      "sha256": "bbf99bfb144387d04610640f3dd3f01f7d3274d3362cc1a7340b49b048f62f45"
+    },
+    {
+      "archivo": "scripts/verificar-zoom-s4.cjs",
+      "bytes": 5375,
+      "normalizacion": "UTF-8 sin BOM; LF",
+      "sha256": "820562cb8ad3a33e06f2fc45b396a9d3fa206504a3c6b6a86625ce0dcafac088"
+    },
+    {
+      "archivo": "scripts/servidor-pruebas-s4.cjs",
+      "bytes": 1121,
+      "normalizacion": "UTF-8 sin BOM; LF",
+      "sha256": "385aa1e92387b43c1e9508476939dd02f0ad72e86f9ea2e01d64e98abaad43cd"
+    },
+    {
+      "archivo": "scripts/grabar-s4.cjs",
+      "bytes": 9974,
+      "normalizacion": "UTF-8 sin BOM; LF",
+      "sha256": "3a57524c1382ea37ee933522f22c752e2cea88b82ce9bd4b18bace3f2d246c57"
+    },
+    {
+      "archivo": "scripts/verificar-video-s4.cjs",
+      "bytes": 4491,
+      "normalizacion": "UTF-8 sin BOM; LF",
+      "sha256": "ac8abbea94abf24dd81681870f0c8e6abf00c4305167e8c8f5dc2336795e85ad"
+    },
+    {
+      "archivo": "scripts/manifiesto-s4.mjs",
+      "bytes": 2540,
+      "normalizacion": "UTF-8 sin BOM; LF",
+      "sha256": "d4e6c34b7429283143521e6e011a06296824fa5d44c793b8592a6e864aca5a37"
+    },
+    {
+      "archivo": "frontend/public/audio/orion-kokoro-v1.wav",
+      "bytes": 990252,
+      "normalizacion": "Binario sin normalización",
+      "sha256": "0b85a88e81f0e03379d6963fea7c9630c254ea5bb63f7395796512181cb130ce"
+    },
+    {
+      "archivo": "frontend/public/audio/osa-mayor-kokoro-v1.wav",
+      "bytes": 1058860,
+      "normalizacion": "Binario sin normalización",
+      "sha256": "76f1818fc731e6bb1356e67bf5e2bda687a0f95dda303512da3242419ae8e2e2"
+    },
+    {
+      "archivo": "frontend/public/audio/escorpio-kokoro-v1.wav",
+      "bytes": 1047596,
+      "normalizacion": "Binario sin normalización",
+      "sha256": "b8bc6b061256e57739b5644d004eeb8d1d97f4394bf13c0894d6fd2c91ab5d21"
+    },
+    {
+      "archivo": "frontend/dist/index.html",
+      "bytes": 533,
+      "normalizacion": "UTF-8 sin BOM; LF",
+      "sha256": "db076aadc2f00aa68116db579b4555dc156550805a95e0f199a0e6d33e965251"
+    },
+    {
+      "archivo": "frontend/dist/assets/index-ButWuUIA.css",
+      "bytes": 23955,
+      "normalizacion": "UTF-8 sin BOM; LF",
+      "sha256": "469dd61af987af30c15b11fc2b0ff586a3fa527bdd0726dc29f6e4810166e479"
+    },
+    {
+      "archivo": "frontend/dist/assets/index-Bv3LUvch.js",
+      "bytes": 359710,
+      "normalizacion": "UTF-8 sin BOM; LF",
+      "sha256": "2b6b6ff20091b4430ccf9e063d82ca42346534e35c07da09ff9d1488302937e0"
+    },
+    {
+      "archivo": "docs/evidencias/s4/api-error-inducido.png",
+      "bytes": 100111,
+      "normalizacion": "Binario sin normalización",
+      "sha256": "15bb115ddfd9bc5efa2165b7492aa58cdd0c094401331f5a5418bebc60c4369f"
+    },
+    {
+      "archivo": "docs/evidencias/s4/astrovisor-respaldo-s4.webm",
+      "bytes": 13369025,
+      "normalizacion": "Binario sin normalización",
+      "sha256": "a7884439bd62ace696480574d3f15115d9275868e6a77ef28b306b8acc0435e5"
+    },
+    {
+      "archivo": "docs/evidencias/s4/audio-error-inducido.png",
+      "bytes": 138002,
+      "normalizacion": "Binario sin normalización",
+      "sha256": "6f6600249cd069f5fb4e4b8e36267df5d15d74dad53bb0fb5bd9f9faa7c6f5c6"
+    },
+    {
+      "archivo": "docs/evidencias/s4/backend.txt",
+      "bytes": 831,
+      "normalizacion": "UTF-8 sin BOM; LF",
+      "sha256": "1ab9165e404b191b07d2adf9c65b85acd1d9ddb6588200a2d19a345993e6b901"
+    },
+    {
+      "archivo": "docs/evidencias/s4/build.txt",
+      "bytes": 445,
+      "normalizacion": "UTF-8 sin BOM; LF",
+      "sha256": "13dd2397b3114e77946c80f2d33753efb9a0c5327fdd572f3674b1ae888072aa"
+    },
+    {
+      "archivo": "docs/evidencias/s4/detector.json",
+      "bytes": 3,
+      "normalizacion": "UTF-8 sin BOM; LF",
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+    },
+    {
+      "archivo": "docs/evidencias/s4/ficha-1024-habitual.png",
+      "bytes": 133773,
+      "normalizacion": "Binario sin normalización",
+      "sha256": "89ebddf5b9dc76189aca63d85bee289a02e9dac166b09af4213d3b6ba80b7177"
+    },
+    {
+      "archivo": "docs/evidencias/s4/ficha-1024-proyeccion.png",
+      "bytes": 193193,
+      "normalizacion": "Binario sin normalización",
+      "sha256": "7ce57fca34568a3cad8ff5980681663a2d802a3e5b17919829ad1adc584bc9d2"
+    },
+    {
+      "archivo": "docs/evidencias/s4/ficha-1920-habitual.png",
+      "bytes": 140721,
+      "normalizacion": "Binario sin normalización",
+      "sha256": "a327a4de6e901f9eac90b0b1a1abfcb49491b55ec804b279d66735e4c545570d"
+    },
+    {
+      "archivo": "docs/evidencias/s4/ficha-1920-proyeccion.png",
+      "bytes": 203115,
+      "normalizacion": "Binario sin normalización",
+      "sha256": "b07544fbb2c918007fb31e9fbd38665828a1e8820eed7c4b836e69b419a77a65"
+    },
+    {
+      "archivo": "docs/evidencias/s4/ficha-2560-habitual.png",
+      "bytes": 145220,
+      "normalizacion": "Binario sin normalización",
+      "sha256": "820c1aeb7197d8943948cd3200874074075daf298b0336b1118fc2e7a61b472f"
+    },
+    {
+      "archivo": "docs/evidencias/s4/ficha-2560-proyeccion.png",
+      "bytes": 208858,
+      "normalizacion": "Binario sin normalización",
+      "sha256": "c77cec98ee853f77ea664865b22f36f8df9fddd69a87f659fdbb5418f9badd76"
+    },
+    {
+      "archivo": "docs/evidencias/s4/ficha-360-habitual.png",
+      "bytes": 138137,
+      "normalizacion": "Binario sin normalización",
+      "sha256": "57ff4949afcb841da710ba482207792b0761177e36a1528c881e5fed16dc0ee1"
+    },
+    {
+      "archivo": "docs/evidencias/s4/ficha-360-proyeccion.png",
+      "bytes": 197306,
+      "normalizacion": "Binario sin normalización",
+      "sha256": "b734d9f86ffb1298fa29b89c25042cc2d73ee07dd5d0286c49a3aaef883cd621"
+    },
+    {
+      "archivo": "docs/evidencias/s4/frontend.txt",
+      "bytes": 2227,
+      "normalizacion": "UTF-8 sin BOM; LF",
+      "sha256": "2aeacecabf32e02c7df4cb809fc3bb9d856e979d3a409cdb332ba7b781a932fd"
+    },
+    {
+      "archivo": "docs/evidencias/s4/grabacion.json",
+      "bytes": 6285,
+      "normalizacion": "UTF-8 sin BOM; LF",
+      "sha256": "99828f62f6ea72e89581c2a02f902aeb3bdad213fbf9a2148286a87028a81f7c"
+    },
+    {
+      "archivo": "docs/evidencias/s4/inicio-1024-habitual.png",
+      "bytes": 79962,
+      "normalizacion": "Binario sin normalización",
+      "sha256": "1446ce9d6417ffc31324da418c984e6d1df085dc5af160bf587dcf97da9df94d"
+    },
+    {
+      "archivo": "docs/evidencias/s4/inicio-1024-proyeccion.png",
+      "bytes": 118672,
+      "normalizacion": "Binario sin normalización",
+      "sha256": "106ec8ef898b435235dc17abf49c2b5399e41cf7e5f3ed22619faf2d17d56972"
+    },
+    {
+      "archivo": "docs/evidencias/s4/inicio-1920-habitual.png",
+      "bytes": 92875,
+      "normalizacion": "Binario sin normalización",
+      "sha256": "d4e94fb4a0fa5e6af9bb54cdc3df8f1134da901ecf401ac374eaf8860f8b352b"
+    },
+    {
+      "archivo": "docs/evidencias/s4/inicio-1920-proyeccion.png",
+      "bytes": 127345,
+      "normalizacion": "Binario sin normalización",
+      "sha256": "7e73bd462e612ac4315687f84c82eb23a55b8d950c6b4acfbf0d535da612cb48"
+    },
+    {
+      "archivo": "docs/evidencias/s4/listado-1024-habitual.png",
+      "bytes": 99458,
+      "normalizacion": "Binario sin normalización",
+      "sha256": "567940263c7d19b776393b9789bb448806e848b40595c8f6d3ec2a4cb0d5bbd6"
+    },
+    {
+      "archivo": "docs/evidencias/s4/listado-1024-proyeccion.png",
+      "bytes": 164805,
+      "normalizacion": "Binario sin normalización",
+      "sha256": "717b568fc3db30cf33ae27592c3246834a93d4439a90cc3dc4f36e35e04a7fa9"
+    },
+    {
+      "archivo": "docs/evidencias/s4/listado-1920-habitual.png",
+      "bytes": 115555,
+      "normalizacion": "Binario sin normalización",
+      "sha256": "c7c81e5b4454c9098366573252e0c988cc64503447e55b7b335134224999277d"
+    },
+    {
+      "archivo": "docs/evidencias/s4/listado-1920-proyeccion.png",
+      "bytes": 170087,
+      "normalizacion": "Binario sin normalización",
+      "sha256": "2d6255b62fafab87b32dfc6aab3f150b61832576883125831735d5edb2d2d330"
+    },
+    {
+      "archivo": "docs/evidencias/s4/navegador.json",
+      "bytes": 23940,
+      "normalizacion": "UTF-8 sin BOM; LF",
+      "sha256": "5445a54df93bb56c30805f9de89ebdd75dc85c10e8f40d4ec768dc5d1acbf7f7"
+    },
+    {
+      "archivo": "docs/evidencias/s4/texto-200-css-ficha-habitual.png",
+      "bytes": 192666,
+      "normalizacion": "Binario sin normalización",
+      "sha256": "e97d2cbd34ce9b362d6cc384a3e4525f633efb40b6d944c5c0c304dbceefa667"
+    },
+    {
+      "archivo": "docs/evidencias/s4/texto-200-css-ficha-proyeccion.png",
+      "bytes": 133948,
+      "normalizacion": "Binario sin normalización",
+      "sha256": "6a1050d1b2e6ce6a74090c5e055f2d562528aa90debc6172e6de347a297e10de"
+    },
+    {
+      "archivo": "docs/evidencias/s4/texto-200-css-inicio-habitual.png",
+      "bytes": 199880,
+      "normalizacion": "Binario sin normalización",
+      "sha256": "a7cfd33b0c00b315948f4d0dc9a3265b6f731d5c40a6bfc95eb49ca22ec9eed0"
+    },
+    {
+      "archivo": "docs/evidencias/s4/texto-200-css-inicio-proyeccion.png",
+      "bytes": 115405,
+      "normalizacion": "Binario sin normalización",
+      "sha256": "515e391987c7e9292c9c8b20d8fed2e5dbcb6cd1c9cb0cf5f30a779480cf43d0"
+    },
+    {
+      "archivo": "docs/evidencias/s4/texto-200-css-listado-habitual.png",
+      "bytes": 146118,
+      "normalizacion": "Binario sin normalización",
+      "sha256": "76b550c58bf18add8e74df9503d8a4d56b9f3bea04077557504a9c8d933737d8"
+    },
+    {
+      "archivo": "docs/evidencias/s4/texto-200-css-listado-proyeccion.png",
+      "bytes": 121686,
+      "normalizacion": "Binario sin normalización",
+      "sha256": "c2b6b37fec381f14f0ef20cc6286a405bf5e0f034902226faaf09b8428672280"
+    },
+    {
+      "archivo": "docs/evidencias/s4/validacion-reportada.json",
+      "bytes": 1063,
+      "normalizacion": "UTF-8 sin BOM; LF",
+      "sha256": "5e2fe7c5353f12d09394ce12da1955537c9b8268f6afb96b5010803964b20435"
+    },
+    {
+      "archivo": "docs/evidencias/s4/video-local-3d.png",
+      "bytes": 260994,
+      "normalizacion": "Binario sin normalización",
+      "sha256": "06b5814102ce65b505f37dcc0838b1e8a0779b64adb266f250dd3084efa6f3c7"
+    },
+    {
+      "archivo": "docs/evidencias/s4/video-local-final.png",
+      "bytes": 319490,
+      "normalizacion": "Binario sin normalización",
+      "sha256": "0c837edac7b0ebc982b7a41e3605c3a19c38aab81f6b30f8f755b39a144feeb4"
+    },
+    {
+      "archivo": "docs/evidencias/s4/video-local-inicio.png",
+      "bytes": 400573,
+      "normalizacion": "Binario sin normalización",
+      "sha256": "b996776c5a18551b6ea80524bd4b319d3f0b166ca282c81a524b6a16606909ed"
+    },
+    {
+      "archivo": "docs/evidencias/s4/video-local.json",
+      "bytes": 841,
+      "normalizacion": "UTF-8 sin BOM; LF",
+      "sha256": "4b570cebd3dba5e26b14e4c7d35ddc6f8f49ad71c09c9a786d6d74f6bbb3d3b3"
+    },
+    {
+      "archivo": "docs/evidencias/s4/video-metadata.txt",
+      "bytes": 659,
+      "normalizacion": "UTF-8 sin BOM; LF",
+      "sha256": "ba79165f02351546da619a490434ed0881d805c90173531fac84687dd4add97e"
+    },
+    {
+      "archivo": "docs/evidencias/s4/zoom-200-chrome.png",
+      "bytes": 86329,
+      "normalizacion": "Binario sin normalización",
+      "sha256": "513fa2451d6b724321e0f8b507ad23e2ec10c1c73b77da2a3925e7b18ac676c3"
+    },
+    {
+      "archivo": "docs/evidencias/s4/zoom-200-ficha-habitual-controles.png",
+      "bytes": 80521,
+      "normalizacion": "Binario sin normalización",
+      "sha256": "f2b7cf0a63841ef94fed185a205ec509065b6a9447126b147ac246a8ec5fac4c"
+    },
+    {
+      "archivo": "docs/evidencias/s4/zoom-200-ficha-habitual.png",
+      "bytes": 77789,
+      "normalizacion": "Binario sin normalización",
+      "sha256": "d4f4a24c21f42d57a5faeec97f6dedf15ce2c055deae4cc25fdf79bf31e8f93a"
+    },
+    {
+      "archivo": "docs/evidencias/s4/zoom-200-ficha-proyeccion-controles.png",
+      "bytes": 98493,
+      "normalizacion": "Binario sin normalización",
+      "sha256": "4f9547c0fb8383e642bbf8a9c2ee8a189a6085c5bde1ae43c14b80a1f567c5c3"
+    },
+    {
+      "archivo": "docs/evidencias/s4/zoom-200-ficha-proyeccion.png",
+      "bytes": 86087,
+      "normalizacion": "Binario sin normalización",
+      "sha256": "a8c28542bcc2e42ca6c7f4d09c4f9e96fa589d1b0689bf4010dab8ecad4c62fb"
+    },
+    {
+      "archivo": "docs/evidencias/s4/zoom-200-inicio-habitual.png",
+      "bytes": 87863,
+      "normalizacion": "Binario sin normalización",
+      "sha256": "e5ceebef51f851be3e2d8b71f5a2d9a510fe37c3318dc5cfe0ddcc871c1d4b44"
+    },
+    {
+      "archivo": "docs/evidencias/s4/zoom-200-inicio-proyeccion.png",
+      "bytes": 88078,
+      "normalizacion": "Binario sin normalización",
+      "sha256": "aaeb990705fd14a8663c3d9b941f2aed2399aa38b2aefc429e045f9f8de27d21"
+    },
+    {
+      "archivo": "docs/evidencias/s4/zoom-200-listado-habitual.png",
+      "bytes": 92610,
+      "normalizacion": "Binario sin normalización",
+      "sha256": "bdb0e47409862b1608939a405bbd60cf611761cd666b063e9286df7738d57bcd"
+    },
+    {
+      "archivo": "docs/evidencias/s4/zoom-200-listado-proyeccion.png",
+      "bytes": 89037,
+      "normalizacion": "Binario sin normalización",
+      "sha256": "927b3d83eefc289df9ad425e44d1d0e618cb8f2d808ac1a6e0e651e597475396"
+    },
+    {
+      "archivo": "docs/evidencias/s4/zoom-nativo.json",
+      "bytes": 1630,
+      "normalizacion": "UTF-8 sin BOM; LF",
+      "sha256": "2f9d9da19fffea54cf2a957d7aaab76ee03f521fe2a881b9d0856fc1552746a8"
+    }
+  ]
+}
