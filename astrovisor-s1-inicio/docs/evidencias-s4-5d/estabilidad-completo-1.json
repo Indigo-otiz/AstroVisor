@@ -1,0 +1,1294 @@
+{
+  "modo": "completo-1",
+  "chrome": "156.0.8078.80",
+  "ms": 20890,
+  "medidas": [
+    {
+      "innerWidth": 1280,
+      "clientWidth": 1280,
+      "scrollWidth": 1280,
+      "sinEtiqueta": 0
+    },
+    {
+      "innerWidth": 360,
+      "clientWidth": 360,
+      "scrollWidth": 360,
+      "sinEtiqueta": 0
+    }
+  ],
+  "lector": {
+    "tipos": [
+      "image/jpeg",
+      "image/png"
+    ],
+    "revision": 8
+  },
+  "homido": {
+    "online": [
+      {
+        "id": "aa-imagen-png",
+        "width": 180,
+        "blob": false
+      },
+      {
+        "id": "ab-imagen-jpeg",
+        "width": 180,
+        "blob": false
+      }
+    ],
+    "respaldo": [
+      {
+        "id": "aa-imagen-png",
+        "width": 180,
+        "blob": true
+      },
+      {
+        "id": "ab-imagen-jpeg",
+        "width": 180,
+        "blob": true
+      }
+    ],
+    "renderizado": "WebGL software, sin dispositivo físico"
+  },
+  "transiciones": {
+    "automatica": 4,
+    "edicion": 5,
+    "sustitucion": 6,
+    "retornoAutomatica": 7,
+    "conflicto": 412,
+    "revision": 8
+  },
+  "expressDetenido": true,
+  "errores": [],
+  "red": [
+    {
+      "ms": 4543,
+      "metodo": "POST",
+      "ruta": "/api/admin/login",
+      "evento": "solicitud"
+    },
+    {
+      "ms": 4543,
+      "metodo": "POST",
+      "ruta": "/api/admin/login",
+      "evento": "respuesta",
+      "estado": 200,
+      "respuestaMs": 5337
+    },
+    {
+      "ms": 5341,
+      "metodo": "GET",
+      "ruta": "/api/admin/sesion",
+      "evento": "solicitud"
+    },
+    {
+      "ms": 5341,
+      "metodo": "GET",
+      "ruta": "/api/admin/sesion",
+      "evento": "respuesta",
+      "estado": 200,
+      "respuestaMs": 5357
+    },
+    {
+      "ms": 5477,
+      "metodo": "GET",
+      "ruta": "/api/admin/catalogo",
+      "evento": "solicitud"
+    },
+    {
+      "ms": 5477,
+      "metodo": "GET",
+      "ruta": "/api/admin/catalogo",
+      "evento": "respuesta",
+      "estado": 200,
+      "respuestaMs": 5508
+    },
+    {
+      "ms": 5815,
+      "metodo": "POST",
+      "ruta": "/api/admin/imagenes",
+      "evento": "solicitud"
+    },
+    {
+      "ms": 5815,
+      "metodo": "POST",
+      "ruta": "/api/admin/imagenes",
+      "evento": "respuesta",
+      "estado": 201,
+      "respuestaMs": 5887
+    },
+    {
+      "ms": 8414,
+      "metodo": "POST",
+      "ruta": "/api/admin/libros",
+      "evento": "solicitud"
+    },
+    {
+      "ms": 8414,
+      "metodo": "POST",
+      "ruta": "/api/admin/libros",
+      "evento": "respuesta",
+      "estado": 201,
+      "respuestaMs": 8521
+    },
+    {
+      "ms": 8526,
+      "metodo": "GET",
+      "ruta": "/api/admin/catalogo",
+      "evento": "solicitud"
+    },
+    {
+      "ms": 8526,
+      "metodo": "GET",
+      "ruta": "/api/admin/catalogo",
+      "evento": "respuesta",
+      "estado": 200,
+      "respuestaMs": 8571
+    },
+    {
+      "ms": 8588,
+      "metodo": "GET",
+      "ruta": "/api/contenidos/libros/aa-imagen-png/portada.png",
+      "evento": "solicitud"
+    },
+    {
+      "ms": 8588,
+      "metodo": "GET",
+      "ruta": "/api/contenidos/libros/aa-imagen-png/portada.png",
+      "evento": "respuesta",
+      "estado": 200,
+      "respuestaMs": 8631
+    },
+    {
+      "ms": 8764,
+      "metodo": "POST",
+      "ruta": "/api/admin/imagenes",
+      "evento": "solicitud"
+    },
+    {
+      "ms": 8764,
+      "metodo": "POST",
+      "ruta": "/api/admin/imagenes",
+      "evento": "respuesta",
+      "estado": 201,
+      "respuestaMs": 8890
+    },
+    {
+      "ms": 9319,
+      "metodo": "POST",
+      "ruta": "/api/admin/libros",
+      "evento": "solicitud"
+    },
+    {
+      "ms": 9319,
+      "metodo": "POST",
+      "ruta": "/api/admin/libros",
+      "evento": "respuesta",
+      "estado": 201,
+      "respuestaMs": 9453
+    },
+    {
+      "ms": 9460,
+      "metodo": "GET",
+      "ruta": "/api/admin/catalogo",
+      "evento": "solicitud"
+    },
+    {
+      "ms": 9460,
+      "metodo": "GET",
+      "ruta": "/api/admin/catalogo",
+      "evento": "respuesta",
+      "estado": 200,
+      "respuestaMs": 9520
+    },
+    {
+      "ms": 9533,
+      "metodo": "GET",
+      "ruta": "/api/contenidos/libros/aa-imagen-png/portada.png",
+      "evento": "solicitud"
+    },
+    {
+      "ms": 9533,
+      "metodo": "GET",
+      "ruta": "/api/contenidos/libros/ab-imagen-jpeg/portada.jpg",
+      "evento": "solicitud"
+    },
+    {
+      "ms": 9533,
+      "metodo": "GET",
+      "ruta": "/api/contenidos/libros/aa-imagen-png/portada.png",
+      "evento": "respuesta",
+      "estado": 200,
+      "respuestaMs": 9598
+    },
+    {
+      "ms": 9533,
+      "metodo": "GET",
+      "ruta": "/api/contenidos/libros/ab-imagen-jpeg/portada.jpg",
+      "evento": "respuesta",
+      "estado": 200,
+      "respuestaMs": 9605
+    },
+    {
+      "ms": 9783,
+      "metodo": "POST",
+      "ruta": "/api/admin/portadas/previsualizar",
+      "evento": "solicitud"
+    },
+    {
+      "ms": 9783,
+      "metodo": "POST",
+      "ruta": "/api/admin/portadas/previsualizar",
+      "evento": "respuesta",
+      "estado": 200,
+      "respuestaMs": 9832
+    },
+    {
+      "ms": 10252,
+      "metodo": "POST",
+      "ruta": "/api/admin/portadas/previsualizar",
+      "evento": "solicitud"
+    },
+    {
+      "ms": 10252,
+      "metodo": "POST",
+      "ruta": "/api/admin/portadas/previsualizar",
+      "evento": "respuesta",
+      "estado": 200,
+      "respuestaMs": 10296
+    },
+    {
+      "ms": 10432,
+      "metodo": "POST",
+      "ruta": "/api/admin/libros",
+      "evento": "solicitud"
+    },
+    {
+      "ms": 10432,
+      "metodo": "POST",
+      "ruta": "/api/admin/libros",
+      "evento": "respuesta",
+      "estado": 201,
+      "respuestaMs": 10570
+    },
+    {
+      "ms": 10573,
+      "metodo": "GET",
+      "ruta": "/api/admin/catalogo",
+      "evento": "solicitud"
+    },
+    {
+      "ms": 10573,
+      "metodo": "GET",
+      "ruta": "/api/admin/catalogo",
+      "evento": "respuesta",
+      "estado": 200,
+      "respuestaMs": 10634
+    },
+    {
+      "ms": 10648,
+      "metodo": "GET",
+      "ruta": "/api/contenidos/libros/aa-imagen-png/portada.png",
+      "evento": "solicitud"
+    },
+    {
+      "ms": 10648,
+      "metodo": "GET",
+      "ruta": "/api/contenidos/libros/ab-imagen-jpeg/portada.jpg",
+      "evento": "solicitud"
+    },
+    {
+      "ms": 10649,
+      "metodo": "GET",
+      "ruta": "/api/contenidos/libros/zz-automatica/portada.svg",
+      "evento": "solicitud"
+    },
+    {
+      "ms": 10649,
+      "metodo": "GET",
+      "ruta": "/api/contenidos/libros/zz-automatica/portada.svg",
+      "evento": "respuesta",
+      "estado": 200,
+      "respuestaMs": 10713
+    },
+    {
+      "ms": 10648,
+      "metodo": "GET",
+      "ruta": "/api/contenidos/libros/ab-imagen-jpeg/portada.jpg",
+      "evento": "respuesta",
+      "estado": 200,
+      "respuestaMs": 10732
+    },
+    {
+      "ms": 10648,
+      "metodo": "GET",
+      "ruta": "/api/contenidos/libros/aa-imagen-png/portada.png",
+      "evento": "respuesta",
+      "estado": 200,
+      "respuestaMs": 10741
+    },
+    {
+      "ms": 10899,
+      "metodo": "POST",
+      "ruta": "/api/admin/portadas/previsualizar",
+      "evento": "solicitud"
+    },
+    {
+      "ms": 10899,
+      "metodo": "POST",
+      "ruta": "/api/admin/portadas/previsualizar",
+      "evento": "respuesta",
+      "estado": 200,
+      "respuestaMs": 10944
+    },
+    {
+      "ms": 11052,
+      "metodo": "PATCH",
+      "ruta": "/api/admin/libros/zz-automatica",
+      "evento": "solicitud"
+    },
+    {
+      "ms": 11052,
+      "metodo": "PATCH",
+      "ruta": "/api/admin/libros/zz-automatica",
+      "evento": "respuesta",
+      "estado": 200,
+      "respuestaMs": 11205
+    },
+    {
+      "ms": 11207,
+      "metodo": "GET",
+      "ruta": "/api/admin/catalogo",
+      "evento": "solicitud"
+    },
+    {
+      "ms": 11207,
+      "metodo": "GET",
+      "ruta": "/api/admin/catalogo",
+      "evento": "respuesta",
+      "estado": 200,
+      "respuestaMs": 11265
+    },
+    {
+      "ms": 11281,
+      "metodo": "GET",
+      "ruta": "/api/contenidos/libros/aa-imagen-png/portada.png",
+      "evento": "solicitud"
+    },
+    {
+      "ms": 11281,
+      "metodo": "GET",
+      "ruta": "/api/contenidos/libros/ab-imagen-jpeg/portada.jpg",
+      "evento": "solicitud"
+    },
+    {
+      "ms": 11281,
+      "metodo": "GET",
+      "ruta": "/api/contenidos/libros/zz-automatica/portada.svg",
+      "evento": "solicitud"
+    },
+    {
+      "ms": 11281,
+      "metodo": "GET",
+      "ruta": "/api/contenidos/libros/zz-automatica/portada.svg",
+      "evento": "respuesta",
+      "estado": 200,
+      "respuestaMs": 11340
+    },
+    {
+      "ms": 11281,
+      "metodo": "GET",
+      "ruta": "/api/contenidos/libros/aa-imagen-png/portada.png",
+      "evento": "respuesta",
+      "estado": 200,
+      "respuestaMs": 11352
+    },
+    {
+      "ms": 11281,
+      "metodo": "GET",
+      "ruta": "/api/contenidos/libros/ab-imagen-jpeg/portada.jpg",
+      "evento": "respuesta",
+      "estado": 200,
+      "respuestaMs": 11353
+    },
+    {
+      "ms": 11467,
+      "metodo": "POST",
+      "ruta": "/api/admin/imagenes",
+      "evento": "solicitud"
+    },
+    {
+      "ms": 11467,
+      "metodo": "POST",
+      "ruta": "/api/admin/imagenes",
+      "evento": "respuesta",
+      "estado": 201,
+      "respuestaMs": 11582
+    },
+    {
+      "ms": 11784,
+      "metodo": "PATCH",
+      "ruta": "/api/admin/libros/zz-automatica",
+      "evento": "solicitud"
+    },
+    {
+      "ms": 11784,
+      "metodo": "PATCH",
+      "ruta": "/api/admin/libros/zz-automatica",
+      "evento": "respuesta",
+      "estado": 200,
+      "respuestaMs": 11941
+    },
+    {
+      "ms": 11944,
+      "metodo": "GET",
+      "ruta": "/api/admin/catalogo",
+      "evento": "solicitud"
+    },
+    {
+      "ms": 11944,
+      "metodo": "GET",
+      "ruta": "/api/admin/catalogo",
+      "evento": "respuesta",
+      "estado": 200,
+      "respuestaMs": 12020
+    },
+    {
+      "ms": 12027,
+      "metodo": "GET",
+      "ruta": "/api/contenidos/libros/aa-imagen-png/portada.png",
+      "evento": "solicitud"
+    },
+    {
+      "ms": 12028,
+      "metodo": "GET",
+      "ruta": "/api/contenidos/libros/ab-imagen-jpeg/portada.jpg",
+      "evento": "solicitud"
+    },
+    {
+      "ms": 12028,
+      "metodo": "GET",
+      "ruta": "/api/contenidos/libros/zz-automatica/portada.png",
+      "evento": "solicitud"
+    },
+    {
+      "ms": 12028,
+      "metodo": "GET",
+      "ruta": "/api/contenidos/libros/ab-imagen-jpeg/portada.jpg",
+      "evento": "respuesta",
+      "estado": 200,
+      "respuestaMs": 12126
+    },
+    {
+      "ms": 12027,
+      "metodo": "GET",
+      "ruta": "/api/contenidos/libros/aa-imagen-png/portada.png",
+      "evento": "respuesta",
+      "estado": 200,
+      "respuestaMs": 12127
+    },
+    {
+      "ms": 12028,
+      "metodo": "GET",
+      "ruta": "/api/contenidos/libros/zz-automatica/portada.png",
+      "evento": "respuesta",
+      "estado": 200,
+      "respuestaMs": 12128
+    },
+    {
+      "ms": 12433,
+      "metodo": "POST",
+      "ruta": "/api/admin/portadas/previsualizar",
+      "evento": "solicitud"
+    },
+    {
+      "ms": 12433,
+      "metodo": "POST",
+      "ruta": "/api/admin/portadas/previsualizar",
+      "evento": "respuesta",
+      "estado": 200,
+      "respuestaMs": 12493
+    },
+    {
+      "ms": 12603,
+      "metodo": "PATCH",
+      "ruta": "/api/admin/libros/zz-automatica",
+      "evento": "solicitud"
+    },
+    {
+      "ms": 12603,
+      "metodo": "PATCH",
+      "ruta": "/api/admin/libros/zz-automatica",
+      "evento": "respuesta",
+      "estado": 200,
+      "respuestaMs": 12776
+    },
+    {
+      "ms": 12783,
+      "metodo": "GET",
+      "ruta": "/api/admin/catalogo",
+      "evento": "solicitud"
+    },
+    {
+      "ms": 12783,
+      "metodo": "GET",
+      "ruta": "/api/admin/catalogo",
+      "evento": "respuesta",
+      "estado": 200,
+      "respuestaMs": 12844
+    },
+    {
+      "ms": 12858,
+      "metodo": "GET",
+      "ruta": "/api/contenidos/libros/aa-imagen-png/portada.png",
+      "evento": "solicitud"
+    },
+    {
+      "ms": 12859,
+      "metodo": "GET",
+      "ruta": "/api/contenidos/libros/ab-imagen-jpeg/portada.jpg",
+      "evento": "solicitud"
+    },
+    {
+      "ms": 12859,
+      "metodo": "GET",
+      "ruta": "/api/contenidos/libros/zz-automatica/portada.svg",
+      "evento": "solicitud"
+    },
+    {
+      "ms": 12859,
+      "metodo": "GET",
+      "ruta": "/api/contenidos/libros/zz-automatica/portada.svg",
+      "evento": "respuesta",
+      "estado": 200,
+      "respuestaMs": 12926
+    },
+    {
+      "ms": 12858,
+      "metodo": "GET",
+      "ruta": "/api/contenidos/libros/aa-imagen-png/portada.png",
+      "evento": "respuesta",
+      "estado": 200,
+      "respuestaMs": 12939
+    },
+    {
+      "ms": 12859,
+      "metodo": "GET",
+      "ruta": "/api/contenidos/libros/ab-imagen-jpeg/portada.jpg",
+      "evento": "respuesta",
+      "estado": 200,
+      "respuestaMs": 12940
+    },
+    {
+      "ms": 13114,
+      "metodo": "POST",
+      "ruta": "/api/admin/portadas/previsualizar",
+      "evento": "solicitud"
+    },
+    {
+      "ms": 13114,
+      "metodo": "POST",
+      "ruta": "/api/admin/portadas/previsualizar",
+      "evento": "respuesta",
+      "estado": 200,
+      "respuestaMs": 13158
+    },
+    {
+      "ms": 14171,
+      "metodo": "PATCH",
+      "ruta": "/api/admin/libros/zz-automatica",
+      "evento": "solicitud"
+    },
+    {
+      "ms": 14171,
+      "metodo": "PATCH",
+      "ruta": "/api/admin/libros/zz-automatica",
+      "evento": "respuesta",
+      "estado": 412,
+      "respuestaMs": 14217
+    }
+  ],
+  "consola": [
+    {
+      "ms": 3466,
+      "tipo": "debug",
+      "texto": "[vite] connecting..."
+    },
+    {
+      "ms": 3560,
+      "tipo": "debug",
+      "texto": "[vite] connected."
+    },
+    {
+      "ms": 14217,
+      "tipo": "error",
+      "texto": "Failed to load resource: the server responded with a status of 412 (Precondition Failed)"
+    }
+  ],
+  "pendientes": [
+    {
+      "ms": 14171,
+      "metodo": "PATCH",
+      "ruta": "/api/admin/libros/zz-automatica"
+    }
+  ],
+  "browserConectado": true,
+  "eventos": [
+    {
+      "ms": 1794249364386,
+      "evento": "focusin",
+      "activo": "admin-user",
+      "destino": "admin-user",
+      "disabled": null,
+      "formulario": false
+    },
+    {
+      "ms": 1794249364417,
+      "evento": "focusin",
+      "activo": "admin-password",
+      "destino": "admin-password",
+      "disabled": null,
+      "formulario": false
+    },
+    {
+      "ms": 1794249365015,
+      "evento": "focusin",
+      "activo": "",
+      "destino": "",
+      "disabled": null,
+      "formulario": false
+    },
+    {
+      "ms": 1794249366163,
+      "evento": "focusin",
+      "activo": "nuevo-libro",
+      "destino": "nuevo-libro",
+      "disabled": false,
+      "formulario": false
+    },
+    {
+      "ms": 1794249366166,
+      "evento": "keydown",
+      "activo": "nuevo-libro",
+      "destino": "nuevo-libro",
+      "disabled": false,
+      "formulario": false
+    },
+    {
+      "ms": 1794249366195,
+      "evento": "focusin",
+      "activo": "editor-heading",
+      "destino": "editor-heading",
+      "disabled": true,
+      "formulario": true
+    },
+    {
+      "ms": 1794249366217,
+      "evento": "focusin",
+      "activo": "nuevo-id",
+      "destino": "nuevo-id",
+      "disabled": true,
+      "formulario": true
+    },
+    {
+      "ms": 1794249366248,
+      "evento": "focusin",
+      "activo": "nuevo-titulo",
+      "destino": "nuevo-titulo",
+      "disabled": true,
+      "formulario": true
+    },
+    {
+      "ms": 1794249366265,
+      "evento": "focusin",
+      "activo": "nuevo-autor",
+      "destino": "nuevo-autor",
+      "disabled": true,
+      "formulario": true
+    },
+    {
+      "ms": 1794249366502,
+      "evento": "focusin",
+      "activo": "imagen-procedencia",
+      "destino": "imagen-procedencia",
+      "disabled": true,
+      "formulario": true
+    },
+    {
+      "ms": 1794249366538,
+      "evento": "focusin",
+      "activo": "imagen-permiso",
+      "destino": "imagen-permiso",
+      "disabled": true,
+      "formulario": true
+    },
+    {
+      "ms": 1794249366556,
+      "evento": "focusin",
+      "activo": "imagen-alternativa",
+      "destino": "imagen-alternativa",
+      "disabled": true,
+      "formulario": true
+    },
+    {
+      "ms": 1794249366575,
+      "evento": "focusin",
+      "activo": "editor-anio",
+      "destino": "editor-anio",
+      "disabled": true,
+      "formulario": true
+    },
+    {
+      "ms": 1794249366592,
+      "evento": "focusin",
+      "activo": "editor-enlace",
+      "destino": "editor-enlace",
+      "disabled": true,
+      "formulario": true
+    },
+    {
+      "ms": 1794249367273,
+      "evento": "focusin",
+      "activo": "",
+      "destino": "",
+      "disabled": true,
+      "formulario": true
+    },
+    {
+      "ms": 1794249367566,
+      "evento": "focusin",
+      "activo": "",
+      "destino": "",
+      "disabled": true,
+      "formulario": true
+    },
+    {
+      "ms": 1794249367589,
+      "evento": "focusin",
+      "activo": "motivo-orion",
+      "destino": "motivo-orion",
+      "disabled": true,
+      "formulario": true
+    },
+    {
+      "ms": 1794249367607,
+      "evento": "focusin",
+      "activo": "motivo-escorpio",
+      "destino": "motivo-escorpio",
+      "disabled": true,
+      "formulario": true
+    },
+    {
+      "ms": 1794249368855,
+      "evento": "focusin",
+      "activo": "imagen-alternativa",
+      "destino": "imagen-alternativa",
+      "disabled": true,
+      "formulario": true
+    },
+    {
+      "ms": 1794249368861,
+      "evento": "focusin",
+      "activo": "editor-anio",
+      "destino": "editor-anio",
+      "disabled": true,
+      "formulario": true
+    },
+    {
+      "ms": 1794249368931,
+      "evento": "focusin",
+      "activo": "",
+      "destino": "",
+      "disabled": true,
+      "formulario": true
+    },
+    {
+      "ms": 1794249369111,
+      "evento": "focusin",
+      "activo": "editor-resultados",
+      "destino": "editor-resultados",
+      "disabled": false,
+      "formulario": false
+    },
+    {
+      "ms": 1794249369167,
+      "evento": "focusin",
+      "activo": "nuevo-libro",
+      "destino": "nuevo-libro",
+      "disabled": false,
+      "formulario": false
+    },
+    {
+      "ms": 1794249369169,
+      "evento": "keydown",
+      "activo": "nuevo-libro",
+      "destino": "nuevo-libro",
+      "disabled": false,
+      "formulario": false
+    },
+    {
+      "ms": 1794249369177,
+      "evento": "focusin",
+      "activo": "editor-heading",
+      "destino": "editor-heading",
+      "disabled": true,
+      "formulario": true
+    },
+    {
+      "ms": 1794249369199,
+      "evento": "focusin",
+      "activo": "nuevo-id",
+      "destino": "nuevo-id",
+      "disabled": true,
+      "formulario": true
+    },
+    {
+      "ms": 1794249369234,
+      "evento": "focusin",
+      "activo": "nuevo-titulo",
+      "destino": "nuevo-titulo",
+      "disabled": true,
+      "formulario": true
+    },
+    {
+      "ms": 1794249369249,
+      "evento": "focusin",
+      "activo": "nuevo-autor",
+      "destino": "nuevo-autor",
+      "disabled": true,
+      "formulario": true
+    },
+    {
+      "ms": 1794249369531,
+      "evento": "focusin",
+      "activo": "imagen-procedencia",
+      "destino": "imagen-procedencia",
+      "disabled": true,
+      "formulario": true
+    },
+    {
+      "ms": 1794249369550,
+      "evento": "focusin",
+      "activo": "imagen-permiso",
+      "destino": "imagen-permiso",
+      "disabled": true,
+      "formulario": true
+    },
+    {
+      "ms": 1794249369568,
+      "evento": "focusin",
+      "activo": "imagen-alternativa",
+      "destino": "imagen-alternativa",
+      "disabled": true,
+      "formulario": true
+    },
+    {
+      "ms": 1794249369588,
+      "evento": "focusin",
+      "activo": "editor-anio",
+      "destino": "editor-anio",
+      "disabled": true,
+      "formulario": true
+    },
+    {
+      "ms": 1794249369613,
+      "evento": "focusin",
+      "activo": "editor-enlace",
+      "destino": "editor-enlace",
+      "disabled": true,
+      "formulario": true
+    },
+    {
+      "ms": 1794249369676,
+      "evento": "focusin",
+      "activo": "",
+      "destino": "",
+      "disabled": true,
+      "formulario": true
+    },
+    {
+      "ms": 1794249369742,
+      "evento": "focusin",
+      "activo": "",
+      "destino": "",
+      "disabled": true,
+      "formulario": true
+    },
+    {
+      "ms": 1794249369762,
+      "evento": "focusin",
+      "activo": "motivo-orion",
+      "destino": "motivo-orion",
+      "disabled": true,
+      "formulario": true
+    },
+    {
+      "ms": 1794249369790,
+      "evento": "focusin",
+      "activo": "motivo-escorpio",
+      "destino": "motivo-escorpio",
+      "disabled": true,
+      "formulario": true
+    },
+    {
+      "ms": 1794249369839,
+      "evento": "focusin",
+      "activo": "",
+      "destino": "",
+      "disabled": true,
+      "formulario": true
+    },
+    {
+      "ms": 1794249370058,
+      "evento": "focusin",
+      "activo": "editor-resultados",
+      "destino": "editor-resultados",
+      "disabled": false,
+      "formulario": false
+    },
+    {
+      "ms": 1794249370173,
+      "evento": "focusin",
+      "activo": "",
+      "destino": "",
+      "disabled": false,
+      "formulario": false
+    },
+    {
+      "ms": 1794249370184,
+      "evento": "focusin",
+      "activo": "editor-heading",
+      "destino": "editor-heading",
+      "disabled": true,
+      "formulario": false
+    },
+    {
+      "ms": 1794249370246,
+      "evento": "focusin",
+      "activo": "editor-titulo",
+      "destino": "editor-titulo",
+      "disabled": true,
+      "formulario": false
+    },
+    {
+      "ms": 1794249370306,
+      "evento": "focusin",
+      "activo": "",
+      "destino": "",
+      "disabled": true,
+      "formulario": false
+    },
+    {
+      "ms": 1794249370440,
+      "evento": "focusin",
+      "activo": "",
+      "destino": "",
+      "disabled": true,
+      "formulario": false
+    },
+    {
+      "ms": 1794249370445,
+      "evento": "focusin",
+      "activo": "",
+      "destino": "",
+      "disabled": false,
+      "formulario": false
+    },
+    {
+      "ms": 1794249370516,
+      "evento": "focusin",
+      "activo": "nuevo-libro",
+      "destino": "nuevo-libro",
+      "disabled": false,
+      "formulario": false
+    },
+    {
+      "ms": 1794249370518,
+      "evento": "keydown",
+      "activo": "nuevo-libro",
+      "destino": "nuevo-libro",
+      "disabled": false,
+      "formulario": false
+    },
+    {
+      "ms": 1794249370525,
+      "evento": "focusin",
+      "activo": "editor-heading",
+      "destino": "editor-heading",
+      "disabled": true,
+      "formulario": true
+    },
+    {
+      "ms": 1794249370566,
+      "evento": "focusin",
+      "activo": "nuevo-id",
+      "destino": "nuevo-id",
+      "disabled": true,
+      "formulario": true
+    },
+    {
+      "ms": 1794249370581,
+      "evento": "focusin",
+      "activo": "nuevo-titulo",
+      "destino": "nuevo-titulo",
+      "disabled": true,
+      "formulario": true
+    },
+    {
+      "ms": 1794249370600,
+      "evento": "focusin",
+      "activo": "nuevo-autor",
+      "destino": "nuevo-autor",
+      "disabled": true,
+      "formulario": true
+    },
+    {
+      "ms": 1794249370617,
+      "evento": "focusin",
+      "activo": "editor-anio",
+      "destino": "editor-anio",
+      "disabled": true,
+      "formulario": true
+    },
+    {
+      "ms": 1794249370631,
+      "evento": "focusin",
+      "activo": "editor-enlace",
+      "destino": "editor-enlace",
+      "disabled": true,
+      "formulario": true
+    },
+    {
+      "ms": 1794249370690,
+      "evento": "focusin",
+      "activo": "",
+      "destino": "",
+      "disabled": true,
+      "formulario": true
+    },
+    {
+      "ms": 1794249370712,
+      "evento": "focusin",
+      "activo": "motivo-orion",
+      "destino": "motivo-orion",
+      "disabled": true,
+      "formulario": true
+    },
+    {
+      "ms": 1794249370775,
+      "evento": "focusin",
+      "activo": "",
+      "destino": "",
+      "disabled": true,
+      "formulario": true
+    },
+    {
+      "ms": 1794249370955,
+      "evento": "focusin",
+      "activo": "",
+      "destino": "",
+      "disabled": true,
+      "formulario": true
+    },
+    {
+      "ms": 1794249371172,
+      "evento": "focusin",
+      "activo": "editor-resultados",
+      "destino": "editor-resultados",
+      "disabled": false,
+      "formulario": false
+    },
+    {
+      "ms": 1794249371306,
+      "evento": "focusin",
+      "activo": "",
+      "destino": "",
+      "disabled": false,
+      "formulario": false
+    },
+    {
+      "ms": 1794249371312,
+      "evento": "focusin",
+      "activo": "editor-heading",
+      "destino": "editor-heading",
+      "disabled": true,
+      "formulario": false
+    },
+    {
+      "ms": 1794249371357,
+      "evento": "focusin",
+      "activo": "editor-titulo",
+      "destino": "editor-titulo",
+      "disabled": true,
+      "formulario": false
+    },
+    {
+      "ms": 1794249371419,
+      "evento": "focusin",
+      "activo": "",
+      "destino": "",
+      "disabled": true,
+      "formulario": false
+    },
+    {
+      "ms": 1794249371573,
+      "evento": "focusin",
+      "activo": "",
+      "destino": "",
+      "disabled": true,
+      "formulario": false
+    },
+    {
+      "ms": 1794249371803,
+      "evento": "focusin",
+      "activo": "editor-resultados",
+      "destino": "editor-resultados",
+      "disabled": false,
+      "formulario": false
+    },
+    {
+      "ms": 1794249371922,
+      "evento": "focusin",
+      "activo": "",
+      "destino": "",
+      "disabled": false,
+      "formulario": false
+    },
+    {
+      "ms": 1794249371928,
+      "evento": "focusin",
+      "activo": "editor-heading",
+      "destino": "editor-heading",
+      "disabled": true,
+      "formulario": false
+    },
+    {
+      "ms": 1794249372204,
+      "evento": "focusin",
+      "activo": "imagen-procedencia",
+      "destino": "imagen-procedencia",
+      "disabled": true,
+      "formulario": false
+    },
+    {
+      "ms": 1794249372224,
+      "evento": "focusin",
+      "activo": "imagen-permiso",
+      "destino": "imagen-permiso",
+      "disabled": true,
+      "formulario": false
+    },
+    {
+      "ms": 1794249372258,
+      "evento": "focusin",
+      "activo": "imagen-alternativa",
+      "destino": "imagen-alternativa",
+      "disabled": true,
+      "formulario": false
+    },
+    {
+      "ms": 1794249372307,
+      "evento": "focusin",
+      "activo": "",
+      "destino": "",
+      "disabled": true,
+      "formulario": false
+    },
+    {
+      "ms": 1794249372556,
+      "evento": "focusin",
+      "activo": "editor-resultados",
+      "destino": "editor-resultados",
+      "disabled": false,
+      "formulario": false
+    },
+    {
+      "ms": 1794249372740,
+      "evento": "focusin",
+      "activo": "",
+      "destino": "",
+      "disabled": false,
+      "formulario": false
+    },
+    {
+      "ms": 1794249372748,
+      "evento": "focusin",
+      "activo": "editor-heading",
+      "destino": "editor-heading",
+      "disabled": true,
+      "formulario": false
+    },
+    {
+      "ms": 1794249372955,
+      "evento": "focusin",
+      "activo": "",
+      "destino": "",
+      "disabled": true,
+      "formulario": false
+    },
+    {
+      "ms": 1794249373124,
+      "evento": "focusin",
+      "activo": "",
+      "destino": "",
+      "disabled": true,
+      "formulario": false
+    },
+    {
+      "ms": 1794249373381,
+      "evento": "focusin",
+      "activo": "editor-resultados",
+      "destino": "editor-resultados",
+      "disabled": false,
+      "formulario": false
+    },
+    {
+      "ms": 1794249373521,
+      "evento": "focusin",
+      "activo": "",
+      "destino": "",
+      "disabled": false,
+      "formulario": false
+    },
+    {
+      "ms": 1794249373527,
+      "evento": "focusin",
+      "activo": "editor-heading",
+      "destino": "editor-heading",
+      "disabled": true,
+      "formulario": false
+    },
+    {
+      "ms": 1794249373573,
+      "evento": "focusin",
+      "activo": "editor-titulo",
+      "destino": "editor-titulo",
+      "disabled": true,
+      "formulario": false
+    },
+    {
+      "ms": 1794249373638,
+      "evento": "focusin",
+      "activo": "",
+      "destino": "",
+      "disabled": true,
+      "formulario": false
+    },
+    {
+      "ms": 1794249374691,
+      "evento": "focusin",
+      "activo": "",
+      "destino": "",
+      "disabled": true,
+      "formulario": false
+    },
+    {
+      "ms": 1794249374753,
+      "evento": "focusin",
+      "activo": "editor-resultados",
+      "destino": "editor-resultados",
+      "disabled": true,
+      "formulario": false
+    }
+  ]
+}

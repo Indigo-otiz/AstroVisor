@@ -6,17 +6,7 @@ import BibliotecaView from '../views/BibliotecaView.vue'
 import VisorView from '../views/VisorView.vue'
 import AdminAccesoView from '../views/AdminAccesoView.vue'
 import AdminPanelView from '../views/AdminPanelView.vue'
-
-function checkAdminAuth() {
-  try {
-    const session = localStorage.getItem('astrovisor_admin_session')
-    if (!session) return false
-    const parsed = JSON.parse(session)
-    return Boolean(parsed?.token || parsed?.user?.id || parsed?.id)
-  } catch {
-    return false
-  }
-}
+import { useAuth } from '../composables/useAuth.js'
 
 const routes = [
   { path: '/', component: InicioView, name: 'inicio' },
@@ -36,9 +26,9 @@ const router = createRouter({
   scrollBehavior: (_to, _from, saved) => saved ?? { top: 0 },
 })
 
-router.beforeEach((to) => {
+router.beforeEach(async (to) => {
   if (to.meta.requiresAdmin) {
-    const isAuthenticated = checkAdminAuth()
+    const isAuthenticated = await useAuth().verificarSesion()
     if (!isAuthenticated) {
       return { name: 'admin-acceso' }
     }

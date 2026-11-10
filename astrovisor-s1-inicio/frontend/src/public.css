@@ -10,7 +10,7 @@
   color: var(--ink);
   font-size: 1.1111rem;
   line-height: 1.65;
-  overflow-wrap: break-word;
+  overflow-wrap: anywhere;
 }
 .public-shell ::selection {
   background: var(--accent);

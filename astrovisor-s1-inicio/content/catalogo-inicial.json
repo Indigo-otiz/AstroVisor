@@ -1,0 +1,185 @@
+{
+  "schemaVersion": 1,
+  "revision": 1,
+  "recorridos": [
+    {
+      "id": "orion",
+      "titulo": "Orión",
+      "resumen": "Identifica una figura conocida del cielo nocturno y algunas de sus estrellas.",
+      "historia": "En un relato de la tradición griega, Orión era un cazador que recorría la tierra. Las personas imaginaron su figura entre las estrellas: dos hombros, dos pies y un cinturón en el centro. Contar su historia ayudaba a recordar ese dibujo en el cielo. Esta es una adaptación breve de muestra; otras culturas han encontrado figuras y relatos diferentes en las mismas estrellas.",
+      "comoReconocerla": "Busca tres estrellas cercanas que parecen formar una línea: representan el cinturón. Imagina después una figura alrededor de ellas. El esquema es una guía de la forma, no un mapa para localizarla en una fecha o lugar concreto.",
+      "demostracion": true,
+      "multimedia": [
+        {
+          "tipo": "audio",
+          "src": "/audio/orion-kokoro-v1.wav",
+          "formato": "audio/wav",
+          "transcripcion": "En un relato de la tradición griega, Orión era un cazador que recorría la tierra. Las personas imaginaron su figura entre las estrellas: dos hombros, dos pies y un cinturón en el centro. Contar su historia ayudaba a recordar ese dibujo en el cielo. Esta es una adaptación breve de muestra; otras culturas han encontrado figuras y relatos diferentes en las mismas estrellas.",
+          "autorTexto": "Equipo AstroVisor (autoría colectiva declarada por Luis).",
+          "procedencia": "Guion de demostración elaborado por el equipo AstroVisor, según confirmación de Luis en esta conversación. Ver content/AUTORIA.md.",
+          "voz": "Voz sintética femenina: Kokoro ef_dora (español latinoamericano).",
+          "permisoTexto": "Elaboración propia del equipo AstroVisor; uso en la demostración indicado por Luis, responsable de S3.",
+          "permiso": "Elaboración propia del equipo AstroVisor; uso en la demostración indicado por Luis, responsable de S3. Modelo de voz Kokoro-82M publicado con licencia Apache-2.0.",
+          "estadoDerechos": "declarado-por-equipo",
+          "licenciaVozFuente": "https://huggingface.co/hexgrad/Kokoro-82M",
+          "demostracion": true
+        }
+      ],
+      "libroRefs": [
+        {
+          "libroId": "star-lore",
+          "motivo": "Descubre relatos antiguos sobre las estrellas y por qué imaginamos a Orión en el cielo.",
+          "referencia": {
+            "licencia": "Dominio público (Project Gutenberg / Public Domain)",
+            "etiqueta": "Referencia de demostración",
+            "aclaracion": "Ejemplar de acceso público consultable en Internet; no disponible para préstamo físico ni propiedad de la biblioteca."
+          }
+        },
+        {
+          "libroId": "field-stars",
+          "motivo": "Observa cómo una guía clásica describe y organiza las estrellas del cielo nocturno."
+        },
+        {
+          "libroId": "half-hours",
+          "motivo": "Dedica una lectura corta a reconocer las figuras del cielo y sus relaciones."
+        }
+      ]
+    },
+    {
+      "id": "osa-mayor",
+      "titulo": "Osa Mayor",
+      "resumen": "Descubre un grupo de estrellas que sirve como referencia al observar el cielo.",
+      "historia": "Una historia de la tradición griega relaciona a la Osa Mayor con Calisto, transformada en una osa y situada en el cielo. Es una de muchas maneras de interpretar estas estrellas. Otras personas han visto en parte de la figura un carro o un cucharón. Esos dibujos compartidos permiten recordar las estrellas y pasar historias de una generación a otra. Este relato es una adaptación de muestra.",
+      "comoReconocerla": "En una parte de esta constelación se distingue una figura de siete estrellas: cuatro parecen formar un recipiente y tres, un mango. Esa figura es solo una parte de la Osa Mayor. Observa el esquema para reconocer su silueta; no indica su posición actual en el cielo.",
+      "demostracion": true,
+      "multimedia": [
+        {
+          "tipo": "audio",
+          "src": "/audio/osa-mayor-kokoro-v1.wav",
+          "formato": "audio/wav",
+          "transcripcion": "Una historia de la tradición griega relaciona a la Osa Mayor con Calisto, transformada en una osa y situada en el cielo. Es una de muchas maneras de interpretar estas estrellas. Otras personas han visto en parte de la figura un carro o un cucharón. Esos dibujos compartidos permiten recordar las estrellas y pasar historias de una generación a otra. Este relato es una adaptación de muestra.",
+          "autorTexto": "Equipo AstroVisor (autoría colectiva declarada por Luis).",
+          "procedencia": "Guion de demostración elaborado por el equipo AstroVisor, según confirmación de Luis en esta conversación. Ver content/AUTORIA.md.",
+          "voz": "Voz sintética femenina: Kokoro ef_dora (español latinoamericano).",
+          "permisoTexto": "Elaboración propia del equipo AstroVisor; uso en la demostración indicado por Luis, responsable de S3.",
+          "permiso": "Elaboración propia del equipo AstroVisor; uso en la demostración indicado por Luis, responsable de S3. Modelo de voz Kokoro-82M publicado con licencia Apache-2.0.",
+          "estadoDerechos": "declarado-por-equipo",
+          "licenciaVozFuente": "https://huggingface.co/hexgrad/Kokoro-82M",
+          "demostracion": true
+        }
+      ],
+      "libroRefs": [
+        {
+          "libroId": "star-lore",
+          "motivo": "Conoce las leyendas que acompañan a las figuras de la Osa Mayor."
+        },
+        {
+          "libroId": "field-stars",
+          "motivo": "Continúa la observación de la Osa Mayor con una guía de estrellas.",
+          "referencia": {
+            "licencia": "Dominio público (Public Domain)",
+            "etiqueta": "Referencia de demostración",
+            "aclaracion": "Ejemplar de acceso público consultable en Internet; no disponible para préstamo físico ni propiedad de la biblioteca."
+          }
+        },
+        {
+          "libroId": "half-hours",
+          "motivo": "Amplía tu recorrido con explicaciones sencillas sobre grupos de estrellas."
+        }
+      ]
+    },
+    {
+      "id": "escorpio",
+      "titulo": "Escorpio",
+      "resumen": "Explora la silueta de esta constelación y aprende a reconocer sus estrellas más llamativas.",
+      "historia": "Algunos relatos de la tradición griega cuentan que un escorpión se enfrentó a Orión. Quienes narraban la historia imaginaron a ambos entre las estrellas y convirtieron sus figuras en una forma de recordar el cielo. El arco de estrellas de Escorpio recuerda una cola curvada. Esta adaptación breve es contenido de muestra y no representa todas las tradiciones que han interpretado la constelación.",
+      "comoReconocerla": "Imagina una línea larga que termina en una curva, como la cola de un escorpión. Una de sus estrellas más conocidas es Antares. El esquema representa la figura de manera simplificada y no permite saber si está visible desde tu ubicación.",
+      "demostracion": true,
+      "multimedia": [
+        {
+          "tipo": "audio",
+          "src": "/audio/escorpio-kokoro-v1.wav",
+          "formato": "audio/wav",
+          "transcripcion": "Algunos relatos de la tradición griega cuentan que un escorpión se enfrentó a Orión. Quienes narraban la historia imaginaron a ambos entre las estrellas y convirtieron sus figuras en una forma de recordar el cielo. El arco de estrellas de Escorpio recuerda una cola curvada. Esta adaptación breve es contenido de muestra y no representa todas las tradiciones que han interpretado la constelación.",
+          "autorTexto": "Equipo AstroVisor (autoría colectiva declarada por Luis).",
+          "procedencia": "Guion de demostración elaborado por el equipo AstroVisor, según confirmación de Luis en esta conversación. Ver content/AUTORIA.md.",
+          "voz": "Voz sintética femenina: Kokoro ef_dora (español latinoamericano).",
+          "permisoTexto": "Elaboración propia del equipo AstroVisor; uso en la demostración indicado por Luis, responsable de S3.",
+          "permiso": "Elaboración propia del equipo AstroVisor; uso en la demostración indicado por Luis, responsable de S3. Modelo de voz Kokoro-82M publicado con licencia Apache-2.0.",
+          "estadoDerechos": "declarado-por-equipo",
+          "licenciaVozFuente": "https://huggingface.co/hexgrad/Kokoro-82M",
+          "demostracion": true
+        }
+      ],
+      "libroRefs": [
+        {
+          "libroId": "star-lore",
+          "motivo": "Explora cómo distintas historias dieron nombre y significado a las constelaciones."
+        },
+        {
+          "libroId": "field-stars",
+          "motivo": "Conoce otros dibujos del firmamento y aprende a buscar sus estrellas."
+        },
+        {
+          "libroId": "half-hours",
+          "motivo": "Después de observar Escorpio, sigue explorando el cielo nocturno con esta lectura.",
+          "referencia": {
+            "licencia": "Dominio público (Project Gutenberg / Public Domain)",
+            "etiqueta": "Referencia de demostración",
+            "aclaracion": "Ejemplar de acceso público consultable en Internet; no disponible para préstamo físico ni propiedad de la biblioteca."
+          }
+        }
+      ]
+    }
+  ],
+  "libros": [
+    {
+      "id": "star-lore",
+      "titulo": "Star Lore of All Ages",
+      "autor": "William Tyler Olcott",
+      "anio": 1911,
+      "enlacePublico": "https://archive.org/details/starloreofallage00olco",
+      "portadaIlustrativa": "/libros-demo/star-lore.svg",
+      "tema": "#142a56",
+      "demostracion": true,
+      "marc21": {
+        "campo001": "DEMO-001",
+        "campo003": "DEMO",
+        "signatura852": null,
+        "ubicacion852": null
+      }
+    },
+    {
+      "id": "field-stars",
+      "titulo": "A Field Book of the Stars",
+      "autor": "William Tyler Olcott",
+      "anio": 1914,
+      "enlacePublico": "https://archive.org/details/fieldbookofstars00olcorich",
+      "portadaIlustrativa": "/libros-demo/field-stars.svg",
+      "tema": "#22463f",
+      "demostracion": true,
+      "marc21": {
+        "campo001": "DEMO-002",
+        "campo003": "DEMO",
+        "signatura852": null,
+        "ubicacion852": null
+      }
+    },
+    {
+      "id": "half-hours",
+      "titulo": "Half-Hours with the Stars",
+      "autor": "Richard A. Proctor",
+      "anio": 1887,
+      "enlacePublico": "https://www.gutenberg.org/ebooks/23300",
+      "portadaIlustrativa": "/libros-demo/half-hours.svg",
+      "tema": "#4d2844",
+      "demostracion": true,
+      "marc21": {
+        "campo001": "DEMO-003",
+        "campo003": "DEMO",
+        "signatura852": null,
+        "ubicacion852": null
+      }
+    }
+  ]
+}

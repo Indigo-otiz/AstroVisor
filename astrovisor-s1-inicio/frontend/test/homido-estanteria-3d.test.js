@@ -5,8 +5,9 @@ import { extraerLibros, calcularDetalleLibro } from '../public/prueba-homido/js/
 import { dibujarFicha, CANVAS, calcularLayout } from '../public/prueba-homido/js/ficha-canvas.js';
 import { crearEstado } from '../public/prueba-homido/js/visor-estado.js';
 import { rutaLibro2D } from '../public/prueba-homido/js/ruta-libro-2d.js';
+import { adaptarRespaldoHeredado } from '../public/prueba-homido/js/datos.js';
 
-const recorridos = JSON.parse(readFileSync(new URL('../../content/recorridos.json', import.meta.url), 'utf8'));
+const recorridos = adaptarRespaldoHeredado(JSON.parse(readFileSync(new URL('../../content/recorridos.json', import.meta.url), 'utf8')));
 function ctxFalso() {
   const dibujado=[];
   const ctx={
