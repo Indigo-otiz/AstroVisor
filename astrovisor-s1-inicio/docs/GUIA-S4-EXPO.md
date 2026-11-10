@@ -43,7 +43,7 @@ Antes del ensayo, completar y comprobar:
 | Proyector/pantalla y resolución de salida | Pantalla revisada y funcionando según Luis (constancia 10/11). Tipo/modelo y resolución sin especificar. |
 | Tamaño de imagen, distancia del público y luz ambiente | Pendiente. |
 | Sonido: bocina/salida y volumen inteligible | Pendiente. |
-| Red del recinto: carga de API, WAV y escena 3D | Pendiente. A-Frame depende de CDN. |
+| Red del recinto: carga de API, WAV y escena 3D | Pendiente de ese entorno. Tras integrar main, A-Frame se incluye localmente en la aplicación. |
 | Teléfono, navegador, visor y sensores | Homido revisado y funcionando según Luis (constancia 10/11). Teléfono, navegador y desglose de sensores/controles sin especificar. |
 | Video local copiado al equipo y reproducido sin red | Pendiente de ese equipo; consultar registro técnico del archivo. |
 | Otro integrante revisor | Índigo Ortiz revisó S4 y lo considera correcto, según confirmación de Luis recibida el 10/11. Fecha exacta y versión sin especificar. |
@@ -68,7 +68,7 @@ Duración de referencia de esta secuencia: 300 segundos. Puede adaptarse a la de
 
 ## Ejecutar localmente para revisión técnica
 
-Desde `astrovisor-s1-inicio`, con dependencias instaladas, abrir dos terminales:
+Desde `astrovisor-s1-inicio`, con dependencias instaladas, abrir dos terminales. La versión actual de main requiere configurar las rutas privadas del catálogo y la administración en el entorno, según `.env.example`, fuera del checkout. Si el almacén es nuevo, inicializar explícitamente el catálogo con `npm run init:catalogo`; no sustituir un catálogo existente. No se requieren credenciales administrativas para recorrer las historias públicas.
 
 ```powershell
 npm run dev:api
@@ -87,7 +87,9 @@ Para repetir la regresión automatizada con Playwright disponible por `NODE_PATH
 node scripts/verificar-s4.cjs --serve
 ```
 
-Este script inicia temporalmente API en 3094 y preview en 5194 y los cierra al terminar. Guarda capturas y `docs/evidencias/s4/navegador.json`; las fallas de API/audio/A-Frame se inducen solo dentro de ese navegador de pruebas. No cambia documentos ni fallas en producción. Configurar `S4_CHROME` si Chrome está en otra ruta. No es una prueba física ni un despliegue.
+Este script inicializa un catálogo de demostración en un directorio temporal aislado, inicia API en 3094 y preview en 5194 y los cierra al terminar. No utiliza el catálogo ni las cuentas reales. Guarda capturas y `docs/evidencias/s4/navegador.json`; para conservar una ejecución separada, establecer `S4_EVIDENCE_DIR` con otra carpeta de salida. Las fallas de API/audio/A-Frame se inducen solo dentro de ese navegador de pruebas. Configurar `S4_CHROME` si Chrome está en otra ruta. No es una prueba física ni un despliegue.
+
+En Windows, las suites del catálogo y los archivos exportados requieren que el directorio temporal use su ruta completa. Si el entorno devuelve un alias como `LUISRO~1`, configurar para esa terminal `TEMP` y `TMP` con la ruta obtenida mediante `node -p "require('node:fs').realpathSync.native(require('node:os').tmpdir())"`. Ejecutar las suites después de terminar el build: una de ellas verifica que sus archivos permanezcan sin cambios durante la prueba.
 
 El zoom nativo al 200 % se comprobó el 10/11, en seis combinaciones de inicio/listado/ficha y vista habitual/proyección, con audio y créditos operables por teclado. Para repetir esa prueba, con Playwright disponible por `NODE_PATH`, ejecutar `node scripts/verificar-zoom-s4.cjs`. Cuando indique LISTO, ajustar el zoom de la ventana de Chrome al **200 %** usando sus controles reales; después, desde otra terminal en el mismo proyecto:
 

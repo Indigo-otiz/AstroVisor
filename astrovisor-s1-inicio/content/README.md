@@ -10,7 +10,9 @@ El MVP trabajará con recorridos de constelaciones, sujetos a validación de la 
 
 `historia` es una adaptación narrativa de demostración; `comoReconocerla` describe la silueta. Ninguno contiene HTML. Las vistas imprimen estos campos como texto y no los ejecutan. `demostracion` permanece en `true` hasta recibir y revisar contenido autorizado; la interfaz S2 todavía se presenta como demostrativa. Los arrays vacíos no acreditan libros ni audios disponibles.
 
-Para sustituir los textos, editar este documento JSON conservando los campos y ejecutar `npm test`, `npm run test:web` y `npm run build` desde la raíz del proyecto Vue. Consultar nuevamente la API: el adaptador lee el archivo en cada petición. La autorización de nuevos materiales y su procedencia deben documentarse antes de presentarlos como contenido institucional.
+S4: la API lee exclusivamente el catálogo privado inicializado explícitamente desde `catalogo-inicial.json`. `recorridos.json` y `frontend/src/data/libros-demo.json` permanecen como fixtures de contrato y regresión, no como fuentes editables de ejecución. Panel y estantería consultan Express; ante error la estantería puede utilizar un paquete público verificado con aviso. Homido intenta API, paquete publicado por revisión y finalmente el JSON histórico de demostración identificado como no verificado. No hay doble escritura automática ni reinicialización al fallar una lectura. Configuración inicial en [PRUEBA-S4-ETAPA1.md](../docs/PRUEBA-S4-ETAPA1.md), exportación en [PRUEBA-S4-ETAPA4B.md](../docs/PRUEBA-S4-ETAPA4B.md) y auditoría de consumidores en [PRUEBA-S4-ETAPA5A.md](../docs/PRUEBA-S4-ETAPA5A.md). La autorización de materiales y su procedencia siguen siendo necesarias antes de presentarlos como contenido institucional.
+
+Los comandos históricos de generación/registro de narraciones descritos abajo son herramientas manuales S3: leen o modifican fixtures y recursos versionados, no migran ni sincronizan el catálogo privado S4. No ejecutarlos como procedimiento de actualización del runtime o de reparación. Una futura entrega coordinada de audio exige revisar catálogo, transcripción, activos y exportación; permanece fuera de esta auditoría. Se conservan los archivos históricos necesarios, sin eliminarlos ni duplicar su escritura en el runtime.
 
 ## Narraciones S3
 
@@ -30,3 +32,10 @@ node scripts/registrar-audios.mjs --kokoro
 La voz usa velocidad 0.96, ajuste de volumen con margen de pico y fundidos de 12 ms, sin música ni reverberación. La salida es WAV PCM16, mono, 24 kHz, sin saturación digital detectada. El registro conserva autoría, procedencia, `permisoTexto`, otros tipos de multimedia y estado de derechos; actualiza únicamente narración y procedencia de voz. El script entrega solo `historia` a la voz; no añade `resumen` ni `comoReconocerla`. `generacion-kokoro.json` identifica configuración, duraciones, nivel y hashes. El registro no sustituye escucha humana, revisión cruzada ni prueba móvil.
 
 La versión inicial usaba Piper es_MX-ald-medium. Se conservan los WAV sin sufijo, el generador PowerShell y `voz-MODEL_CARD.txt` como material previo; ya no son las narraciones activas. Los manifiestos iniciales se conservaron como `audios-piper-original.json` y `version-piper-original.json`; sus capturas y medidas de duración documentan la versión anterior. Ver `docs/PRUEBA-S3.md` para resultados y pendientes.
+
+
+## Bibliografía de demostración S3 (Karime)
+
+Las tres constelaciones (`orion`, `osa-mayor`, `escorpio`) incorporan en el arreglo `libros` obras reales de acceso público en Internet (Project Gutenberg e Internet Archive). Se rotulan expresamente como `Referencia de demostración`.
+
+La biblioteca **no se atribuye como poseedora** de las obras físicas ni se afirma disponibilidad de préstamo. La ficha del visor Homido adapta y muestra el título y autor verificados desde este registro documental. El detalle completo de fuentes, enlaces y condiciones de uso libres de derechos patrimoniales se encuentra en [BIBLIOGRAFIA.md](BIBLIOGRAFIA.md).

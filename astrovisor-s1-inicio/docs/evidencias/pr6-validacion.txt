@@ -1,0 +1,187 @@
+# Validación local de PR #6
+Rama: feat/estanteria-libros-demo
+HEAD base: 8b6ffc3f7e853ec696cbbd2e01bba0d16abb3154
+Resultados contra copia de trabajo con corrección autorizada; sin commit/merge.
+
+Comando/comprobación: npm test
+Código de salida: 0
+
+> astrovisor@0.1.0 test
+> npm run test --workspace backend
+
+
+> @astrovisor/backend@0.1.0 test
+> node --test
+
+✔ middleware auth: almacena y recupera sesiones válidas en el servidor (1.1643ms)
+✔ middleware auth: verificarAdmin deniega con 401 si no hay token (0.2403ms)
+✔ middleware auth: verificarAdmin autoriza con token válido (0.2388ms)
+✔ Express API: POST /api/admin/login deniega con 401 ante credenciales incorrectas (1.3764ms)
+✔ Express API: POST /api/admin/login autoriza con credenciales válidas y emite token (0.8ms)
+✔ el repositorio documental devuelve recorridos de demostración (6.2522ms)
+✔ las tres narraciones tienen WAV PCM real y transcripción fiel al guion de muestra (33.5625ms)
+✔ el contrato documental incluye libros de demostración reales y coincide con el respaldo del visor (2.294ms)
+ℹ tests 8
+ℹ suites 0
+ℹ pass 8
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 295.3945
+
+
+Comando/comprobación: npm run test:web
+Código de salida: 0
+
+> astrovisor@0.1.0 test:web
+> npm run test --workspace frontend
+
+
+> @astrovisor/frontend@0.1.0 test
+> node --test
+
+✔ catálogo de demostración: ids únicos y sin existencias inventadas (3.0194ms)
+✔ cada constelación presenta tres recomendaciones con información de interés (0.3233ms)
+✔ parámetros desconocidos no muestran un libro ajeno (0.7464ms)
+✔ las recomendaciones remiten a enlaces públicos, no al inventario de la biblioteca (0.2251ms)
+✔ los enlaces aprobados coinciden en catálogo, contrato documental y bibliografía (0.8627ms)
+✔ consume el contrato documental real y transmite la cancelación (47.8224ms)
+✔ rechaza HTTP fallido para mostrar un error recuperable (1.2373ms)
+✔ rechaza red interrumpida para mostrar un error recuperable (0.3107ms)
+✔ rechaza JSON inválido para mostrar un error recuperable (0.6704ms)
+✔ rechaza objeto sin arreglo para mostrar un error recuperable (0.6964ms)
+✔ rechaza historia ausente para mostrar un error recuperable (0.7562ms)
+✔ rechaza IDs repetidos para mostrar un error recuperable (2.6068ms)
+✔ rechaza ID incompatible para mostrar un error recuperable (0.8919ms)
+✔ distingue una lista vacía de un fallo (0.842ms)
+✔ una solicitud nueva se recupera de una respuesta fallida (2.0837ms)
+✔ metadatos de audio inválidos no invalidan una historia legible (1.0294ms)
+✔ GazeController se inicializa en reposo con 3000 ms por defecto (1.5331ms)
+✔ GazeController avanza por las etapas 0%, 33%, 66% y confirma en 100% (157.815ms)
+✔ GazeController cancela y reinicia a 0% si la mirada se desvía antes de tiempo (61.5035ms)
+✔ GazeController pausa y no inicia mirada mientras esté pausado (0.4594ms)
+✔ GazeController permite fijar estados manuales para revisión (0%, 33%, 66%, 100%) (0.3139ms)
+✔ generarEstrellas: cantidad exacta, vectores unitarios, solo sobre el horizonte y determinista (10.1957ms)
+✔ el campo de estrellas cubre el cielo y no solo la banda (2.6238ms)
+✔ la banda es una franja suave: gaussiana, mucho más estrecha que el cielo libre y sin borde duro (13.9315ms)
+✔ el resplandor de la banda es más ancho que las estrellas de la banda (4.0056ms)
+✔ vistasOjos: dos mitades completas en píxeles CSS, independientes de la densidad de píxeles (0.537ms)
+✔ el respaldo local cumple el contrato y trae las tres constelaciones (3.5367ms)
+✔ el respaldo local mantiene los mismos ids que content/recorridos.json (1.3696ms)
+✔ cargarDatos usa la API cuando responde bien (1.1105ms)
+✔ cargarDatos cae al respaldo local si la API falla, devuelve basura o HTML (1.9862ms)
+✔ cargarDatos falla si API y respaldo fallan (6.0007ms)
+✔ validarRecorridos rechaza ids repetidos y campos vacíos (0.5577ms)
+✔ adaptarLibro/adaptarAudio no inventan recursos (1.6918ms)
+✔ resumirParaVisor corta por oraciones y nunca modifica el texto original (1.1411ms)
+✔ sin ?diag=1 el modo está desactivado aunque haya otros parámetros (1.5296ms)
+✔ ?diag=1 lee opciones apagadas, antialiasing y tope de DPR; ignora valores inválidos (2.0561ms)
+✔ la configuración se reproduce: aBusqueda ∘ leerParametros es la identidad (2.4406ms)
+✔ flujo recorrido → ficha → recorrido → otra constelación (2.2852ms)
+✔ acciones permitidas según el modo (0.4106ms)
+✔ la pausa bloquea la mirada pero no Pausa, Salir ni el clic (0.288ms)
+✔ hay figuras para las tres constelaciones y tienen formas distintas (1.3418ms)
+✔ catálogo: datos astronómicos completos y razonables, y trazos con índices válidos (0.6418ms)
+✔ catálogo: las estrellas conocidas tienen sus valores característicos (SIMBAD) (0.4694ms)
+✔ orientación como en un atlas (norte arriba, este a la izquierda) (1.0067ms)
+✔ las figuras caben dentro del área de mirada con la misma escala angular (2.7046ms)
+✔ tamaño y color de las estrellas varían de forma natural con la magnitud y el color (1.1698ms)
+✔ las constelaciones están repartidas en direcciones distintas y sus áreas de mirada no se traslapan (0.6507ms)
+✔ al menos una constelación es visible en la vista inicial (campo de ±40° del frente) (0.2102ms)
+✔ posicionEnEsfera: distancia constante, hacia el frente y encarando al observador (0.372ms)
+✔ la ficha aparece frente a la dirección de la cámara (0.3066ms)
+✔ la estantería utiliza libros[] existentes, prioriza la constelación y limita a tres (3.6452ms)
+✔ la ficha de constelación invita a explorar y el botón queda dentro del canvas (2.3987ms)
+✔ detalle 3D tiene dos botones grandes y advierte que la ubicación es desconocida (1.0729ms)
+✔ las acciones de libros respetan modo ficha y pausa de mirada (1.7607ms)
+✔ cada libro navega a una URL interna y rechaza IDs ajenos (0.3824ms)
+✔ se mantiene un solo reproductor de narraciones (0.7397ms)
+✔ ajustarLineas respeta el ancho máximo (2.083ms)
+✔ cada constelación dibuja su propio título y resumen, y ninguno de otra (1.8739ms)
+✔ el layout cabe en el lienzo, sin desbordar ni superponer zonas (0.8224ms)
+✔ un texto muy largo se resume para el visor (sin reducir la tipografía) y sigue cabiendo (0.6709ms)
+✔ sin libros muestra estado pendiente honesto, sin atribuir libros a la biblioteca (0.8567ms)
+✔ con libros invita a explorar la estantería sin atribuir existencias (0.5956ms)
+✔ el aviso de audio aparece solo cuando se indica (0.7166ms)
+✔ las zonas de mirada salen del mismo layout: el centro del botón dibujado coincide (0.5231ms)
+✔ valores por defecto: 3000 ms y 280 ms de gracia; etapas 0/33/66/100 (2.5732ms)
+✔ confirma tras el tiempo de permanencia pasando por todas las etapas (259.4458ms)
+✔ retirar la mirada más allá de la gracia cancela y no confirma (233.5284ms)
+✔ volver a mirar dentro de la gracia conserva la carga (325.8351ms)
+✔ cambiar de constelación reinicia la carga de la anterior (294.506ms)
+✔ puedeEnfocar=false impide iniciar (pausa o estado incorrecto) (61.9052ms)
+✔ cancelar() explícito deja el controlador listo para un nuevo objetivo (261.1834ms)
+✔ extinción: las estrellas bajas se ven más tenues, crece de forma monótona y satura en 1 (1.5606ms)
+✔ las colinas son bajas, irregulares y continuas (cierran el círculo sin saltos) (4.3085ms)
+✔ perspectiva atmosférica: más lejos = más alto en la lista de radios y más claro; la cercana es la más oscura (0.9311ms)
+✔ las colinas no tapan las constelaciones: su punto más bajo queda por encima del borde de la cresta más alta (1.059ms)
+✔ cada constelación mantiene su dirección (el cielo de fondo no depende de ellas) (0.4389ms)
+✔ las colinas son perceptibles: la más cercana sube lo bastante para verse en un móvil (≥ 2° de pico) y hay picos de 3° o más (2.4817ms)
+✔ index.html no incluye a-sky (taparía la cúpula con degradado del horizonte) (0.9339ms)
+✔ prueba.js no asigna a variables sin declarar (p. ej. el fallo lastSample en cada evento de orientación) (2.0701ms)
+✔ la ficha solo dice «Reproduciendo» cuando el reproductor lo confirma (3.3507ms)
+✔ cambiar de constelación no superpone narraciones y cada una usa su WAV (1.5174ms)
+✔ sin audio o sin reproductor la ficha avisa y nunca afirma reproducción (0.2063ms)
+✔ contrato visor ↔ narraciones: nombres coinciden y la pausa de mirada no pausa la narración (1.0556ms)
+✔ el audio opcional inválido no sustituye el relato ni habilita una URL externa (3.0031ms)
+✔ pausa conserva posición y reanudar continúa; finalizar permite repetir (3.0824ms)
+✔ rechazo por gesto ofrece recuperación sin anunciar reproducción (0.8428ms)
+✔ fallo del medio conserva lectura y permite intentar de nuevo (0.6337ms)
+✔ un play tardío no deja sonido después de detener (0.6551ms)
+✔ un play tardío no deja sonido después de seleccionar (0.5089ms)
+✔ un play tardío no deja sonido después de destruir (0.3697ms)
+✔ un play tardío no deja sonido después de pausar (0.3813ms)
+✔ resolver el play anterior no pausa la narración nueva (1.9651ms)
+✔ ocultar pausa; pagehide reinicia y destruir retira observadores y listeners (0.7139ms)
+ℹ tests 93
+ℹ suites 0
+ℹ pass 93
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1787.0778
+
+
+Comando/comprobación: npm run build
+Código de salida: 0
+
+> astrovisor@0.1.0 build
+> npm run build --workspace frontend
+
+
+> @astrovisor/frontend@0.1.0 build
+> vite build
+
+vite v6.4.4 building for production...
+transforming...
+✓ 89 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                   0.55 kB │ gzip:   0.34 kB
+dist/assets/index-Cj74fUPN.css   26.83 kB │ gzip:   6.38 kB
+dist/assets/index-CxTc2Z00.js   367.84 kB │ gzip: 110.95 kB
+✓ built in 1.85s
+
+
+Comando/comprobación: pr6supplemental
+Código de salida: 0
+{
+  "result": "PASS",
+  "canonicalEqualsFallback": true,
+  "metadataPreserved": true,
+  "bibliographyOnlyApprovedUrlsChanged": true,
+  "bookConstellationPairs": 9,
+  "homidoRoutes": [
+    "/explorar/orion/libros/star-lore",
+    "/explorar/osa-mayor/libros/field-stars",
+    "/explorar/escorpio/libros/half-hours"
+  ],
+  "svgHashesUnchanged": {
+    "star-lore": "c4266615a052733476739e2b6ff22c43c904499f3b05a76b91e684eaf197b9a4",
+    "field-stars": "fd1bd898d6bd05f322badc32ca38c8370762e47f5e2204ec3730007b5c823631",
+    "half-hours": "ee49362effa9a303c4e63adb44c0ae60aee59f1eb3fab2c88602cefc2b98af75"
+  },
+  "buildFallbackMatches": true
+}

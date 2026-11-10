@@ -1,0 +1,1066 @@
+{
+  "fechaUTC": "2026-11-10T17:14:16.765Z",
+  "zona": "America/Mexico_City",
+  "origen": "http://127.0.0.1:5194",
+  "metodo": "Playwright, Chrome de escritorio; viewports configurados, no hardware físico",
+  "casos": [
+    {
+      "nombre": "distribucion 360 habitual /",
+      "resultado": "correcto"
+    },
+    {
+      "nombre": "distribucion 360 habitual /explorar",
+      "resultado": "correcto"
+    },
+    {
+      "nombre": "distribucion 360 habitual /explorar/orion",
+      "resultado": "correcto"
+    },
+    {
+      "nombre": "distribucion 360 proyeccion /",
+      "resultado": "correcto"
+    },
+    {
+      "nombre": "distribucion 360 proyeccion /explorar",
+      "resultado": "correcto"
+    },
+    {
+      "nombre": "distribucion 360 proyeccion /explorar/orion",
+      "resultado": "correcto"
+    },
+    {
+      "nombre": "distribucion 1024 habitual /",
+      "resultado": "correcto"
+    },
+    {
+      "nombre": "distribucion 1024 habitual /explorar",
+      "resultado": "correcto"
+    },
+    {
+      "nombre": "distribucion 1024 habitual /explorar/orion",
+      "resultado": "correcto"
+    },
+    {
+      "nombre": "distribucion 1024 proyeccion /",
+      "resultado": "correcto"
+    },
+    {
+      "nombre": "distribucion 1024 proyeccion /explorar",
+      "resultado": "correcto"
+    },
+    {
+      "nombre": "distribucion 1024 proyeccion /explorar/orion",
+      "resultado": "correcto"
+    },
+    {
+      "nombre": "distribucion 1280 habitual /",
+      "resultado": "correcto"
+    },
+    {
+      "nombre": "distribucion 1280 habitual /explorar",
+      "resultado": "correcto"
+    },
+    {
+      "nombre": "distribucion 1280 habitual /explorar/orion",
+      "resultado": "correcto"
+    },
+    {
+      "nombre": "distribucion 1280 proyeccion /",
+      "resultado": "correcto"
+    },
+    {
+      "nombre": "distribucion 1280 proyeccion /explorar",
+      "resultado": "correcto"
+    },
+    {
+      "nombre": "distribucion 1280 proyeccion /explorar/orion",
+      "resultado": "correcto"
+    },
+    {
+      "nombre": "distribucion 1920 habitual /",
+      "resultado": "correcto"
+    },
+    {
+      "nombre": "distribucion 1920 habitual /explorar",
+      "resultado": "correcto"
+    },
+    {
+      "nombre": "distribucion 1920 habitual /explorar/orion",
+      "resultado": "correcto"
+    },
+    {
+      "nombre": "distribucion 1920 proyeccion /",
+      "resultado": "correcto"
+    },
+    {
+      "nombre": "distribucion 1920 proyeccion /explorar",
+      "resultado": "correcto"
+    },
+    {
+      "nombre": "distribucion 1920 proyeccion /explorar/orion",
+      "resultado": "correcto"
+    },
+    {
+      "nombre": "distribucion 2560 habitual /",
+      "resultado": "correcto"
+    },
+    {
+      "nombre": "distribucion 2560 habitual /explorar",
+      "resultado": "correcto"
+    },
+    {
+      "nombre": "distribucion 2560 habitual /explorar/orion",
+      "resultado": "correcto"
+    },
+    {
+      "nombre": "distribucion 2560 proyeccion /",
+      "resultado": "correcto"
+    },
+    {
+      "nombre": "distribucion 2560 proyeccion /explorar",
+      "resultado": "correcto"
+    },
+    {
+      "nombre": "distribucion 2560 proyeccion /explorar/orion",
+      "resultado": "correcto"
+    },
+    {
+      "nombre": "teclado completo false",
+      "resultado": "correcto",
+      "detalle": "Tab/Shift+Tab/Enter/Espacio, tres audios y créditos, historial, estado y recarga"
+    },
+    {
+      "nombre": "teclado completo true",
+      "resultado": "correcto",
+      "detalle": "Tab/Shift+Tab/Enter/Espacio, tres audios y créditos, historial, estado y recarga"
+    },
+    {
+      "nombre": "texto 200 por CSS, simulacion false /",
+      "resultado": "correcto",
+      "detalle": {
+        "metodo": "Raíz 18→36px por CSS, no zoom nativo",
+        "ancho": 1280,
+        "documento": 1280
+      }
+    },
+    {
+      "nombre": "texto 200 por CSS, simulacion false /explorar",
+      "resultado": "correcto",
+      "detalle": {
+        "metodo": "Raíz 18→36px por CSS, no zoom nativo",
+        "ancho": 1280,
+        "documento": 1280
+      }
+    },
+    {
+      "nombre": "texto 200 por CSS, simulacion false /explorar/orion",
+      "resultado": "correcto",
+      "detalle": {
+        "metodo": "Raíz 18→36px por CSS, no zoom nativo",
+        "ancho": 1280,
+        "documento": 1280
+      }
+    },
+    {
+      "nombre": "texto 200 por CSS, simulacion true /",
+      "resultado": "correcto",
+      "detalle": {
+        "metodo": "Raíz 18→36px por CSS, no zoom nativo",
+        "ancho": 1280,
+        "documento": 1280
+      }
+    },
+    {
+      "nombre": "texto 200 por CSS, simulacion true /explorar",
+      "resultado": "correcto",
+      "detalle": {
+        "metodo": "Raíz 18→36px por CSS, no zoom nativo",
+        "ancho": 1280,
+        "documento": 1280
+      }
+    },
+    {
+      "nombre": "texto 200 por CSS, simulacion true /explorar/orion",
+      "resultado": "correcto",
+      "detalle": {
+        "metodo": "Raíz 18→36px por CSS, no zoom nativo",
+        "ancho": 1280,
+        "documento": 1280
+      }
+    },
+    {
+      "nombre": "salto al contenido",
+      "resultado": "correcto"
+    },
+    {
+      "nombre": "raton y detencion de medios al salir",
+      "resultado": "correcto",
+      "detalle": "Archivos WAV reales; tiempo avanza, pausa conserva, salida reinicia. No acredita escucha humana."
+    },
+    {
+      "nombre": "API fallida y reintento",
+      "resultado": "correcto",
+      "detalle": "503 inducido por intercepción Playwright, API real al reintentar"
+    },
+    {
+      "nombre": "audio ausente conserva lectura",
+      "resultado": "correcto"
+    },
+    {
+      "nombre": "sin A-Frame y retorno 2D",
+      "resultado": "correcto",
+      "detalle": "Motor A-Frame bloqueado intencionalmente; retorno 2D con API disponible"
+    },
+    {
+      "nombre": "integracion biblioteca y footer 360 false",
+      "resultado": "correcto",
+      "detalle": "Recorrido de constelación a estantería y libro; estado conservado, sin desbordamiento y tres logos institucionales cargados"
+    },
+    {
+      "nombre": "integracion biblioteca y footer 360 true",
+      "resultado": "correcto",
+      "detalle": "Recorrido de constelación a estantería y libro; estado conservado, sin desbordamiento y tres logos institucionales cargados"
+    },
+    {
+      "nombre": "integracion biblioteca y footer 1024 false",
+      "resultado": "correcto",
+      "detalle": "Recorrido de constelación a estantería y libro; estado conservado, sin desbordamiento y tres logos institucionales cargados"
+    },
+    {
+      "nombre": "integracion biblioteca y footer 1024 true",
+      "resultado": "correcto",
+      "detalle": "Recorrido de constelación a estantería y libro; estado conservado, sin desbordamiento y tres logos institucionales cargados"
+    },
+    {
+      "nombre": "integracion biblioteca y footer 1920 false",
+      "resultado": "correcto",
+      "detalle": "Recorrido de constelación a estantería y libro; estado conservado, sin desbordamiento y tres logos institucionales cargados"
+    },
+    {
+      "nombre": "integracion biblioteca y footer 1920 true",
+      "resultado": "correcto",
+      "detalle": "Recorrido de constelación a estantería y libro; estado conservado, sin desbordamiento y tres logos institucionales cargados"
+    },
+    {
+      "nombre": "aislamiento de presentacion y administracion protegida",
+      "resultado": "correcto",
+      "detalle": "Sin inicio de sesión real; HTTP 401 de API real"
+    }
+  ],
+  "distribucion": [
+    {
+      "ruta": "/",
+      "width": 360,
+      "height": 800,
+      "proyeccion": false,
+      "ancho": 360,
+      "documento": 360,
+      "shell": "app-shell public-shell",
+      "shellPx": "19.9998px",
+      "padres": [
+        {
+          "clase": "home-intro",
+          "px": "19.9998px"
+        },
+        {
+          "clase": "public-home",
+          "px": "19.9998px"
+        },
+        {
+          "clase": "container main-content",
+          "px": "19.9998px"
+        }
+      ],
+      "textoPx": 19.9998,
+      "botonPx": 80,
+      "desbordados": []
+    },
+    {
+      "ruta": "/explorar",
+      "width": 360,
+      "height": 800,
+      "proyeccion": false,
+      "ancho": 360,
+      "documento": 360,
+      "shell": "app-shell public-shell",
+      "shellPx": "19.9998px",
+      "padres": [
+        {
+          "clase": "constellation-card-copy",
+          "px": "19.9998px"
+        },
+        {
+          "clase": "constellation-card",
+          "px": "19.9998px"
+        },
+        {
+          "clase": "container main-content",
+          "px": "19.9998px"
+        }
+      ],
+      "textoPx": 19.0008,
+      "botonPx": 80,
+      "desbordados": []
+    },
+    {
+      "ruta": "/explorar/orion",
+      "width": 360,
+      "height": 800,
+      "proyeccion": false,
+      "ancho": 360,
+      "documento": 360,
+      "shell": "app-shell public-shell",
+      "shellPx": "19.9998px",
+      "padres": [
+        {
+          "clase": "",
+          "px": "19.9998px"
+        },
+        {
+          "clase": "detail-reading",
+          "px": "19.9998px"
+        },
+        {
+          "clase": "container main-content",
+          "px": "19.9998px"
+        }
+      ],
+      "textoPx": 19.9998,
+      "botonPx": 80,
+      "desbordados": []
+    },
+    {
+      "ruta": "/",
+      "width": 360,
+      "height": 800,
+      "proyeccion": true,
+      "ancho": 360,
+      "documento": 360,
+      "shell": "app-shell public-shell presentation-shell",
+      "shellPx": "24.0012px",
+      "padres": [
+        {
+          "clase": "home-intro",
+          "px": "24.0012px"
+        },
+        {
+          "clase": "public-home",
+          "px": "24.0012px"
+        },
+        {
+          "clase": "container main-content",
+          "px": "24.0012px"
+        }
+      ],
+      "textoPx": 24.0012,
+      "botonPx": 92,
+      "desbordados": []
+    },
+    {
+      "ruta": "/explorar",
+      "width": 360,
+      "height": 800,
+      "proyeccion": true,
+      "ancho": 360,
+      "documento": 360,
+      "shell": "app-shell public-shell presentation-shell",
+      "shellPx": "24.0012px",
+      "padres": [
+        {
+          "clase": "constellation-card-copy",
+          "px": "24.0012px"
+        },
+        {
+          "clase": "constellation-card",
+          "px": "24.0012px"
+        },
+        {
+          "clase": "container main-content",
+          "px": "24.0012px"
+        }
+      ],
+      "textoPx": 24.0012,
+      "botonPx": 92,
+      "desbordados": []
+    },
+    {
+      "ruta": "/explorar/orion",
+      "width": 360,
+      "height": 800,
+      "proyeccion": true,
+      "ancho": 360,
+      "documento": 360,
+      "shell": "app-shell public-shell presentation-shell",
+      "shellPx": "24.0012px",
+      "padres": [
+        {
+          "clase": "",
+          "px": "24.0012px"
+        },
+        {
+          "clase": "detail-reading",
+          "px": "24.0012px"
+        },
+        {
+          "clase": "container main-content",
+          "px": "24.0012px"
+        }
+      ],
+      "textoPx": 24.0012,
+      "botonPx": 49.484375,
+      "desbordados": []
+    },
+    {
+      "ruta": "/",
+      "width": 1024,
+      "height": 768,
+      "proyeccion": false,
+      "ancho": 1024,
+      "documento": 1024,
+      "shell": "app-shell public-shell",
+      "shellPx": "19.9998px",
+      "padres": [
+        {
+          "clase": "home-intro",
+          "px": "19.9998px"
+        },
+        {
+          "clase": "public-home",
+          "px": "19.9998px"
+        },
+        {
+          "clase": "container main-content",
+          "px": "19.9998px"
+        }
+      ],
+      "textoPx": 19.9998,
+      "botonPx": 49,
+      "desbordados": []
+    },
+    {
+      "ruta": "/explorar",
+      "width": 1024,
+      "height": 768,
+      "proyeccion": false,
+      "ancho": 1024,
+      "documento": 1024,
+      "shell": "app-shell public-shell",
+      "shellPx": "19.9998px",
+      "padres": [
+        {
+          "clase": "constellation-card-copy",
+          "px": "19.9998px"
+        },
+        {
+          "clase": "constellation-card",
+          "px": "19.9998px"
+        },
+        {
+          "clase": "container main-content",
+          "px": "19.9998px"
+        }
+      ],
+      "textoPx": 19.0008,
+      "botonPx": 49,
+      "desbordados": []
+    },
+    {
+      "ruta": "/explorar/orion",
+      "width": 1024,
+      "height": 768,
+      "proyeccion": false,
+      "ancho": 1024,
+      "documento": 1024,
+      "shell": "app-shell public-shell",
+      "shellPx": "19.9998px",
+      "padres": [
+        {
+          "clase": "",
+          "px": "19.9998px"
+        },
+        {
+          "clase": "detail-reading",
+          "px": "19.9998px"
+        },
+        {
+          "clase": "container main-content",
+          "px": "19.9998px"
+        }
+      ],
+      "textoPx": 19.9998,
+      "botonPx": 49,
+      "desbordados": []
+    },
+    {
+      "ruta": "/",
+      "width": 1024,
+      "height": 768,
+      "proyeccion": true,
+      "ancho": 1024,
+      "documento": 1024,
+      "shell": "app-shell public-shell presentation-shell",
+      "shellPx": "24.0012px",
+      "padres": [
+        {
+          "clase": "home-intro",
+          "px": "24.0012px"
+        },
+        {
+          "clase": "public-home",
+          "px": "24.0012px"
+        },
+        {
+          "clase": "container main-content",
+          "px": "24.0012px"
+        }
+      ],
+      "textoPx": 24.0012,
+      "botonPx": 55,
+      "desbordados": []
+    },
+    {
+      "ruta": "/explorar",
+      "width": 1024,
+      "height": 768,
+      "proyeccion": true,
+      "ancho": 1024,
+      "documento": 1024,
+      "shell": "app-shell public-shell presentation-shell",
+      "shellPx": "24.0012px",
+      "padres": [
+        {
+          "clase": "constellation-card-copy",
+          "px": "24.0012px"
+        },
+        {
+          "clase": "constellation-card",
+          "px": "24.0012px"
+        },
+        {
+          "clase": "container main-content",
+          "px": "24.0012px"
+        }
+      ],
+      "textoPx": 24.0012,
+      "botonPx": 55,
+      "desbordados": []
+    },
+    {
+      "ruta": "/explorar/orion",
+      "width": 1024,
+      "height": 768,
+      "proyeccion": true,
+      "ancho": 1024,
+      "documento": 1024,
+      "shell": "app-shell public-shell presentation-shell",
+      "shellPx": "24.0012px",
+      "padres": [
+        {
+          "clase": "",
+          "px": "24.0012px"
+        },
+        {
+          "clase": "detail-reading",
+          "px": "24.0012px"
+        },
+        {
+          "clase": "container main-content",
+          "px": "24.0012px"
+        }
+      ],
+      "textoPx": 24.0012,
+      "botonPx": 55,
+      "desbordados": []
+    },
+    {
+      "ruta": "/",
+      "width": 1280,
+      "height": 900,
+      "proyeccion": false,
+      "ancho": 1280,
+      "documento": 1280,
+      "shell": "app-shell public-shell",
+      "shellPx": "19.9998px",
+      "padres": [
+        {
+          "clase": "home-intro",
+          "px": "19.9998px"
+        },
+        {
+          "clase": "public-home",
+          "px": "19.9998px"
+        },
+        {
+          "clase": "container main-content",
+          "px": "19.9998px"
+        }
+      ],
+      "textoPx": 19.9998,
+      "botonPx": 49,
+      "desbordados": []
+    },
+    {
+      "ruta": "/explorar",
+      "width": 1280,
+      "height": 900,
+      "proyeccion": false,
+      "ancho": 1280,
+      "documento": 1280,
+      "shell": "app-shell public-shell",
+      "shellPx": "19.9998px",
+      "padres": [
+        {
+          "clase": "constellation-card-copy",
+          "px": "19.9998px"
+        },
+        {
+          "clase": "constellation-card",
+          "px": "19.9998px"
+        },
+        {
+          "clase": "container main-content",
+          "px": "19.9998px"
+        }
+      ],
+      "textoPx": 19.0008,
+      "botonPx": 49,
+      "desbordados": []
+    },
+    {
+      "ruta": "/explorar/orion",
+      "width": 1280,
+      "height": 900,
+      "proyeccion": false,
+      "ancho": 1280,
+      "documento": 1280,
+      "shell": "app-shell public-shell",
+      "shellPx": "19.9998px",
+      "padres": [
+        {
+          "clase": "",
+          "px": "19.9998px"
+        },
+        {
+          "clase": "detail-reading",
+          "px": "19.9998px"
+        },
+        {
+          "clase": "container main-content",
+          "px": "19.9998px"
+        }
+      ],
+      "textoPx": 19.9998,
+      "botonPx": 49,
+      "desbordados": []
+    },
+    {
+      "ruta": "/",
+      "width": 1280,
+      "height": 900,
+      "proyeccion": true,
+      "ancho": 1280,
+      "documento": 1280,
+      "shell": "app-shell public-shell presentation-shell",
+      "shellPx": "24.0012px",
+      "padres": [
+        {
+          "clase": "home-intro",
+          "px": "24.0012px"
+        },
+        {
+          "clase": "public-home",
+          "px": "24.0012px"
+        },
+        {
+          "clase": "container main-content",
+          "px": "24.0012px"
+        }
+      ],
+      "textoPx": 24.0012,
+      "botonPx": 55,
+      "desbordados": []
+    },
+    {
+      "ruta": "/explorar",
+      "width": 1280,
+      "height": 900,
+      "proyeccion": true,
+      "ancho": 1280,
+      "documento": 1280,
+      "shell": "app-shell public-shell presentation-shell",
+      "shellPx": "24.0012px",
+      "padres": [
+        {
+          "clase": "constellation-card-copy",
+          "px": "24.0012px"
+        },
+        {
+          "clase": "constellation-card",
+          "px": "24.0012px"
+        },
+        {
+          "clase": "container main-content",
+          "px": "24.0012px"
+        }
+      ],
+      "textoPx": 24.0012,
+      "botonPx": 55,
+      "desbordados": []
+    },
+    {
+      "ruta": "/explorar/orion",
+      "width": 1280,
+      "height": 900,
+      "proyeccion": true,
+      "ancho": 1280,
+      "documento": 1280,
+      "shell": "app-shell public-shell presentation-shell",
+      "shellPx": "24.0012px",
+      "padres": [
+        {
+          "clase": "",
+          "px": "24.0012px"
+        },
+        {
+          "clase": "detail-reading",
+          "px": "24.0012px"
+        },
+        {
+          "clase": "container main-content",
+          "px": "24.0012px"
+        }
+      ],
+      "textoPx": 24.0012,
+      "botonPx": 55,
+      "desbordados": []
+    },
+    {
+      "ruta": "/",
+      "width": 1920,
+      "height": 1080,
+      "proyeccion": false,
+      "ancho": 1920,
+      "documento": 1920,
+      "shell": "app-shell public-shell",
+      "shellPx": "19.9998px",
+      "padres": [
+        {
+          "clase": "home-intro",
+          "px": "19.9998px"
+        },
+        {
+          "clase": "public-home",
+          "px": "19.9998px"
+        },
+        {
+          "clase": "container main-content",
+          "px": "19.9998px"
+        }
+      ],
+      "textoPx": 19.9998,
+      "botonPx": 49,
+      "desbordados": []
+    },
+    {
+      "ruta": "/explorar",
+      "width": 1920,
+      "height": 1080,
+      "proyeccion": false,
+      "ancho": 1920,
+      "documento": 1920,
+      "shell": "app-shell public-shell",
+      "shellPx": "19.9998px",
+      "padres": [
+        {
+          "clase": "constellation-card-copy",
+          "px": "19.9998px"
+        },
+        {
+          "clase": "constellation-card",
+          "px": "19.9998px"
+        },
+        {
+          "clase": "container main-content",
+          "px": "19.9998px"
+        }
+      ],
+      "textoPx": 19.0008,
+      "botonPx": 49,
+      "desbordados": []
+    },
+    {
+      "ruta": "/explorar/orion",
+      "width": 1920,
+      "height": 1080,
+      "proyeccion": false,
+      "ancho": 1920,
+      "documento": 1920,
+      "shell": "app-shell public-shell",
+      "shellPx": "19.9998px",
+      "padres": [
+        {
+          "clase": "",
+          "px": "19.9998px"
+        },
+        {
+          "clase": "detail-reading",
+          "px": "19.9998px"
+        },
+        {
+          "clase": "container main-content",
+          "px": "19.9998px"
+        }
+      ],
+      "textoPx": 19.9998,
+      "botonPx": 49,
+      "desbordados": []
+    },
+    {
+      "ruta": "/",
+      "width": 1920,
+      "height": 1080,
+      "proyeccion": true,
+      "ancho": 1920,
+      "documento": 1920,
+      "shell": "app-shell public-shell presentation-shell",
+      "shellPx": "24.0012px",
+      "padres": [
+        {
+          "clase": "home-intro",
+          "px": "24.0012px"
+        },
+        {
+          "clase": "public-home",
+          "px": "24.0012px"
+        },
+        {
+          "clase": "container main-content",
+          "px": "24.0012px"
+        }
+      ],
+      "textoPx": 24.0012,
+      "botonPx": 55,
+      "desbordados": []
+    },
+    {
+      "ruta": "/explorar",
+      "width": 1920,
+      "height": 1080,
+      "proyeccion": true,
+      "ancho": 1920,
+      "documento": 1920,
+      "shell": "app-shell public-shell presentation-shell",
+      "shellPx": "24.0012px",
+      "padres": [
+        {
+          "clase": "constellation-card-copy",
+          "px": "24.0012px"
+        },
+        {
+          "clase": "constellation-card",
+          "px": "24.0012px"
+        },
+        {
+          "clase": "container main-content",
+          "px": "24.0012px"
+        }
+      ],
+      "textoPx": 24.0012,
+      "botonPx": 55,
+      "desbordados": []
+    },
+    {
+      "ruta": "/explorar/orion",
+      "width": 1920,
+      "height": 1080,
+      "proyeccion": true,
+      "ancho": 1920,
+      "documento": 1920,
+      "shell": "app-shell public-shell presentation-shell",
+      "shellPx": "24.0012px",
+      "padres": [
+        {
+          "clase": "",
+          "px": "24.0012px"
+        },
+        {
+          "clase": "detail-reading",
+          "px": "24.0012px"
+        },
+        {
+          "clase": "container main-content",
+          "px": "24.0012px"
+        }
+      ],
+      "textoPx": 24.0012,
+      "botonPx": 55,
+      "desbordados": []
+    },
+    {
+      "ruta": "/",
+      "width": 2560,
+      "height": 1440,
+      "proyeccion": false,
+      "ancho": 2560,
+      "documento": 2560,
+      "shell": "app-shell public-shell",
+      "shellPx": "19.9998px",
+      "padres": [
+        {
+          "clase": "home-intro",
+          "px": "19.9998px"
+        },
+        {
+          "clase": "public-home",
+          "px": "19.9998px"
+        },
+        {
+          "clase": "container main-content",
+          "px": "19.9998px"
+        }
+      ],
+      "textoPx": 19.9998,
+      "botonPx": 49,
+      "desbordados": []
+    },
+    {
+      "ruta": "/explorar",
+      "width": 2560,
+      "height": 1440,
+      "proyeccion": false,
+      "ancho": 2560,
+      "documento": 2560,
+      "shell": "app-shell public-shell",
+      "shellPx": "19.9998px",
+      "padres": [
+        {
+          "clase": "constellation-card-copy",
+          "px": "19.9998px"
+        },
+        {
+          "clase": "constellation-card",
+          "px": "19.9998px"
+        },
+        {
+          "clase": "container main-content",
+          "px": "19.9998px"
+        }
+      ],
+      "textoPx": 19.0008,
+      "botonPx": 49,
+      "desbordados": []
+    },
+    {
+      "ruta": "/explorar/orion",
+      "width": 2560,
+      "height": 1440,
+      "proyeccion": false,
+      "ancho": 2560,
+      "documento": 2560,
+      "shell": "app-shell public-shell",
+      "shellPx": "19.9998px",
+      "padres": [
+        {
+          "clase": "",
+          "px": "19.9998px"
+        },
+        {
+          "clase": "detail-reading",
+          "px": "19.9998px"
+        },
+        {
+          "clase": "container main-content",
+          "px": "19.9998px"
+        }
+      ],
+      "textoPx": 19.9998,
+      "botonPx": 49,
+      "desbordados": []
+    },
+    {
+      "ruta": "/",
+      "width": 2560,
+      "height": 1440,
+      "proyeccion": true,
+      "ancho": 2560,
+      "documento": 2560,
+      "shell": "app-shell public-shell presentation-shell",
+      "shellPx": "24.0012px",
+      "padres": [
+        {
+          "clase": "home-intro",
+          "px": "24.0012px"
+        },
+        {
+          "clase": "public-home",
+          "px": "24.0012px"
+        },
+        {
+          "clase": "container main-content",
+          "px": "24.0012px"
+        }
+      ],
+      "textoPx": 24.0012,
+      "botonPx": 55,
+      "desbordados": []
+    },
+    {
+      "ruta": "/explorar",
+      "width": 2560,
+      "height": 1440,
+      "proyeccion": true,
+      "ancho": 2560,
+      "documento": 2560,
+      "shell": "app-shell public-shell presentation-shell",
+      "shellPx": "24.0012px",
+      "padres": [
+        {
+          "clase": "constellation-card-copy",
+          "px": "24.0012px"
+        },
+        {
+          "clase": "constellation-card",
+          "px": "24.0012px"
+        },
+        {
+          "clase": "container main-content",
+          "px": "24.0012px"
+        }
+      ],
+      "textoPx": 24.0012,
+      "botonPx": 55,
+      "desbordados": []
+    },
+    {
+      "ruta": "/explorar/orion",
+      "width": 2560,
+      "height": 1440,
+      "proyeccion": true,
+      "ancho": 2560,
+      "documento": 2560,
+      "shell": "app-shell public-shell presentation-shell",
+      "shellPx": "24.0012px",
+      "padres": [
+        {
+          "clase": "",
+          "px": "24.0012px"
+        },
+        {
+          "clase": "detail-reading",
+          "px": "24.0012px"
+        },
+        {
+          "clase": "container main-content",
+          "px": "24.0012px"
+        }
+      ],
+      "textoPx": 24.0012,
+      "botonPx": 55,
+      "desbordados": []
+    }
+  ],
+  "navegador": "157.0.8103.50",
+  "erroresPagina": [],
+  "correctos": 50,
+  "fallos": 0
+}

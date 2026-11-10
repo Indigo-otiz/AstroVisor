@@ -1,10 +1,12 @@
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuth } from '../composables/useAuth.js'
+import { hayBorradorPendiente, descartarBorradorPendiente } from '../composables/useEditorCatalogo.js'
 
 const router = useRouter()
-const { signIn, signOut, isAuthenticated, userDisplayName, loading, isSupabaseConfigured } = useAuth()
+const { signIn, signOut, isAuthenticated, userDisplayName, loading, verificarSesion } = useAuth()
+onMounted(verificarSesion)
 
 const username = ref('')
 const password = ref('')
@@ -13,6 +15,7 @@ const errorMessage = ref('')
 const isSubmitting = ref(false)
 
 async function handleLogout() {
+  descartarBorradorPendiente()
   await signOut()
 }
 
@@ -29,7 +32,6 @@ async function handleSubmit() {
     await signIn(username.value, password.value)
     router.push('/admin')
   } catch (err) {
-    console.error('Error al iniciar sesión:', err)
     if (err.message?.includes('Invalid login credentials') || err.message?.includes('incorrectos')) {
       errorMessage.value = 'Usuario o contraseña incorrectos.'
     } else {
@@ -111,9 +113,6 @@ async function handleSubmit() {
         <h2 class="card-title">Acceso del personal</h2>
         <p class="card-subtitle">Solo para personal autorizado de la biblioteca.</p>
 
-        <div v-if="!isSupabaseConfigured" class="env-notice">
-          <small>⚠️ Configura tu <strong>SUPABASE_PUBLISHABLE_KEY</strong> en <code>frontend/.env</code></small>
-        </div>
 
         <div v-if="isAuthenticated" class="active-session-box">
           <p>Sesión activa como: <strong>{{ userDisplayName }}</strong></p>
@@ -126,6 +125,7 @@ async function handleSubmit() {
         </div>
 
         <form v-else @submit.prevent="handleSubmit" class="auth-form" novalidate>
+          <p v-if="hayBorradorPendiente" role="status">Tu sesión terminó. Hay un borrador solo en memoria de esta pestaña. Inicia sesión con la misma cuenta para recuperarlo; no recargues ni cierres la pestaña.</p>
           <div v-if="errorMessage" class="error-banner" role="alert">
             {{ errorMessage }}
           </div>
@@ -138,7 +138,7 @@ async function handleSubmit() {
               type="text"
               required
               autocomplete="username"
-              placeholder="admin o root"
+              placeholder="Usuario configurado"
               :disabled="isSubmitting"
               class="styled-input"
             />
@@ -170,7 +170,7 @@ async function handleSubmit() {
           <button
             type="submit"
             class="btn-submit"
-            :disabled="isSubmitting || !isSupabaseConfigured"
+            :disabled="isSubmitting || loading"
           >
             <span v-if="isSubmitting">Verificando...</span>
             <span v-else>Entrar</span>

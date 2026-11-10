@@ -102,3 +102,13 @@ La [versión Word del informe individual](../../entregables/Sprint%204_Luis%20Ro
 ## Datos exigidos en una prueba física
 
 Registrar fecha real, persona, versión/commit o manifiesto, URL HTTPS, computadora y sistema, navegador/versión, resolución de salida, proyector/pantalla, tamaño de imagen y distancia/luz, red, salida de sonido, teléfono/visor cuando corresponda, pasos, resultado e incidencias. Adjuntar captura/video o identificar la fuente del reporte. Las pruebas de navegador y las fallas inducidas no equivalen a ensayo físico ni evaluación con personas adultas mayores.
+
+## Verificación de integración con main del 10 de noviembre
+
+Después de terminar el informe individual, Luis autorizó continuar con la subida, PR e integración. Se combinó S4 con `main` en `c294ecc167279dfb2f29b51371f278d5b6b9ef78`, que incorpora persistencia documental, biblioteca, visor actualizado y pie institucional. La combinación se aplicó sin conflictos; se conservaron esos cambios del equipo.
+
+El build integrado aprobó, junto con 132/132 pruebas backend, 153/153 frontend y 50/50 casos de navegador sin errores JavaScript. Los 50 casos reúnen los 44 anteriores y seis recorridos adicionales de biblioteca/libro y logos institucionales a 360, 1024 y 1920 px en ambas vistas. Las nuevas evidencias están en [integracion-main](evidencias/s4/integracion-main/README.md), separadas de las capturas y del video de la entrega inicial.
+
+La nueva API se comprobó con catálogo temporal y cuentas reales excluidas del proceso de prueba. Se adaptó el servidor auxiliar de QA para inicializar y cerrar ese almacén. La primera ejecución de suites detectó alias cortos de TEMP de Windows y una carrera al compilar mientras una prueba verificaba que el build no cambiara; se repitieron con ruta temporal nativa completa y build estable. No se modificó el código productivo del equipo para resolver esos problemas de ejecución.
+
+El zoom nativo, la reproducción del respaldo, las constancias físicas y la revisión de Índigo conservan las versiones y métodos descritos en sus registros anteriores; no se atribuyen repeticiones sobre esta combinación. El Word y el video conservan la entrega académica ya revisada. El manifiesto inicial `version.json` se mantiene como captura histórica; la versión combinada tiene su manifiesto propio en `integracion-main/version.json`.

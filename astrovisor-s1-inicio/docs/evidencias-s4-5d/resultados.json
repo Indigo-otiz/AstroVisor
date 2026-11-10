@@ -1,0 +1,53 @@
+{
+  "chrome": "156.0.8078.80",
+  "medidas": [
+    {
+      "innerWidth": 1280,
+      "clientWidth": 1280,
+      "scrollWidth": 1280,
+      "sinEtiqueta": 0
+    },
+    {
+      "innerWidth": 360,
+      "clientWidth": 360,
+      "scrollWidth": 360,
+      "sinEtiqueta": 0
+    }
+  ],
+  "lector": {
+    "tipos": [
+      "image/jpeg",
+      "image/png"
+    ],
+    "revision": 8
+  },
+  "homido": {
+    "online": [
+      {
+        "id": "aa-imagen-png",
+        "width": 180,
+        "blob": false
+      },
+      {
+        "id": "ab-imagen-jpeg",
+        "width": 180,
+        "blob": false
+      }
+    ],
+    "respaldo": [
+      {
+        "id": "aa-imagen-png",
+        "width": 180,
+        "blob": true
+      },
+      {
+        "id": "ab-imagen-jpeg",
+        "width": 180,
+        "blob": true
+      }
+    ],
+    "renderizado": "WebGL software, sin dispositivo físico"
+  },
+  "errores": [],
+  "revision": 8
+}

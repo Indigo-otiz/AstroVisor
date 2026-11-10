@@ -1,0 +1,316 @@
+{
+  "paso": "abrir-alta",
+  "ms": 38809,
+  "error": "TimeoutError",
+  "estado": {
+    "ruta": "/admin",
+    "activo": "editor-resultados",
+    "botonDeshabilitado": false,
+    "formulario": false,
+    "eventos": [
+      {
+        "ms": 1794249038138,
+        "evento": "focusin",
+        "activo": "admin-user",
+        "destino": "admin-user",
+        "disabled": null,
+        "formulario": false
+      },
+      {
+        "ms": 1794249038164,
+        "evento": "focusin",
+        "activo": "admin-password",
+        "destino": "admin-password",
+        "disabled": null,
+        "formulario": false
+      },
+      {
+        "ms": 1794249038510,
+        "evento": "focusin",
+        "activo": "",
+        "destino": "",
+        "disabled": null,
+        "formulario": false
+      },
+      {
+        "ms": 1794249039828,
+        "evento": "focusin",
+        "activo": "nuevo-libro",
+        "destino": "nuevo-libro",
+        "disabled": false,
+        "formulario": false
+      },
+      {
+        "ms": 1794249039832,
+        "evento": "keydown",
+        "activo": "nuevo-libro",
+        "destino": "nuevo-libro",
+        "disabled": false,
+        "formulario": false
+      },
+      {
+        "ms": 1794249039859,
+        "evento": "focusin",
+        "activo": "editor-heading",
+        "destino": "editor-heading",
+        "disabled": true,
+        "formulario": true
+      },
+      {
+        "ms": 1794249039875,
+        "evento": "focusin",
+        "activo": "nuevo-id",
+        "destino": "nuevo-id",
+        "disabled": true,
+        "formulario": true
+      },
+      {
+        "ms": 1794249039914,
+        "evento": "focusin",
+        "activo": "nuevo-titulo",
+        "destino": "nuevo-titulo",
+        "disabled": true,
+        "formulario": true
+      },
+      {
+        "ms": 1794249039932,
+        "evento": "focusin",
+        "activo": "nuevo-autor",
+        "destino": "nuevo-autor",
+        "disabled": true,
+        "formulario": true
+      },
+      {
+        "ms": 1794249040267,
+        "evento": "focusin",
+        "activo": "imagen-procedencia",
+        "destino": "imagen-procedencia",
+        "disabled": true,
+        "formulario": true
+      },
+      {
+        "ms": 1794249040302,
+        "evento": "focusin",
+        "activo": "imagen-permiso",
+        "destino": "imagen-permiso",
+        "disabled": true,
+        "formulario": true
+      },
+      {
+        "ms": 1794249040323,
+        "evento": "focusin",
+        "activo": "imagen-alternativa",
+        "destino": "imagen-alternativa",
+        "disabled": true,
+        "formulario": true
+      },
+      {
+        "ms": 1794249040341,
+        "evento": "focusin",
+        "activo": "editor-anio",
+        "destino": "editor-anio",
+        "disabled": true,
+        "formulario": true
+      },
+      {
+        "ms": 1794249040360,
+        "evento": "focusin",
+        "activo": "editor-enlace",
+        "destino": "editor-enlace",
+        "disabled": true,
+        "formulario": true
+      },
+      {
+        "ms": 1794249040990,
+        "evento": "focusin",
+        "activo": "",
+        "destino": "",
+        "disabled": true,
+        "formulario": true
+      },
+      {
+        "ms": 1794249041183,
+        "evento": "focusin",
+        "activo": "",
+        "destino": "",
+        "disabled": true,
+        "formulario": true
+      },
+      {
+        "ms": 1794249041204,
+        "evento": "focusin",
+        "activo": "motivo-orion",
+        "destino": "motivo-orion",
+        "disabled": true,
+        "formulario": true
+      },
+      {
+        "ms": 1794249041225,
+        "evento": "focusin",
+        "activo": "motivo-escorpio",
+        "destino": "motivo-escorpio",
+        "disabled": true,
+        "formulario": true
+      },
+      {
+        "ms": 1794249042520,
+        "evento": "focusin",
+        "activo": "imagen-alternativa",
+        "destino": "imagen-alternativa",
+        "disabled": true,
+        "formulario": true
+      },
+      {
+        "ms": 1794249042525,
+        "evento": "focusin",
+        "activo": "editor-anio",
+        "destino": "editor-anio",
+        "disabled": true,
+        "formulario": true
+      },
+      {
+        "ms": 1794249042589,
+        "evento": "focusin",
+        "activo": "",
+        "destino": "",
+        "disabled": true,
+        "formulario": true
+      },
+      {
+        "ms": 1794249042780,
+        "evento": "focusin",
+        "activo": "editor-resultados",
+        "destino": "editor-resultados",
+        "disabled": false,
+        "formulario": false
+      },
+      {
+        "ms": 1794249042780,
+        "evento": "keydown",
+        "activo": "editor-resultados",
+        "destino": "editor-resultados",
+        "disabled": false,
+        "formulario": false
+      }
+    ],
+    "alertas": []
+  },
+  "health": 200,
+  "browserConectado": true,
+  "apiEscuchando": true,
+  "pendientes": [],
+  "red": [
+    {
+      "ms": 4527,
+      "metodo": "POST",
+      "ruta": "/api/admin/login",
+      "evento": "solicitud"
+    },
+    {
+      "ms": 4527,
+      "metodo": "POST",
+      "ruta": "/api/admin/login",
+      "evento": "respuesta",
+      "estado": 200,
+      "respuestaMs": 5515
+    },
+    {
+      "ms": 5528,
+      "metodo": "GET",
+      "ruta": "/api/admin/sesion",
+      "evento": "solicitud"
+    },
+    {
+      "ms": 5528,
+      "metodo": "GET",
+      "ruta": "/api/admin/sesion",
+      "evento": "respuesta",
+      "estado": 200,
+      "respuestaMs": 5539
+    },
+    {
+      "ms": 5638,
+      "metodo": "GET",
+      "ruta": "/api/admin/catalogo",
+      "evento": "solicitud"
+    },
+    {
+      "ms": 5638,
+      "metodo": "GET",
+      "ruta": "/api/admin/catalogo",
+      "evento": "respuesta",
+      "estado": 200,
+      "respuestaMs": 5646
+    },
+    {
+      "ms": 5965,
+      "metodo": "POST",
+      "ruta": "/api/admin/imagenes",
+      "evento": "solicitud"
+    },
+    {
+      "ms": 5965,
+      "metodo": "POST",
+      "ruta": "/api/admin/imagenes",
+      "evento": "respuesta",
+      "estado": 201,
+      "respuestaMs": 6062
+    },
+    {
+      "ms": 8558,
+      "metodo": "POST",
+      "ruta": "/api/admin/libros",
+      "evento": "solicitud"
+    },
+    {
+      "ms": 8558,
+      "metodo": "POST",
+      "ruta": "/api/admin/libros",
+      "evento": "respuesta",
+      "estado": 201,
+      "respuestaMs": 8658
+    },
+    {
+      "ms": 8666,
+      "metodo": "GET",
+      "ruta": "/api/admin/catalogo",
+      "evento": "solicitud"
+    },
+    {
+      "ms": 8666,
+      "metodo": "GET",
+      "ruta": "/api/admin/catalogo",
+      "evento": "respuesta",
+      "estado": 200,
+      "respuestaMs": 8728
+    },
+    {
+      "ms": 8743,
+      "metodo": "GET",
+      "ruta": "/api/contenidos/libros/aa-imagen-png/portada.png",
+      "evento": "solicitud"
+    },
+    {
+      "ms": 8743,
+      "metodo": "GET",
+      "ruta": "/api/contenidos/libros/aa-imagen-png/portada.png",
+      "evento": "respuesta",
+      "estado": 200,
+      "respuestaMs": 8781
+    }
+  ],
+  "consola": [
+    {
+      "ms": 3083,
+      "tipo": "debug",
+      "texto": "[vite] connecting..."
+    },
+    {
+      "ms": 3098,
+      "tipo": "debug",
+      "texto": "[vite] connected."
+    }
+  ],
+  "errores": [],
+  "pid": 72244
+}

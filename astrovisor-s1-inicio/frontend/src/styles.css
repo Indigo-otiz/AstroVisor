@@ -31,6 +31,14 @@ h2 { font-size: 1.35rem; }
 .alert { padding: 1rem; color: #8f1b1b; background: #fff1f1; border: 1px solid #ddaaaa; }
 .support-text, .site-footer { color: #4e6078; }
 .site-footer { padding: 1.2rem 0; border-top: 1px solid #d9e0e8; font-size: .82rem; }
+.institutional-footer-logos { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 2rem; padding: 0; margin: 0 0 1.5rem; list-style: none; }
+.institutional-footer-logos li { min-width: 0; max-width: 100%; }
+.institutional-footer-logos img { display: block; max-width: 100%; height: auto; object-fit: contain; }
+.institutional-logo-library { width: 300px; }
+.institutional-logo-tecnm { width: 270px; }
+.institutional-logo-tepic { width: 96px; }
+.institutional-footer p { margin: 0; }
+@media (max-width: 600px) { .institutional-footer-logos { justify-content: center; gap: 1.5rem; } }
 .narrow { max-width: 730px; }
 .skip-link { position: absolute; left: -9999px; top: .25rem; background: #fff; color: #111; padding: .6rem; z-index: 20; }
 .skip-link:focus { left: .25rem; }
@@ -932,4 +940,30 @@ h2 { font-size: 1.35rem; }
   .admin-topbar {
     padding: 0.8rem 1rem;
   }
+}
+
+
+.books-title-group {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.badge-postergado {
+  background: #fef3c7;
+  color: #92400e;
+  font-size: 0.78rem;
+  font-weight: 600;
+  padding: 0.25rem 0.65rem;
+  border-radius: 9999px;
+  border: 1px solid #fde68a;
+}
+
+.admin-note {
+  font-size: 0.85rem;
+  color: #64748b;
+  margin-top: -0.8rem;
+  margin-bottom: 1.2rem;
+  line-height: 1.4;
 }

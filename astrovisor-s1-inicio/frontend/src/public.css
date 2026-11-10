@@ -10,7 +10,7 @@
   color: var(--ink);
   font-size: 1.1111rem;
   line-height: 1.65;
-  overflow-wrap: break-word;
+  overflow-wrap: anywhere;
 }
 .public-shell ::selection {
   background: var(--accent);
@@ -503,6 +503,52 @@
 .narracion-transcripcion dl { font-size: 1rem; }
 .narracion-transcripcion dt { margin-top: 12px; font-weight: 700; }
 .narracion-transcripcion dd { margin-left: 0; color: var(--muted); }
+.constelacion-libros .libro-ficha {
+  margin-top: 14px;
+}
+.constelacion-libros .libro-etiqueta {
+  color: var(--muted);
+  font-size: 0.9444rem;
+  margin: 0 0 4px !important;
+}
+.constelacion-libros .libro-titulo {
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 1.3333rem;
+  color: var(--night);
+  margin: 0 0 6px !important;
+  font-weight: 700;
+}
+.constelacion-libros .libro-autor {
+  font-size: 1.0556rem;
+  margin: 0 0 8px !important;
+}
+.constelacion-libros .libro-aclaracion {
+  color: var(--muted);
+  font-size: 0.9444rem;
+  line-height: 1.55;
+  margin: 0 0 14px !important;
+}
+.constelacion-libros .libro-enlace-contenedor {
+  margin: 8px 0 0 !important;
+}
+.constelacion-libros .libro-enlace {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--blue);
+  font-weight: 650;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+.constelacion-libros .libro-enlace:hover {
+  color: var(--night);
+}
+.constelacion-libros .libro-enlace-icono {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+}
+
 @media (max-width: 960px) {
   .public-shell .header-content {
     gap: 12px;

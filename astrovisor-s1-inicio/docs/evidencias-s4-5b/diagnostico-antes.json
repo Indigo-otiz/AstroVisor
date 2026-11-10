@@ -1,0 +1,609 @@
+{
+  "antes": {
+    "innerWidth": 360,
+    "clientWidth": 360,
+    "scrollWidth": 447,
+    "bodyScrollWidth": 224,
+    "visualViewport": {
+      "width": 360,
+      "height": 900,
+      "scale": 1,
+      "offsetLeft": 0
+    },
+    "elementos": [
+      {
+        "selector": "#contenido",
+        "x": 40,
+        "derecha": 320,
+        "ancho": 280,
+        "clientWidth": 140,
+        "scrollWidth": 197,
+        "minWidth": "auto",
+        "grid": "none",
+        "overflowWrap": "break-word"
+      },
+      {
+        "selector": ".biblioteca-page",
+        "x": 40,
+        "derecha": 320,
+        "ancho": 280,
+        "clientWidth": 140,
+        "scrollWidth": 197,
+        "minWidth": "0px",
+        "grid": "none",
+        "overflowWrap": "break-word"
+      },
+      {
+        "selector": ".biblioteca-detalle",
+        "x": 40,
+        "derecha": 320,
+        "ancho": 280,
+        "clientWidth": 140,
+        "scrollWidth": 197,
+        "minWidth": "0px",
+        "grid": "197.461px",
+        "overflowWrap": "break-word"
+      },
+      {
+        "selector": ".biblioteca-detalle-portada",
+        "x": 40,
+        "derecha": 324.34375,
+        "ancho": 284.34375,
+        "clientWidth": 142,
+        "scrollWidth": 142,
+        "minWidth": "auto",
+        "grid": "none",
+        "overflowWrap": "break-word"
+      },
+      {
+        "selector": ".biblioteca-detalle-info",
+        "x": 40,
+        "derecha": 434.921875,
+        "ancho": 394.921875,
+        "clientWidth": 197,
+        "scrollWidth": 197,
+        "minWidth": "auto",
+        "grid": "none",
+        "overflowWrap": "break-word"
+      },
+      {
+        "selector": ".biblioteca-buscar",
+        "x": 40,
+        "derecha": 434.921875,
+        "ancho": 394.921875,
+        "clientWidth": 195,
+        "scrollWidth": 195,
+        "minWidth": "0px",
+        "grid": "none",
+        "overflowWrap": "break-word"
+      },
+      {
+        "selector": ".biblioteca-marc",
+        "x": 88.796875,
+        "derecha": 386.125,
+        "ancho": 297.328125,
+        "clientWidth": 149,
+        "scrollWidth": 149,
+        "minWidth": "0px",
+        "grid": "none",
+        "overflowWrap": "break-word"
+      },
+      {
+        "selector": ".biblioteca-boton",
+        "x": 40,
+        "derecha": 434.921875,
+        "ancho": 394.921875,
+        "clientWidth": 197,
+        "scrollWidth": 197,
+        "minWidth": "0px",
+        "grid": "none",
+        "overflowWrap": "break-word"
+      }
+    ],
+    "exceden": [
+      {
+        "tag": "A",
+        "clase": "brand",
+        "derecha": 447.046875,
+        "ancho": 407.046875
+      },
+      {
+        "tag": "DIV",
+        "clase": "biblioteca-detalle-info",
+        "derecha": 434.921875,
+        "ancho": 394.921875
+      },
+      {
+        "tag": "P",
+        "clase": "biblioteca-autor",
+        "derecha": 434.921875,
+        "ancho": 394.921875
+      },
+      {
+        "tag": "SECTION",
+        "clase": "",
+        "derecha": 434.921875,
+        "ancho": 394.921875
+      },
+      {
+        "tag": "H2",
+        "clase": "",
+        "derecha": 434.921875,
+        "ancho": 394.921875
+      },
+      {
+        "tag": "P",
+        "clase": "",
+        "derecha": 434.921875,
+        "ancho": 394.921875
+      },
+      {
+        "tag": "SECTION",
+        "clase": "biblioteca-buscar",
+        "derecha": 434.921875,
+        "ancho": 394.921875
+      },
+      {
+        "tag": "H2",
+        "clase": "",
+        "derecha": 386.125,
+        "ancho": 297.328125
+      },
+      {
+        "tag": "P",
+        "clase": "",
+        "derecha": 386.125,
+        "ancho": 297.328125
+      },
+      {
+        "tag": "P",
+        "clase": "",
+        "derecha": 386.125,
+        "ancho": 297.328125
+      },
+      {
+        "tag": "DETAILS",
+        "clase": "biblioteca-marc",
+        "derecha": 386.125,
+        "ancho": 297.328125
+      },
+      {
+        "tag": "SUMMARY",
+        "clase": "",
+        "derecha": 386.125,
+        "ancho": 297.328125
+      },
+      {
+        "tag": "P",
+        "clase": "",
+        "derecha": 386.125,
+        "ancho": 297.328125
+      },
+      {
+        "tag": "P",
+        "clase": "",
+        "derecha": 386.125,
+        "ancho": 297.328125
+      }
+    ]
+  },
+  "hipotesis": [
+    {
+      "css": ".biblioteca-detalle-info{min-width:0}",
+      "medida": {
+        "innerWidth": 360,
+        "clientWidth": 360,
+        "scrollWidth": 447,
+        "bodyScrollWidth": 224,
+        "visualViewport": {
+          "width": 360,
+          "height": 900,
+          "scale": 1,
+          "offsetLeft": 0
+        },
+        "elementos": [
+          {
+            "selector": "#contenido",
+            "x": 40,
+            "derecha": 320,
+            "ancho": 280,
+            "clientWidth": 140,
+            "scrollWidth": 140,
+            "minWidth": "auto",
+            "grid": "none",
+            "overflowWrap": "break-word"
+          },
+          {
+            "selector": ".biblioteca-page",
+            "x": 40,
+            "derecha": 320,
+            "ancho": 280,
+            "clientWidth": 140,
+            "scrollWidth": 140,
+            "minWidth": "0px",
+            "grid": "none",
+            "overflowWrap": "break-word"
+          },
+          {
+            "selector": ".biblioteca-detalle",
+            "x": 40,
+            "derecha": 320,
+            "ancho": 280,
+            "clientWidth": 140,
+            "scrollWidth": 140,
+            "minWidth": "0px",
+            "grid": "140px",
+            "overflowWrap": "break-word"
+          },
+          {
+            "selector": ".biblioteca-detalle-portada",
+            "x": 40,
+            "derecha": 241.59375,
+            "ancho": 201.59375,
+            "clientWidth": 101,
+            "scrollWidth": 101,
+            "minWidth": "auto",
+            "grid": "none",
+            "overflowWrap": "break-word"
+          },
+          {
+            "selector": ".biblioteca-detalle-info",
+            "x": 40,
+            "derecha": 320,
+            "ancho": 280,
+            "clientWidth": 140,
+            "scrollWidth": 140,
+            "minWidth": "0px",
+            "grid": "none",
+            "overflowWrap": "break-word"
+          },
+          {
+            "selector": ".biblioteca-buscar",
+            "x": 40,
+            "derecha": 320,
+            "ancho": 280,
+            "clientWidth": 138,
+            "scrollWidth": 138,
+            "minWidth": "0px",
+            "grid": "none",
+            "overflowWrap": "break-word"
+          },
+          {
+            "selector": ".biblioteca-marc",
+            "x": 88.796875,
+            "derecha": 271.203125,
+            "ancho": 182.40625,
+            "clientWidth": 91,
+            "scrollWidth": 91,
+            "minWidth": "0px",
+            "grid": "none",
+            "overflowWrap": "break-word"
+          },
+          {
+            "selector": ".biblioteca-boton",
+            "x": 40,
+            "derecha": 320,
+            "ancho": 280,
+            "clientWidth": 140,
+            "scrollWidth": 140,
+            "minWidth": "0px",
+            "grid": "none",
+            "overflowWrap": "break-word"
+          }
+        ],
+        "exceden": [
+          {
+            "tag": "A",
+            "clase": "brand",
+            "derecha": 447.046875,
+            "ancho": 407.046875
+          }
+        ]
+      }
+    },
+    {
+      "css": ".biblioteca-detalle{grid-template-columns:minmax(0,1fr)}",
+      "medida": {
+        "innerWidth": 360,
+        "clientWidth": 360,
+        "scrollWidth": 447,
+        "bodyScrollWidth": 224,
+        "visualViewport": {
+          "width": 360,
+          "height": 900,
+          "scale": 1,
+          "offsetLeft": 0
+        },
+        "elementos": [
+          {
+            "selector": "#contenido",
+            "x": 40,
+            "derecha": 320,
+            "ancho": 280,
+            "clientWidth": 140,
+            "scrollWidth": 197,
+            "minWidth": "auto",
+            "grid": "none",
+            "overflowWrap": "break-word"
+          },
+          {
+            "selector": ".biblioteca-page",
+            "x": 40,
+            "derecha": 320,
+            "ancho": 280,
+            "clientWidth": 140,
+            "scrollWidth": 197,
+            "minWidth": "0px",
+            "grid": "none",
+            "overflowWrap": "break-word"
+          },
+          {
+            "selector": ".biblioteca-detalle",
+            "x": 40,
+            "derecha": 320,
+            "ancho": 280,
+            "clientWidth": 140,
+            "scrollWidth": 197,
+            "minWidth": "0px",
+            "grid": "197.461px",
+            "overflowWrap": "break-word"
+          },
+          {
+            "selector": ".biblioteca-detalle-portada",
+            "x": 40,
+            "derecha": 324.34375,
+            "ancho": 284.34375,
+            "clientWidth": 142,
+            "scrollWidth": 142,
+            "minWidth": "auto",
+            "grid": "none",
+            "overflowWrap": "break-word"
+          },
+          {
+            "selector": ".biblioteca-detalle-info",
+            "x": 40,
+            "derecha": 434.921875,
+            "ancho": 394.921875,
+            "clientWidth": 197,
+            "scrollWidth": 197,
+            "minWidth": "auto",
+            "grid": "none",
+            "overflowWrap": "break-word"
+          },
+          {
+            "selector": ".biblioteca-buscar",
+            "x": 40,
+            "derecha": 434.921875,
+            "ancho": 394.921875,
+            "clientWidth": 195,
+            "scrollWidth": 195,
+            "minWidth": "0px",
+            "grid": "none",
+            "overflowWrap": "break-word"
+          },
+          {
+            "selector": ".biblioteca-marc",
+            "x": 88.796875,
+            "derecha": 386.125,
+            "ancho": 297.328125,
+            "clientWidth": 149,
+            "scrollWidth": 149,
+            "minWidth": "0px",
+            "grid": "none",
+            "overflowWrap": "break-word"
+          },
+          {
+            "selector": ".biblioteca-boton",
+            "x": 40,
+            "derecha": 434.921875,
+            "ancho": 394.921875,
+            "clientWidth": 197,
+            "scrollWidth": 197,
+            "minWidth": "0px",
+            "grid": "none",
+            "overflowWrap": "break-word"
+          }
+        ],
+        "exceden": [
+          {
+            "tag": "A",
+            "clase": "brand",
+            "derecha": 447.046875,
+            "ancho": 407.046875
+          },
+          {
+            "tag": "DIV",
+            "clase": "biblioteca-detalle-info",
+            "derecha": 434.921875,
+            "ancho": 394.921875
+          },
+          {
+            "tag": "P",
+            "clase": "biblioteca-autor",
+            "derecha": 434.921875,
+            "ancho": 394.921875
+          },
+          {
+            "tag": "SECTION",
+            "clase": "",
+            "derecha": 434.921875,
+            "ancho": 394.921875
+          },
+          {
+            "tag": "H2",
+            "clase": "",
+            "derecha": 434.921875,
+            "ancho": 394.921875
+          },
+          {
+            "tag": "P",
+            "clase": "",
+            "derecha": 434.921875,
+            "ancho": 394.921875
+          },
+          {
+            "tag": "SECTION",
+            "clase": "biblioteca-buscar",
+            "derecha": 434.921875,
+            "ancho": 394.921875
+          },
+          {
+            "tag": "H2",
+            "clase": "",
+            "derecha": 386.125,
+            "ancho": 297.328125
+          },
+          {
+            "tag": "P",
+            "clase": "",
+            "derecha": 386.125,
+            "ancho": 297.328125
+          },
+          {
+            "tag": "P",
+            "clase": "",
+            "derecha": 386.125,
+            "ancho": 297.328125
+          },
+          {
+            "tag": "DETAILS",
+            "clase": "biblioteca-marc",
+            "derecha": 386.125,
+            "ancho": 297.328125
+          },
+          {
+            "tag": "SUMMARY",
+            "clase": "",
+            "derecha": 386.125,
+            "ancho": 297.328125
+          },
+          {
+            "tag": "P",
+            "clase": "",
+            "derecha": 386.125,
+            "ancho": 297.328125
+          },
+          {
+            "tag": "P",
+            "clase": "",
+            "derecha": 386.125,
+            "ancho": 297.328125
+          }
+        ]
+      }
+    },
+    {
+      "css": ".biblioteca-page{overflow-wrap:anywhere}",
+      "medida": {
+        "innerWidth": 360,
+        "clientWidth": 360,
+        "scrollWidth": 447,
+        "bodyScrollWidth": 224,
+        "visualViewport": {
+          "width": 360,
+          "height": 900,
+          "scale": 1,
+          "offsetLeft": 0
+        },
+        "elementos": [
+          {
+            "selector": "#contenido",
+            "x": 40,
+            "derecha": 320,
+            "ancho": 280,
+            "clientWidth": 140,
+            "scrollWidth": 140,
+            "minWidth": "auto",
+            "grid": "none",
+            "overflowWrap": "break-word"
+          },
+          {
+            "selector": ".biblioteca-page",
+            "x": 40,
+            "derecha": 320,
+            "ancho": 280,
+            "clientWidth": 140,
+            "scrollWidth": 140,
+            "minWidth": "0px",
+            "grid": "none",
+            "overflowWrap": "anywhere"
+          },
+          {
+            "selector": ".biblioteca-detalle",
+            "x": 40,
+            "derecha": 320,
+            "ancho": 280,
+            "clientWidth": 140,
+            "scrollWidth": 140,
+            "minWidth": "0px",
+            "grid": "140px",
+            "overflowWrap": "anywhere"
+          },
+          {
+            "selector": ".biblioteca-detalle-portada",
+            "x": 40,
+            "derecha": 241.59375,
+            "ancho": 201.59375,
+            "clientWidth": 101,
+            "scrollWidth": 101,
+            "minWidth": "auto",
+            "grid": "none",
+            "overflowWrap": "anywhere"
+          },
+          {
+            "selector": ".biblioteca-detalle-info",
+            "x": 40,
+            "derecha": 320,
+            "ancho": 280,
+            "clientWidth": 140,
+            "scrollWidth": 140,
+            "minWidth": "auto",
+            "grid": "none",
+            "overflowWrap": "anywhere"
+          },
+          {
+            "selector": ".biblioteca-buscar",
+            "x": 40,
+            "derecha": 320,
+            "ancho": 280,
+            "clientWidth": 138,
+            "scrollWidth": 138,
+            "minWidth": "0px",
+            "grid": "none",
+            "overflowWrap": "anywhere"
+          },
+          {
+            "selector": ".biblioteca-marc",
+            "x": 88.796875,
+            "derecha": 271.203125,
+            "ancho": 182.40625,
+            "clientWidth": 91,
+            "scrollWidth": 91,
+            "minWidth": "0px",
+            "grid": "none",
+            "overflowWrap": "anywhere"
+          },
+          {
+            "selector": ".biblioteca-boton",
+            "x": 40,
+            "derecha": 320,
+            "ancho": 280,
+            "clientWidth": 140,
+            "scrollWidth": 140,
+            "minWidth": "0px",
+            "grid": "none",
+            "overflowWrap": "anywhere"
+          }
+        ],
+        "exceden": [
+          {
+            "tag": "A",
+            "clase": "brand",
+            "derecha": 447.046875,
+            "ancho": 407.046875
+          }
+        ]
+      }
+    }
+  ]
+}

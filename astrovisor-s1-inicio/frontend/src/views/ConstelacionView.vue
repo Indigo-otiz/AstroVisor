@@ -48,6 +48,15 @@ watch(tituloPagina, (titulo) => { document.title = `${titulo} · AstroVisor` }, 
             <p>{{ constelacion.comoReconocerla }}</p>
           </section>
           <NarracionAudio :key="constelacion.id" :constelacion="constelacion" />
+          <section class="invitacion-lectura" aria-labelledby="invitacion-lectura-titulo">
+            <p class="invitacion-lectura-etiqueta">Tu viaje por las estrellas continúa en los libros</p>
+            <h2 id="invitacion-lectura-titulo">¿Te gustaría conocer más sobre {{ constelacion.titulo }}?</h2>
+            <p>Descubre tres lecturas recomendadas y explora una estantería digital creada para disfrutar con calma.</p>
+            <RouterLink class="public-button" :to="{ name: 'biblioteca', params: { id: constelacion.id } }">
+              Ver libros recomendados sobre {{ constelacion.titulo }}
+            </RouterLink>
+            <p class="invitacion-nota">Las portadas y los datos de catálogo son de demostración; los ejemplares físicos no se han confirmado.</p>
+          </section>
           <RouterLink class="public-button" to="/explorar"
             >Explorar otra constelación
             <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12h15m-6-6 6 6-6 6" /></svg
@@ -65,3 +74,12 @@ watch(tituloPagina, (titulo) => { document.title = `${titulo} · AstroVisor` }, 
     </p>
   </section>
 </template>
+
+<style scoped>
+.invitacion-lectura { padding: 1.4rem; background: #fff6df; border: 2px solid #d0a348; border-radius: 18px; }
+.invitacion-lectura .invitacion-lectura-etiqueta { color: #775000; font-weight: 700; font-size: .93rem; margin-bottom: .6rem; }
+.invitacion-lectura h2 { font-family: Georgia, 'Times New Roman', serif; margin-bottom: .7rem; }
+.invitacion-lectura p { margin-bottom: 1rem; }
+.invitacion-lectura .public-button { width: 100%; min-height: 58px; text-align: center; }
+.invitacion-lectura .invitacion-nota { font-size: .86rem; color: #4d515d; margin-top: .9rem; margin-bottom: 0; }
+</style>

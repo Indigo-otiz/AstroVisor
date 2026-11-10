@@ -5,7 +5,7 @@ const assert = require('node:assert/strict')
 const fs = require('node:fs/promises')
 const path = require('node:path')
 const base = process.env.S4_URL || 'http://127.0.0.1:5194'
-const out = path.resolve(__dirname, '../docs/evidencias/s4')
+const out = process.env.S4_EVIDENCE_DIR ? path.resolve(process.env.S4_EVIDENCE_DIR) : path.resolve(__dirname, '../docs/evidencias/s4')
 const report = { fechaUTC: new Date().toISOString(), zona: 'America/Mexico_City', origen: base,
   metodo: 'Playwright, Chrome de escritorio; viewports configurados, no hardware físico', casos: [], distribucion: [] }
 const delay = ms => new Promise(r => setTimeout(r, ms))
@@ -158,7 +158,26 @@ async function distribucion(ruta, width, height, proyeccion, captura) {
     await page.goto(base + '/prueba-homido/index.html')
     await page.getByRole('link',{name:'Regresar al modo web 2D'}).click(); await page.locator('.constellation-grid').waitFor()
     await page.unroute(ruta)
-    return 'CDN bloqueada intencionalmente; retorno 2D con API disponible'
+    return 'Motor A-Frame bloqueado intencionalmente; retorno 2D con API disponible'
+  })
+  for (const ancho of [360, 1024, 1920]) for (const modo of [false, true]) await caso(`integracion biblioteca y footer ${ancho} ${modo}`, async () => {
+    await page.setViewportSize({ width: ancho, height: 900 }); await listo('/explorar/orion')
+    if (modo) await page.getByRole('button', { name: 'Vista para proyección', exact: true }).click()
+    await page.getByRole('link', { name: 'Ver libros recomendados sobre Orión', exact: true }).click()
+    await page.locator('.biblioteca-rejilla').waitFor()
+    assert.equal(await page.locator('.presentation-toggle').getAttribute('aria-pressed'), String(modo))
+    const comprobarAncho = async () => assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1), 'Biblioteca fuera del ancho')
+    await comprobarAncho()
+    const logos = page.locator('.institutional-footer-logos img')
+    assert.equal(await logos.count(), 3)
+    await page.waitForFunction(() => [...document.querySelectorAll('.institutional-footer-logos img')].every(img => img.complete && img.naturalWidth > 0))
+    await page.getByRole('link', { name: 'Ver información del libro', exact: true }).first().click()
+    await page.locator('.biblioteca-detalle').waitFor(); await comprobarAncho()
+    assert.equal(await page.locator('.presentation-toggle').getAttribute('aria-pressed'), String(modo))
+    await page.screenshot({ path: path.join(out, `biblioteca-${ancho}-${modo ? 'proyeccion' : 'habitual'}.png`), fullPage: true })
+    await page.getByRole('link', { name: '← Volver a los libros sobre Orión', exact: true }).click()
+    await page.locator('.biblioteca-rejilla').waitFor()
+    return 'Recorrido de constelación a estantería y libro; estado conservado, sin desbordamiento y tres logos institucionales cargados'
   })
   await caso('aislamiento de presentacion y administracion protegida', async () => {
     await listo('/'); await page.getByRole('button',{name:'Vista para proyección',exact:true}).click()

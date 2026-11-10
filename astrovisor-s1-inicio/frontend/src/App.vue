@@ -3,12 +3,14 @@ import { computed, nextTick, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import './public.css'
 const route = useRoute()
-const esPublica = computed(() => ['inicio', 'explorar', 'constelacion'].includes(route.name))
+const esPublica = computed(() => ['inicio', 'explorar', 'constelacion', 'biblioteca', 'libro'].includes(route.name))
 const esAdmin = computed(() => ['admin', 'admin-acceso'].includes(route.name))
 const presentacion = ref(false)
 const titulos = {
   inicio: 'Inicio',
   explorar: 'Constelaciones e historias del cielo',
+  biblioteca: 'La biblioteca de las estrellas',
+  libro: 'Información de libro',
   visor: 'Modo Homido',
   'admin-acceso': 'Acceso administrativo',
   admin: 'Panel de administración',
@@ -17,7 +19,7 @@ watch(
   () => route.fullPath,
   async () => {
     // La ficha resuelve su propio título al terminar la consulta documental.
-    if (route.name !== 'constelacion') {
+    if (route.name !== 'constelacion' && route.name !== 'biblioteca' && route.name !== 'libro') {
       document.title = `${titulos[route.name] ?? 'Historias del cielo'} · AstroVisor`
     }
     await nextTick()
@@ -66,8 +68,13 @@ watch(
     </main>
 
     <!-- Footer general: solo en vistas públicas -->
-    <footer v-if="!esAdmin" class="container site-footer">
-      <p>Prototipo académico · Contenido de demostración · Material de la biblioteca pendiente.</p>
+    <footer v-if="!esAdmin" class="container site-footer institutional-footer">
+      <ul class="institutional-footer-logos" aria-label="Instituciones">
+        <li><img class="institutional-logo-library" src="/institucional/biblioteca-solon-arguello.png" width="1000" height="430" alt="Biblioteca Pública Central Estatal Solón Argüello" /></li>
+        <li><img class="institutional-logo-tecnm" src="/Logo%20TecNMs.png" width="961" height="428" alt="Tecnológico Nacional de México" /></li>
+        <li><img class="institutional-logo-tepic" src="/ITTepic_logo.jpg" width="225" height="225" alt="Instituto Tecnológico de Tepic" /></li>
+      </ul>
+      <p>Prototipo académico · Contenido de demostración.</p>
     </footer>
   </div>
 </template>

@@ -7,6 +7,10 @@
     "backend"
   ],
   "scripts": {
+    "exportar:homido": "node scripts/exportar-homido.mjs",
+    "dev:homido:respaldo": "node scripts/servir-homido-dev.mjs",
+    "init:catalogo": "node scripts/inicializar-catalogo.mjs",
+    "configurar:admin": "node scripts/configurar-admin.mjs",
     "test:web": "npm run test --workspace frontend",
     "dev:web": "npm run dev --workspace frontend",
     "dev:api": "npm run dev --workspace backend",

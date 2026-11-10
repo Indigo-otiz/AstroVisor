@@ -1,4 +1,5 @@
 import { audioDe, crearNarrador } from '../audio/narration.js'
+import { cargarDatosCompartidos } from './js/datos.js'
 
 const $ = (id) => document.getElementById(id)
 const narrador = crearNarrador()
@@ -60,9 +61,7 @@ async function cargar() {
   $('storiesStatus').textContent = 'Cargando historias…'
   $('retryStories').hidden = true
   try {
-    const respuesta = await fetch('/api/contenidos/recorridos', { credentials: 'same-origin' })
-    if (!respuesta.ok) throw new Error('HTTP')
-    const datos = await respuesta.json()
+    const datos = (await cargarDatosCompartidos()).datos
     if (!Array.isArray(datos)) throw new Error('Documento')
     historias = ['orion', 'osa-mayor', 'escorpio'].map((id) => datos.find((x) => x?.id === id))
     if (historias.some((x) => !x || !['titulo', 'resumen', 'historia'].every((campo) => typeof x[campo] === 'string' && x[campo].trim()) || !Array.isArray(x.multimedia))) throw new Error('Historias')
@@ -102,7 +101,7 @@ window.addEventListener('astrovisor:ficha-abierta', (event) => {
 })
 window.addEventListener('astrovisor:ficha-cerrada', () => cerrar({ desdeVisor: true }))
 window.addEventListener('astrovisor:audio-solicitado', controlarAudio)
-window.addEventListener('astrovisor:mirilla-pausa', () => narrador.pausar())
+// La pausa de la mirada ('astrovisor:mirilla-pausa') NO pausa la narración: se controla solo con Pausar/Reanudar de la ficha.
 window.addEventListener('astrovisor:salida-visor', () => cerrar({ desdeVisor: true }))
 $('testScene').addEventListener('exit-vr', () => cerrar())
 $('testScene').addEventListener('loaded', () => {

@@ -1,19 +1,25 @@
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, onBeforeUnmount, nextTick, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuth } from '../composables/useAuth.js'
-import { supabase, isSupabaseConfigured } from '../services/supabaseClient.js'
+import { useEditorCatalogo } from '../composables/useEditorCatalogo.js'
+import { alternativaPortada } from '../services/librosDemoService.js'
 
 const router = useRouter()
-const { userDisplayName, username, signOut } = useAuth()
+const { userDisplayName, username, signOut, token, invalidarSesion } = useAuth()
 
 const isIniciando3D = ref(false)
-const libroList = ref([])
-const loadingLibros = ref(false)
-const librosError = ref('')
+const { catalogo, seleccion, borrador, cargando, guardando, error, mensaje, conflicto, necesitaRecarga,
+  libroActual, recorridoActual, cargar, seleccionarLibro, seleccionarRecorrido, cancelarEdicion, guardar, cancelarPeticiones,
+  hayBorradorPendiente, recuperarBorrador, descartarBorradorPendiente, nuevoLibro, previsualizar, previsualizacion, previsualizando,subirImagen,puedeEditarTexto,requierePreview } = useEditorCatalogo({
+  obtenerToken: () => token.value,
+  obtenerUsuario: () => username.value,
+  alExpirarSesion: () => { invalidarSesion(); void router.replace({ name: 'admin-acceso' }) },
+})
 
-function handleLogout() {
-  signOut()
+async function handleLogout() {
+  descartarBorradorPendiente()
+  await signOut()
   router.push('/admin/acceso')
 }
 
@@ -28,32 +34,20 @@ function handleCancelar3D() {
   isIniciando3D.value = false
 }
 
-// Cargar las fichas_libros desde Supabase
-async function cargarLibros() {
-  if (!isSupabaseConfigured) return
-  loadingLibros.value = true
-  librosError.value = ''
-  try {
-    const { data, error } = await supabase
-      .from('fichas_libros')
-      .select('*')
-      .order('id', { ascending: true })
-
-    if (error) {
-      librosError.value = error.message
-    } else {
-      libroList.value = data || []
-    }
-  } catch (err) {
-    librosError.value = err.message || 'Error de conexión'
-  } finally {
-    loadingLibros.value = false
-  }
+const nombreRecorrido = (id) => catalogo.value?.recorridos.find((r) => r.id === id)?.titulo ?? id
+const constelacionesLibro = (id) => catalogo.value?.recorridos.filter((r) => r.libroRefs.some((v) => v.libroId === id)) ?? []
+async function guardarYCentrar() {
+  await guardar(); await nextTick()
+  document.querySelector('#editor-resultados')?.focus()
 }
-
-onMounted(() => {
-  cargarLibros()
-})
+async function cancelarYCentrar() {
+  const anterior = seleccion.value
+  cancelarEdicion(); await nextTick()
+  if (anterior) document.querySelector(anterior.tipo === 'nuevo' ? '#nuevo-libro' : `[data-editar="${anterior.tipo}-${anterior.id}"]`)?.focus()
+}
+watch(seleccion, async (actual) => { if (actual) { await nextTick(); document.querySelector('#editor-heading')?.focus() } })
+onMounted(cargar)
+onBeforeUnmount(cancelarPeticiones)
 </script>
 
 <template>
@@ -336,34 +330,159 @@ onMounted(() => {
       </section>
 
       <!-- SECCIÓN LIBROS -->
-      <section class="books-section">
+      <section class="books-section" aria-labelledby="catalogo-heading" :aria-busy="cargando || guardando">
         <div class="books-header">
-          <h2 class="experiences-title">Libros</h2>
-          <button type="button" class="btn-refresh" @click="cargarLibros" :disabled="loadingLibros">
-            {{ loadingLibros ? 'Cargando...' : 'Actualizar libros' }}
+          <div class="books-title-group">
+            <h2 id="catalogo-heading" class="experiences-title">Libros y Bibliografía</h2>
+            <span class="badge-postergado">Edición documental</span>
+          </div>
+          <button type="button" class="btn-refresh" @click="cargar()" :disabled="cargando || guardando">
+            {{ cargando ? 'Cargando...' : borrador ? 'Recargar catálogo y descartar edición' : 'Actualizar catálogo' }}
           </button>
         </div>
-
-        <div v-if="librosError" class="alert">
-          {{ librosError }}
+        <p class="admin-note">
+          Edita una ficha a la vez. Las referencias son de demostración; no representan préstamos ni disponibilidad de ejemplares.
+        </p>
+        <button id="nuevo-libro" type="button" class="btn-refresh" :disabled="!catalogo || cargando || guardando || Boolean(borrador) || necesitaRecarga" @click="nuevoLibro">Registrar libro de demostración</button>
+        <div v-if="hayBorradorPendiente" role="status" class="admin-note">
+          <p>Hay una edición pendiente de la sesión anterior, solo en memoria de esta pestaña. Puedes recuperarla después de consultar el catálogo. Se pierde al recargar o cerrar la pestaña.</p>
+          <button type="button" class="btn-refresh" :disabled="!catalogo || cargando || guardando || Boolean(borrador)" @click="recuperarBorrador">Recuperar borrador</button>
+          <button type="button" class="btn-refresh" @click="descartarBorradorPendiente">Descartar borrador pendiente</button>
         </div>
 
-        <div v-else-if="libroList.length > 0" class="books-grid">
-          <article v-for="libro in libroList" :key="libro.id" class="book-card">
+        <div id="editor-resultados" tabindex="-1">
+          <p v-if="error" class="alert" role="alert">{{ error }}</p>
+          <p v-if="mensaje" class="admin-note" role="status">{{ mensaje }}</p>
+        </div>
+        <p v-if="cargando" role="status">Consultando el catálogo…</p>
+        <p v-if="catalogo" class="admin-note">Revisión consultada: {{ catalogo.revision }}.
+          <template v-if="catalogo.publicacionHomido?.respaldoPublico === 'publicado' && catalogo.publicacionHomido.revisionPublicada === catalogo.revision">Respaldo Homido publicado para esta revisión.</template>
+          <template v-else>Respaldo Homido pendiente de sincronización. <span v-if="catalogo.publicacionHomido?.revisionPublicada">Copia publicada: revisión {{ catalogo.publicacionHomido.revisionPublicada }}.</span></template>
+          La exportación se ejecuta por separado en el servidor, no desde este panel.
+        </p>
+        <p v-if="borrador" class="admin-note">Termina o cancela esta edición antes de seleccionar otra ficha.</p>
+        <p v-if="necesitaRecarga" class="admin-note" role="status">El guardado ya está confirmado. Actualiza el catálogo antes de iniciar otra edición; no repitas la escritura.</p>
+        <div v-if="catalogo?.libros.length" class="books-grid">
+          <article v-for="libro in catalogo.libros" :key="libro.id" class="book-card">
+            <img class="book-cover" :src="libro.portadaIlustrativa" :alt="alternativaPortada(libro)" width="112" height="160" />
             <div class="book-pill-id">{{ libro.id }}</div>
             <h3 class="book-title">{{ libro.titulo }}</h3>
-            <p class="book-author">Por: <strong>{{ libro.autor || 'Autor no especificado' }}</strong></p>
-            <p class="book-desc">{{ libro.descripcion || 'Sin descripción' }}</p>
-            <div v-if="libro.mensaje_prestamo" class="loan-message">
-              <span>{{ libro.mensaje_prestamo }}</span>
-            </div>
+            <p class="book-author">Por: <strong>{{ libro.autor }}</strong></p>
+            <p class="book-desc">Relacionada con: {{ constelacionesLibro(libro.id).map((r) => r.titulo).join(', ') }}</p>
+            <p v-if="libro.demostracion" class="book-desc">Referencia de demostración. {{ libro.portada?.tipo === 'imagen-autorizada' ? 'Imagen con permiso declarado.' : libro.portada?.plantilla ? 'Portada automática.' : 'SVG ilustrativo heredado.' }}</p>
+            <button type="button" class="btn-refresh" :data-editar="`libro-${libro.id}`" :disabled="cargando || guardando || Boolean(borrador) || necesitaRecarga" @click="seleccionarLibro(libro.id)">Editar {{ libro.titulo }}</button>
           </article>
         </div>
 
-        <div v-else class="empty-books-box">
-          <p>No hay libros registrados aún en la tabla <code>fichas_libros</code>.</p>
+        <div v-else-if="catalogo && !cargando" class="empty-books-box">
+          <p>No hay libros en el catálogo consultado.</p>
         </div>
+        <section v-if="catalogo" class="catalogo-constelaciones" aria-labelledby="constelaciones-editor">
+          <h3 id="constelaciones-editor">Constelaciones</h3>
+          <ul><li v-for="r in catalogo.recorridos" :key="r.id">
+            <button type="button" class="btn-refresh" :data-editar="`recorrido-${r.id}`" :disabled="cargando || guardando || Boolean(borrador) || necesitaRecarga" @click="seleccionarRecorrido(r.id)">Editar información de {{ r.titulo }}</button>
+          </li></ul>
+        </section>
+        <form v-if="borrador" class="catalogo-formulario" @submit.prevent="guardarYCentrar">
+          <h3 id="editor-heading" tabindex="-1">{{ seleccion.tipo === 'nuevo' ? 'Registrar libro de demostración' : `Editar ${libroActual?.titulo ?? recorridoActual?.titulo}` }}</h3>
+          <fieldset :disabled="guardando || cargando">
+            <legend>{{ seleccion.tipo !== 'recorrido' ? 'Información bibliográfica y motivos de lectura' : 'Información de la constelación' }}</legend>
+            <template v-if="seleccion.tipo === 'nuevo'">
+              <p class="admin-note">Referencia de demostración: no registra un ejemplar institucional. La exportación Homido se realiza por separado.</p>
+              <label for="nuevo-id">ID estable (minúsculas, números y guiones)</label>
+              <input id="nuevo-id" v-model="borrador.id" required maxlength="100" pattern="[a-z0-9]+(-[a-z0-9]+)*" aria-describedby="id-ayuda" />
+              <p id="id-ayuda" class="admin-note">Debe ser único. Se usará en el enlace del libro y no podrá editarse después.</p>
+              <label for="nuevo-titulo">Título</label>
+              <input id="nuevo-titulo" v-model="borrador.titulo" required maxlength="200" />
+              <label for="nuevo-autor">Autor</label>
+              <input id="nuevo-autor" v-model="borrador.autor" required maxlength="200" />
+            </template>
+            <template v-else-if="libroActual">
+              <p id="restriccion-portadas" class="admin-note">El SVG heredado contiene texto fijo. Para cambiar título o autor, sustituye explícitamente la portada. Homido navega por ID.</p>
+              <label for="editor-titulo">Título</label>
+              <input id="editor-titulo" v-model="borrador.titulo" :readonly="!puedeEditarTexto" required maxlength="200" aria-describedby="restriccion-portadas" />
+              <label for="editor-autor">Autor</label>
+              <input id="editor-autor" v-model="borrador.autor" :readonly="!puedeEditarTexto" required maxlength="200" aria-describedby="restriccion-portadas" />
+            </template>
+            <template v-if="seleccion.tipo !== 'recorrido'">
+              <label for="tipo-portada">Tipo de portada</label>
+              <select id="tipo-portada" v-model="borrador.tipoPortada">
+                <option v-if="libroActual && !libroActual.portada" value="heredada">Conservar SVG heredado</option>
+                <option value="ilustrativa">Ilustrativa automática</option>
+                <option value="imagen-autorizada">Imagen propia autorizada (PNG/JPEG)</option>
+              </select>
+              <template v-if="borrador.tipoPortada === 'ilustrativa'">
+              <label for="nueva-plantilla">Plantilla ilustrativa</label>
+              <select id="nueva-plantilla" v-model="borrador.portada.plantilla"><option value="cielo">Cielo — constelación abierta</option><option value="guia">Guía — recorrido de estrellas</option><option value="relatos">Relatos — trama estelar</option></select>
+              <label for="nueva-paleta">Paleta de la portada</label>
+              <select id="nueva-paleta" v-model="borrador.portada.paleta"><option value="azul">Azul noche</option><option value="verde">Verde profundo</option><option value="violeta">Violeta</option></select>
+              <p class="admin-note">Se admiten letras latinas básicas y Latin-1 (incluidos acentos del español), números y puntuación común. La previsualización comprueba el ajuste: no recorta texto para hacerlo caber.</p>
+              <button type="button" class="btn-refresh" :disabled="previsualizando || conflicto" @click="previsualizar">{{ previsualizando ? 'Generando portada…' : 'Previsualizar portada' }}</button>
+              </template>
+              <template v-if="borrador.tipoPortada === 'imagen-autorizada'">
+                <p id="imagen-ayuda" class="admin-note">PNG/JPEG hasta 2 MiB, máximo 4096 px por lado y 8 millones de píxeles. Preparar una imagen no guarda el libro. Si cambias título o autor, revisa la correspondencia de la imagen.</p>
+                <label for="archivo-portada">Preparar o reemplazar imagen</label>
+                <input id="archivo-portada" type="file" accept="image/png,image/jpeg" :disabled="previsualizando || conflicto" aria-describedby="imagen-ayuda" @change="subirImagen($event.target.files?.[0])" />
+                <p v-if="previsualizando" role="status">Preparando imagen…</p>
+                <label for="imagen-procedencia">Procedencia de la imagen</label><textarea id="imagen-procedencia" v-model="borrador.portada.procedencia" required maxlength="1000" rows="2"></textarea>
+                <label for="imagen-permiso">Permiso o autorización de uso</label><textarea id="imagen-permiso" v-model="borrador.portada.permiso" required maxlength="1000" rows="2"></textarea>
+                <label for="imagen-alternativa">Texto alternativo</label><input id="imagen-alternativa" v-model="borrador.portada.textoAlternativo" required maxlength="1000" />
+              </template>
+              <figure v-if="previsualizacion" class="portada-preview"><img :src="previsualizacion" :alt="borrador.tipoPortada === 'imagen-autorizada' ? borrador.portada.textoAlternativo || 'Previsualización de imagen preparada' : `Previsualización ilustrativa de ${borrador.titulo}`" width="225" height="320" /><figcaption>{{ borrador.tipoPortada === 'imagen-autorizada' ? 'Imagen preparada; asociación pendiente de guardar.' : 'Portada ilustrativa, no original.' }}</figcaption></figure>
+            </template>
+            <template v-if="libroActual || seleccion.tipo === 'nuevo'">
+              <label for="editor-anio">Año de publicación</label>
+              <input id="editor-anio" v-model.number="borrador.anio" type="number" min="1" max="9999" :required="seleccion.tipo === 'nuevo' || libroActual?.anio !== undefined" />
+              <label for="editor-enlace">Enlace público de la obra (HTTPS)</label>
+              <input id="editor-enlace" v-model="borrador.enlacePublico" type="url" required maxlength="2048" pattern="https://.+" />
+              <div v-for="relacion in borrador.relaciones" :key="relacion.constelacionId" class="catalogo-motivo">
+                <label v-if="seleccion.tipo === 'nuevo'" class="catalogo-check"><input v-model="relacion.seleccionada" type="checkbox" /> Asociar con {{ nombreRecorrido(relacion.constelacionId) }}</label>
+                <template v-if="seleccion.tipo !== 'nuevo' || relacion.seleccionada">
+                <label :for="`motivo-${relacion.constelacionId}`">Motivo de lectura para {{ nombreRecorrido(relacion.constelacionId) }}</label>
+                <textarea :id="`motivo-${relacion.constelacionId}`" v-model="relacion.motivo" required maxlength="1000" rows="3"></textarea>
+                </template>
+              </div>
+            </template>
+            <template v-else>
+              <label for="editor-resumen">Resumen</label>
+              <textarea id="editor-resumen" v-model="borrador.resumen" required maxlength="1000" rows="4"></textarea>
+              <label for="editor-reconocer">Cómo reconocerla</label>
+              <textarea id="editor-reconocer" v-model="borrador.comoReconocerla" required maxlength="12000" rows="5"></textarea>
+              <p class="admin-note">Esta edición conserva la historia, la narración y sus atribuciones.</p>
+            </template>
+            <p v-if="conflicto || necesitaRecarga" class="admin-note">Tu formulario se conserva. Puedes copiar tu edición antes de usar «Recargar catálogo y descartar edición».</p>
+            <div class="catalogo-acciones">
+              <button type="submit" class="btn-refresh" :disabled="conflicto || necesitaRecarga || previsualizando || (requierePreview && !previsualizacion) || (borrador.tipoPortada === 'imagen-autorizada' && !borrador.portada.recursoId)">{{ guardando ? 'Guardando…' : seleccion.tipo === 'nuevo' ? 'Confirmar registro' : 'Guardar cambios' }}</button>
+              <button type="button" class="btn-refresh" @click="cancelarYCentrar">Cancelar edición</button>
+            </div>
+          </fieldset>
+        </form>
       </section>
     </main>
   </div>
 </template>
+
+<style scoped>
+.books-grid { grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr)); }
+.book-cover { display: block; object-fit: contain; max-width: 100%; margin-bottom: 1rem; }
+.books-section .btn-refresh { min-height: 48px; white-space: normal; }
+.books-section .btn-refresh:disabled { opacity: .65; cursor: default; }
+.books-section .admin-note { margin-top: .75rem; }
+.books-section :focus-visible { outline: 3px solid #173868; outline-offset: 3px; }
+.catalogo-constelaciones, .catalogo-formulario { margin-top: 2rem; }
+.catalogo-constelaciones ul { display: flex; flex-wrap: wrap; gap: .75rem; padding: 0; list-style: none; }
+.catalogo-formulario fieldset { min-width: 0; padding: 1.25rem; border: 1px solid #cbd5e1; border-radius: .8rem; background: #fff; }
+.catalogo-formulario legend { padding: 0 .5rem; font-weight: 700; }
+.catalogo-formulario label { display: block; margin: 1rem 0 .4rem; font-weight: 600; }
+.catalogo-formulario input, .catalogo-formulario textarea, .catalogo-formulario select { display: block; width: 100%; max-width: 100%; min-height: 48px; box-sizing: border-box; padding: .7rem; border: 1px solid #64748b; border-radius: .4rem; font: inherit; color: #0f1f38; background: #fff; }
+.catalogo-formulario .catalogo-check { display: flex; align-items: center; gap: .75rem; min-height: 48px; }
+.catalogo-formulario input[type="checkbox"] { width: 24px; min-height: 24px; height: 24px; flex-shrink: 0; }
+.portada-preview { margin: 1.5rem 0; max-width: 26rem; }
+.portada-preview img { display: block; max-width: 100%; height: auto; }
+.catalogo-formulario input[readonly] { background: #f1f5f9; }
+.catalogo-formulario textarea { resize: vertical; line-height: 1.5; }
+.catalogo-acciones { display: flex; flex-wrap: wrap; gap: .75rem; margin-top: 1.5rem; }
+@media (max-width: 640px) {
+  .admin-topbar, .topbar-left, .topbar-right { flex-wrap: wrap; }
+}
+</style>
