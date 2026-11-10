@@ -17,7 +17,20 @@
   "detalleDeControlesAudioYRetorno2D": null,
   "videoSinRedEnEquipoDeEnsayo": null,
   "participantes": null,
-  "revisorIdentificado": null,
+  "revisorIdentificado": "Índigo Ortiz",
+  "revisionCruzada": {
+    "estado": "conformidad-reportada",
+    "revisor": "Índigo Ortiz",
+    "nombreInformado": "indigo",
+    "fechaConstanciaLocal": "2026-11-10",
+    "fechaRevision": null,
+    "versionRevisada": null,
+    "alcance": "Revisión general de S4, según confirmación de Luis",
+    "resultado": "Dice que está bien; sin incidencias comunicadas",
+    "fuente": "Luis en este chat de S4",
+    "textoOriginal": "indigo ya lo reivozo y dice que esta bien",
+    "revisionFormalGitHub": null
+  },
   "evidenciaAdjunta": null,
-  "limite": "La constancia acredita el reporte de funcionamiento correcto de Homido y pantalla. Los detalles no especificados permanecen sin dato; no se atribuyen observación directa del agente, protocolo completo, ensayo cronometrado ni revisión cruzada identificada."
+  "limite": "La constancia registra el reporte de funcionamiento correcto de Homido y pantalla y la conformidad de Índigo con S4 comunicada por Luis. Fechas de ejecución/revisión y versiones exactas no especificadas permanecen sin dato; no se atribuyen observación directa del agente, protocolo físico completo, ensayo cronometrado ni revisión formal de GitHub."
 }

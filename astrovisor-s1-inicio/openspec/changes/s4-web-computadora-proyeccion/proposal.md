@@ -46,3 +46,5 @@ Estado al 10/11: plan aprobado mediante «continua»; adaptación implementada, 
 Decisión posterior de Luis del 10/11: dejar pendientes las pruebas físicas, el ensayo y la revisión cruzada por no considerarlos necesarios para el trabajo inmediato. Se concluye el trabajo técnico actual y se conservan las cuatro actividades pendientes para retomarlas cuando lo indique. No se modifica el contrato de aceptación ni se atribuyen pruebas realizadas.
 
 Aclaración siguiente de Luis del 10/11: Homido y pantalla ya se revisaron y funcionan correctamente. Se registra esta validación funcional reportada y se mantienen sin especificar fecha de ejecución, equipos, versión y pasos del protocolo. Ensayo cronometrado y revisión cruzada identificada siguen diferidos; ver la constancia en `docs/evidencias/s4/validacion-reportada.json`.
+
+Confirmación posterior del 10/11: Luis informa que Índigo revisó S4 y dice que está bien. Se registra esa conformidad como revisión cruzada reportada y se completa su tarea; el ensayo sigue diferido y el registro físico conserva sus límites documentados. Avance: 17/20, sin archivo automático.

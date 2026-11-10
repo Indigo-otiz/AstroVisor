@@ -46,7 +46,7 @@ Antes del ensayo, completar y comprobar:
 | Red del recinto: carga de API, WAV y escena 3D | Pendiente. A-Frame depende de CDN. |
 | Teléfono, navegador, visor y sensores | Homido revisado y funcionando según Luis (constancia 10/11). Teléfono, navegador y desglose de sensores/controles sin especificar. |
 | Video local copiado al equipo y reproducido sin red | Pendiente de ese equipo; consultar registro técnico del archivo. |
-| Otro integrante revisor | Pendiente de nombre y confirmación S4. |
+| Otro integrante revisor | Índigo Ortiz revisó S4 y lo considera correcto, según confirmación de Luis recibida el 10/11. Fecha exacta y versión sin especificar. |
 
 Abrir el enlace HTTPS sin advertencias, visitar directamente una ficha y recargarla. Probar teclado y ratón, escuchar las tres narraciones y revisar lectura desde la distancia prevista. Abrir el visor en teléfono real, activar audio y sensores mediante gesto, seleccionar, pausar/reanudar y regresar a 2D. Registrar resultados sin completar modelos o versiones por suposición.
 

@@ -19,6 +19,6 @@ for(const archivo of archivos){
 const git=(...args)=>execFileSync('git',args,{cwd:root,encoding:'utf8',windowsHide:true}).trim()
 const fecha=new Date()
 const report={fechaUTC:fecha.toISOString(),fechaLocal:new Intl.DateTimeFormat('sv-SE',{timeZone:'America/Mexico_City',dateStyle:'short',timeStyle:'medium'}).format(fecha),zona:'America/Mexico_City',rama:git('branch','--show-current'),commitBase:git('rev-parse','HEAD'),cambiosSinCommit:true,
- alcance:'Implementación y verificación técnica local S4, incluido zoom nativo 200%. No certifica proyector, red del recinto, Homido físico S4, escucha humana, ensayo o Expo, ni revisión de otro integrante.',hashes}
+ alcance:'Implementación y verificación técnica local S4, incluido zoom nativo 200%, junto con reportes de Luis sobre Homido/pantalla y la conformidad de Índigo. Distingue esos reportes de observación directa; no acredita protocolo físico completo, ensayo cronometrado, Expo ni revisión formal de GitHub.',hashes}
 await writeFile(resolve(out,'version.json'),JSON.stringify(report,null,2)+'\n')
 console.log(`${hashes.length} archivos registrados en ${relative(root,resolve(out,'version.json'))}`)

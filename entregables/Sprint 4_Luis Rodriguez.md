@@ -11,7 +11,8 @@ Informe de resultados del Sprint 4
 | Periodo académico base | 2–6 de noviembre de 2026 |
 | Implementación y verificación técnica registradas | 9–10 de noviembre de 2026 |
 | Fecha del informe | 10 de noviembre de 2026 |
-| Estado | Trabajo técnico concluido; ensayo cronometrado y revisión cruzada identificada pendientes por decisión del responsable. |
+| Estado | Trabajo técnico concluido; revisión cruzada de Índigo reportada como correcta. Ensayo cronometrado pendiente por decisión del responsable. |
+| Revisión cruzada reportada | Índigo Ortiz; conformidad comunicada por Luis el 10 de noviembre de 2026. |
 
 ## Objetivo y alcance de mi participación
 
@@ -45,7 +46,7 @@ La adaptación se aplica al recorrido público 2D. El visitante sigue entrando s
 | Contingencia 2D | La salida del visor permite regresar a las historias web cuando el frontend, la API y los recursos están disponibles. |
 | Respaldo local | Video WebM reproducido completo desde archivo local con el navegador sin conexión. Pendiente comprobar ese archivo en el equipo específico de ensayo. |
 | Homido y pantalla reales | Reporté que ambos ya fueron revisados y funcionan correctamente. Los detalles no especificados permanecen identificados como tales. |
-| Evidencias y revisión cruzada | Capturas, logs, registros y hashes disponibles. La revisión de otro integrante identificado permanece pendiente. |
+| Evidencias y revisión cruzada | Capturas, logs, registros y hashes disponibles. Índigo revisó S4 y lo considera correcto, según la confirmación del responsable. |
 | Contenido provisional y acceso | Se conservan rótulos de demostración, créditos y voz sintética; la visita pública no requiere credenciales. |
 
 ## Pruebas técnicas
@@ -81,12 +82,16 @@ La [guía de presentación](../astrovisor-s1-inicio/docs/GUIA-S4-EXPO.md) contie
 
 El 10 de noviembre confirmé en el chat de trabajo que «el homido el homido y la pantalla ya lo revisamos, funciona correctamente». Esa declaración se registró como resultado funcional correcto reportado por el responsable, tanto para Homido como para pantalla.
 
-La constancia no especifica fecha de ejecución, teléfono, computadora, navegador, modelo de pantalla/proyector, resolución, enlace ni participantes. Tampoco desglosa pruebas de sonido, red o video sin conexión en ese equipo. Esos datos no se completaron por suposición. La expresión «revisamos» no identifica por sí sola a otro integrante como revisor cruzado. Ver [constancia del reporte](../astrovisor-s1-inicio/docs/evidencias/s4/validacion-reportada.json).
+La constancia de hardware no especifica fecha de ejecución, teléfono, computadora, navegador, modelo de pantalla/proyector, resolución, enlace ni participantes. Tampoco desglosa pruebas de sonido, red o video sin conexión en ese equipo. Esos datos no se completaron por suposición. Ver [constancia del reporte](../astrovisor-s1-inicio/docs/evidencias/s4/validacion-reportada.json).
+
+## Revisión cruzada
+
+Posteriormente confirmé que **Índigo Ortiz revisó S4 y dice que está bien**, mediante el mensaje «indigo ya lo reivozo y dice que esta bien». Su conformidad queda registrada como revisión cruzada reportada por el responsable, sin incidencias comunicadas. La fecha de esta constancia es el 10 de noviembre; no se especificaron fecha exacta de revisión ni versión revisada. Esta confirmación corresponde a S4 y no reutiliza la aprobación de S3 ni representa una revisión formal de GitHub.
 
 ## Estado de entrega y pendientes
 
 El trabajo técnico actual está concluido y preparado en la rama `codex/s4-web-computadora-proyeccion`; su integración en `main` sigue pendiente. La versión y los archivos verificados están identificados mediante el [manifiesto de evidencias](../astrovisor-s1-inicio/docs/evidencias/s4/version.json).
 
-Por mi indicación, el ensayo cronometrado de cinco minutos y la revisión cruzada identificada se dejan pendientes, sin fecha comprometida. También queda abierto completar los detalles disponibles de las pruebas de Homido/pantalla ya reportadas correctas y comprobar el respaldo sin red en el equipo específico de ensayo. Estos pendientes no se presentan como resultados aprobados ni como participación realizada en la Expo.
+Por mi indicación, el ensayo cronometrado de cinco minutos se deja pendiente, sin fecha comprometida. También queda abierto completar los detalles disponibles de las pruebas de Homido/pantalla ya reportadas correctas y comprobar el respaldo sin red en el equipo específico de ensayo. Estos pendientes no se presentan como resultados aprobados ni como participación realizada en la Expo.
 
 El alcance entregado permite usar y demostrar el recorrido web desde computadora, ampliar la presentación para pantalla y disponer de una contingencia audiovisual verificable. El [registro técnico completo](../astrovisor-s1-inicio/docs/PRUEBA-S4.md) conserva los resultados, métodos y límites de cada comprobación.

@@ -1,11 +1,11 @@
 {
-  "fechaUTC": "2026-11-10T15:51:35.453Z",
-  "fechaLocal": "2026-11-10 09:51:35",
+  "fechaUTC": "2026-11-10T16:04:18.038Z",
+  "fechaLocal": "2026-11-10 10:04:18",
   "zona": "America/Mexico_City",
   "rama": "codex/s4-web-computadora-proyeccion",
-  "commitBase": "88667899838cc0c09976383972cadc7f1bf781e1",
+  "commitBase": "48791cf71ca5668ff7828436310220b47eb2565f",
   "cambiosSinCommit": true,
-  "alcance": "Implementación y verificación técnica local S4, incluido zoom nativo 200%. No certifica proyector, red del recinto, Homido físico S4, escucha humana, ensayo o Expo, ni revisión de otro integrante.",
+  "alcance": "Implementación y verificación técnica local S4, incluido zoom nativo 200%, junto con reportes de Luis sobre Homido/pantalla y la conformidad de Índigo. Distingue esos reportes de observación directa; no acredita protocolo físico completo, ensayo cronometrado, Expo ni revisión formal de GitHub.",
   "hashes": [
     {
       "archivo": "frontend/src/App.vue",
@@ -27,21 +27,21 @@
     },
     {
       "archivo": "docs/GUIA-S4-EXPO.md",
-      "bytes": 9503,
+      "bytes": 9602,
       "normalizacion": "UTF-8 sin BOM; LF",
-      "sha256": "a47c2e2a4bb3cbab038206f9f82258c6364a5edcb7e6e6ad1d66d263feed0105"
+      "sha256": "45d9c55a8cd538bc5d35ed71d810fca4d873f1a4b7c409b13e6bfcaf0762ca6c"
     },
     {
       "archivo": "docs/PRUEBA-S4.md",
-      "bytes": 14504,
+      "bytes": 15053,
       "normalizacion": "UTF-8 sin BOM; LF",
-      "sha256": "4f360545958e0cffbd4ec882f427771fbe596227f4c5039fd019d94d1a4008ba"
+      "sha256": "64dd040e2a8426190c7b27e38de8c16d0ef65aa2139486339c9a6971e388ddee"
     },
     {
       "archivo": "../entregables/Sprint 4_Luis Rodriguez.md",
-      "bytes": 10021,
+      "bytes": 10570,
       "normalizacion": "UTF-8 sin BOM; LF",
-      "sha256": "194f8a5ee397f7ed1db032e83c13ec99f9a42460559b38baad2831fc365b7f5c"
+      "sha256": "da3bbcafe0a2ff53137451df89db21bc9724fd801dc8e750378a0696f33679f0"
     },
     {
       "archivo": "content/AUTORIA.md",
@@ -87,9 +87,9 @@
     },
     {
       "archivo": "scripts/manifiesto-s4.mjs",
-      "bytes": 2540,
+      "bytes": 2640,
       "normalizacion": "UTF-8 sin BOM; LF",
-      "sha256": "d4e6c34b7429283143521e6e011a06296824fa5d44c793b8592a6e864aca5a37"
+      "sha256": "c23cc66be2fc2aaa4a18233b8450dce70e6206f6d6a21153f6194fcb9b7020be"
     },
     {
       "archivo": "frontend/public/audio/orion-kokoro-v1.wav",
@@ -315,9 +315,9 @@
     },
     {
       "archivo": "docs/evidencias/s4/validacion-reportada.json",
-      "bytes": 1063,
+      "bytes": 1682,
       "normalizacion": "UTF-8 sin BOM; LF",
-      "sha256": "5e2fe7c5353f12d09394ce12da1955537c9b8268f6afb96b5010803964b20435"
+      "sha256": "02d66fa8fe93de439b31d6abceff36247cf2f921b9ff51ec00a27d6ff68fa3fe"
     },
     {
       "archivo": "docs/evidencias/s4/video-local-3d.png",

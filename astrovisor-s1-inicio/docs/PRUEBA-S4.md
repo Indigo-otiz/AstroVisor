@@ -2,11 +2,13 @@
 
 Responsable: Luis Alberto Rodríguez. Periodo base: 2–6 de noviembre de 2026. Implementación autorizada el **9 de noviembre de 2026**, America/Mexico_City, mediante «continua» en este chat. Luis confirmó que las pruebas y actividades del periodo base no se realizaron. No se atribuye participación en Expo ni se retrofechan evidencias.
 
-Estado al **10 de noviembre de 2026**: **adaptación implementada, regresión técnica aprobada, zoom nativo 200 % comprobado y respaldo audiovisual verificado localmente**. Luis reportó posteriormente que **Homido y pantalla ya fueron revisados y funcionan correctamente**. Seguimiento: 16 tareas completas; 6.1 y 6.2 cuentan con confirmación funcional reportada y registro detallado parcial; ensayo cronometrado y revisión cruzada identificada siguen diferidos. S4 no está archivado.
+Estado al **10 de noviembre de 2026**: **adaptación implementada, regresión técnica aprobada, zoom nativo 200 % comprobado y respaldo audiovisual verificado localmente**. Luis reportó que **Homido y pantalla ya fueron revisados y funcionan correctamente**, y confirmó que **Índigo revisó S4 y lo considera correcto**. Seguimiento: 17 tareas completas; 6.1 y 6.2 cuentan con confirmación funcional reportada y registro detallado parcial; el ensayo cronometrado sigue diferido. S4 no está archivado.
 
 **Decisión de seguimiento del 10/11:** Luis confirmó en este chat que las pruebas físicas, el ensayo y la revisión cruzada todavía no se realizaron y decidió dejarlos pendientes por no considerarlos necesarios para el trabajo inmediato. El trabajo técnico actual queda concluido; esas cuatro actividades se conservan como pendientes diferidos, sin fecha comprometida. Esta decisión no cambia sus resultados a aprobados ni implica archivo del cambio.
 
 **Aclaración posterior del 10/11, que actualiza el estado anterior:** Luis indicó «el homido el homido y la pantalla ya lo revisamos, funciona correctamente». Se registran ambos como **revisados y con funcionamiento correcto según su reporte**, con fuente en este chat. La fecha de esta constancia no se presenta como fecha de ejecución. Los modelos, participantes, versión probada, URL y pasos concretos no fueron especificados. [Constancia estructurada](evidencias/s4/validacion-reportada.json).
+
+**Revisión cruzada confirmada posteriormente el 10/11:** Luis informó «indigo ya lo reivozo y dice que esta bien». Se registra la conformidad de **Índigo Ortiz** con S4 como revisión reportada por Luis, sin incidencias comunicadas. La identidad corresponde al integrante ya identificado en el proyecto; esta aprobación proviene de la confirmación nueva de S4, no de la revisión de S3. Fecha de ejecución y versión exacta no especificadas. No se atribuye revisión formal desde una cuenta de GitHub.
 
 ## Versión de partida
 
@@ -33,7 +35,7 @@ Estado al **10 de noviembre de 2026**: **adaptación implementada, regresión t�
 | Homido real S4 | Reportado correcto por Luis | Ya revisado y funcionando según su confirmación. Fecha, teléfono, versión, URL y detalle de pasos sin especificar; `validacion-reportada.json`. |
 | Pantalla real | Reportado correcto por Luis | Ya revisada y funcionando según su confirmación. Tipo/modelo, computadora, resolución, luz, distancia, sonido y red sin desglose; no se deduce que se utilizó proyector. |
 | Ensayo de cinco minutos / Expo | Pendiente | Actividades del 2–6 no realizadas según Luis. |
-| Revisión cruzada de S4 | Pendiente | Nombre y confirmación por otro integrante pendientes. |
+| Revisión cruzada de S4 | Conformidad de Índigo reportada por Luis | Revisado y considerado correcto, según confirmación nueva de este chat. Fecha exacta y versión no especificadas; `validacion-reportada.json`. |
 
 ## Alcance de la regresión de escritorio
 
@@ -91,7 +93,6 @@ La aclaración posterior registra el funcionamiento correcto de Homido y pantall
 1. Completar, si se dispone de ellos, los detalles del protocolo de Homido ya reportado correcto: fecha real, teléfono, navegador, versión, HTTPS y resultados por control.
 2. Completar el registro de la pantalla ya reportada correcta y la comprobación del video sin red en ese equipo. No se atribuyen modelo de proyector, pruebas de red ni escucha en sala sin desglose.
 3. Ensayo cronometrado de cinco minutos con el equipo. El apoyo de Expo del 5/11 no se registra como realizado.
-4. Revisión cruzada de otro integrante, con nombre, alcance y confirmación sobre esta versión S4.
 
 El avance técnico no acredita esas actividades ni una evaluación formal con personas adultas mayores. Los materiales académicos son esta guía/registro y las evidencias; OpenSpec conserva únicamente el seguimiento interno. La aprobación de archivo se solicitará solo cuando corresponda finalizar el cambio.
 
