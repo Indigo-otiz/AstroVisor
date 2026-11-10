@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="theme-color" content="#142033" />
-  <title>Prueba técnica Homido — AstroVisor</title>
+  <meta name="theme-color" content="#0b1530" />
+  <title>Historias del cielo en el visor Homido — AstroVisor</title>
   <link rel="stylesheet" href="./styles.css" />
   <!-- A-Frame 1.8.0 local (ver vendor/LEEME.md): sin dependencia de CDN -->
   <script src="./vendor/aframe.min.js"></script>
@@ -23,79 +23,106 @@
 <body>
   <header class="site-header">
     <div class="header-content">
-      <a href="/visor" class="brand">AstroVisor</a>
-      <span>Constelaciones e historias del cielo · Demostración</span>
+      <a href="/visor" class="brand">
+        <svg class="brand-star" viewBox="0 0 32 32" aria-hidden="true">
+          <path d="m16 2 4 10 10 4-10 4-4 10-4-10-10-4 10-4Z" fill="#f5b301" />
+        </svg>
+        <span>AstroVisor</span>
+      </a>
+      <div class="header-badges">
+        <span class="badge-tag">Experiencia Inmersiva Homido</span>
+        <a href="/explorar" class="header-link">Modo web 2D</a>
+      </div>
     </div>
   </header>
+
   <main id="main">
-    <h1>Historias del cielo en el visor</h1>
-    <p class="lead">Elige Orión, Osa Mayor o Escorpio para leer o escuchar su historia. Las fichas y la vista Homido son una demostración.</p>
-    <p id="fuenteDatos" role="status">Consultando la fuente de contenidos…</p>
-    <div class="notice" role="note">
-      <strong>Prueba con precaución.</strong> Si aparece mareo, incomodidad o fatiga visual, retira el visor o pulsa el botón de Pausa. Siéntate, mantén el entorno despejado y solicita ayuda si la necesitas.
+    <div class="page-intro">
+      <span class="eyebrow-text">Realidad Virtual · Constelaciones 3D</span>
+      <h1>Historias del cielo en el visor</h1>
+      <p class="lead">Recorre la bóveda celeste en 360 grados, enfoca una constelación para escuchar su relato mitológico y explora sus lecturas en la estantería.</p>
+      <p id="fuenteDatos" role="status" class="fuente-datos-status">Consultando la fuente de contenidos…</p>
     </div>
 
+    <div class="notice" role="note">
+      <div class="notice-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#b07800" stroke-width="2" class="notice-svg">
+          <circle cx="12" cy="12" r="10" />
+          <line x1="12" y1="8" x2="12" y2="12" stroke-width="2.5" />
+          <circle cx="12" cy="16" r="1" fill="#b07800" />
+        </svg>
+      </div>
+      <div class="notice-body">
+        <strong>Recomendación para una sesión agradable:</strong> Si aparece fatiga visual o incomodidad, retira el visor unos momentos o pulsa el botón de Pausa. Siéntate cómodamente, mantén el entorno despejado y recuerda que puedes salir en cualquier momento al modo web convencional.
+      </div>
+    </div>
+
+    <!-- PANEL DE CONTROLES ELEGANTE Y AGRUPADO -->
     <section aria-labelledby="control-title" class="controls-panel">
-      <h2 id="control-title">Controles de la prueba</h2>
-      <p>Primero abre esta página en el teléfono mediante HTTPS. Autoriza los sensores si el navegador lo solicita; después prueba el modo 2D y, por último, la vista dividida.</p>
+      <div class="panel-header">
+        <div class="panel-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#1f4e8c" stroke-width="2">
+            <rect x="2" y="6" width="20" height="12" rx="4" />
+            <circle cx="8" cy="12" r="3" />
+            <circle cx="16" cy="12" r="3" />
+            <path d="M11 12h2" />
+          </svg>
+        </div>
+        <div>
+          <h2 id="control-title">Controles y preparación del visor</h2>
+          <p class="panel-sub">Sigue estos pasos en tu celular antes de colocarlo en el visor Homido:</p>
+        </div>
+      </div>
+
       <div class="actions">
-        <button id="activateAudio" type="button" disabled>Activar audio</button>
-        <button id="permissionButton" type="button">Solicitar sensores</button>
-        <button id="stereoButton" type="button" disabled>Probar vista dividida</button>
+        <button id="activateAudio" type="button" disabled>1. Activar audio</button>
+        <button id="permissionButton" type="button">2. Solicitar sensores</button>
+        <button id="stereoButton" type="button" disabled>3. Probar vista dividida</button>
         <button id="pauseButton" class="secondary" type="button">Pausar mirilla</button>
         <button id="reticleToggleButton" class="secondary" type="button">Ocultar mirilla guía</button>
         <button id="exitButton" class="secondary" type="button" hidden>Salir de vista dividida</button>
-        <a class="button secondary" href="/explorar">Regresar al modo web 2D</a>
+        <a class="button secondary btn-return" href="/explorar">Regresar al modo web 2D</a>
       </div>
-      <p id="audioPreparation" role="status" aria-live="polite">Cargando narraciones…</p>
-      <p>Antes de colocarte el visor, toca Activar audio. Después elige Escuchar con la mirada. Si el navegador bloquea el sonido, retira el visor y toca de nuevo el control.</p>
-      <p class="status" id="orientationStatus" role="status" aria-live="polite">Sensores: listos para comprobar.</p>
-      <p class="status" id="stereoStatus" role="status" aria-live="polite">Vista estereoscópica: modo 2D activo.</p>
-      <p class="status" id="selectionStatus" role="status" aria-live="polite">Selección: mira una constelación (Orión, Osa Mayor o Escorpio) durante 3 segundos para abrir su ficha.</p>
-      <p class="small" id="angles">Ángulos de orientación: sin datos.</p>
-    </section>
 
-    <section class="reading-panel" aria-labelledby="stories-title">
-      <h2 id="stories-title">Elige una constelación</h2>
-      <p id="storiesStatus" role="status">Cargando historias…</p>
-      <div id="storyChoices" class="actions"></div>
-      <button id="retryStories" type="button" hidden>Volver a cargar historias</button>
-      <article id="storyCard" hidden aria-labelledby="storyTitle">
-        <h2 id="storyTitle" tabindex="-1"></h2>
-        <p id="storyText"></p>
-        <p id="storyOrigin" class="small"></p>
-        <div class="actions">
-          <button id="listenStory" type="button" hidden>Escuchar</button>
-          <button id="closeStory" class="secondary" type="button">Cerrar ficha</button>
+      <div class="status-indicators">
+        <div class="status-card">
+          <span class="status-label">Narraciones de voz</span>
+          <p id="audioPreparation" role="status" aria-live="polite">Cargando narraciones…</p>
         </div>
-        <p id="storyAudioStatus" role="status" aria-live="polite"></p>
-        <details id="storyTranscript" hidden>
-          <summary>Transcripción y créditos</summary>
-          <p id="transcriptText"></p>
-          <dl id="storyCredits"></dl>
-        </details>
-      </article>
+        <div class="status-card">
+          <span class="status-label">Sensores de Movimiento</span>
+          <p class="status" id="orientationStatus" role="status" aria-live="polite">Sensores: listos para comprobar.</p>
+          <p class="small" id="angles">Ángulos de orientación: sin datos.</p>
+        </div>
+        <div class="status-card">
+          <span class="status-label">Modo Visual</span>
+          <p class="status" id="stereoStatus" role="status" aria-live="polite">Vista estereoscópica: modo 2D activo.</p>
+        </div>
+        <div class="status-card">
+          <span class="status-label">Selección por Mirada</span>
+          <p class="status" id="selectionStatus" role="status" aria-live="polite">Selección: mira una constelación durante 3 segundos para abrir su ficha.</p>
+        </div>
+      </div>
     </section>
 
-    <section aria-labelledby="scene-title">
-      <h2 id="scene-title">Escena de demostración</h2>
-      <p class="scene-help">En computadora: arrastra la vista con el mouse. En teléfono: mueve suavemente el dispositivo o desliza el dedo. Gira hacia una de las tres constelaciones y centra la mirilla en ella durante 3 segundos para abrir su ficha sin tocar la pantalla. Pausar mirada detiene solo la selección (no la narración, que se controla en la ficha); Salir a 2D siempre funciona. En la ficha de la constelación, elige «Ver libros recomendados» para abrir una estantería de demostración. Para leer los datos completos del libro, retira el teléfono del visor y continúa en la pantalla normal.</p>
-      
+    <!-- ESCENA 3D INMERSIVA -->
+    <section aria-labelledby="scene-title" class="scene-section">
+      <div class="scene-header">
+        <h2 id="scene-title">Bóveda celeste inmersiva</h2>
+        <p class="scene-help">
+          En computadora: arrastra con el ratón. En teléfono: mueve suavemente el dispositivo o gira la cabeza con el visor puesto. Mantén la mirilla 3 segundos sobre una constelación o botón para activarlo.
+        </p>
+      </div>
+
       <div class="scene-host" id="sceneHost">
-        <!-- Escena A-Frame 3D -->
         <a-scene id="testScene" embedded vr-mode-ui="enabled: false" renderer="antialias: true; colorManagement: true;">
           <a-assets>
-            <!-- Lienzo de la ficha única; su contenido lo dibuja js/ficha-canvas.js -->
             <canvas id="cardCanvas" width="1400" height="1200"></canvas>
           </a-assets>
 
-          <!-- Sin a-sky: taparía la cúpula con degradado. Estrellas, cielo, suelo y colinas los crea prueba.js (js/cielo.js: campo-estelar y horizonte-nocturno) -->
           <a-entity light="type: ambient; intensity: 1.2"></a-entity>
-
-          <!-- Las constelaciones se crean desde los datos (js/escena-constelaciones.js) -->
           <a-entity id="constelaciones"></a-entity>
 
-          <!-- Controles del visor, siempre disponibles (también con la ficha abierta). Pausa = pausa de la MIRADA, no de la narración -->
           <a-entity id="visorControls3D" position="0 0.45 -3.5">
             <a-plane position="-1.0 0 -0.01" width="1.78" height="0.5" color="#FFFFFF" material="shader: flat"></a-plane>
             <a-plane id="pauseBtn3D" class="selectable" position="-1.0 0 0" data-action="pausa" data-ring="pauseProgressRing" width="1.7" height="0.42" color="#1B2A5A" material="shader: flat">
@@ -109,42 +136,67 @@
             </a-plane>
           </a-entity>
 
-          <!-- Ficha única: el plano muestra el lienzo; las zonas de mirada (Escuchar, Volver) las coloca prueba.js desde el layout -->
           <a-entity id="infoPanel3D" visible="false" position="0 2.3 -3.0">
             <a-plane id="cardPlane" width="3.2" height="2.7429" material="shader: flat; src: #cardCanvas; transparent: true"></a-plane>
           </a-entity>
 
-          <!-- Estantería 3D de cubiertas ilustrativas, sin catálogo físico confirmado -->
           <a-entity id="estanteria3D" visible="false"></a-entity>
 
-          <!-- Cámara con mirilla central (retícula ligera y visible) -->
           <a-entity id="cameraRig" camera="active: true" look-controls="magicWindowTrackingEnabled: true; touchEnabled: true; mouseEnabled: true" position="0 1.6 0">
             <a-entity id="gazeCursor" cursor="fuse: false; rayOrigin: entity" raycaster="objects: .selectable; far: 25" position="0 0 -1.2"></a-entity>
             <a-entity id="reticleGroup" position="0 0 -1.2">
-              <!-- Halo oscuro exterior para contraste universal -->
               <a-ring radius-inner="0.016" radius-outer="0.026" color="#0B1530" material="shader: flat; side: double; opacity: 0.55"></a-ring>
-              <!-- Aro mirilla blanco -->
               <a-ring id="reticleRing" radius-inner="0.018" radius-outer="0.024" color="#ffffff" material="shader: flat; side: double; opacity: 0.85"></a-ring>
-              <!-- Mirilla central: núcleo blanco -->
               <a-circle id="centerDot" radius="0.005" color="#ffffff" material="shader: flat"></a-circle>
-
-
             </a-entity>
           </a-entity>
         </a-scene>
       </div>
     </section>
 
+    <!-- PANEL DE LECTURA 2D DE HISTORIAS -->
+    <section class="reading-panel" aria-labelledby="stories-title">
+      <div class="reading-header">
+        <h2 id="stories-title">Historias accesibles en pantalla</h2>
+        <p class="reading-sub">También puedes explorar y leer las fichas directamente desde aquí sin usar el visor:</p>
+      </div>
+      <p id="storiesStatus" role="status" class="stories-status">Cargando historias…</p>
+      <div id="storyChoices" class="actions story-buttons"></div>
+      <button id="retryStories" type="button" hidden>Volver a cargar historias</button>
+
+      <article id="storyCard" hidden aria-labelledby="storyTitle" class="story-article-card">
+        <h2 id="storyTitle" tabindex="-1"></h2>
+        <p id="storyText" class="story-body-text"></p>
+        <p id="storyOrigin" class="small story-origin"></p>
+        <div class="actions story-actions">
+          <button id="listenStory" type="button" hidden>Escuchar</button>
+          <button id="closeStory" class="secondary" type="button">Cerrar ficha</button>
+        </div>
+        <p id="storyAudioStatus" role="status" aria-live="polite" class="audio-feedback-status"></p>
+        <details id="storyTranscript" hidden class="story-transcript-box">
+          <summary>Transcripción y créditos de narración</summary>
+          <p id="transcriptText"></p>
+          <dl id="storyCredits"></dl>
+        </details>
+      </article>
+    </section>
+
+    <!-- REGISTRO TÉCNICO DE LA SESIÓN -->
     <section class="log-panel" aria-labelledby="log-title">
-      <h2 id="log-title">Registro de esta sesión</h2>
-      <p class="small">El registro es local y no se envía a ningún servidor. Copia los resultados antes de cerrar la página.</p>
-      <div class="actions">
-        <button id="copyButton" class="secondary" type="button">Copiar registro</button>
-        <button id="clearButton" class="secondary" type="button">Limpiar registro</button>
+      <div class="log-header">
+        <h2 id="log-title">Registro de eventos de la sesión</h2>
+        <p class="small">Registro local en memoria del dispositivo para verificar sensores y tiempos de respuesta.</p>
+      </div>
+      <div class="actions log-actions">
+        <button id="copyButton" class="secondary btn-sm" type="button">Copiar registro</button>
+        <button id="clearButton" class="secondary btn-sm" type="button">Limpiar registro</button>
       </div>
       <pre id="log" aria-label="Registro de eventos de la prueba"></pre>
     </section>
-    <p class="small">El modo estereoscópico es experimental: emplea dos cámaras virtuales y no asegura calibración óptica ni compatibilidad física con Homido. La orientación, la selección y la vista dividida se evalúan por separado.</p>
+
+    <footer class="visor-page-footer">
+      <p>AstroVisor · Prototipo de divulgación astronómica e interactividad en visores móviles · Homido VR</p>
+    </footer>
   </main>
 </body>
 </html>

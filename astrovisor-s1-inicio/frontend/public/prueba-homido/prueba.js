@@ -102,6 +102,30 @@ import { rutaLibro2D } from './js/ruta-libro-2d.js';
     } catch (_) {}
   }
 
+  function playPauseSound(pausado) {
+    try {
+      const AudioCtx = window.AudioContext || window.webkitAudioContext;
+      if (!AudioCtx) return;
+      const ctx = new AudioCtx();
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'sine';
+      if (pausado) {
+        osc.frequency.setValueAtTime(440, ctx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(311.13, ctx.currentTime + 0.14);
+      } else {
+        osc.frequency.setValueAtTime(311.13, ctx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(440, ctx.currentTime + 0.14);
+      }
+      gain.gain.setValueAtTime(0.12, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.18);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start();
+      osc.stop(ctx.currentTime + 0.2);
+    } catch (_) {}
+  }
+
   // --- Objetivos de mirada: cada elemento con data-action; elementos con la misma acción+id comparten carga ---
   function objetivoDe(el) {
     const accion = el.getAttribute('data-action');
@@ -202,7 +226,11 @@ import { rutaLibro2D } from './js/ruta-libro-2d.js';
 
   function actualizarTextura() {
     const mesh = cardPlane && cardPlane.getObject3D('mesh');
-    if (mesh && mesh.material && mesh.material.map) mesh.material.map.needsUpdate = true;
+    if (mesh && mesh.material && mesh.material.map) {
+      mesh.material.map.needsUpdate = true;
+    } else if (cardPlane) {
+      cardPlane.setAttribute('material', 'shader: flat; src: #cardCanvas; transparent: true');
+    }
   }
 
   /** Reutiliza un único canvas para ficha de constelación y detalle de libro. */
@@ -415,6 +443,7 @@ import { rutaLibro2D } from './js/ruta-libro-2d.js';
   function alternarPausa() {
     const pausado = estado.alternarPausa();
     dwell.cancelar();
+    playPauseSound(pausado);
     etiquetaPausa.actualizar(pausado ? 'Reanudar mirada' : 'Pausar mirada');
     pauseBtn3D.setAttribute('color', pausado ? '#B26A00' : '#1B2A5A');
     if (pauseButton) {
@@ -429,14 +458,20 @@ import { rutaLibro2D } from './js/ruta-libro-2d.js';
     if (!pausado) setTimeout(comprobarFoco, 250);
   }
 
-  function salir() {
+  function desmontarVisor() {
+    window.removeEventListener('deviceorientation', listenOrientation);
+    liberarPantalla();
     window.dispatchEvent(new Event('astrovisor:salida-visor'));
+  }
+
+  function salir() {
+    desmontarVisor();
     selectionStatus.textContent = '✔ Salida confirmada. Regresando al modo web 2D...';
-    eventLine('✔ Salida a 2D.');
+    eventLine('✔ Salida a 2D y liberación de sensores completada.');
     setTimeout(() => {
       if (stereoActive) exitStereo();
       window.location.href = '/explorar';
-    }, 300);
+    }, 250);
   }
 
   // --- Eventos de mirada y de clic/toque sobre cada elemento con data-action ---
@@ -483,6 +518,67 @@ import { rutaLibro2D } from './js/ruta-libro-2d.js';
   window.addEventListener('mousemove', () => { userReady = true; comprobarFoco(); }, { once: true });
   window.addEventListener('touchstart', () => { userReady = true; comprobarFoco(); }, { once: true });
 
+  function mostrarAvisoError3D(titulo, mensaje) {
+    if (!cardCanvas) return;
+    const ctx = cardCanvas.getContext('2d');
+    const W = 1400, H = 1200;
+    ctx.clearRect(0, 0, W, H);
+
+    ctx.fillStyle = '#FFFFFF';
+    ctx.fillRect(40, 40, W - 80, H - 80);
+    ctx.lineWidth = 8;
+    ctx.strokeStyle = '#D9534F';
+    ctx.strokeRect(40, 40, W - 80, H - 80);
+
+    ctx.fillStyle = '#FDF2F2';
+    ctx.fillRect(80, 80, 320, 60);
+    ctx.fillStyle = '#9B2C2C';
+    ctx.font = 'bold 28px system-ui, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('Aviso del Visor', 240, 110);
+
+    ctx.fillStyle = '#1A202C';
+    ctx.font = 'bold 56px system-ui, sans-serif';
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'top';
+    ctx.fillText(titulo, 80, 180);
+
+    ctx.fillStyle = '#4A5568';
+    ctx.font = '36px system-ui, sans-serif';
+    const palabras = String(mensaje).split(/\s+/);
+    let linea = '', y = 280;
+    for (const p of palabras) {
+      const prueba = linea ? `${linea} ${p}` : p;
+      if (ctx.measureText(prueba).width > 1200) {
+        ctx.fillText(linea, 80, y);
+        linea = p;
+        y += 56;
+      } else {
+        linea = prueba;
+      }
+    }
+    if (linea) ctx.fillText(linea, 80, y);
+
+    ctx.fillStyle = '#1B2A5A';
+    ctx.font = 'bold 36px system-ui, sans-serif';
+    ctx.fillText('Enfoca con la mirada o toca el botón «Salir a 2D» para volver.', 80, y + 80);
+
+    actualizarTextura();
+    const frente = frenteAlFrente(3.0);
+    infoPanel3D.setAttribute('position', `${frente.x} ${FICHA_BASE_Y + PLANO_ALTO / 2} ${frente.z}`);
+    infoPanel3D.setAttribute('rotation', `0 ${frente.rotY} 0`);
+    activarGrupo(infoPanel3D, true);
+
+    visorControls3D.setAttribute('position', `${frente.x} ${POS_CONTROLES_Y} ${frente.z}`);
+    visorControls3D.setAttribute('rotation', `0 ${frente.rotY} 0`);
+    activarGrupo(visorControls3D, true);
+    setTimeout(() => {
+      actualizarTextura();
+      refrescarRaycaster();
+    }, 100);
+  }
+
   // --- Datos y construcción de las constelaciones ---
   async function iniciarContenido() {
     registrarCielo(AFRAME);
@@ -494,12 +590,17 @@ import { rutaLibro2D } from './js/ruta-libro-2d.js';
     scene.appendChild(horizonte);
     const esperar = scene.hasLoaded ? Promise.resolve() : new Promise((ok) => scene.addEventListener('loaded', ok, { once: true }));
     let carga;
+    const params = new URLSearchParams(window.location.search);
+    const forzarError = params.get('error') === '1' || params.get('simularError') === '1';
     try {
+      if (forzarError) throw new Error('Fallo simulado mediante ?error=1');
       carga = await cargarDatosCompartidos();
     } catch (error) {
-      selectionStatus.textContent = 'No se pudieron cargar las constelaciones. Usa "Regresar al modo web 2D".';
-      $('fuenteDatos').textContent = 'No hay una fuente de contenidos disponible.';
+      await esperar;
+      selectionStatus.textContent = 'No se pudieron cargar las constelaciones. Usa "Salir a 2D".';
+      if ($('fuenteDatos')) $('fuenteDatos').textContent = 'No hay una fuente de contenidos disponible.';
       eventLine(`Error al cargar datos: ${error.message}`);
+      mostrarAvisoError3D('No fue posible cargar las historias', 'Ocurrió un problema de conexión con los contenidos. Si estás usando el visor, enfoca o pulsa «Salir a 2D» para volver a la pantalla principal.');
       return;
     }
     await esperar;

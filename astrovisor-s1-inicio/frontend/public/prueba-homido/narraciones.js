@@ -61,6 +61,8 @@ async function cargar() {
   $('storiesStatus').textContent = 'Cargando historias…'
   $('retryStories').hidden = true
   try {
+    const params = new URLSearchParams(window.location.search)
+    if (params.get('error') === '1' || params.get('simularError') === '1') throw new Error('Fallo simulado')
     const datos = (await cargarDatosCompartidos()).datos
     if (!Array.isArray(datos)) throw new Error('Documento')
     historias = ['orion', 'osa-mayor', 'escorpio'].map((id) => datos.find((x) => x?.id === id))
