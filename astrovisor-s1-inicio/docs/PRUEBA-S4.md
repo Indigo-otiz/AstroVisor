@@ -97,7 +97,7 @@ El avance técnico no acredita esas actividades ni una evaluación formal con pe
 
 El [informe académico de S4](../../entregables/Sprint%204_Luis%20Rodriguez.md) reúne resultados y pendientes para entrega, separado del seguimiento interno.
 
-La [versión Word del informe individual](../../entregables/Sprint%204_Luis%20Rodriguez.docx) está centrada en la parte de Luis. Se renderizaron e inspeccionaron sus dos páginas y el audit automático de accesibilidad no registró hallazgos; la constancia está en `evidencias/s4/word.json`. Los renders de QA permanecen como archivos temporales, separados del documento entregable.
+La [versión Word del informe individual](../../entregables/Sprint%204_Luis%20Rodriguez.docx) está centrada en la parte de Luis. A petición del responsable, se amplió con una profundidad similar al informe de S3: objetivo, criterios de aceptación, implementación, pruebas, respaldo, validación y evidencias. Se renderizaron e inspeccionaron sus cinco páginas y el audit automático de accesibilidad no registró hallazgos; la constancia está en `evidencias/s4/word.json`. Los renders de QA permanecen como archivos temporales, separados del documento entregable.
 
 ## Datos exigidos en una prueba física
 
