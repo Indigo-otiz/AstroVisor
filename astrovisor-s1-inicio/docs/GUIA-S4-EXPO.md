@@ -52,7 +52,9 @@ Abrir el enlace HTTPS sin advertencias, visitar directamente una ficha y recarga
 
 Para el respaldo, abrir el archivo con el reproductor local del equipo y desconectar la red durante la reproducción. Verificar inicio, transiciones, sonido, final y regreso a 2D. Registrar incidencias y restablecer la conexión al terminar. Evitar pestañas personales, notificaciones y pantallas administrativas durante la proyección o grabación.
 
-## Guion de cinco minutos
+## Secuencia opcional para demostrar el proyecto
+
+Luis aclaró que el equipo usa una presentación y muestra el proyecto. La siguiente secuencia es un recurso de apoyo ya preparado; un ensayo cronometrado separado no es requisito de su entrega personal de S4.
 
 | Tiempo | Acción y explicación |
 |---|---|
@@ -62,7 +64,7 @@ Para el respaldo, abrir el archivo con el reproductor local del equipo y descone
 | 2:30–4:00 | Demostrar la escena 3D y, solo si está comprobado, usar teléfono/Homido. Ante fallo continuar en 2D o video según contingencia. Explicar qué se está mostrando. |
 | 4:00–5:00 | Regresar a 2D, mostrar otra constelación y cerrar con lo verificado y las limitaciones reales. |
 
-Duración planeada: 300 segundos. Cronometrar el ensayo y registrar duración observada, participantes, versión y ruta utilizada. El guion no acredita ensayo realizado ni exposición el 5 de noviembre.
+Duración de referencia de esta secuencia: 300 segundos. Puede adaptarse a la demostración del equipo; no acredita un ensayo realizado ni una exposición el 5 de noviembre.
 
 ## Ejecutar localmente para revisión técnica
 

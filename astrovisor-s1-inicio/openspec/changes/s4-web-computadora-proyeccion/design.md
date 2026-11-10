@@ -54,7 +54,7 @@ Guardar el respaldo preferentemente en `docs/evidencias/s4/astrovisor-respaldo-s
 
 Crear durante implementación `docs/GUIA-S4-EXPO.md` y `docs/PRUEBA-S4.md` y guardar capturas/logs/manifiesto S4 con fecha local y UTC cuando aplique. El manifiesto identifica commit base, cambios aún sin commit y hashes de archivos relevantes, incluyendo respaldo. No editar evidencias S3.
 
-La guía incluirá guion de cinco minutos (0:00–0:30 contexto y rótulos, 0:30–1:30 explorar/leer, 1:30–2:30 narración y accesibilidad, 2:30–4:00 demostración Homido o contingencia explicada, 4:00–5:00 retorno y cierre), prueba previa de HTTPS y checklist del equipo, red, luz, sonido y video. Es una preparación para ensayo/presentación posterior: no afirma que hubo Expo el 5/11.
+La guía conserva como recurso opcional la secuencia de demostración de cinco minutos ya preparada, junto con contingencias y comprobaciones del equipo. Según la aclaración de Luis del 10/11, la exposición usa una presentación y la demostración del proyecto; no se requiere un ensayo cronometrado separado para su entrega personal. No se afirma participación en Expo el 5/11.
 
 Cada caso registra método (observado, reportado, simulado, pendiente), fecha, versión, navegador/dispositivo, pasos, resultado y evidencia. El reporte de otro integrante identifica nombre y fuente; la autoevaluación de Luis o una revisión AI no reemplazan esa revisión. Preparar instrucciones no marca como realizados ensayo, proyección ni prueba Homido.
 
@@ -79,4 +79,4 @@ Tras aprobación crear rama de trabajo S4, preservando los archivos ajenos de `e
 
 ## Open Questions
 
-Se resolverán para la ejecución física sin modificar el comportamiento previsto: URL HTTPS disponible; modelo/resolución y condiciones del equipo de proyección; navegador/sistema y salida de sonido; teléfono/Homido; fecha de ensayo posterior y nombre del revisor. Luis confirmó que todavía no realizaron esas actividades; cada caso seguirá pendiente hasta recibir evidencia.
+Los modelos, versiones, URL y condiciones de sala no especificados quedan disponibles para seguimiento operativo del equipo. Luis confirmó funcionamiento correcto de Homido/pantalla y conformidad de Índigo con S4. Esas constancias completan el registro requerido para su parte; no se inventan parámetros ni se exige un ensayo separado. La integración y el archivo del cambio se gestionan por separado.

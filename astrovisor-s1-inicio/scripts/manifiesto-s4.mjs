@@ -4,7 +4,7 @@ import {execFileSync} from 'node:child_process'
 import {fileURLToPath} from 'node:url'
 import {resolve,relative,join,extname,basename} from 'node:path'
 const root=fileURLToPath(new URL('../',import.meta.url)),out=resolve(root,'docs/evidencias/s4')
-const archivos=['frontend/src/App.vue','frontend/src/public.css','.gitignore','docs/GUIA-S4-EXPO.md','docs/PRUEBA-S4.md','../entregables/Sprint 4_Luis Rodriguez.md','content/AUTORIA.md','content/recorridos.json',
+const archivos=['frontend/src/App.vue','frontend/src/public.css','.gitignore','docs/GUIA-S4-EXPO.md','docs/PRUEBA-S4.md','../entregables/Sprint 4_Luis Rodriguez.md','../entregables/Sprint 4_Luis Rodriguez.docx','content/AUTORIA.md','content/recorridos.json',
  'scripts/verificar-s4.cjs','scripts/verificar-zoom-s4.cjs','scripts/servidor-pruebas-s4.cjs','scripts/grabar-s4.cjs','scripts/verificar-video-s4.cjs','scripts/manifiesto-s4.mjs',
  'frontend/public/audio/orion-kokoro-v1.wav','frontend/public/audio/osa-mayor-kokoro-v1.wav','frontend/public/audio/escorpio-kokoro-v1.wav','frontend/dist/index.html']
 for(const name of await readdir(resolve(root,'frontend/dist/assets')))archivos.push('frontend/dist/assets/'+name)

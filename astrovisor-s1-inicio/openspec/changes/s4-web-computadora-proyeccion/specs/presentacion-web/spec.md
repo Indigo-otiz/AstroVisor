@@ -86,9 +86,14 @@ La preparación de presentación SHALL incluir un archivo de video local reprodu
 - **WHEN** no se puede producir, abrir o comprobar una parte del video o su audio
 - **THEN** se registra qué falta y la aceptación de respaldo permanece pendiente; una guía o colección de imágenes no se presenta como el video completo.
 
-### Requirement: Guía de ensayo y apoyo de exposición
+### Requirement: Guía de demostración del proyecto
 
-La entrega SHALL incluir instrucciones para comprobar enlace HTTPS, computadora, pantalla/proyector y sonido, un guion de cinco minutos y las decisiones para pasar del visor a 2D y de la web al video local. SHALL registrar por separado limitaciones de red, proyección y Homido.
+La entrega de Luis SHALL incluir instrucciones de operación y contingencia para demostrar el proyecto con una presentación. SHALL distinguir las pruebas observadas de los reportes de hardware. Un ensayo cronometrado separado no SHALL ser requisito de su entrega personal; la guía de cinco minutos existente será un recurso opcional del equipo.
+
+#### Scenario: Presentación mediante demostración
+- **WHEN** el equipo utiliza una presentación y muestra el proyecto
+- **THEN** la entrega de Luis se evalúa por la adaptación web, sus evidencias y la revisión identificada, sin exigirle un ensayo separado.
+- **AND** no se registra como realizada una exposición o prueba que no haya sido confirmada.
 
 #### Scenario: Selección de contingencia
 - **WHEN** falla el visor y la web permanece accesible, o falla la red requerida por la demostración

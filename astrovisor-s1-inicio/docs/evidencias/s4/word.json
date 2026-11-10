@@ -1,0 +1,20 @@
+{
+  "fechaUTC": "2026-11-10T16:26:19.717335+00:00",
+  "zona": "America/Mexico_City",
+  "archivo": "../entregables/Sprint 4_Luis Rodriguez.docx",
+  "bytes": 158626,
+  "sha256": "98b66244a82f97329c2837264625bd6a9f1b2d8dfb2a2cba95dbb2c35e060bcb",
+  "paginas": 2,
+  "metodo": "Autoría python-docx con runtime empaquetado; render_docx.py y LibreOffice extraído temporalmente; inspección visual de todas las páginas PNG; a11y_audit.py sin hallazgos",
+  "resultadoVisual": "correcto",
+  "alcance": "Informe individual de Luis para S4; exposición mediante presentación y demostración, sin ensayo cronometrado separado como requisito personal",
+  "auditAccesibilidad": {
+    "file": "../entregables/Sprint 4_Luis Rodriguez.docx",
+    "counts": {
+      "high": 0,
+      "medium": 0,
+      "low": 0
+    },
+    "findings": []
+  }
+}

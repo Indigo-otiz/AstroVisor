@@ -32,5 +32,13 @@
     "revisionFormalGitHub": null
   },
   "evidenciaAdjunta": null,
+  "alcancePersonal": {
+    "fechaConstanciaLocal": "2026-11-10",
+    "responsable": "Luis Alberto Rodríguez",
+    "formaDeExposicion": "Presentación y demostración del proyecto",
+    "ensayoCronometradoSeparadoRequerido": false,
+    "fuente": "Luis pidió centrarse únicamente en su parte y aclaró el formato de exposición en este chat",
+    "textoOriginal": "tu solo enfocate en mi pate, usamos prestancion, solo mostramos el proyecto"
+  },
   "limite": "La constancia registra el reporte de funcionamiento correcto de Homido y pantalla y la conformidad de Índigo con S4 comunicada por Luis. Fechas de ejecución/revisión y versiones exactas no especificadas permanecen sin dato; no se atribuyen observación directa del agente, protocolo físico completo, ensayo cronometrado ni revisión formal de GitHub."
 }

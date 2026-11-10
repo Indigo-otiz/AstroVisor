@@ -2,7 +2,7 @@
 
 Responsable: Luis Alberto Rodríguez. Periodo base: 2–6 de noviembre de 2026. Implementación autorizada el **9 de noviembre de 2026**, America/Mexico_City, mediante «continua» en este chat. Luis confirmó que las pruebas y actividades del periodo base no se realizaron. No se atribuye participación en Expo ni se retrofechan evidencias.
 
-Estado al **10 de noviembre de 2026**: **adaptación implementada, regresión técnica aprobada, zoom nativo 200 % comprobado y respaldo audiovisual verificado localmente**. Luis reportó que **Homido y pantalla ya fueron revisados y funcionan correctamente**, y confirmó que **Índigo revisó S4 y lo considera correcto**. Seguimiento: 17 tareas completas; 6.1 y 6.2 cuentan con confirmación funcional reportada y registro detallado parcial; el ensayo cronometrado sigue diferido. S4 no está archivado.
+Estado al **10 de noviembre de 2026**: **la parte de Luis está terminada**. Adaptación implementada, regresión técnica aprobada, zoom nativo 200 % comprobado y respaldo audiovisual verificado localmente. Luis reportó funcionamiento correcto de Homido/pantalla y conformidad de Índigo. Tras su aclaración de alcance, se registran 19/19 tareas personales completas: el ensayo cronometrado separado no forma parte de su entrega. Integración y archivo se gestionan por separado.
 
 **Decisión de seguimiento del 10/11:** Luis confirmó en este chat que las pruebas físicas, el ensayo y la revisión cruzada todavía no se realizaron y decidió dejarlos pendientes por no considerarlos necesarios para el trabajo inmediato. El trabajo técnico actual queda concluido; esas cuatro actividades se conservan como pendientes diferidos, sin fecha comprometida. Esta decisión no cambia sus resultados a aprobados ni implica archivo del cambio.
 
@@ -86,17 +86,18 @@ La [reproducción local completa](evidencias/s4/video-local.json) terminó corre
 
 Se inspeccionaron frames de inicio, escena 3D y final; [captura 3D](evidencias/s4/video-local-3d.png) y [retorno a 2D](evidencias/s4/video-local-final.png). Durante la instrumentación inicial, `MediaElementAudioSourceNode` entregó ceros al analizar `file://`; se cambió a análisis independiente de los bytes del archivo para conservar la reproducción nativa. Esta medición no sustituye escucha humana. El equipo de proyección y su reproductor siguen pendientes de ensayo real.
 
-## Pendientes diferidos por decisión de Luis
+## Alcance personal y seguimiento operativo del equipo
 
-La aclaración posterior registra el funcionamiento correcto de Homido y pantalla. Se mantiene fuera del trabajo inmediato lo que no fue confirmado o desglosado; se retomará cuando Luis lo indique.
+Luis aclaró que el equipo utiliza una presentación y muestra el proyecto, y pidió centrar el trabajo en su parte. Se retira el ensayo cronometrado separado como requisito personal, sin declararlo ejecutado. Las confirmaciones de Homido/pantalla e Índigo se aceptan como constancias para el informe de Luis. Los siguientes detalles quedan disponibles para seguimiento operativo del equipo y no bloquean su entrega:
 
 1. Completar, si se dispone de ellos, los detalles del protocolo de Homido ya reportado correcto: fecha real, teléfono, navegador, versión, HTTPS y resultados por control.
 2. Completar el registro de la pantalla ya reportada correcta y la comprobación del video sin red en ese equipo. No se atribuyen modelo de proyector, pruebas de red ni escucha en sala sin desglose.
-3. Ensayo cronometrado de cinco minutos con el equipo. El apoyo de Expo del 5/11 no se registra como realizado.
 
 El avance técnico no acredita esas actividades ni una evaluación formal con personas adultas mayores. Los materiales académicos son esta guía/registro y las evidencias; OpenSpec conserva únicamente el seguimiento interno. La aprobación de archivo se solicitará solo cuando corresponda finalizar el cambio.
 
 El [informe académico de S4](../../entregables/Sprint%204_Luis%20Rodriguez.md) reúne resultados y pendientes para entrega, separado del seguimiento interno.
+
+La [versión Word del informe individual](../../entregables/Sprint%204_Luis%20Rodriguez.docx) está centrada en la parte de Luis. Se renderizaron e inspeccionaron sus dos páginas y el audit automático de accesibilidad no registró hallazgos; la constancia está en `evidencias/s4/word.json`. Los renders de QA permanecen como archivos temporales, separados del documento entregable.
 
 ## Datos exigidos en una prueba física
 
