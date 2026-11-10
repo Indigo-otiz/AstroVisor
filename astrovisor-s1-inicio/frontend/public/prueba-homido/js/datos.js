@@ -2,6 +2,8 @@
    Mismo contrato que /api/contenidos/recorridos (ver content/README.md); no lo modifica. */
 
 import { audioDe } from '../../audio/narration.js'
+import { idBibliograficoValido } from './ruta-libro-2d.js'
+import { cargarRespaldoPublicado, URL_EXPORTACION } from './respaldo-publicado.js'
 
 export const URL_API = '/api/contenidos/recorridos'
 export const URL_RESPALDO = new URL('../data/recorridos-demo.json', import.meta.url).href
@@ -23,6 +25,17 @@ export function validarRecorridos(datos) {
       ids.has(r.id)
     ) throw new Error('Ficha de constelación inválida')
     ids.add(r.id)
+    if (r.revisionCatalogo !== undefined && (!Number.isSafeInteger(r.revisionCatalogo) || r.revisionCatalogo < 1)) throw new Error('Revisión de catálogo inválida')
+    const librosVistos = new Set()
+    for (const l of r.libros) {
+      if (!l || typeof l.titulo !== 'string' || !l.titulo.trim()) throw new Error('Libro inválido')
+      if (Object.hasOwn(l, 'libroId') && (!idBibliograficoValido(l.libroId) || l.constelacionId !== r.id)) throw new Error('Identidad bibliográfica inválida')
+      if (r.revisionCatalogo !== undefined && !Object.hasOwn(l, 'libroId')) throw new Error('Falta identidad bibliográfica')
+      if (Object.hasOwn(l, 'libroId')) {
+        if (librosVistos.has(l.libroId)) throw new Error('Identidad bibliográfica duplicada')
+        librosVistos.add(l.libroId)
+      }
+    }
   }
   return datos
 }
@@ -40,18 +53,53 @@ async function leerJson(fetchFn, url, timeoutMs) {
 }
 
 /** Intenta la API; si falla o es inválida usa el respaldo local de demostración. */
-export async function cargarDatos({ fetchFn = globalThis.fetch, timeoutMs = 3000, urlApi = URL_API, urlRespaldo = URL_RESPALDO } = {}) {
+export async function cargarDatos({ fetchFn = globalThis.fetch, timeoutMs = 3000, urlApi = URL_API, urlRespaldo = URL_RESPALDO, urlExportacion = URL_EXPORTACION } = {}) {
   try {
-    return { datos: await leerJson(fetchFn, urlApi, timeoutMs), fuente: 'api', motivo: null }
+    const datos = await leerJson(fetchFn, urlApi, timeoutMs)
+    const revisiones = new Set(datos.map(r => r.revisionCatalogo))
+    const revision = revisiones.size === 1 && Number.isSafeInteger(datos[0].revisionCatalogo) && datos[0].revisionCatalogo > 0 ? datos[0].revisionCatalogo : null
+    return { datos, fuente: 'api', motivo: null, revision, aviso: revision ? `Datos de API, revisión ${revision}.` : 'Datos de API sin revisión verificada.' }
   } catch (errorApi) {
+    let carga
+    try {
+      carga = await cargarRespaldoPublicado({ fetchFn, urlExportacion, timeoutMs })
+      validarRecorridos(carga.datos)
+      return carga
+    } catch { carga?.liberar() }
     const datos = await leerJson(fetchFn, urlRespaldo, timeoutMs)
-    return { datos, fuente: 'local', motivo: errorApi.message }
+    return { datos: adaptarRespaldoHeredado(datos), fuente: 'local', motivo: errorApi.message, revision: null,
+      aviso: 'Respaldo heredado de demostración, sin revisión verificada; no se afirma que esté actualizado.' }
   }
 }
 
-/* --- Adaptadores: único lugar que conoce la forma de libros[] y multimedia[] ---
-   SUPUESTOS PENDIENTES DE CONFIRMAR (el contrato actual solo exige arreglos):
-   - libros[i]      = { titulo: string, autor?: string }                       (Karime / Carlos)
+// Escena y narración comparten una sola revisión y los mismos recursos verificados.
+let compartida
+export function cargarDatosCompartidos() {
+  if (!compartida) compartida = cargarDatos().then(carga => {
+    globalThis.window?.addEventListener('pagehide', evento => { if (!evento.persisted) carga.liberar?.() })
+    return carga
+  }).catch(error => { compartida = null; throw error })
+  return compartida
+}
+
+// Compatibilidad exclusiva del respaldo antiguo: firma URL+autor de tres referencias conocidas, nunca título.
+const referenciasHeredadas = [
+  ['https://archive.org/details/starloreofallage00olco', 'William Tyler Olcott', 'star-lore'],
+  ['https://archive.org/details/fieldbookofstars00olcorich', 'William Tyler Olcott', 'field-stars'],
+  ['https://www.gutenberg.org/ebooks/23300', 'Richard A. Proctor', 'half-hours'],
+]
+export function adaptarRespaldoHeredado(datos) {
+  return datos.map(r => ({ ...r, libros: r.libros.map(l => {
+    if (Object.hasOwn(l, 'libroId')) return { ...l }
+    const coincidencias = referenciasHeredadas.filter(([url, autor]) => l.url === url && l.autor === autor)
+    const unicaEnFicha = r.libros.filter(otra => otra.url === l.url && otra.autor === l.autor).length === 1
+    const ref = coincidencias.length === 1 && unicaEnFicha ? coincidencias[0] : null
+    return { ...l, constelacionId: r.id, ...(ref ? { libroId: ref[2], identidadHeredada: true } : {}) }
+  }) }))
+}
+
+/* --- Adaptadores de presentación: la identidad de navegación es libroId/constelacionId.
+   - libros[i]      = { libroId, constelacionId, titulo, autor, motivo, ... } (API versionada)
    - multimedia[i]  = { tipo: 'audio', src: '/audio/<id>.wav', transcripcion, ... } (Luis; lo valida audioDe) */
 
 export function adaptarLibro(ficha) {

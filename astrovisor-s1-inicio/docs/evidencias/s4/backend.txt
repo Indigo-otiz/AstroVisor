@@ -1,0 +1,23 @@
+
+> astrovisor@0.1.0 test
+> npm run test --workspace backend
+
+
+> @astrovisor/backend@0.1.0 test
+> node --test
+
+✔ middleware auth: almacena y recupera sesiones válidas en el servidor (1.5885ms)
+✔ middleware auth: verificarAdmin deniega con 401 si no hay token (0.2812ms)
+✔ middleware auth: verificarAdmin autoriza con token válido (0.2829ms)
+✔ Express API: POST /api/admin/login deniega con 401 ante credenciales incorrectas (1.7379ms)
+✔ Express API: POST /api/admin/login autoriza con credenciales válidas y emite token (1.033ms)
+✔ el repositorio documental devuelve recorridos de demostración (12.7791ms)
+✔ las tres narraciones tienen WAV PCM real y transcripción fiel al guion de muestra (87.13ms)
+ℹ tests 7
+ℹ suites 0
+ℹ pass 7
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 683.8194

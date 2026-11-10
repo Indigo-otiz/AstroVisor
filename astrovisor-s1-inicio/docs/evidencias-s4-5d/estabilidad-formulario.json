@@ -1,0 +1,262 @@
+{
+  "modo": "formulario",
+  "chrome": "156.0.8078.80",
+  "ms": 8203,
+  "aperturas": 5,
+  "cancelaciones": 5,
+  "revision": 1,
+  "health": 200,
+  "errores": [],
+  "red": [
+    {
+      "ms": 4557,
+      "metodo": "POST",
+      "ruta": "/api/admin/login",
+      "evento": "solicitud"
+    },
+    {
+      "ms": 4557,
+      "metodo": "POST",
+      "ruta": "/api/admin/login",
+      "evento": "respuesta",
+      "estado": 200,
+      "respuestaMs": 5292
+    },
+    {
+      "ms": 5300,
+      "metodo": "GET",
+      "ruta": "/api/admin/sesion",
+      "evento": "solicitud"
+    },
+    {
+      "ms": 5300,
+      "metodo": "GET",
+      "ruta": "/api/admin/sesion",
+      "evento": "respuesta",
+      "estado": 200,
+      "respuestaMs": 5311
+    },
+    {
+      "ms": 5405,
+      "metodo": "GET",
+      "ruta": "/api/admin/catalogo",
+      "evento": "solicitud"
+    },
+    {
+      "ms": 5405,
+      "metodo": "GET",
+      "ruta": "/api/admin/catalogo",
+      "evento": "respuesta",
+      "estado": 200,
+      "respuestaMs": 5414
+    }
+  ],
+  "consola": [
+    {
+      "ms": 3323,
+      "tipo": "debug",
+      "texto": "[vite] connecting..."
+    },
+    {
+      "ms": 3333,
+      "tipo": "debug",
+      "texto": "[vite] connected."
+    }
+  ],
+  "pendientes": [],
+  "browserConectado": true,
+  "eventos": [
+    {
+      "ms": 1794249290243,
+      "evento": "focusin",
+      "activo": "admin-user",
+      "destino": "admin-user",
+      "disabled": null,
+      "formulario": false
+    },
+    {
+      "ms": 1794249290271,
+      "evento": "focusin",
+      "activo": "admin-password",
+      "destino": "admin-password",
+      "disabled": null,
+      "formulario": false
+    },
+    {
+      "ms": 1794249290466,
+      "evento": "focusin",
+      "activo": "",
+      "destino": "",
+      "disabled": null,
+      "formulario": false
+    },
+    {
+      "ms": 1794249291470,
+      "evento": "focusin",
+      "activo": "nuevo-libro",
+      "destino": "nuevo-libro",
+      "disabled": false,
+      "formulario": false
+    },
+    {
+      "ms": 1794249291473,
+      "evento": "keydown",
+      "activo": "nuevo-libro",
+      "destino": "nuevo-libro",
+      "disabled": false,
+      "formulario": false
+    },
+    {
+      "ms": 1794249291497,
+      "evento": "focusin",
+      "activo": "editor-heading",
+      "destino": "editor-heading",
+      "disabled": true,
+      "formulario": true
+    },
+    {
+      "ms": 1794249292608,
+      "evento": "focusin",
+      "activo": "",
+      "destino": "",
+      "disabled": true,
+      "formulario": true
+    },
+    {
+      "ms": 1794249292613,
+      "evento": "focusin",
+      "activo": "nuevo-libro",
+      "destino": "nuevo-libro",
+      "disabled": false,
+      "formulario": false
+    },
+    {
+      "ms": 1794249292695,
+      "evento": "keydown",
+      "activo": "nuevo-libro",
+      "destino": "nuevo-libro",
+      "disabled": false,
+      "formulario": false
+    },
+    {
+      "ms": 1794249292705,
+      "evento": "focusin",
+      "activo": "editor-heading",
+      "destino": "editor-heading",
+      "disabled": true,
+      "formulario": true
+    },
+    {
+      "ms": 1794249293321,
+      "evento": "focusin",
+      "activo": "",
+      "destino": "",
+      "disabled": true,
+      "formulario": true
+    },
+    {
+      "ms": 1794249293328,
+      "evento": "focusin",
+      "activo": "nuevo-libro",
+      "destino": "nuevo-libro",
+      "disabled": false,
+      "formulario": false
+    },
+    {
+      "ms": 1794249293408,
+      "evento": "keydown",
+      "activo": "nuevo-libro",
+      "destino": "nuevo-libro",
+      "disabled": false,
+      "formulario": false
+    },
+    {
+      "ms": 1794249293437,
+      "evento": "focusin",
+      "activo": "editor-heading",
+      "destino": "editor-heading",
+      "disabled": true,
+      "formulario": true
+    },
+    {
+      "ms": 1794249293585,
+      "evento": "focusin",
+      "activo": "",
+      "destino": "",
+      "disabled": true,
+      "formulario": true
+    },
+    {
+      "ms": 1794249293594,
+      "evento": "focusin",
+      "activo": "nuevo-libro",
+      "destino": "nuevo-libro",
+      "disabled": false,
+      "formulario": false
+    },
+    {
+      "ms": 1794249293673,
+      "evento": "keydown",
+      "activo": "nuevo-libro",
+      "destino": "nuevo-libro",
+      "disabled": false,
+      "formulario": false
+    },
+    {
+      "ms": 1794249293680,
+      "evento": "focusin",
+      "activo": "editor-heading",
+      "destino": "editor-heading",
+      "disabled": true,
+      "formulario": true
+    },
+    {
+      "ms": 1794249293825,
+      "evento": "focusin",
+      "activo": "",
+      "destino": "",
+      "disabled": true,
+      "formulario": true
+    },
+    {
+      "ms": 1794249293831,
+      "evento": "focusin",
+      "activo": "nuevo-libro",
+      "destino": "nuevo-libro",
+      "disabled": false,
+      "formulario": false
+    },
+    {
+      "ms": 1794249293922,
+      "evento": "keydown",
+      "activo": "nuevo-libro",
+      "destino": "nuevo-libro",
+      "disabled": false,
+      "formulario": false
+    },
+    {
+      "ms": 1794249293930,
+      "evento": "focusin",
+      "activo": "editor-heading",
+      "destino": "editor-heading",
+      "disabled": true,
+      "formulario": true
+    },
+    {
+      "ms": 1794249294064,
+      "evento": "focusin",
+      "activo": "",
+      "destino": "",
+      "disabled": true,
+      "formulario": true
+    },
+    {
+      "ms": 1794249294069,
+      "evento": "focusin",
+      "activo": "nuevo-libro",
+      "destino": "nuevo-libro",
+      "disabled": false,
+      "formulario": false
+    }
+  ]
+}

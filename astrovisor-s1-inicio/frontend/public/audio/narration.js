@@ -1,8 +1,15 @@
 /** Reproductor compartido por Vue y la página independiente del visor. */
+const audiosPublicados = new WeakSet()
+export function registrarAudioPublicado(audio) {
+  if (!audio?.src?.startsWith('blob:')) throw new Error('Audio publicado inválido')
+  const registrado = Object.freeze({ ...audio })
+  audiosPublicados.add(registrado)
+  return registrado
+}
 export function audioDe(recorrido) {
   return recorrido?.multimedia?.find((item) =>
     item?.tipo === 'audio' &&
-    /^\/audio\/[a-z0-9-]+\.(wav|mp3|m4a|ogg)$/.test(item.src) &&
+    (/^\/audio\/[a-z0-9-]+\.(wav|mp3|m4a|ogg)$/.test(item.src) || audiosPublicados.has(item)) &&
     ['transcripcion', 'autorTexto', 'voz', 'procedencia', 'permiso'].every(
       (campo) => typeof item[campo] === 'string' && item[campo].trim(),
     ),

@@ -1,0 +1,27 @@
+{
+  "fechaUTC": "2026-11-10T17:01:54.769416+00:00",
+  "zona": "America/Mexico_City",
+  "archivo": "../entregables/Sprint 4_Luis Rodriguez.docx",
+  "bytes": 1268110,
+  "sha256": "a76e12483cad95c8afbde9c6a69e3a7d89cde3dc2add58b52c39e4f62d78656d",
+  "paginas": 8,
+  "metodo": "Autoría python-docx con runtime empaquetado; render_docx.py y LibreOffice extraído temporalmente; inspección visual de todas las páginas PNG; a11y_audit.py sin hallazgos",
+  "resultadoVisual": "correcto",
+  "alcance": "Informe individual de Luis para S4; exposición mediante presentación y demostración, sin ensayo cronometrado separado como requisito personal",
+  "auditAccesibilidad": {
+    "file": "../entregables/Sprint 4_Luis Rodriguez.docx",
+    "counts": {
+      "high": 0,
+      "medium": 0,
+      "low": 0
+    },
+    "findings": []
+  },
+  "revision": "Portada independiente y formato recuperados del Word S3 suministrado por Luis; Times New Roman 12, interlineado doble, márgenes de 2.54 cm, sangría de 1.27 cm y numeración superior; contenido S4 ampliado conservado",
+  "referenciaFormato": {
+    "archivo": "Sprint 3_Luis Rodriguez.docx",
+    "sha256": "9a5f85401572f769674478bf5f866435f2751578b419b063c0531769c8d70568",
+    "sinModificaciones": true,
+    "partesConservadas": 23
+  }
+}

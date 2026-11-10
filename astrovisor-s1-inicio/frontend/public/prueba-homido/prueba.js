@@ -6,7 +6,7 @@
    - Audio: el reproductor ES el de Luis (audio/narration.js, vía narraciones.js). Contrato: window.astrovisorVisor y eventos
      astrovisor:ficha-abierta/-cerrada/audio-solicitado/salida-visor (ver docs/PRUEBA-S3-HOMIDO.md).
 */
-import { cargarDatos, adaptarAudio } from './js/datos.js';
+import { cargarDatosCompartidos, adaptarAudio } from './js/datos.js';
 import { FIGURAS, posicionEnEsfera, frenteDeCamara } from './js/figuras.js';
 import { crearConstelacion, crearAnillo, actualizarAnillo, vincularEtiqueta, COLOR_CONFIRMADO } from './js/escena-constelaciones.js';
 import { crearDwell } from './js/gaze-dwell.js';
@@ -73,6 +73,7 @@ import { rutaLibro2D } from './js/ruta-libro-2d.js';
   let layoutActual = null;
   let vistaLectura = 'ficha'; // ficha | estanteria | detalle; modo de visor continúa en 'ficha'
   let libroSeleccionado = null;
+  let recorridosBibliograficos = [];
   let estanteria = null;
   let userReady = false; // evita autodisparos mientras la persona acomoda el visor
 
@@ -343,8 +344,13 @@ import { rutaLibro2D } from './js/ruta-libro-2d.js';
   }
 
   function abrirEstanteria() {
-    if (vistaLectura !== 'ficha' || estado.modo !== 'ficha' || !estanteria?.libros.length) return;
+    if (vistaLectura !== 'ficha' || estado.modo !== 'ficha') return;
+    const libros = extraerLibros(recorridosBibliograficos, estado.fichaId);
+    if (!libros.length) return;
     dwell.cancelar();
+    estanteriaEl.replaceChildren();
+    document.querySelectorAll('[data-portada-homido]').forEach(c => c.remove());
+    estanteria = crearEstanteria3D(document, estanteriaEl, libros, ligar);
     vistaLectura = 'estanteria';
     colocarVistaFrente(estanteriaEl);
     estanteria.mostrar(estado.fichaId);
@@ -588,10 +594,11 @@ import { rutaLibro2D } from './js/ruta-libro-2d.js';
     const forzarError = params.get('error') === '1' || params.get('simularError') === '1';
     try {
       if (forzarError) throw new Error('Fallo simulado mediante ?error=1');
-      carga = await cargarDatos();
+      carga = await cargarDatosCompartidos();
     } catch (error) {
       await esperar;
       selectionStatus.textContent = 'No se pudieron cargar las constelaciones. Usa "Salir a 2D".';
+      if ($('fuenteDatos')) $('fuenteDatos').textContent = 'No hay una fuente de contenidos disponible.';
       eventLine(`Error al cargar datos: ${error.message}`);
       mostrarAvisoError3D('No fue posible cargar las historias', 'Ocurrió un problema de conexión con los contenidos. Si estás usando el visor, enfoca o pulsa «Salir a 2D» para volver a la pantalla principal.');
       return;
@@ -599,7 +606,8 @@ import { rutaLibro2D } from './js/ruta-libro-2d.js';
     await esperar;
     eventLine(carga.fuente === 'api'
       ? 'Datos de constelaciones: API /api/contenidos/recorridos.'
-      : `Datos de constelaciones: respaldo local de DEMOSTRACIÓN (API no disponible: ${carga.motivo}).`);
+      : carga.aviso);
+    $('fuenteDatos').textContent = carga.aviso;
     const lista = carga.datos.filter((f) => {
       if (FIGURAS[f.id]) return true;
       eventLine(`Constelación "${f.id}" sin figura 3D definida: omitida del recorrido.`);
@@ -614,7 +622,7 @@ import { rutaLibro2D } from './js/ruta-libro-2d.js';
       constelacionesEl.appendChild(c.el);
       c.el.querySelectorAll('[data-action]').forEach(ligar);
     });
-    estanteria = crearEstanteria3D(document, estanteriaEl, extraerLibros(lista), ligar);
+    recorridosBibliograficos = lista;
     activarGrupo(estanteriaEl, false);
     activarGrupo(constelacionesEl, true);
     activarGrupo(visorControls3D, true);

@@ -1,7 +1,15 @@
-import test from 'node:test'
+import test, { after } from 'node:test'
 import assert from 'node:assert/strict'
-import { obtenerRecorridos } from '../src/services/documentRepository.js'
-import { readFile } from 'node:fs/promises'
+import { obtenerRecorridos as leerRecorridos, inicializarCatalogo } from '../src/services/documentRepository.js'
+import { readFile, mkdtemp, rm } from 'node:fs/promises'
+import { tmpdir } from 'node:os'
+import { join, dirname } from 'node:path'
+
+const directorio = await mkdtemp(join(tmpdir(), 'astrovisor-s4-contrato-'))
+assert.equal(dirname(directorio), tmpdir())
+after(() => rm(directorio, { recursive: true, force: true }))
+await inicializarCatalogo({ directorio })
+const obtenerRecorridos = () => leerRecorridos({ directorio })
 
 test('el repositorio documental devuelve recorridos de demostración', async () => {
   const recorridos = await obtenerRecorridos()
@@ -53,16 +61,20 @@ test('las tres narraciones tienen WAV PCM real y transcripción fiel al guion de
   }
 })
 
-test('el contrato documental incluye libros de demostración reales y coincide con el respaldo del visor', async () => {
+test('el contrato por ID incluye nueve relaciones y conserva los campos del respaldo heredado', async () => {
   const recorridos = await obtenerRecorridos()
   for (const r of recorridos) {
     assert.ok(r.libros.length >= 1, `${r.id}: debe tener al menos una referencia de libro`)
     for (const libro of r.libros) {
       assert.ok(libro.titulo?.trim(), `${r.id}: el libro debe tener título`)
       assert.ok(libro.autor?.trim(), `${r.id}: el libro debe tener autor`)
-      assert.equal(libro.etiqueta, 'Referencia de demostración')
+      assert.ok(libro.libroId && libro.motivo)
+      assert.equal(libro.demostracion, true)
+      if (libro.referenciaHeredada) assert.equal(libro.etiqueta, 'Referencia de demostración')
     }
   }
   const demoJson = JSON.parse(await readFile(new URL('../../frontend/public/prueba-homido/data/recorridos-demo.json', import.meta.url), 'utf8'))
-  assert.deepEqual(demoJson, recorridos, 'El archivo de respaldo local debe ser idéntico al contrato documental canónico')
+  assert.equal(recorridos.flatMap(r => r.libros).length, 9)
+  const heredado = recorridos.map(({ revisionCatalogo, libros, ...r }) => ({ ...r, libros: libros.filter(l => l.referenciaHeredada).map(({ libroId, constelacionId, motivo, demostracion, referenciaHeredada, portada, ...l }) => l) }))
+  assert.deepEqual(demoJson, heredado, 'Los campos bibliográficos previos permanecen intactos; el respaldo no se ha actualizado')
 })
