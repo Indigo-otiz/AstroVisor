@@ -1,0 +1,774 @@
+{
+  "fechaUTC": "2026-11-10T17:17:09.229Z",
+  "zona": "America/Mexico_City",
+  "rama": "codex/s4-web-computadora-proyeccion",
+  "entregaAntesDeIntegracion": "16848a13e23113f3752eb1748d46b7e9894e5295",
+  "mainVerificado": "c294ecc167279dfb2f29b51371f278d5b6b9ef78",
+  "estado": "Captura de verificación previa al commit de combinación; merge preparado localmente",
+  "resultados": {
+    "backend": 132,
+    "frontend": 153,
+    "navegador": 50,
+    "erroresJavaScript": 0,
+    "build": "correcto"
+  },
+  "alcance": "Pruebas técnicas de integración. Word/video y aceptación física/revisión conservan sus registros previos. No acredita repetición de hardware ni despliegue.",
+  "hashes": [
+    {
+      "archivo": "backend/src/index.js",
+      "bytes": 10678,
+      "normalizacion": "UTF-8 sin BOM; LF",
+      "sha256": "fd1d8126776e696e8d90af3d532f15f46891bb8a0bc5358ca8c209a8a6f16ea3"
+    },
+    {
+      "archivo": "backend/src/middleware/auth.js",
+      "bytes": 2461,
+      "normalizacion": "UTF-8 sin BOM; LF",
+      "sha256": "3ff83b8426ec55252d7a84c2f3820f90699feb825693caa68e75b7a3a4e7391b"
+    },
+    {
+      "archivo": "backend/src/services/adminCredentials.js",
+      "bytes": 4379,
+      "normalizacion": "UTF-8 sin BOM; LF",
+      "sha256": "3cfd9b1797fa341bb6963169a880b3b9e7a9073b2e24b8db04566e3023bac897"
+    },
+    {
+      "archivo": "backend/src/services/catalogo.js",
+      "bytes": 9508,
+      "normalizacion": "UTF-8 sin BOM; LF",
+      "sha256": "7107c55981575d0acaedb40e91d853bd2780e429c626bf9b4648da87a3833e7a"
+    },
+    {
+      "archivo": "backend/src/services/catalogoEdicion.js",
+      "bytes": 5707,
+      "normalizacion": "UTF-8 sin BOM; LF",
+      "sha256": "e94b6763897598e709e8ebff86d18616da2cb23fc0119532fe9509c9181f0be2"
+    },
+    {
+      "archivo": "backend/src/services/documentRepository.js",
+      "bytes": 2251,
+      "normalizacion": "UTF-8 sin BOM; LF",
+      "sha256": "0caf05b1f8394bd442db39eee537ea791bf987eb2eebccb874ef034b23828dea"
+    },
+    {
+      "archivo": "backend/src/services/documentWriter.js",
+      "bytes": 11726,
+      "normalizacion": "UTF-8 sin BOM; LF",
+      "sha256": "a68928f4a9e2610d1c0eea6f1fcb1a395404b4ae9557a73a6164c126cc5daf96"
+    },
+    {
+      "archivo": "backend/src/services/homidoExport.js",
+      "bytes": 10931,
+      "normalizacion": "UTF-8 sin BOM; LF",
+      "sha256": "3e8682cbe854486d1d4b12586460bcd5aee8645f1382ef4e87f8eeb168abfb75"
+    },
+    {
+      "archivo": "backend/src/services/imageResources.js",
+      "bytes": 4806,
+      "normalizacion": "UTF-8 sin BOM; LF",
+      "sha256": "7c2b9af13b8c925bafe0943898d03e5b43e2760b8c0fbd411f8659f2406abba6"
+    },
+    {
+      "archivo": "backend/src/services/portadas.js",
+      "bytes": 5129,
+      "normalizacion": "UTF-8 sin BOM; LF",
+      "sha256": "0c52d96c977936dd57b006f8d7d14c83060f1c72267b1ad4150b1c6e287a26ef"
+    },
+    {
+      "archivo": "backend/src/services/privateStorage.js",
+      "bytes": 1222,
+      "normalizacion": "UTF-8 sin BOM; LF",
+      "sha256": "55be214d13f73448d09a8a498f6cc404e9abe2afbeab13e9f2448ab578479330"
+    },
+    {
+      "archivo": "content/catalogo-inicial.json",
+      "bytes": 10800,
+      "normalizacion": "UTF-8 sin BOM; LF",
+      "sha256": "cb102a60ec2869ba9b4d9e56bbd2a4508ac62a362197ce474214368d8c1f94ca"
+    },
+    {
+      "archivo": "frontend/public/ITTepic_logo.jpg",
+      "bytes": 14235,
+      "normalizacion": "Binario sin normalización",
+      "sha256": "71e6952ec7d6dd41e113f4a9268ae50e32792cd117013394cc5b25fa866c8c91"
+    },
+    {
+      "archivo": "frontend/public/Logo TecNMs.png",
+      "bytes": 63061,
+      "normalizacion": "Binario sin normalización",
+      "sha256": "31350118d983d18c3d9c6ba52b7b790e77f9e4e425722cfdacc85f78068a515d"
+    },
+    {
+      "archivo": "frontend/public/audio/escorpio-kokoro-v1.wav",
+      "bytes": 1047596,
+      "normalizacion": "Binario sin normalización",
+      "sha256": "b8bc6b061256e57739b5644d004eeb8d1d97f4394bf13c0894d6fd2c91ab5d21"
+    },
+    {
+      "archivo": "frontend/public/audio/escorpio.txt",
+      "bytes": 403,
+      "normalizacion": "UTF-8 sin BOM; LF",
+      "sha256": "259c105f0341647a950e452fe7523f7aaafca3a9ffd3fa5f0a250eebf7c32baa"
+    },
+    {
+      "archivo": "frontend/public/audio/escorpio.wav",
+      "bytes": 1174012,
+      "normalizacion": "Binario sin normalización",
+      "sha256": "9b8606f3159796a242a45abf98b0a9ea46b1b4a6569af00fc2e24a7319e7eee8"
+    },
+    {
+      "archivo": "frontend/public/audio/narration.js",
+      "bytes": 6360,
+      "normalizacion": "UTF-8 sin BOM; LF",
+      "sha256": "6ab6a0c643fb42ab2f01805b866a39582e826406fdf4c35ba4a763c925e8f2ba"
+    },
+    {
+      "archivo": "frontend/public/audio/orion-kokoro-v1.wav",
+      "bytes": 990252,
+      "normalizacion": "Binario sin normalización",
+      "sha256": "0b85a88e81f0e03379d6963fea7c9630c254ea5bb63f7395796512181cb130ce"
+    },
+    {
+      "archivo": "frontend/public/audio/orion.txt",
+      "bytes": 379,
+      "normalizacion": "UTF-8 sin BOM; LF",
+      "sha256": "7a83a9940337252d1b4638d0e6803366fd08f3b25b5c60c678b9d82c79101406"
+    },
+    {
+      "archivo": "frontend/public/audio/orion.wav",
+      "bytes": 1223676,
+      "normalizacion": "Binario sin normalización",
+      "sha256": "a020034c321a631c702472801228ffc010e82b9b119651dab57fc7f1a9ac03f1"
+    },
+    {
+      "archivo": "frontend/public/audio/osa-mayor-kokoro-v1.wav",
+      "bytes": 1058860,
+      "normalizacion": "Binario sin normalización",
+      "sha256": "76f1818fc731e6bb1356e67bf5e2bda687a0f95dda303512da3242419ae8e2e2"
+    },
+    {
+      "archivo": "frontend/public/audio/osa-mayor.txt",
+      "bytes": 396,
+      "normalizacion": "UTF-8 sin BOM; LF",
+      "sha256": "3910a2c3c73944bf5c14bab3984b124d35518865028879e8e5ba7220f5462724"
+    },
+    {
+      "archivo": "frontend/public/audio/osa-mayor.wav",
+      "bytes": 1225840,
+      "normalizacion": "Binario sin normalización",
+      "sha256": "f839b6d1e347e535133d8963d960b422d10a68e0388bad137cf82eda921cd956"
+    },
+    {
+      "archivo": "frontend/public/favicon.svg",
+      "bytes": 212,
+      "normalizacion": "UTF-8 sin BOM; LF",
+      "sha256": "b775347dcb0d0ddbabc6739cfdd499a15973671655b4174fbac02fcb13cb72a6"
+    },
+    {
+      "archivo": "frontend/public/institucional/biblioteca-solon-arguello.png",
+      "bytes": 77278,
+      "normalizacion": "Binario sin normalización",
+      "sha256": "76e5539cd571384940bdcfae80dabf88a21b99dda929d2bd3ec6fce6c4160263"
+    },
+    {
+      "archivo": "frontend/public/libros-demo/field-stars.svg",
+      "bytes": 1483,
+      "normalizacion": "UTF-8 sin BOM; LF",
+      "sha256": "f241990eb92799a8be18102a724ef2ea4ff524374414e46532e5f6b7d4b0124c"
+    },
+    {
+      "archivo": "frontend/public/libros-demo/half-hours.svg",
+      "bytes": 1484,
+      "normalizacion": "UTF-8 sin BOM; LF",
+      "sha256": "905e02247d12184d268d75e5362b9dc6f201f3ab022030157241ee060437d276"
+    },
+    {
+      "archivo": "frontend/public/libros-demo/star-lore.svg",
+      "bytes": 1475,
+      "normalizacion": "UTF-8 sin BOM; LF",
+      "sha256": "46094f074bdcdf069d5decab843457c38d9978c0456c0e758c5941bc87cc5faa"
+    },
+    {
+      "archivo": "frontend/public/prueba-homido/data/recorridos-demo.json",
+      "bytes": 8154,
+      "normalizacion": "UTF-8 sin BOM; LF",
+      "sha256": "2da99f0911ead6e5446ce80a9b43a8ecc6c84649abe27269758e97b61f9db11e"
+    },
+    {
+      "archivo": "frontend/public/prueba-homido/index.html",
+      "bytes": 10263,
+      "normalizacion": "UTF-8 sin BOM; LF",
+      "sha256": "fd812a41f30c0dff77070de201b565d48f3f8f9a6f64eca2ceb3bbdb3c949abf"
+    },
+    {
+      "archivo": "frontend/public/prueba-homido/js/catalogo-estelar.js",
+      "bytes": 3371,
+      "normalizacion": "UTF-8 sin BOM; LF",
+      "sha256": "b71229a6f350de080f7339102b3e5153a5bb31856cc9519e8baec3ac1e158c33"
+    },
+    {
+      "archivo": "frontend/public/prueba-homido/js/cielo.js",
+      "bytes": 14520,
+      "normalizacion": "UTF-8 sin BOM; LF",
+      "sha256": "d75c6d6991d7bbf055ed443af27cad03669b1254d61b606abbe09fd587525fc0"
+    },
+    {
+      "archivo": "frontend/public/prueba-homido/js/datos.js",
+      "bytes": 6756,
+      "normalizacion": "UTF-8 sin BOM; LF",
+      "sha256": "0f7391bb95003c66d049753b8b555018abd593baeb1ca97974d8fd97b542f2ac"
+    },
+    {
+      "archivo": "frontend/public/prueba-homido/js/diagnostico.js",
+      "bytes": 8539,
+      "normalizacion": "UTF-8 sin BOM; LF",
+      "sha256": "bd56587c77b74fea6061ed29a39e5f368cbd4a60a71ab12c994e8a52d602a61b"
+    },
+    {
+      "archivo": "frontend/public/prueba-homido/js/escena-constelaciones.js",
+      "bytes": 7246,
+      "normalizacion": "UTF-8 sin BOM; LF",
+      "sha256": "d3d20af8b6239ae1e436706c0c6984e697b4510c730c0f340780ce6cd5c3d057"
+    },
+    {
+      "archivo": "frontend/public/prueba-homido/js/estanteria-3d.js",
+      "bytes": 7778,
+      "normalizacion": "UTF-8 sin BOM; LF",
+      "sha256": "72ecb61305f9a1a7e1729ca0f076d16dacb406591dc070a3ba3b71133d7cf947"
+    },
+    {
+      "archivo": "frontend/public/prueba-homido/js/estereo.js",
+      "bytes": 602,
+      "normalizacion": "UTF-8 sin BOM; LF",
+      "sha256": "9e39ab7c9cb3a0369c2d3c667b325200c5bab52d31c9ba261afa2dccf2376e4b"
+    },
+    {
+      "archivo": "frontend/public/prueba-homido/js/ficha-canvas.js",
+      "bytes": 8624,
+      "normalizacion": "UTF-8 sin BOM; LF",
+      "sha256": "a83566aa457aaad17b278acd7f88a22bf4f422b8fd0c6354a0fea8aceb19d2ba"
+    },
+    {
+      "archivo": "frontend/public/prueba-homido/js/figuras.js",
+      "bytes": 5359,
+      "normalizacion": "UTF-8 sin BOM; LF",
+      "sha256": "665885749381667544fae9e01df926694678dc0e7d737167245bb1617141728b"
+    },
+    {
+      "archivo": "frontend/public/prueba-homido/js/gaze-dwell.js",
+      "bytes": 2859,
+      "normalizacion": "UTF-8 sin BOM; LF",
+      "sha256": "b4ac9d1ef5d927450a680b57279f4ef07a96ec2b727cd3e32758dbd2fde6b54a"
+    },
+    {
+      "archivo": "frontend/public/prueba-homido/js/paquete-publico.js",
+      "bytes": 3581,
+      "normalizacion": "UTF-8 sin BOM; LF",
+      "sha256": "3ab666465005f3efc0c7c758059c2592ca58ed963191465bdf3e6e9c9cf547f4"
+    },
+    {
+      "archivo": "frontend/public/prueba-homido/js/respaldo-publicado.js",
+      "bytes": 3874,
+      "normalizacion": "UTF-8 sin BOM; LF",
+      "sha256": "bc251394c204a89ca70e26d9c1a269345e9f352c98c176ee60b4d2fba9b9acc7"
+    },
+    {
+      "archivo": "frontend/public/prueba-homido/js/ruta-libro-2d.js",
+      "bytes": 507,
+      "normalizacion": "UTF-8 sin BOM; LF",
+      "sha256": "1a0c9cce731fe57993e53bd94d9fc870f4166f1ed9857d2e6173b92cc97e5a51"
+    },
+    {
+      "archivo": "frontend/public/prueba-homido/js/visor-estado.js",
+      "bytes": 1263,
+      "normalizacion": "UTF-8 sin BOM; LF",
+      "sha256": "58a69f2b6199b02bf26dc1090bc99ab87329185259a71e7f87357cc03f587f98"
+    },
+    {
+      "archivo": "frontend/public/prueba-homido/narraciones.js",
+      "bytes": 5520,
+      "normalizacion": "UTF-8 sin BOM; LF",
+      "sha256": "1b71dc6f89a000885f73df9af5767f0a21432fcf0dd361cd798628099cb70926"
+    },
+    {
+      "archivo": "frontend/public/prueba-homido/prueba.js",
+      "bytes": 31892,
+      "normalizacion": "UTF-8 sin BOM; LF",
+      "sha256": "f37811de8c0c0be1679c4f78de528988302fe358ab7802f0ae76682e3e5e2dec"
+    },
+    {
+      "archivo": "frontend/public/prueba-homido/styles.css",
+      "bytes": 3963,
+      "normalizacion": "UTF-8 sin BOM; LF",
+      "sha256": "d89380e09bd155b14792124ebd140281f185236fd53cb242196287c5f5da49bc"
+    },
+    {
+      "archivo": "frontend/public/prueba-homido/vendor/LEEME.md",
+      "bytes": 3780,
+      "normalizacion": "UTF-8 sin BOM; LF",
+      "sha256": "fed3a97f25375aaebe5061dc2af276201611e67d6377a1ab9dfd495cbc5c28a4"
+    },
+    {
+      "archivo": "frontend/public/prueba-homido/vendor/LICENSE-aframe.txt",
+      "bytes": 1081,
+      "normalizacion": "UTF-8 sin BOM; LF",
+      "sha256": "b95e475bf6ac9fe406e46cb49474194e425c4eff2c480701e4d314ab886e394f"
+    },
+    {
+      "archivo": "frontend/public/prueba-homido/vendor/THIRD-PARTY-NOTICES.txt",
+      "bytes": 50879,
+      "normalizacion": "UTF-8 sin BOM; LF",
+      "sha256": "78883d1812a5cc3428f0db10b39640f953eb2282a23fb03ae915f30f5592ffb4"
+    },
+    {
+      "archivo": "frontend/public/prueba-homido/vendor/aframe.min.js",
+      "bytes": 1323396,
+      "normalizacion": "UTF-8 sin BOM; LF",
+      "sha256": "27a49c530c18c0710f5d0b9492934d5ba6670fe492be37a5e5ea890f26a9864f"
+    },
+    {
+      "archivo": "frontend/src/App.vue",
+      "bytes": 3724,
+      "normalizacion": "UTF-8 sin BOM; LF",
+      "sha256": "5cdc796aacea515f95d700c09a4431ce70067e59801fdbaefe48f252d7efea45"
+    },
+    {
+      "archivo": "frontend/src/components/ConstellationArt.vue",
+      "bytes": 1986,
+      "normalizacion": "UTF-8 sin BOM; LF",
+      "sha256": "9c46f73b644640483c871d2a4c03a418d018af1fb2d51a85b5037d5d365cade2"
+    },
+    {
+      "archivo": "frontend/src/components/ContentState.vue",
+      "bytes": 1386,
+      "normalizacion": "UTF-8 sin BOM; LF",
+      "sha256": "0d34c326d2d9e3cb28224ead5c8890cba712ccdd57b1328f01dba6666e3f5c16"
+    },
+    {
+      "archivo": "frontend/src/components/GazeReticle.vue",
+      "bytes": 4608,
+      "normalizacion": "UTF-8 sin BOM; LF",
+      "sha256": "5f8e53bfd528e6b20bc5ef58fbb15e5dd01053c57c7da871616e993c052c9803"
+    },
+    {
+      "archivo": "frontend/src/components/NarracionAudio.vue",
+      "bytes": 2959,
+      "normalizacion": "UTF-8 sin BOM; LF",
+      "sha256": "05ab359adc6e9a6e114fc97d2a34d179216aabb26abd47efae335880424d0b33"
+    },
+    {
+      "archivo": "frontend/src/composables/useAuth.js",
+      "bytes": 2741,
+      "normalizacion": "UTF-8 sin BOM; LF",
+      "sha256": "60058eed9942e584420a73564f102b68026fccc7cd868c55af368fb69aaef2e8"
+    },
+    {
+      "archivo": "frontend/src/composables/useEditorCatalogo.js",
+      "bytes": 12883,
+      "normalizacion": "UTF-8 sin BOM; LF",
+      "sha256": "6eff15b8fd63a09f5568a505ecb4c9fc3959a72b3985b9e1fa4445a673d6fdd5"
+    },
+    {
+      "archivo": "frontend/src/composables/useLibros.js",
+      "bytes": 1153,
+      "normalizacion": "UTF-8 sin BOM; LF",
+      "sha256": "345d95d537f444e80054af0bc3b8b086d8ba1f69a69d9aa0bba8720367f095fc"
+    },
+    {
+      "archivo": "frontend/src/composables/useRecorridos.js",
+      "bytes": 1099,
+      "normalizacion": "UTF-8 sin BOM; LF",
+      "sha256": "bbaefa56f0fe740728411fb6e2187de1ef91e299be690d3832e3c062ce525af1"
+    },
+    {
+      "archivo": "frontend/src/data/libros-demo.json",
+      "bytes": 2304,
+      "normalizacion": "UTF-8 sin BOM; LF",
+      "sha256": "163cf312b0b97fadd9f5b84ff4e0e187562231a023ff912dd3b87f176af2cb36"
+    },
+    {
+      "archivo": "frontend/src/main.js",
+      "bytes": 163,
+      "normalizacion": "UTF-8 sin BOM; LF",
+      "sha256": "97d1c4a59f294a2218b73604607fab88ef8392a3d490b55b0c298bc9b7e5ef14"
+    },
+    {
+      "archivo": "frontend/src/public.css",
+      "bytes": 13577,
+      "normalizacion": "UTF-8 sin BOM; LF",
+      "sha256": "f72d547822d7eb469c92850fc5313564f54a057c19daa2e6ccd80658e02f7409"
+    },
+    {
+      "archivo": "frontend/src/router/index.js",
+      "bytes": 1536,
+      "normalizacion": "UTF-8 sin BOM; LF",
+      "sha256": "43a35665bf0d22eb9aafa487ae611c490293b17ccaa9bbd4d675895a9dffcf79"
+    },
+    {
+      "archivo": "frontend/src/services/catalogoAdminService.js",
+      "bytes": 5841,
+      "normalizacion": "UTF-8 sin BOM; LF",
+      "sha256": "eae0a1b0164130d9d94f584b57f5a34dd8500c9c03dc8a75023abb997dac60d2"
+    },
+    {
+      "archivo": "frontend/src/services/contentService.js",
+      "bytes": 1066,
+      "normalizacion": "UTF-8 sin BOM; LF",
+      "sha256": "72cff4dd81337e107475c3baa95a3bcf035d803385e4ba3c6061ddb6c40b1657"
+    },
+    {
+      "archivo": "frontend/src/services/gazeController.js",
+      "bytes": 3595,
+      "normalizacion": "UTF-8 sin BOM; LF",
+      "sha256": "b931c93b3d66da801c158a6238268c57e53da332c581ce7865b554234f1fd51a"
+    },
+    {
+      "archivo": "frontend/src/services/librosDemoService.js",
+      "bytes": 3667,
+      "normalizacion": "UTF-8 sin BOM; LF",
+      "sha256": "351b9ed096c61f7b7d03e125d6dce835948875e8593c3c1df3bdc747ca9c841a"
+    },
+    {
+      "archivo": "frontend/src/services/supabaseClient.js",
+      "bytes": 909,
+      "normalizacion": "UTF-8 sin BOM; LF",
+      "sha256": "a0fd9554a99838934e9b3d33e4976fe3c49c8632a01631742916acd6fbcadd35"
+    },
+    {
+      "archivo": "frontend/src/styles.css",
+      "bytes": 18351,
+      "normalizacion": "UTF-8 sin BOM; LF",
+      "sha256": "cfb3069619e81537099a59167057f31f15dc3692f286ad526be8953d1b201a87"
+    },
+    {
+      "archivo": "frontend/src/views/AdminAccesoView.vue",
+      "bytes": 7244,
+      "normalizacion": "UTF-8 sin BOM; LF",
+      "sha256": "02652835dbbe634aaf4a7a914d859cc822915c860acb60d953f4a372d49e485c"
+    },
+    {
+      "archivo": "frontend/src/views/AdminPanelView.vue",
+      "bytes": 30013,
+      "normalizacion": "UTF-8 sin BOM; LF",
+      "sha256": "2b2fd5abf8b5225e5796c7d39dae30d5f7ff55dcf7aaf648542643d13afc5079"
+    },
+    {
+      "archivo": "frontend/src/views/BibliotecaView.vue",
+      "bytes": 10124,
+      "normalizacion": "UTF-8 sin BOM; LF",
+      "sha256": "0e6637ff8ffb702eb6f8f09ff063696ccc3f8a6e4268070e055e8f097a350de8"
+    },
+    {
+      "archivo": "frontend/src/views/ConstelacionView.vue",
+      "bytes": 4230,
+      "normalizacion": "UTF-8 sin BOM; LF",
+      "sha256": "ea986baebcb056d0dbbff0d137b3c8c73a22b3c0d8ce2581d10021aab0e59756"
+    },
+    {
+      "archivo": "frontend/src/views/ExplorarView.vue",
+      "bytes": 1866,
+      "normalizacion": "UTF-8 sin BOM; LF",
+      "sha256": "5b0460eaf8348b9fe993b5ced830c873a326d80993152988eb6680835a7ba041"
+    },
+    {
+      "archivo": "frontend/src/views/InicioView.vue",
+      "bytes": 1330,
+      "normalizacion": "UTF-8 sin BOM; LF",
+      "sha256": "12874c7e4b6150621223fb25958ac71517831b9b5dd340dc9e30c42e3b3fa51f"
+    },
+    {
+      "archivo": "frontend/src/views/VisorView.vue",
+      "bytes": 790,
+      "normalizacion": "UTF-8 sin BOM; LF",
+      "sha256": "b2d37c3b27ed1379b0bd829103c542029bc0712eee0634c1475de5d928040028"
+    },
+    {
+      "archivo": "package-lock.json",
+      "bytes": 97015,
+      "normalizacion": "UTF-8 sin BOM; LF",
+      "sha256": "1ab0a71c0436583f519ff21ad2ab5d6999252f14002bcc997033568d9281a724"
+    },
+    {
+      "archivo": "package.json",
+      "bytes": 640,
+      "normalizacion": "UTF-8 sin BOM; LF",
+      "sha256": "a517566b6fbdae0247a082440dc1089c3d34ce2bfe3f94615f11f22481b65168"
+    },
+    {
+      "archivo": "scripts/servidor-pruebas-s4.cjs",
+      "bytes": 2655,
+      "normalizacion": "UTF-8 sin BOM; LF",
+      "sha256": "2a1de606ef3276d64ed6dad83dfdbf8368f72aee98a215891dfd6522c402611c"
+    },
+    {
+      "archivo": "scripts/verificar-s4.cjs",
+      "bytes": 14622,
+      "normalizacion": "UTF-8 sin BOM; LF",
+      "sha256": "7f77ab5b7e76bcd3a7716f9e4826455d9837ac7411056c3b694ddb82a7aecffd"
+    },
+    {
+      "archivo": "docs/PRUEBA-S4.md",
+      "bytes": 17595,
+      "normalizacion": "UTF-8 sin BOM; LF",
+      "sha256": "1c3f0a0718fff0a57cc6c0d8776bb9f0966e8cb9c49d041bf6919e77d9dd3bef"
+    },
+    {
+      "archivo": "docs/GUIA-S4-EXPO.md",
+      "bytes": 10861,
+      "normalizacion": "UTF-8 sin BOM; LF",
+      "sha256": "298aa9b0c23423c344319f9f3825d7231c6d0c2d85a1d899345a7ae4c704418c"
+    },
+    {
+      "archivo": "../entregables/Sprint 4_Luis Rodriguez.docx",
+      "bytes": 1268110,
+      "normalizacion": "Binario sin normalización",
+      "sha256": "a76e12483cad95c8afbde9c6a69e3a7d89cde3dc2add58b52c39e4f62d78656d"
+    },
+    {
+      "archivo": "../entregables/Sprint 4_Luis Rodriguez.md",
+      "bytes": 10943,
+      "normalizacion": "UTF-8 sin BOM; LF",
+      "sha256": "d733b561312be03389367ebf1a799ef459abfea7c83dbcdacb722d4608e28e6c"
+    },
+    {
+      "archivo": "docs/evidencias/s4/astrovisor-respaldo-s4.webm",
+      "bytes": 13369025,
+      "normalizacion": "Binario sin normalización",
+      "sha256": "a7884439bd62ace696480574d3f15115d9275868e6a77ef28b306b8acc0435e5"
+    },
+    {
+      "archivo": "docs/evidencias/s4/word.json",
+      "bytes": 1281,
+      "normalizacion": "UTF-8 sin BOM; LF",
+      "sha256": "94e1215053e3da6f6b64b26eb39cbf828560b20af9210883cf2801be1a7fd57a"
+    },
+    {
+      "archivo": "frontend/dist/index.html",
+      "bytes": 533,
+      "normalizacion": "UTF-8 sin BOM; LF",
+      "sha256": "28434a0e34331332012a8647bc3af0524d15cc2e4036a849c98f45b7c44a049f"
+    },
+    {
+      "archivo": "frontend/dist/assets/index-C-ENQNVz.js",
+      "bytes": 176500,
+      "normalizacion": "UTF-8 sin BOM; LF",
+      "sha256": "371bb71b18f498bbc5a180b7bfc9770b4a5202eaed74a42cb58a01bb68682967"
+    },
+    {
+      "archivo": "frontend/dist/assets/index-CdvUSALg.css",
+      "bytes": 31942,
+      "normalizacion": "UTF-8 sin BOM; LF",
+      "sha256": "e8390333e7c113c84878282753b92b211484b759f81db211f10aa02dd643a813"
+    },
+    {
+      "archivo": "docs/evidencias/s4/integracion-main/api-error-inducido.png",
+      "bytes": 165041,
+      "normalizacion": "Binario sin normalización",
+      "sha256": "52caa1cc3c2889881899c596cd6414ebc1efc43652e33992001df647ebbd941e"
+    },
+    {
+      "archivo": "docs/evidencias/s4/integracion-main/audio-error-inducido.png",
+      "bytes": 232715,
+      "normalizacion": "Binario sin normalización",
+      "sha256": "fda01daaa4f31bd8343c475e6b30144891dae6896ca4a3b379eb5ab2d717087a"
+    },
+    {
+      "archivo": "docs/evidencias/s4/integracion-main/backend.txt",
+      "bytes": 14538,
+      "normalizacion": "UTF-8 sin BOM; LF",
+      "sha256": "357b59370504c2dfd91fd5666fd2110ec8953268813dc223a120ccc2e47a60f8"
+    },
+    {
+      "archivo": "docs/evidencias/s4/integracion-main/biblioteca-1024-habitual.png",
+      "bytes": 224362,
+      "normalizacion": "Binario sin normalización",
+      "sha256": "649612b84b03396853c540e5fe8038258ddee1eea589c4250bd8d0962816ace7"
+    },
+    {
+      "archivo": "docs/evidencias/s4/integracion-main/biblioteca-1024-proyeccion.png",
+      "bytes": 236481,
+      "normalizacion": "Binario sin normalización",
+      "sha256": "3a1f4fb528678ef7b0e5bc0b9da43761473257639e4c5a056cf2e7a7b70d3ae3"
+    },
+    {
+      "archivo": "docs/evidencias/s4/integracion-main/biblioteca-1920-habitual.png",
+      "bytes": 260601,
+      "normalizacion": "Binario sin normalización",
+      "sha256": "72b5da4980ac086deda7fdfbc0e7cd2cb7b3c92e7481f8038543f60407fe9db2"
+    },
+    {
+      "archivo": "docs/evidencias/s4/integracion-main/biblioteca-1920-proyeccion.png",
+      "bytes": 274741,
+      "normalizacion": "Binario sin normalización",
+      "sha256": "cf62db94418a4a7ca7e9116d1ff0cf1fbffeb1ab0c459d543cc5842556fde689"
+    },
+    {
+      "archivo": "docs/evidencias/s4/integracion-main/biblioteca-360-habitual.png",
+      "bytes": 190478,
+      "normalizacion": "Binario sin normalización",
+      "sha256": "764c5c6d1c9e2cdd94b4fdbe9e0b0987c47291a0105a42f9c0f32fb971cc15cb"
+    },
+    {
+      "archivo": "docs/evidencias/s4/integracion-main/biblioteca-360-proyeccion.png",
+      "bytes": 202742,
+      "normalizacion": "Binario sin normalización",
+      "sha256": "32389e0a42b0972a70355fa43b545517109f66c1947ecb2f16d1bb35a6f2159e"
+    },
+    {
+      "archivo": "docs/evidencias/s4/integracion-main/build.txt",
+      "bytes": 442,
+      "normalizacion": "UTF-8 sin BOM; LF",
+      "sha256": "57ca8965154ea447485eaa4c8e28441735cc82a304169348e6cf1813db089662"
+    },
+    {
+      "archivo": "docs/evidencias/s4/integracion-main/ficha-1024-habitual.png",
+      "bytes": 223650,
+      "normalizacion": "Binario sin normalización",
+      "sha256": "0fcc6ba0887e74619a0551bbdc0647c1e4e31f373268e017e9b58841321a33af"
+    },
+    {
+      "archivo": "docs/evidencias/s4/integracion-main/ficha-1024-proyeccion.png",
+      "bytes": 302301,
+      "normalizacion": "Binario sin normalización",
+      "sha256": "208c44155aa31df250a77859939a289f317100e853f8e21b127df143bf8635b7"
+    },
+    {
+      "archivo": "docs/evidencias/s4/integracion-main/ficha-1920-habitual.png",
+      "bytes": 239138,
+      "normalizacion": "Binario sin normalización",
+      "sha256": "322a57401f916de8ec4f309a2e86ffd6e4e350e6f948ab91d63b6287ede2ed29"
+    },
+    {
+      "archivo": "docs/evidencias/s4/integracion-main/ficha-1920-proyeccion.png",
+      "bytes": 308297,
+      "normalizacion": "Binario sin normalización",
+      "sha256": "d3830d8ddb54c98b8fe59a7ef073e50a0e6cb0b3574fa5161efee17356617bf6"
+    },
+    {
+      "archivo": "docs/evidencias/s4/integracion-main/ficha-2560-habitual.png",
+      "bytes": 245298,
+      "normalizacion": "Binario sin normalización",
+      "sha256": "7fa543e094dce2cd4369c0df6bb2d8cfb923e101df7ecb4823477a1ad5d33f05"
+    },
+    {
+      "archivo": "docs/evidencias/s4/integracion-main/ficha-2560-proyeccion.png",
+      "bytes": 317203,
+      "normalizacion": "Binario sin normalización",
+      "sha256": "c51353f3c30a6d534c3ce6fcd2da1eb21d5bd2c59725ac596068df0312e9b51e"
+    },
+    {
+      "archivo": "docs/evidencias/s4/integracion-main/ficha-360-habitual.png",
+      "bytes": 229393,
+      "normalizacion": "Binario sin normalización",
+      "sha256": "b9ade6546ad4e4b10c4f5e9200e2e6b6762173019f62f90084883ed3a61a44a3"
+    },
+    {
+      "archivo": "docs/evidencias/s4/integracion-main/ficha-360-proyeccion.png",
+      "bytes": 284974,
+      "normalizacion": "Binario sin normalización",
+      "sha256": "9c584ccca1c124e7640bcad1a3f6ef59b7396456b67177c499dd2900f1c57003"
+    },
+    {
+      "archivo": "docs/evidencias/s4/integracion-main/frontend.txt",
+      "bytes": 14320,
+      "normalizacion": "UTF-8 sin BOM; LF",
+      "sha256": "46b086268361655e271d5b7288434120f839ad11dd695201fa2b0af2bd6c2752"
+    },
+    {
+      "archivo": "docs/evidencias/s4/integracion-main/inicio-1024-habitual.png",
+      "bytes": 143349,
+      "normalizacion": "Binario sin normalización",
+      "sha256": "6c0a1fc8e4adb638b9cdfd8737820ee81de085bc11297234bd4846fce5ef64e9"
+    },
+    {
+      "archivo": "docs/evidencias/s4/integracion-main/inicio-1024-proyeccion.png",
+      "bytes": 181402,
+      "normalizacion": "Binario sin normalización",
+      "sha256": "2b6c9f97f1cb952595554fbd8252ef3810c0d2d2566196c80a6b123937927bf1"
+    },
+    {
+      "archivo": "docs/evidencias/s4/integracion-main/inicio-1920-habitual.png",
+      "bytes": 158913,
+      "normalizacion": "Binario sin normalización",
+      "sha256": "d42030a4c2fb35a84aa81cf55ef6559dd8ae2bc1a8fe3e1840e73d0951000da3"
+    },
+    {
+      "archivo": "docs/evidencias/s4/integracion-main/inicio-1920-proyeccion.png",
+      "bytes": 191132,
+      "normalizacion": "Binario sin normalización",
+      "sha256": "e7b193f50e28fbeb65b9efc39fd51ddbdbc5a650b348a3826e4787f8e47c08bc"
+    },
+    {
+      "archivo": "docs/evidencias/s4/integracion-main/listado-1024-habitual.png",
+      "bytes": 161660,
+      "normalizacion": "Binario sin normalización",
+      "sha256": "3cadbf3a4cdc918bdc0be959996f2aca25531ff431b775c3035ed54ae1b19056"
+    },
+    {
+      "archivo": "docs/evidencias/s4/integracion-main/listado-1024-proyeccion.png",
+      "bytes": 227732,
+      "normalizacion": "Binario sin normalización",
+      "sha256": "9a414a1f425dcd3aeb8dccb24b2443664c7d114112ce55b9334cddc21c511e9f"
+    },
+    {
+      "archivo": "docs/evidencias/s4/integracion-main/listado-1920-habitual.png",
+      "bytes": 180312,
+      "normalizacion": "Binario sin normalización",
+      "sha256": "84f69e001be1c97ed101e74acb60ea55b19455c3d9e5de6c40333470795fa68a"
+    },
+    {
+      "archivo": "docs/evidencias/s4/integracion-main/listado-1920-proyeccion.png",
+      "bytes": 234107,
+      "normalizacion": "Binario sin normalización",
+      "sha256": "28459e5ddef1373f6c0bf04cf375c34392e69b49624265759e140d70a8ba1ab1"
+    },
+    {
+      "archivo": "docs/evidencias/s4/integracion-main/navegador.json",
+      "bytes": 25423,
+      "normalizacion": "UTF-8 sin BOM; LF",
+      "sha256": "355cf9c3133f323ad7ec7120a8f8ae2dfd05807ac0eaba60677a2a9d1061968b"
+    },
+    {
+      "archivo": "docs/evidencias/s4/integracion-main/README.md",
+      "bytes": 3623,
+      "normalizacion": "UTF-8 sin BOM; LF",
+      "sha256": "29b5fe8ee50e5b04023b9aa8f5a786e23d6541976351fab70d4b9b962224f467"
+    },
+    {
+      "archivo": "docs/evidencias/s4/integracion-main/texto-200-css-ficha-habitual.png",
+      "bytes": 504895,
+      "normalizacion": "Binario sin normalización",
+      "sha256": "0ab28f2056574f581fdd460dfdee682d1fd80e79a795ea98c8acb375b230f79d"
+    },
+    {
+      "archivo": "docs/evidencias/s4/integracion-main/texto-200-css-ficha-proyeccion.png",
+      "bytes": 577988,
+      "normalizacion": "Binario sin normalización",
+      "sha256": "06bbf75cb069b04dae4c8b107b090c4dfa7828ea305f958f3ffdf2e1da81dfdd"
+    },
+    {
+      "archivo": "docs/evidencias/s4/integracion-main/texto-200-css-inicio-habitual.png",
+      "bytes": 256513,
+      "normalizacion": "Binario sin normalización",
+      "sha256": "9acf7b9f57577e7b35d22f090022e2527a6c62dd98afccfc08fbf1b717f3fe77"
+    },
+    {
+      "archivo": "docs/evidencias/s4/integracion-main/texto-200-css-inicio-proyeccion.png",
+      "bytes": 119793,
+      "normalizacion": "Binario sin normalización",
+      "sha256": "b6b3a961930fd20bf9333b5c09a334a9a756bfe473f5744e9e57a83108e4be04"
+    },
+    {
+      "archivo": "docs/evidencias/s4/integracion-main/texto-200-css-listado-habitual.png",
+      "bytes": 161297,
+      "normalizacion": "Binario sin normalización",
+      "sha256": "661bffe1dc548f5a59601ac5ba61c507cd29d09a38b6f73b6f9fcfb61a3d6b02"
+    },
+    {
+      "archivo": "docs/evidencias/s4/integracion-main/texto-200-css-listado-proyeccion.png",
+      "bytes": 335508,
+      "normalizacion": "Binario sin normalización",
+      "sha256": "1345421da7b76928ed573f4dbcd00b9e7cd185ab0e2eb4c96336c268d09dcccf"
+    }
+  ]
+}

@@ -1,0 +1,264 @@
+{
+  "fechaUTC": "2026-11-09T08:17:15.303Z",
+  "metodo": "Video de frames reales de Chrome con Playwright; voz editada de WAV originales S3 alineada a eventos de reproducción. Sin captura de hardware, micrófono o audio del sistema.",
+  "secuencia": [
+    {
+      "nombre": "Inicio público y contenido de demostración",
+      "t": 444
+    },
+    {
+      "nombre": "Activar vista para proyección",
+      "t": 2009
+    },
+    {
+      "nombre": "Listado de las tres constelaciones",
+      "t": 3581
+    },
+    {
+      "nombre": "Leer Orión",
+      "t": 5249
+    },
+    {
+      "nombre": "Narración Orión",
+      "t": 6847
+    },
+    {
+      "nombre": "Pausar y conservar posición",
+      "t": 9875
+    },
+    {
+      "nombre": "Reanudar Orión",
+      "t": 11404
+    },
+    {
+      "nombre": "Transcripción y créditos Orión",
+      "t": 29206
+    },
+    {
+      "nombre": "Leer Osa Mayor",
+      "t": 31726
+    },
+    {
+      "nombre": "Narración Osa Mayor",
+      "t": 33280
+    },
+    {
+      "nombre": "Transcripción y créditos Osa Mayor",
+      "t": 55462
+    },
+    {
+      "nombre": "Leer Escorpio",
+      "t": 57939
+    },
+    {
+      "nombre": "Narración Escorpio",
+      "t": 59490
+    },
+    {
+      "nombre": "Transcripción y créditos Escorpio",
+      "t": 81423
+    },
+    {
+      "nombre": "Preparación Homido y ruta 2D",
+      "t": 83844
+    },
+    {
+      "nombre": "Escena 3D y ficha de Orión en escritorio, sin visor físico",
+      "t": 87652
+    },
+    {
+      "nombre": "Escuchar en la experiencia del visor",
+      "t": 90230
+    },
+    {
+      "nombre": "Pausar en visor",
+      "t": 92801
+    },
+    {
+      "nombre": "Reanudar en visor",
+      "t": 94074
+    },
+    {
+      "nombre": "Cerrar ficha y detener sonido",
+      "t": 97741
+    },
+    {
+      "nombre": "Vista dividida experimental en escritorio",
+      "t": 97803
+    },
+    {
+      "nombre": "Regreso al recorrido web 2D",
+      "t": 101561
+    }
+  ],
+  "audio": [
+    {
+      "event": "emptied",
+      "src": "http://127.0.0.1:5194/audio/orion-kokoro-v1.wav",
+      "posicion": 0,
+      "t": 1794212241316
+    },
+    {
+      "event": "playing",
+      "src": "http://127.0.0.1:5194/audio/orion-kokoro-v1.wav",
+      "posicion": 0,
+      "t": 1794212243051
+    },
+    {
+      "event": "pause",
+      "src": "http://127.0.0.1:5194/audio/orion-kokoro-v1.wav",
+      "posicion": 2.88464,
+      "t": 1794212246039
+    },
+    {
+      "event": "playing",
+      "src": "http://127.0.0.1:5194/audio/orion-kokoro-v1.wav",
+      "posicion": 2.944,
+      "t": 1794212247572
+    },
+    {
+      "event": "pause",
+      "src": "http://127.0.0.1:5194/audio/orion-kokoro-v1.wav",
+      "posicion": 20.629333,
+      "t": 1794212265317
+    },
+    {
+      "event": "ended",
+      "src": "http://127.0.0.1:5194/audio/orion-kokoro-v1.wav",
+      "posicion": 20.629333,
+      "t": 1794212265318
+    },
+    {
+      "event": "emptied",
+      "src": "http://127.0.0.1:5194/audio/orion-kokoro-v1.wav",
+      "posicion": 0,
+      "t": 1794212266901
+    },
+    {
+      "event": "emptied",
+      "src": "http://127.0.0.1:5194/audio/osa-mayor-kokoro-v1.wav",
+      "posicion": 0,
+      "t": 1794212267792
+    },
+    {
+      "event": "playing",
+      "src": "http://127.0.0.1:5194/audio/osa-mayor-kokoro-v1.wav",
+      "posicion": 0,
+      "t": 1794212269443
+    },
+    {
+      "event": "pause",
+      "src": "http://127.0.0.1:5194/audio/osa-mayor-kokoro-v1.wav",
+      "posicion": 22.058667,
+      "t": 1794212291566
+    },
+    {
+      "event": "ended",
+      "src": "http://127.0.0.1:5194/audio/osa-mayor-kokoro-v1.wav",
+      "posicion": 22.058667,
+      "t": 1794212291566
+    },
+    {
+      "event": "emptied",
+      "src": "http://127.0.0.1:5194/audio/osa-mayor-kokoro-v1.wav",
+      "posicion": 0,
+      "t": 1794212293162
+    },
+    {
+      "event": "emptied",
+      "src": "http://127.0.0.1:5194/audio/escorpio-kokoro-v1.wav",
+      "posicion": 0,
+      "t": 1794212294037
+    },
+    {
+      "event": "playing",
+      "src": "http://127.0.0.1:5194/audio/escorpio-kokoro-v1.wav",
+      "posicion": 0,
+      "t": 1794212295651
+    },
+    {
+      "event": "pause",
+      "src": "http://127.0.0.1:5194/audio/escorpio-kokoro-v1.wav",
+      "posicion": 21.824,
+      "t": 1794212317529
+    },
+    {
+      "event": "ended",
+      "src": "http://127.0.0.1:5194/audio/escorpio-kokoro-v1.wav",
+      "posicion": 21.824,
+      "t": 1794212317529
+    },
+    {
+      "event": "emptied",
+      "src": "http://127.0.0.1:5194/audio/escorpio-kokoro-v1.wav",
+      "posicion": 0,
+      "t": 1794212319122
+    },
+    {
+      "event": "emptied",
+      "src": "http://127.0.0.1:5194/audio/orion-kokoro-v1.wav",
+      "posicion": 0,
+      "t": 1794212323112
+    },
+    {
+      "event": "playing",
+      "src": "http://127.0.0.1:5194/audio/orion-kokoro-v1.wav",
+      "posicion": 0,
+      "t": 1794212323178
+    },
+    {
+      "event": "pause",
+      "src": "http://127.0.0.1:5194/audio/orion-kokoro-v1.wav",
+      "posicion": 0,
+      "t": 1794212323186
+    },
+    {
+      "event": "emptied",
+      "src": "http://127.0.0.1:5194/audio/orion-kokoro-v1.wav",
+      "posicion": 0,
+      "t": 1794212323749
+    },
+    {
+      "event": "playing",
+      "src": "http://127.0.0.1:5194/audio/orion-kokoro-v1.wav",
+      "posicion": 0,
+      "t": 1794212326395
+    },
+    {
+      "event": "pause",
+      "src": "http://127.0.0.1:5194/audio/orion-kokoro-v1.wav",
+      "posicion": 2.519024,
+      "t": 1794212328943
+    },
+    {
+      "event": "playing",
+      "src": "http://127.0.0.1:5194/audio/orion-kokoro-v1.wav",
+      "posicion": 2.581333,
+      "t": 1794212330222
+    },
+    {
+      "event": "emptied",
+      "src": "http://127.0.0.1:5194/audio/orion-kokoro-v1.wav",
+      "posicion": 0,
+      "t": 1794212333882
+    },
+    {
+      "event": "emptied",
+      "src": "http://127.0.0.1:5194/audio/orion-kokoro-v1.wav",
+      "posicion": 0,
+      "t": 1794212337048
+    },
+    {
+      "event": "emptied",
+      "src": "http://127.0.0.1:5194/audio/orion-kokoro-v1.wav",
+      "posicion": 0,
+      "t": 1794212337109
+    }
+  ],
+  "navegador": "157.0.8103.38",
+  "inicio": 1794212236159,
+  "fin": 1794212339723,
+  "duracionPlaneada": 104.564,
+  "codificacion": "WebM VP8 + Opus, indexado con FFmpeg sin recodificar",
+  "completo": true
+}

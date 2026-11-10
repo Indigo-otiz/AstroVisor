@@ -6,4 +6,5 @@ frontend/dist/
 !.env.example
 .DS_Store
 coverage/
+.qa/
 *.log
