@@ -56,8 +56,13 @@ watch(
     </main>
 
     <!-- Footer general: solo en vistas públicas -->
-    <footer v-if="!esAdmin" class="container site-footer">
-      <p>Prototipo académico · Contenido de demostración · Material de la biblioteca pendiente.</p>
+    <footer v-if="!esAdmin" class="container site-footer institutional-footer">
+      <ul class="institutional-footer-logos" aria-label="Instituciones">
+        <li><img class="institutional-logo-library" src="/institucional/biblioteca-solon-arguello.png" width="1000" height="430" alt="Biblioteca Pública Central Estatal Solón Argüello" /></li>
+        <li><img class="institutional-logo-tecnm" src="/Logo%20TecNMs.png" width="961" height="428" alt="Tecnológico Nacional de México" /></li>
+        <li><img class="institutional-logo-tepic" src="/ITTepic_logo.jpg" width="225" height="225" alt="Instituto Tecnológico de Tepic" /></li>
+      </ul>
+      <p>Prototipo académico · Contenido de demostración.</p>
     </footer>
   </div>
 </template>
