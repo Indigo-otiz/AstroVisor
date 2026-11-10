@@ -1,6 +1,7 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
 import { crearDwell, etapaDe, DWELL_MS, GRACIA_MS } from '../public/prueba-homido/js/gaze-dwell.js'
+import { crearReloj } from '../test-support/reloj-mirada.mjs'
 
 const esperar = (ms) => new Promise((r) => setTimeout(r, ms))
 const A = { key: 'constelacion:orion' }
@@ -26,14 +27,73 @@ test('valores por defecto: 3000 ms y 280 ms de gracia; etapas 0/33/66/100', () =
   assert.deepEqual([0, 0.32, 0.33, 0.65, 0.66, 0.99, 1].map(etapaDe), ['0%', '0%', '33%', '33%', '66%', '66%', '100%'])
 })
 
-test('confirma tras el tiempo de permanencia pasando por todas las etapas', async () => {
-  const { d, ev } = registrar()
+test('confirma tras el tiempo de permanencia pasando por todas las etapas', () => {
+  const reloj = crearReloj(), progresos = []
+  const { d, ev } = registrar({ dwellMs: DWELL_MS, ahora: reloj.ahora, pedirFrame: reloj.pedirFrame, cancelarFrame: reloj.cancelarFrame,
+    onProgreso: (p, e) => progresos.push([p, e]) })
   d.enfocar(A)
-  await esperar(250)
+  reloj.frameEn(989)
+  assert.ok(progresos.at(-1)[0] < 0.33)
+  assert.equal(progresos.at(-1)[1], '0%')
+  reloj.frameEn(990)
+  assert.equal(progresos.at(-1)[1], '33%')
+  reloj.frameEn(1979)
+  assert.equal(progresos.at(-1)[1], '33%')
+  reloj.frameEn(1980)
+  assert.equal(progresos.at(-1)[1], '66%')
+  reloj.frameEn(2999)
+  assert.equal(ev.some(([tipo]) => tipo === 'confirmar'), false)
+  reloj.frameEn(3000)
   assert.deepEqual(ev.filter(([t]) => t === 'etapa').map((e) => e[1]), ['33%', '66%', '100%'])
+  assert.deepEqual([...new Set(progresos.map(([, e]) => e))], ['0%', '33%', '66%', '100%'])
   assert.deepEqual(ev.at(-1), ['confirmar', A.key])
   assert.equal(d.activo, null)
+  reloj.frameEn(6000)
+  assert.equal(ev.filter(([tipo]) => tipo === 'confirmar').length, 1)
+  assert.equal(reloj.pendientes(), 0)
 })
+
+test('cancelación y pausa del consumidor reinician Homido sin confirmar la carga anterior', () => {
+  const reloj = crearReloj()
+  let permitido = true
+  const { d, ev } = registrar({ dwellMs: DWELL_MS, ahora: reloj.ahora, pedirFrame: reloj.pedirFrame, cancelarFrame: reloj.cancelarFrame,
+    puedeEnfocar: () => permitido })
+  d.enfocar(A)
+  reloj.frameEn(2999)
+  permitido = false
+  d.cancelar() // La escena cancela explícitamente al alternar la pausa.
+  assert.equal(d.activo, null)
+  assert.equal(reloj.pendientes(), 0)
+  assert.equal(d.enfocar(A), false)
+  reloj.frameEn(4000)
+  assert.equal(ev.some(([tipo]) => tipo === 'confirmar'), false)
+  permitido = true
+  d.enfocar(B)
+  reloj.frameEn(6999)
+  assert.equal(ev.some(([tipo]) => tipo === 'confirmar'), false)
+  reloj.frameEn(7000)
+  assert.deepEqual(ev.filter(([tipo]) => tipo === 'confirmar'), [['confirmar', B.key]])
+  assert.equal(reloj.pendientes(), 0)
+})
+
+for (const [dwellMs, tiempos, esperadas] of [
+  [100, [80, 96, 112], ['66%', '100%']],
+  [3000, [2400, 3000], ['66%', '100%']],
+  [3000, [6000], ['100%']],
+]) {
+  test(`Homido con dwell ${dwellMs} y frames ${tiempos} no emite etapas retroactivas`, () => {
+    const reloj = crearReloj()
+    const { d, ev } = registrar({ dwellMs, ahora: reloj.ahora, pedirFrame: reloj.pedirFrame, cancelarFrame: reloj.cancelarFrame })
+    d.enfocar(A)
+    for (const tiempo of tiempos) reloj.frameEn(tiempo)
+    assert.deepEqual(ev.filter(([tipo]) => tipo === 'etapa').map(([, e]) => e), esperadas)
+    assert.deepEqual(ev.at(-1), ['confirmar', A.key])
+    assert.equal(d.activo, null)
+    reloj.frameEn(10000)
+    assert.equal(ev.filter(([tipo]) => tipo === 'confirmar').length, 1)
+    assert.equal(reloj.pendientes(), 0)
+  })
+}
 
 test('retirar la mirada más allá de la gracia cancela y no confirma', async () => {
   const { d, ev } = registrar()
