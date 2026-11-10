@@ -8,6 +8,10 @@ Informe de resultados del Sprint 4
 
 **Periodo base:** 2–6 de noviembre de 2026 · **Registro técnico:** 9–10 de noviembre de 2026
 
+**Fecha del informe:** 10 de noviembre de 2026
+
+**Revisión cruzada reportada:** Índigo Ortiz
+
 ## Mi aportación al Sprint 4
 
 Mi parte del sprint quedó terminada: adapté el recorrido público de AstroVisor para computadora y pantalla, preparé el respaldo audiovisual y reuní las evidencias. Se conservan las historias y narraciones de Orión, Osa Mayor y Escorpio, disponibles sin cuenta ni visor.
@@ -24,12 +28,12 @@ El periodo base fue el 2–6 de noviembre y el registro técnico se realizó los
 
 | Criterio | Resultado de mi entrega |
 |---|---|
-| Computadora y pantalla | Vista para proyección y distribución adaptable en inicio, listado y ficha. |
+| Computadora y pantalla | Vista para proyección en inicio, listado y ficha. |
 | Experiencia 2D sin visor | Lectura, narraciones y créditos disponibles en el recorrido público. |
-| Accesibilidad y operación | Texto ampliado, foco visible, salto al contenido y uso con teclado y ratón. |
+| Accesibilidad y operación | Texto ampliado, foco visible y uso con teclado y ratón. |
 | Evidencia verificable | Suites aprobadas, 44 casos de navegador y 6 comprobaciones de zoom nativo. |
 | Contenido y acceso | Rótulos demostrativos, autoría y créditos conservados; ajuste limitado al recorrido público. |
-| Revisión cruzada | Conformidad de Índigo Ortiz registrada como reporte del responsable. |
+| Revisión cruzada | Conformidad de Índigo Ortiz reportada por el responsable. |
 
 ## Cambios realizados
 
@@ -39,11 +43,11 @@ Añadí el control **Vista para proyección** en el recorrido público. El botó
 
 La vista amplía el cuerpo principal a aproximadamente **24 px** y permite un contenedor de hasta **1440 px**. Las columnas se reorganizan según el espacio disponible y el texto mantiene un ancho de lectura acotado. Esto permite aprovechar una pantalla grande sin convertir cada párrafo en una línea excesivamente larga.
 
-Conservé el fondo claro, la tinta oscura y el azul del diseño anterior, además de los títulos Georgia y el texto de interfaz del sistema. El ajuste se aplica a las páginas públicas; no modifica el panel administrativo ni amplía automáticamente los elementos internos del lienzo 3D.
-
 ![Inicio de AstroVisor con la vista para proyección activada a 1920 px](../astrovisor-s1-inicio/docs/evidencias/s4/inicio-1920-proyeccion.png)
 
 *Figura 1. Inicio público con la vista para proyección activada. Captura de navegador a 1920 px; muestra la distribución web y no constituye una fotografía de proyector.*
+
+Conservé el fondo claro, la tinta oscura y el azul del diseño anterior, además de los títulos Georgia y el texto de interfaz del sistema. El ajuste se aplica a las páginas públicas; no modifica el panel administrativo ni amplía automáticamente los elementos internos del lienzo 3D.
 
 ### Teclado y continuidad de la experiencia
 

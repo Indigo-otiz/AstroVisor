@@ -1,9 +1,9 @@
 {
-  "fechaUTC": "2026-11-10T16:42:26.225Z",
-  "fechaLocal": "2026-11-10 10:42:26",
+  "fechaUTC": "2026-11-10T17:01:55.141Z",
+  "fechaLocal": "2026-11-10 11:01:55",
   "zona": "America/Mexico_City",
   "rama": "codex/s4-web-computadora-proyeccion",
-  "commitBase": "f9ffbe407f79aef018ddb0648b766e89537962fe",
+  "commitBase": "1f839782e9d88dc17466c310d4654117bf98e94a",
   "cambiosSinCommit": true,
   "alcance": "Implementación y verificación técnica local S4, incluido zoom nativo 200%, junto con reportes de Luis sobre Homido/pantalla y la conformidad de Índigo. Distingue esos reportes de observación directa; no acredita protocolo físico completo, ensayo cronometrado, Expo ni revisión formal de GitHub.",
   "hashes": [
@@ -33,21 +33,21 @@
     },
     {
       "archivo": "docs/PRUEBA-S4.md",
-      "bytes": 15717,
+      "bytes": 15801,
       "normalizacion": "UTF-8 sin BOM; LF",
-      "sha256": "198e14090c283ddbf152af10a49d3f1a7f5ef778662e4ea63bce97f2445a85ee"
+      "sha256": "0cfbc1fc2e2cdaea2a99786e7c3348a08031fc6c29bbc04fff457b8a6a45268e"
     },
     {
       "archivo": "../entregables/Sprint 4_Luis Rodriguez.md",
-      "bytes": 10904,
+      "bytes": 10943,
       "normalizacion": "UTF-8 sin BOM; LF",
-      "sha256": "cb03d09c3eb3d83b18d7634c1cd526d0d15f3fecd651d44eed498e98f9f5989d"
+      "sha256": "d733b561312be03389367ebf1a799ef459abfea7c83dbcdacb722d4608e28e6c"
     },
     {
       "archivo": "../entregables/Sprint 4_Luis Rodriguez.docx",
-      "bytes": 418907,
+      "bytes": 1268110,
       "normalizacion": "Binario sin normalización",
-      "sha256": "1e6135328744357f60ac5edb17586944c3c3a07a4dc3ae6d62485f4057d7f6d3"
+      "sha256": "a76e12483cad95c8afbde9c6a69e3a7d89cde3dc2add58b52c39e4f62d78656d"
     },
     {
       "archivo": "content/AUTORIA.md",
@@ -357,9 +357,9 @@
     },
     {
       "archivo": "docs/evidencias/s4/word.json",
-      "bytes": 969,
+      "bytes": 1281,
       "normalizacion": "UTF-8 sin BOM; LF",
-      "sha256": "95d60bd0815f02a1e9b480dbb13241f234983e23ff8163aecdcf910f2f712a6f"
+      "sha256": "94e1215053e3da6f6b64b26eb39cbf828560b20af9210883cf2801be1a7fd57a"
     },
     {
       "archivo": "docs/evidencias/s4/zoom-200-chrome.png",
