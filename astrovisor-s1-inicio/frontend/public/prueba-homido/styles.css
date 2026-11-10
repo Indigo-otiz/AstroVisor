@@ -1,45 +1,591 @@
-:root { color-scheme: light; font-family: Arial, Helvetica, sans-serif; background: #f8f9fb; color: #172438; }
-* { box-sizing: border-box; }
-body { margin: 0; line-height: 1.55; }
-.site-header { background: #11213b; color: #fff; }
-.header-content { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 1rem; max-width: 1020px; margin: auto; padding: 1rem; }
-.brand { font-size: 1.35rem; font-weight: 700; color: #fff; text-decoration: none; }
-main { max-width: 1020px; padding: 1rem 1rem 3rem; margin: auto; }
-h1 { font-size: clamp(1.9rem,4vw,2.6rem); line-height: 1.15; }
-h2 { font-size: 1.3rem; margin-bottom: 0.5rem; }
-.lead { font-size: 1.1rem; }
-.notice { padding: 1rem; border: 1px solid #a7aab1; background: #fff; border-radius: 0.4rem; }
-.controls-panel, .log-panel { margin: 1.4rem 0; padding: 1rem; background: #fff; border: 1px solid #cfd7e0; border-radius: 0.4rem; }
-.actions { display: flex; gap: 0.65rem; flex-wrap: wrap; align-items: center; }
-button, .button { padding: 0.7rem 1rem; font-size: 1.125rem; font-weight: 600; cursor: pointer; color: #fff; background: #1a4077; border: 2px solid #1a4077; border-radius: 0.35rem; text-decoration: none; min-height: 48px; }
-button.secondary,.button.secondary { background: #fff; color: #1a4077; }
-button:disabled { cursor: not-allowed; opacity: 0.5; }
-button:focus-visible,.button:focus-visible { outline: 3px solid #df932b; outline-offset: 3px; }
-.status { margin: 0.6rem 0; }
-.small, .scene-help { font-size: 0.96rem; }
-.scene-host { height: min(60vh, 520px); min-height: 300px; position: relative; overflow: hidden; background: #071426; border-radius: 0.5rem; border: 2px solid #354760; }
-.scene-host a-scene { display: block; height: 100%; width: 100%; }
-.scene-host.stereo-active { position: fixed; top: 0; left: 0; right: 0; bottom: 0; width: 100vw; width: 100%; height: 100vh; height: 100dvh; min-height: 0; max-height: none; border: 0; border-radius: 0; z-index: 900; background: #071426; }
-.scene-host.stereo-active a-scene { width:100%;height:100%; }
-#exitButton[hidden] { display: none; }
-body.stereo-mode #exitButton { display: block; position: fixed; top: 8px; right: 8px; z-index: 1000; font-size: .95rem; background: #fff; }
-#log { max-height: 270px; overflow: auto; white-space: pre-wrap; overflow-wrap: anywhere; background: #f6f7f9; color: #15243b; padding: 0.75rem; min-height: 80px; }
-[hidden] { display: none !important; }
-.reading-panel { margin-block: 2rem; }
-#storyCard { margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid #cfd7e0; }
-#storyText, #transcriptText { max-width: 70ch; font-size: 1.25rem; }
-.reading-panel summary { min-height: 48px; padding-block: 12px; cursor: pointer; color: #1a4077; text-decoration: underline; text-underline-offset: 4px; }
-.reading-panel summary:focus-visible { outline: 3px solid #df932b; outline-offset: 3px; }
-.reading-panel dt { font-weight: 700; margin-top: 12px; }
-.reading-panel dd { margin-left: 0; overflow-wrap: anywhere; }
-::selection { background: #f5e4c0; color: #11213b; }
-@media (max-width: 650px) { main{padding:.85rem} .actions button,.actions .button{width:100%;text-align:center;} .scene-host{height:55vh;min-height:280px;} body.stereo-mode #exitButton{width:auto;} }
-body.stereo-mode { overflow: hidden; overscroll-behavior: none; }
-.scene-host.stereo-active { touch-action: none; }
+/* ==========================================================================
+   AstroVisor — Estilos de la Experiencia Homido VR
+   Alineado con el sistema visual: papel cálido, azul noche y acentos dorados
+   ========================================================================== */
 
-/* Modo ?diag=1 (temporal): panel de aislamiento, oculto en vista dividida */
-.diag-panel { position: fixed; left: 8px; bottom: 8px; z-index: 800; max-width: min(92vw, 420px); max-height: 60vh; overflow: auto; background: rgba(255,255,255,.96); color: #111; border: 2px solid #F5B301; border-radius: 8px; padding: .5rem .7rem; font-size: .85rem; }
-.diag-panel label { display: block; margin: .25rem 0; }
-.diag-panel pre { white-space: pre-wrap; font-size: .75rem; margin: .4rem 0; }
-.diag-panel input[readonly] { width: 100%; font-size: .7rem; }
-body.stereo-mode .diag-panel { display: none; }
+:root {
+  color-scheme: light;
+  --paper: #faf7f0;
+  --ink: #1b2430;
+  --blue: #1f4e8c;
+  --blue-hover: #163d70;
+  --blue-soft: #e8edf4;
+  --night: #0b1530;
+  --gold: #f5b301;
+  --gold-soft: #fff9e6;
+  --gold-text: #614700;
+  --muted: #535e6c;
+  --border: #dedbd3;
+  --card-bg: #ffffff;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  background: var(--paper);
+  color: var(--ink);
+  font-size: 16px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  line-height: 1.6;
+  background: var(--paper);
+  color: var(--ink);
+  -webkit-font-smoothing: antialiased;
+}
+
+::selection {
+  background: var(--gold);
+  color: var(--night);
+}
+
+/* --- HEADER PRINCIPAL --- */
+.site-header {
+  background: var(--night);
+  color: #ffffff;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 14px 0;
+}
+
+.header-content {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  max-width: 1100px;
+  margin: auto;
+  padding: 0 1.5rem;
+}
+
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 1.55rem;
+  font-weight: 700;
+  color: #ffffff;
+  text-decoration: none;
+}
+
+.brand-star {
+  width: 28px;
+  height: 28px;
+}
+
+.header-badges {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.badge-tag {
+  background: rgba(245, 179, 1, 0.15);
+  border: 1px solid rgba(245, 179, 1, 0.4);
+  color: #ffd666;
+  padding: 5px 12px;
+  border-radius: 999px;
+  font-size: 0.85rem;
+  font-weight: 650;
+}
+
+.header-link {
+  color: #c4d6ed;
+  text-decoration: none;
+  font-size: 0.95rem;
+  font-weight: 600;
+  padding: 6px 12px;
+  border-radius: 8px;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.header-link:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+}
+
+/* --- CONTENEDOR PRINCIPAL --- */
+main {
+  max-width: 1100px;
+  padding: 2.2rem 1.5rem 4rem;
+  margin: auto;
+}
+
+.page-intro {
+  margin-bottom: 2rem;
+}
+
+.eyebrow-text {
+  display: block;
+  color: #b07800;
+  font-weight: 700;
+  font-size: 0.9rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+
+h1 {
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(2rem, 4vw, 2.8rem);
+  line-height: 1.18;
+  color: var(--night);
+  margin: 0 0 12px;
+  letter-spacing: -0.02em;
+}
+
+h2 {
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 1.45rem;
+  color: var(--night);
+  margin: 0 0 8px;
+}
+
+.lead {
+  font-size: 1.18rem;
+  color: var(--muted);
+  max-width: 68ch;
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* --- TARJETA DE AVISO / PRECAUCIÓN --- */
+.notice {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+  padding: 1.25rem 1.4rem;
+  border: 1.5px solid var(--gold);
+  background: var(--gold-soft);
+  color: var(--gold-text);
+  border-radius: 16px;
+  margin: 1.8rem 0;
+  box-shadow: 0 3px 12px rgba(245, 179, 1, 0.08);
+}
+
+.notice-icon {
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.notice-svg {
+  width: 24px;
+  height: 24px;
+}
+
+.notice-body {
+  font-size: 0.98rem;
+  line-height: 1.55;
+}
+
+/* --- PANEL DE CONTROLES --- */
+.controls-panel {
+  margin: 2.2rem 0;
+  padding: 2rem;
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  box-shadow: 0 6px 20px rgba(11, 21, 48, 0.04);
+}
+
+.panel-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 1.5rem;
+}
+
+.panel-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: var(--blue-soft);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.panel-icon svg {
+  width: 24px;
+  height: 24px;
+}
+
+.panel-sub {
+  color: var(--muted);
+  margin: 0;
+  font-size: 1rem;
+}
+
+/* --- BOTONES Y ACCIONES --- */
+.actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+button, .button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 13px 22px;
+  font-size: 1.05rem;
+  font-weight: 650;
+  cursor: pointer;
+  color: #ffffff;
+  background: var(--blue);
+  border: 2px solid var(--blue);
+  border-radius: 14px;
+  text-decoration: none;
+  min-height: 52px;
+  transition: all 0.16s ease-out;
+  box-shadow: 0 2px 6px rgba(31, 78, 140, 0.15);
+}
+
+button:hover, .button:hover {
+  background: var(--blue-hover);
+  border-color: var(--blue-hover);
+  transform: translateY(-1px);
+}
+
+button.secondary, .button.secondary {
+  background: var(--blue-soft);
+  color: var(--blue);
+  border-color: var(--blue-soft);
+  box-shadow: none;
+}
+
+button.secondary:hover, .button.secondary:hover {
+  background: #d9e3ef;
+  border-color: #d9e3ef;
+  color: var(--night);
+}
+
+button:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+button:focus-visible, .button:focus-visible {
+  outline: 3px solid var(--blue);
+  outline-offset: 4px;
+}
+
+.btn-return {
+  color: var(--ink) !important;
+  background: #f1ede4 !important;
+  border-color: #dedbd3 !important;
+}
+
+.btn-return:hover {
+  background: #e6e0d5 !important;
+}
+
+/* --- INDICADORES MODULARES DE ESTADO --- */
+.status-indicators {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  margin-top: 1.8rem;
+  padding-top: 1.6rem;
+  border-top: 1px solid var(--border);
+}
+
+.status-card {
+  background: #f8f9fb;
+  border: 1px solid #e3e8ee;
+  border-radius: 12px;
+  padding: 14px 16px;
+}
+
+.status-label {
+  display: block;
+  font-size: 0.82rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+
+.status-card p {
+  margin: 0;
+  font-size: 0.98rem;
+  color: var(--ink);
+  line-height: 1.45;
+}
+
+.small {
+  font-size: 0.88rem !important;
+  color: var(--muted) !important;
+  margin-top: 4px !important;
+}
+
+/* --- SECCIÓN ESCENA 3D --- */
+.scene-section {
+  margin: 2.8rem 0;
+}
+
+.scene-header {
+  margin-bottom: 14px;
+}
+
+.scene-help {
+  color: var(--muted);
+  font-size: 0.98rem;
+  margin: 0;
+}
+
+.scene-host {
+  height: min(65vh, 580px);
+  min-height: 320px;
+  position: relative;
+  overflow: hidden;
+  background: #071426;
+  border-radius: 22px;
+  border: 3px solid var(--blue);
+  box-shadow: 0 12px 36px rgba(11, 21, 48, 0.22);
+}
+
+.scene-host a-scene {
+  display: block;
+  height: 100%;
+  width: 100%;
+}
+
+/* --- PANTALLA COMPLETA ESTEREOSCÓPICA --- */
+.scene-host.stereo-active {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100vw;
+  width: 100%;
+  height: 100vh;
+  height: 100dvh;
+  min-height: 0;
+  max-height: none;
+  border: 0;
+  border-radius: 0;
+  z-index: 900;
+  background: #071426;
+  touch-action: none;
+}
+
+.scene-host.stereo-active a-scene {
+  width: 100%;
+  height: 100%;
+}
+
+#exitButton[hidden] {
+  display: none;
+}
+
+body.stereo-mode #exitButton {
+  display: block;
+  position: fixed;
+  top: 14px;
+  right: 14px;
+  z-index: 1000;
+  font-size: 1rem;
+  background: #ffffff;
+  color: var(--night);
+  border: 2px solid var(--gold);
+  border-radius: 12px;
+  padding: 10px 18px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+}
+
+body.stereo-mode {
+  overflow: hidden;
+  overscroll-behavior: none;
+}
+
+/* --- PANEL DE LECTURA 2D DE HISTORIAS --- */
+.reading-panel {
+  margin: 3rem 0;
+  padding: 2.2rem;
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  box-shadow: 0 6px 20px rgba(11, 21, 48, 0.04);
+}
+
+.reading-header {
+  margin-bottom: 1.2rem;
+}
+
+.reading-sub {
+  color: var(--muted);
+  margin: 0;
+}
+
+.stories-status {
+  font-weight: 600;
+  color: var(--blue);
+  margin: 1rem 0;
+}
+
+.story-buttons {
+  margin: 1rem 0 1.5rem;
+}
+
+.story-article-card {
+  margin-top: 1.8rem;
+  padding: 1.8rem;
+  background: #fbfbfd;
+  border: 1px solid #e2e7ee;
+  border-radius: 16px;
+}
+
+.story-body-text {
+  max-width: 68ch;
+  font-size: 1.15rem;
+  line-height: 1.65;
+  color: var(--ink);
+  margin: 1rem 0;
+}
+
+.story-origin {
+  color: var(--muted);
+  margin-bottom: 1.2rem;
+}
+
+.story-transcript-box {
+  margin-top: 1.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid #dedbd3;
+}
+
+.story-transcript-box summary {
+  min-height: 48px;
+  padding-block: 10px;
+  cursor: pointer;
+  color: var(--blue);
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+.story-transcript-box summary:focus-visible {
+  outline: 3px solid var(--gold);
+  outline-offset: 3px;
+}
+
+.story-transcript-box dt {
+  font-weight: 700;
+  margin-top: 10px;
+  color: var(--night);
+}
+
+.story-transcript-box dd {
+  margin-left: 0;
+  color: var(--muted);
+}
+
+/* --- LOG DE EVENTOS --- */
+.log-panel {
+  margin: 2.5rem 0;
+  padding: 1.8rem;
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+}
+
+.log-header {
+  margin-bottom: 1rem;
+}
+
+.log-actions {
+  margin-bottom: 1rem;
+}
+
+.btn-sm {
+  min-height: 42px !important;
+  font-size: 0.92rem !important;
+  padding: 8px 16px !important;
+}
+
+#log {
+  max-height: 250px;
+  overflow: auto;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  background: #0b1530;
+  color: #a7f3d0;
+  font-family: Consolas, Monaco, "Courier New", monospace;
+  font-size: 0.88rem;
+  padding: 1rem;
+  border-radius: 10px;
+  min-height: 80px;
+  border: 1px solid #1e293b;
+}
+
+.visor-page-footer {
+  text-align: center;
+  color: var(--muted);
+  font-size: 0.92rem;
+  margin-top: 3rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--border);
+}
+
+[hidden] {
+  display: none !important;
+}
+
+/* --- MODO DIAGNÓSTICO (?diag=1) --- */
+.diag-panel {
+  position: fixed;
+  left: 10px;
+  bottom: 10px;
+  z-index: 800;
+  max-width: min(92vw, 420px);
+  max-height: 60vh;
+  overflow: auto;
+  background: rgba(255, 255, 255, 0.98);
+  color: #111;
+  border: 2px solid var(--gold);
+  border-radius: 12px;
+  padding: 0.8rem 1rem;
+  font-size: 0.88rem;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+}
+
+body.stereo-mode .diag-panel {
+  display: none;
+}
+
+/* --- RESPONSIVIDAD MÓVIL --- */
+@media (max-width: 760px) {
+  main {
+    padding: 1.4rem 1rem 3rem;
+  }
+  .header-content {
+    padding: 0 1rem;
+  }
+  .controls-panel, .reading-panel {
+    padding: 1.4rem 1.2rem;
+  }
+  .status-indicators {
+    grid-template-columns: 1fr;
+  }
+  .actions button, .actions .button {
+    width: 100%;
+    text-align: center;
+  }
+  .scene-host {
+    height: 55vh;
+    min-height: 280px;
+  }
+  body.stereo-mode #exitButton {
+    width: auto;
+  }
+}

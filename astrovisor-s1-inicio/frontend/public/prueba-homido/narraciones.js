@@ -1,4 +1,5 @@
 import { audioDe, crearNarrador } from '../audio/narration.js'
+import { cargarDatos } from './js/datos.js'
 
 const $ = (id) => document.getElementById(id)
 const narrador = crearNarrador()
@@ -60,10 +61,10 @@ async function cargar() {
   $('storiesStatus').textContent = 'Cargando historias…'
   $('retryStories').hidden = true
   try {
-    const respuesta = await fetch('/api/contenidos/recorridos', { credentials: 'same-origin' })
-    if (!respuesta.ok) throw new Error('HTTP')
-    const datos = await respuesta.json()
-    if (!Array.isArray(datos)) throw new Error('Documento')
+    const params = new URLSearchParams(window.location.search)
+    if (params.get('error') === '1' || params.get('simularError') === '1') throw new Error('Fallo simulado')
+    const carga = await cargarDatos()
+    const datos = carga.datos
     historias = ['orion', 'osa-mayor', 'escorpio'].map((id) => datos.find((x) => x?.id === id))
     if (historias.some((x) => !x || !['titulo', 'resumen', 'historia'].every((campo) => typeof x[campo] === 'string' && x[campo].trim()) || !Array.isArray(x.multimedia))) throw new Error('Historias')
     $('storyChoices').replaceChildren()

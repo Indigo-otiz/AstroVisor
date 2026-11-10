@@ -3,7 +3,7 @@ import { computed, nextTick, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import './public.css'
 const route = useRoute()
-const esPublica = computed(() => ['inicio', 'explorar', 'constelacion', 'biblioteca', 'libro'].includes(route.name))
+const esPublica = computed(() => ['inicio', 'explorar', 'constelacion', 'biblioteca', 'libro', 'visor'].includes(route.name))
 const esAdmin = computed(() => ['admin', 'admin-acceso'].includes(route.name))
 const titulos = {
   inicio: 'Inicio',
