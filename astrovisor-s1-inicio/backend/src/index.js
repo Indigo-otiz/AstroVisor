@@ -3,7 +3,7 @@ import { pathToFileURL } from 'node:url'
 import { resolve } from 'node:path'
 import { createHash } from 'node:crypto'
 import { generarPortada, configurarPortada, rutaPortada } from './services/portadas.js'
-import { obtenerRecorridos, obtenerLibros, obtenerCatalogo, abrirEscritor } from './services/documentRepository.js'
+import { obtenerRecorridos, obtenerLibros, obtenerCatalogo, abrirEscritor, retirarBloqueoAbandonado } from './services/documentRepository.js'
 import { editarCatalogo } from './services/catalogoEdicion.js'
 import { crearSesion, destruirSesion, verificarAdmin, crearLimitadorLogin } from './middleware/auth.js'
 import { verificarCredenciales } from './services/adminCredentials.js'
@@ -157,11 +157,16 @@ export function crearApp() {
 export const app = crearApp()
 if (process.argv[1] && pathToFileURL(resolve(process.argv[1])).href === import.meta.url) {
   try {
+    try { await retirarBloqueoAbandonado() } catch {}
     await app.locals.iniciarEscritor()
     const puerto = Number(process.env.PORT ?? 3001)
     const servidor = app.listen(puerto, () => console.log(`API AstroVisor en http://localhost:${puerto}`))
     for (const señal of ['SIGINT', 'SIGTERM']) process.once(señal, () => {
       servidor.close(async () => { await app.locals.cerrarEscritor(); process.exit(0) })
     })
-  } catch { console.error('No se pudo abrir el almacén documental privado'); process.exitCode = 1 }
+  } catch (err) {
+    console.error('No se pudo abrir el almacén documental privado:', err?.cause?.message || err?.message || err)
+    if (err?.cause?.stack) console.error(err.cause.stack)
+    process.exitCode = 1
+  }
 }
