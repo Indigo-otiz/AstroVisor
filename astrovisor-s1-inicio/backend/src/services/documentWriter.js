@@ -9,7 +9,7 @@ import { rutaPrivada } from './privateStorage.js'
 import { validarImagenes } from './imageResources.js'
 
 const fallo = (status, mensaje) => Object.assign(new Error(mensaje), { status })
-const noDisponible = () => fallo(503, 'Almacenamiento documental no disponible')
+const noDisponible = (cause) => Object.assign(new Error('Almacenamiento documental no disponible', { cause }), { status: 503 })
 const nombreBackup = /^catalogo-r([1-9][0-9]*)-[a-f0-9-]{36}\.json$/
 const hash = (c) => createHash('sha256').update(JSON.stringify(c)).digest('hex')
 const codigosOperativos = new Set(['EACCES', 'EPERM', 'EIO', 'ENOSPC', 'EEXIST', 'ENOENT', 'EBUSY', 'ENOTDIR', 'EISDIR', 'ENOTSUP'])
@@ -26,22 +26,47 @@ async function directorioReal(ruta, io) {
 async function escribirExclusivo(ruta, contenido, io) {
   const h = await io.open(ruta, 'wx', 0o600)
   try { await h.writeFile(contenido, 'utf8'); await h.sync() }
-  catch (error) { await h.close(); await io.unlink(ruta); throw error }
+  catch (error) {
+    // Conservar cada fallo de limpieza sin sustituir el error de escritura/sync.
+    for (const limpiar of [() => h.close(), () => io.unlink(ruta)]) {
+      try { await limpiar() }
+      catch (e) { Object.defineProperty(error, 'erroresLimpieza', { value: [...(error.erroresLimpieza ?? []), e], configurable: true }) }
+    }
+    throw error
+  }
   await h.close()
 }
 async function sincronizarDirectorio(ruta, io) {
-  let h
+  let h, errorOperacion
   try { h = await io.open(ruta, 'r'); await h.sync(); return true }
   catch (e) {
     if (process.platform === 'win32' && ['EPERM', 'EISDIR', 'EINVAL', 'ENOTSUP'].includes(e.code)) return false
+    errorOperacion = e
     throw e
-  } finally { if (h) await h.close() }
+  } finally {
+    if (h) {
+      try { await h.close() }
+      catch (e) {
+        if (!errorOperacion) throw e
+        Object.defineProperty(errorOperacion, 'erroresLimpieza', { value: [...(errorOperacion.erroresLimpieza ?? []), e], configurable: true })
+      }
+    }
+  }
 }
 async function conControl(ruta, io, operacion) {
   // Serializa alta y retirada de locks para que una recuperación no borre el lock de un nuevo escritor.
   const control = join(ruta, 'control.lock')
   await escribirExclusivo(control, JSON.stringify({ pid: process.pid, host: hostname() }), io)
-  try { return await operacion() } finally { await io.unlink(control) }
+  let errorOperacion
+  try { return await operacion() }
+  catch (e) { errorOperacion = e; throw e }
+  finally {
+    try { await io.unlink(control) }
+    catch (e) {
+      if (!errorOperacion) throw e
+      Object.defineProperty(errorOperacion, 'erroresLimpieza', { value: [...(errorOperacion.erroresLimpieza ?? []), e], configurable: true })
+    }
+  }
 }
 async function bloquear(directorio, io) {
   const ruta = await rutaPrivada(directorio)
@@ -83,7 +108,7 @@ async function podar(ruta, io) {
 }
 async function sustituir(ruta, catalogo, io) {
   const temporal = join(ruta, `catalogo-${randomUUID()}.tmp`)
-  let publicado = false
+  let publicado = false, errorOperacion
   try {
     await escribirExclusivo(temporal, `${JSON.stringify(catalogo, null, 2)}\n`, io)
     for (let intento = 0; ; intento++) {
@@ -93,7 +118,18 @@ async function sustituir(ruta, catalogo, io) {
         await esperar(50 * 2 ** intento)
       }
     }
-  } finally { if (!publicado) await io.unlink(temporal).catch((e) => { if (e.code !== 'ENOENT') throw e }) }
+  } catch (e) { errorOperacion = e; throw e }
+  finally {
+    if (!publicado) {
+      try { await io.unlink(temporal) }
+      catch (e) {
+        if (e.code !== 'ENOENT') {
+          if (!errorOperacion) throw e
+          Object.defineProperty(errorOperacion, 'erroresLimpieza', { value: [...(errorOperacion.erroresLimpieza ?? []), e], configurable: true })
+        }
+      }
+    }
+  }
 }
 
 export async function abrirEscritor({ directorio = process.env.ASTROVISOR_DATA_DIR, io = fs } = {}) {
@@ -102,7 +138,13 @@ export async function abrirEscritor({ directorio = process.env.ASTROVISOR_DATA_D
     bloqueo = await bloquear(directorio, io)
     await archivoRegular(join(bloqueo.ruta, 'catalogo.json'), io)
     await obtenerCatalogo({ directorio: bloqueo.ruta })
-  } catch { if (bloqueo) await bloqueo.liberar(); throw noDisponible() }
+  } catch (error) {
+    if (bloqueo) {
+      try { await bloqueo.liberar() }
+      catch (e) { Object.defineProperty(error, 'erroresLimpieza', { value: [...(error.erroresLimpieza ?? []), e], configurable: true }) }
+    }
+    throw noDisponible(error)
+  }
   let cola = Promise.resolve(), cerrado = false
   return {
     guardar({ revision, cambiar, actor }) {
@@ -124,7 +166,7 @@ export async function abrirEscritor({ directorio = process.env.ASTROVISOR_DATA_D
         try { validarCatalogo(siguiente) } catch { throw fallo(400, 'Documento o relaciones inválidos') }
         await validarImagenes(siguiente)
         try { await respaldar(bloqueo.ruta, actual, io); await sustituir(bloqueo.ruta, siguiente, io) }
-        catch { throw noDisponible() }
+        catch (error) { throw noDisponible(error) }
         // shortcut: rename confirma publicación; un fallo de sync/poda posterior se informa, no revierte el guardado.
         let durabilidadPendiente = false, retencionPendiente = false
         try { durabilidadPendiente = !await sincronizarDirectorio(bloqueo.ruta, io) } catch { durabilidadPendiente = true }
@@ -153,7 +195,7 @@ export async function retirarBloqueoAbandonado({ directorio = process.env.ASTROV
       try { process.kill(lock.pid, 0); throw noDisponible() } catch (e) { if (e.code !== 'ESRCH') throw noDisponible() }
       await fs.unlink(archivo)
     })
-  } catch { throw noDisponible() }
+  } catch (error) { throw noDisponible(error) }
 }
 
 export async function restaurarCatalogo({ directorio = process.env.ASTROVISOR_DATA_DIR, respaldo, ultimaRevision } = {}) {
@@ -185,7 +227,7 @@ export async function restaurarCatalogo({ directorio = process.env.ASTROVISOR_DA
     resultado = { ...noConfirmada, confirmada: true, revisionPersistida: restaurado.revision,
       catalogo: restaurado, durabilidadPendiente: true }
     try { resultado.durabilidadPendiente = !await sincronizarDirectorio(bloqueo.ruta, fs) } catch {}
-  } catch (e) { errorOperacion = Object.assign(noDisponible(), noConfirmada, { code: codigoOperativo(e) }) }
+  } catch (e) { errorOperacion = Object.assign(noDisponible(e), noConfirmada, { code: codigoOperativo(e) }) }
   // La limpieza no cambia si rename confirmó ni sustituye un error previo de la operación.
   if (bloqueo) {
     try { await bloqueo.liberar() }

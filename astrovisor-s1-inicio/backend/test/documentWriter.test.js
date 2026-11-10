@@ -1,6 +1,7 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
 import * as fs from 'node:fs/promises'
+import { createHash } from 'node:crypto'
 import { tmpdir, hostname } from 'node:os'
 import { join } from 'node:path'
 import { spawn, execFileSync } from 'node:child_process'
@@ -19,6 +20,93 @@ const modulo = new URL('../src/services/documentRepository.js', import.meta.url)
 const ejecutar = (codigo, directorio) => execFileSync(process.execPath, ['--input-type=module', '-e', codigo], {
   env: { ...process.env, ASTROVISOR_DATA_DIR: directorio }, encoding: 'utf8', stdio: 'pipe',
 })
+
+for (const fase of ['cierre-temporal', 'cierre-directorio', 'control', 'apertura']) {
+  test(`error original conserva prioridad ante limpieza de ${fase}`, async (t) => {
+    const directorio = await entorno(t)
+    const antes = await fs.readFile(join(directorio, 'catalogo.json'))
+    const original = Object.assign(new Error('operación privada'), { code: 'EIO' })
+    const secundario = Object.assign(new Error('limpieza privada'), { code: 'EACCES' })
+    const io = { ...fs,
+      open: async (ruta, ...args) => {
+        if (fase === 'control' && ruta.endsWith('escritor.lock')) throw original
+        if (fase === 'cierre-directorio' && ruta === join(directorio, 'backups')) return {
+          sync: async () => { throw original }, close: async () => { throw secundario },
+        }
+        const h = await fs.open(ruta, ...args)
+        if (fase !== 'cierre-temporal' || !ruta.endsWith('.tmp')) return h
+        return { writeFile: async () => { throw original }, sync: () => h.sync(),
+          close: async () => { await h.close(); throw secundario } }
+      },
+      lstat: async (ruta) => { if (fase === 'apertura' && ruta.endsWith('catalogo.json')) throw original; return fs.lstat(ruta) },
+      unlink: async (ruta) => {
+        if ((fase === 'control' && ruta.endsWith('control.lock')) || (fase === 'apertura' && ruta.endsWith('escritor.lock'))) throw secundario
+        return fs.unlink(ruta)
+      },
+    }
+    let fallo
+    try {
+      const escritor = t.escritor = await repo.abrirEscritor({ directorio, io })
+      await escritor.guardar({ revision: 1, cambiar: cambio('No confirmado') })
+    } catch (e) { fallo = e }
+    assert.equal(fallo?.status, 503)
+    assert.deepEqual(await fs.readFile(join(directorio, 'catalogo.json')), antes)
+    assert.equal(fallo.cause, original)
+    assert.deepEqual(fallo.cause.erroresLimpieza, [secundario])
+    assert.equal((await fs.readdir(directorio)).some(n => n.endsWith('.tmp')), false)
+    if (fase === 'control') assert.ok((await fs.readdir(directorio)).includes('control.lock'))
+    if (fase === 'apertura') assert.ok((await fs.readdir(directorio)).includes('escritor.lock'))
+  })
+}
+
+for (const fase of ['rename', 'writeFile', 'sync']) {
+  for (const limpiezaFalla of [false, true]) {
+    test(`error original ${fase} conserva EIO con limpieza ${limpiezaFalla ? 'EACCES pendiente' : 'correcta'}`, async (t) => {
+      const directorio = await entorno(t)
+      const previo = await repo.abrirEscritor({ directorio })
+      try { await previo.guardar({ revision: 1, cambiar: cambio('Confirmación anterior') }) }
+      finally { await previo.cerrar() }
+      const [nombrePrevio] = await fs.readdir(join(directorio, 'backups'))
+      const backupPrevio = await fs.readFile(join(directorio, 'backups', nombrePrevio))
+      const antes = await fs.readFile(join(directorio, 'catalogo.json'))
+      const original = Object.assign(new Error('fallo privado de operación'), { code: 'EIO' })
+      const secundario = Object.assign(new Error('fallo privado de limpieza'), { code: 'EACCES' })
+      let intentos = 0
+      const escritor = t.escritor = await repo.abrirEscritor({ directorio, io: { ...fs,
+        rename: async (...args) => { intentos++; if (fase === 'rename') throw original; return fs.rename(...args) },
+        open: async (ruta, ...args) => {
+          const h = await fs.open(ruta, ...args)
+          if (!ruta.endsWith('.tmp') || fase === 'rename') return h
+          return {
+            writeFile: async (...v) => { if (fase === 'writeFile') throw original; return h.writeFile(...v) },
+            sync: async () => { throw original },
+            close: () => h.close(),
+          }
+        },
+        unlink: async (ruta) => { if (limpiezaFalla && ruta.endsWith('.tmp')) throw secundario; return fs.unlink(ruta) },
+      } })
+      let fallo
+      try { await escritor.guardar({ revision: 2, cambiar: cambio('No confirmado') }) }
+      catch (e) { fallo = e }
+      assert.ok(fallo, 'Una escritura no confirmada debe rechazarse')
+      assert.equal(fallo.status, 503)
+      assert.deepEqual(await fs.readFile(join(directorio, 'catalogo.json')), antes)
+      const respaldos = await fs.readdir(join(directorio, 'backups'))
+      assert.equal(respaldos.length, 2)
+      assert.deepEqual(await fs.readFile(join(directorio, 'backups', nombrePrevio)), backupPrevio)
+      const sobre = JSON.parse(await fs.readFile(join(directorio, 'backups', respaldos.find(n => n !== nombrePrevio)), 'utf8'))
+      assert.deepEqual(sobre.catalogo, JSON.parse(antes))
+      assert.equal(sobre.sha256, createHash('sha256').update(JSON.stringify(sobre.catalogo)).digest('hex'))
+      assert.equal(intentos, fase === 'rename' ? 1 : 0, 'No reintentar EIO ni el guardado')
+      assert.equal((await fs.readdir(directorio)).some(n => n.endsWith('.tmp')), limpiezaFalla)
+      assert.equal(fallo.cause, original, 'La normalización 503 conserva la excepción original')
+      assert.equal(fallo.cause.code, 'EIO')
+      assert.equal(fallo.cause.erroresLimpieza?.length ?? 0, limpiezaFalla ? (fase === 'rename' ? 1 : 2) : 0)
+      for (const e of fallo.cause.erroresLimpieza ?? []) assert.equal(e, secundario)
+      assert.ok(!JSON.stringify(fallo).includes('fallo privado'), 'Diagnóstico interno no enumerable')
+    })
+  }
+}
 
 test('guardado exclusivo conserva metadatos y persiste al leer desde otro proceso', async (t) => {
   const directorio = await entorno(t)

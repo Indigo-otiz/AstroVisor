@@ -27,47 +27,54 @@ function programa(directorio, respaldo, modo, usarCLI = false) {
   return `
     import * as fs from 'node:fs/promises'; import {mock} from 'node:test';
     const dir=${JSON.stringify(directorio)}, modo=${JSON.stringify(modo)};
-    let confirmaciones=0, liberaciones=0;
+    let confirmaciones=0, liberaciones=0, intentosRename=0;
     const error=(code)=>Object.assign(new Error('NO-PUBLICAR '+dir),{code});
     mock.module('node:fs/promises',{namedExports:{...fs,
-      rename:async(...args)=>{if(['operacion','ambos'].includes(modo))throw error('EIO');await fs.rename(...args);confirmaciones++},
-      unlink:async(ruta)=>{if(ruta.endsWith('escritor.lock')){liberaciones++;if(['liberacion','ambos'].includes(modo))throw error('EACCES')}return fs.unlink(ruta)},
+      rename:async(...args)=>{intentosRename++;if(['operacion','ambos','temporal','temporal-liberacion'].includes(modo))throw error('EIO');await fs.rename(...args);confirmaciones++},
+      unlink:async(ruta)=>{if(ruta.endsWith('.tmp')&&modo.startsWith('temporal'))throw error('EACCES');if(ruta.endsWith('escritor.lock')){liberaciones++;if(['liberacion','ambos','temporal-liberacion'].includes(modo))throw error('EACCES')}return fs.unlink(ruta)},
       open:async(ruta,...args)=>{if(modo==='sync'&&confirmaciones&&ruta===dir)throw error('EIO');return fs.open(ruta,...args)},
     }});
     ${usarCLI ? `process.env.ASTROVISOR_DATA_DIR=dir;
       process.argv=[process.execPath,'recuperar-catalogo.mjs','restaurar',${JSON.stringify(respaldo)},'2'];await import(${JSON.stringify(cli)});`
       : `const repo=await import(${JSON.stringify(modulo)});let resultado,errorOperacion;
       try{resultado=await repo.restaurarCatalogo({directorio:dir,respaldo:${JSON.stringify(respaldo)},ultimaRevision:2})}
-      catch(e){errorOperacion={status:e.status,code:e.code,confirmada:e.confirmada,revisionPersistida:e.revisionPersistida,limpiezaPendiente:e.limpiezaPendiente,codigoLimpieza:e.codigoLimpieza}}
+      catch(e){errorOperacion={status:e.status,code:e.code,confirmada:e.confirmada,revisionPersistida:e.revisionPersistida,limpiezaPendiente:e.limpiezaPendiente,codigoLimpieza:e.codigoLimpieza,causa:e.cause?.code,limpiezaTemporal:e.cause?.erroresLimpieza?.map(x=>x.code)}}
       const antes=liberaciones;let bloqueoActivoProtegido=null;
-      if(['liberacion','ambos'].includes(modo)){
+      if(['liberacion','ambos','temporal-liberacion'].includes(modo)){
         try{await repo.retirarBloqueoAbandonado({directorio:dir});bloqueoActivoProtegido=false}
         catch(e){bloqueoActivoProtegido=e.status===503&&antes===liberaciones}
       }
-      console.log(JSON.stringify({resultado,errorOperacion,confirmaciones,liberaciones,bloqueoActivoProtegido}));`}
+      console.log(JSON.stringify({resultado,errorOperacion,confirmaciones,liberaciones,intentosRename,bloqueoActivoProtegido}));`}
   `
 }
 
-for (const modo of ['normal', 'liberacion', 'operacion', 'ambos', 'sync']) {
+for (const modo of ['normal', 'liberacion', 'operacion', 'ambos', 'sync', 'temporal', 'temporal-liberacion']) {
   test(`restauración ${modo}: resultado distingue confirmación, operación y limpieza`, async (t) => {
     const { directorio, respaldo, original } = await entorno(t)
+    const backupPrevio = await fs.readFile(join(directorio, 'backups', respaldo))
     const salida = spawnSync(process.execPath, ['--experimental-test-module-mocks', '--input-type=module', '-e', programa(directorio, respaldo, modo)], { encoding: 'utf8', timeout: 15000 })
     assert.equal(salida.status, 0, salida.stderr)
-    const d = JSON.parse(salida.stdout), confirmada = !['operacion', 'ambos'].includes(modo)
+    const d = JSON.parse(salida.stdout), confirmada = !['operacion', 'ambos', 'temporal', 'temporal-liberacion'].includes(modo)
     const estado = confirmada ? d.resultado : d.errorOperacion
     assert.ok(estado, 'El resultado debe comunicar el estado real de confirmación, aunque falle la limpieza')
     assert.equal(estado.confirmada, confirmada)
     assert.equal(estado.revisionPersistida, confirmada ? 3 : null)
-    assert.equal(estado.limpiezaPendiente, ['liberacion', 'ambos'].includes(modo))
-    assert.equal(estado.codigoLimpieza, ['liberacion', 'ambos'].includes(modo) ? 'EACCES' : null)
+    assert.equal(estado.limpiezaPendiente, ['liberacion', 'ambos', 'temporal-liberacion'].includes(modo))
+    assert.equal(estado.codigoLimpieza, ['liberacion', 'ambos', 'temporal-liberacion'].includes(modo) ? 'EACCES' : null)
     assert.equal(d.confirmaciones, confirmada ? 1 : 0)
-    if (!confirmada) { assert.equal(estado.status, 503); assert.equal(estado.code, 'EIO') }
+    if (!confirmada) { assert.equal(estado.status, 503); assert.equal(estado.code, 'EIO'); assert.equal(d.intentosRename, 1, 'No repetir una restauración rechazada con EIO') }
+    if (modo.startsWith('temporal')) {
+      assert.equal(estado.causa, 'EIO')
+      assert.deepEqual(estado.limpiezaTemporal, ['EACCES'])
+      assert.ok((await fs.readdir(directorio)).some(n => n.endsWith('.tmp')))
+    }
     if (modo === 'sync') assert.equal(estado.durabilidadPendiente, true)
     const leido = await obtenerCatalogo({ directorio })
     assert.equal(leido.revision, confirmada ? 3 : 2)
     assert.equal(leido.libros[0].titulo, confirmada ? original.libros[0].titulo : 'Estado posterior')
     assert.deepEqual(leido.metadatosDesconocidos, original.metadatosDesconocidos)
     assert.deepEqual(leido.recorridos, original.recorridos)
+    assert.deepEqual(await fs.readFile(join(directorio, 'backups', respaldo)), backupPrevio)
     if (confirmada) {
       assert.deepEqual(leido.libros, original.libros)
       const reiniciado = JSON.parse(execFileSync(process.execPath, ['--input-type=module', '-e', `import{obtenerCatalogo}from ${JSON.stringify(modulo)};console.log(JSON.stringify(await obtenerCatalogo()))`], {

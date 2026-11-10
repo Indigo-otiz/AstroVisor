@@ -1,6 +1,7 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
 import { mkdtemp, writeFile, readFile, rm, readdir } from 'node:fs/promises'
+import * as fs from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { randomBytes, createHash } from 'node:crypto'
@@ -9,7 +10,7 @@ import { once } from 'node:events'
 import { spawn } from 'node:child_process'
 import { crearApp } from '../src/index.js'
 import { crearConfiguracionAdmin } from '../src/services/adminCredentials.js'
-import { inicializarCatalogo, obtenerCatalogo } from '../src/services/documentRepository.js'
+import { inicializarCatalogo, obtenerCatalogo, abrirEscritor } from '../src/services/documentRepository.js'
 
 const password = randomBytes(24).toString('hex')
 const config = await crearConfiguracionAdmin('editor-aislado', 'Prueba documental', password)
@@ -60,6 +61,25 @@ async function entorno(t, preparar) {
   })
   return { datos, pedir, headers, guardar, app, server }
 }
+
+test('POST con error de operación y limpieza conserva HTTP 503 privado sin repetir la escritura', async (t) => {
+  const { datos, guardar, app } = await entorno(t)
+  const antes = await readFile(join(datos, 'catalogo.json'))
+  let intentos = 0
+  const escritor = await abrirEscritor({ directorio: datos, io: { ...fs,
+    rename: async () => { intentos++; throw Object.assign(new Error('NO-PUBLICAR ' + datos), { code: 'EIO' }) },
+    unlink: async (ruta) => { if (ruta.endsWith('.tmp')) throw Object.assign(new Error('NO-PUBLICAR ' + datos), { code: 'EACCES' }); return fs.unlink(ruta) },
+  } })
+  app.locals.iniciarEscritor = async () => escritor
+  app.locals.cerrarEscritor = () => escritor.cerrar()
+  const respuesta = await guardar('/api/admin/libros', altaDinamica, '"catalogo-1"', 'POST')
+  assert.equal(respuesta.status, 503)
+  assert.deepEqual(await respuesta.json(), { error: 'Almacenamiento documental no disponible' })
+  assert.equal(respuesta.headers.get('etag')?.startsWith('"catalogo-'), false)
+  assert.equal(intentos, 1)
+  assert.deepEqual(await readFile(join(datos, 'catalogo.json')), antes)
+  assert.equal((await obtenerCatalogo({ directorio: datos })).revision, 1)
+})
 
 test('alta dinámica, previsualización, revalidación y revisión obsoleta sin modificar SVG iniciales', async (t) => {
   const activos = await activosPublicos()
