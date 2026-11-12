@@ -131,6 +131,21 @@ test('S5-02: btnActivarInmersion solicita orientación síncronamente en gesto y
     content.includes('btn-reintentar') && content.includes('Reintentar activación'),
     'Debe ofrecer reintento dinámico si algún permiso es denegado o no disponible'
   );
+
+  // 5. Audio sincronizado con el narrador real sin AudioContext independiente
+  assert.equal(
+    handlerCode.includes('window.__astroAudioCtx'),
+    false,
+    'No debe usar AudioContext independiente como prueba de narraciones'
+  );
+  assert.ok(
+    content.includes("addEventListener('astrovisor:narracion'") || content.includes('astrovisor:narracion'),
+    'Debe sincronizar el estado de audio con el evento astrovisor:narracion del narrador real'
+  );
+  assert.ok(
+    handlerCode.includes('activateAudio') || handlerCode.includes('astrovisor:activar-audio'),
+    'Debe accionar la activación en el reproductor real de narraciones'
+  );
 });
 
 test('S5-06: VR index.html integra identidad CECAN/Nayarit con letras blancas y proporción 5.83:1', () => {

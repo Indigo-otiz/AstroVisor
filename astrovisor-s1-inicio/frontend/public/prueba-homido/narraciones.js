@@ -103,6 +103,14 @@ window.addEventListener('astrovisor:ficha-abierta', (event) => {
 })
 window.addEventListener('astrovisor:ficha-cerrada', () => cerrar({ desdeVisor: true }))
 window.addEventListener('astrovisor:audio-solicitado', controlarAudio)
+window.addEventListener('astrovisor:activar-audio', () => {
+  if (!audioDe(actual)) {
+    const primera = historias.find(audioDe)
+    if (!primera) return
+    narrador.seleccionar(audioDe(primera))
+  }
+  narrador.activar()
+})
 window.addEventListener('astrovisor:audio-repetir', () => {
   if (!actual) return;
   narrador.detener();

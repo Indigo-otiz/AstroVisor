@@ -69,6 +69,7 @@ import { rutaLibro2D } from './js/ruta-libro-2d.js';
   let stereoActive = false;
   let stereoComponent;
   let narracion = null; // último estado REAL del reproductor (narraciones.js); null = sin reproductor/audio
+  let actualizarInmersion = null;
   let sincronizando = false; // true mientras narraciones.js nos abre/cierra la ficha (no se le devuelve el evento)
   let layoutActual = null;
   let vistaLectura = 'ficha'; // ficha | estanteria | detalle; modo de visor continúa en 'ficha'
@@ -448,6 +449,7 @@ import { rutaLibro2D } from './js/ruta-libro-2d.js';
     cerrar: () => sincronizar(() => { if (estado.modo === 'ficha') cerrarFicha(); }),
     estadoNarracion(nuevo) {
       narracion = nuevo;
+      if (typeof actualizarInmersion === 'function') actualizarInmersion();
       if (estado.modo === 'ficha' && vistaLectura === 'ficha') pintarFicha(fichas.get(estado.fichaId));
     },
   };
@@ -774,15 +776,21 @@ import { rutaLibro2D } from './js/ruta-libro-2d.js';
         const estadoInmersion = {
           pantallaCompleta: false,
           orientacion: typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function' ? 'pendiente' : 'no_requerido',
-          audio: 'bloqueado',
+          audio: 'pendiente',
           intentoPrevio: false,
         };
 
         const comprobarEstado = () => {
           estadoInmersion.pantallaCompleta = Boolean(document.fullscreenElement || document.webkitFullscreenElement);
-          if (window.__astroAudioCtx && window.__astroAudioCtx.state === 'running') {
+          
+          // Sincronización con el estado real del reproductor (narrador de audio/narration.js vía narraciones.js)
+          const estadoNarrador = narracion?.estado;
+          if (estadoNarrador && ['listo', 'cargando', 'reproduciendo', 'pausado', 'finalizado'].includes(estadoNarrador)) {
             estadoInmersion.audio = 'desbloqueado';
+          } else if (estadoNarrador === 'bloqueado' || estadoNarrador === 'error') {
+            estadoInmersion.audio = 'bloqueado';
           }
+
           const fsOk = estadoInmersion.pantallaCompleta;
           const oriOk = estadoInmersion.orientacion === 'concedido' || estadoInmersion.orientacion === 'no_requerido';
           const audOk = estadoInmersion.audio === 'desbloqueado';
@@ -808,6 +816,7 @@ import { rutaLibro2D } from './js/ruta-libro-2d.js';
         };
 
         comprobarEstado();
+        actualizarInmersion = comprobarEstado;
 
         btnActivar.addEventListener('click', async () => {
           estadoInmersion.intentoPrevio = true;
@@ -823,18 +832,17 @@ import { rutaLibro2D } from './js/ruta-libro-2d.js';
             }
           }
 
-          // 2. ACTIVACIÓN DIRECTA DE AUDIO EN EL MISMO GESTO
+          // 2. ACTIVACIÓN DIRECTA DEL REPRODUCTOR REAL DE NARRACIONES EN EL GESTO
           try {
-            const AudioCtx = window.AudioContext || window.webkitAudioContext;
-            if (AudioCtx) {
-              if (!window.__astroAudioCtx) {
-                window.__astroAudioCtx = new AudioCtx();
-              }
-              if (window.__astroAudioCtx.state === 'suspended') {
-                window.__astroAudioCtx.resume().catch(() => {});
-              }
+            const btnAudio = $('activateAudio');
+            if (btnAudio && !btnAudio.disabled) {
+              btnAudio.click();
+            } else {
+              window.dispatchEvent(new Event('astrovisor:activar-audio'));
             }
-          } catch (_) {}
+          } catch (err) {
+            eventLine(`Audio activación error: ${err.message || err.name}`);
+          }
 
           // 3. SOLICITUD DE PANTALLA COMPLETA
           let fsPromesa = null;
@@ -863,17 +871,20 @@ import { rutaLibro2D } from './js/ruta-libro-2d.js';
             await fsPromesa;
           }
 
-          if (window.__astroAudioCtx && window.__astroAudioCtx.state === 'running') {
-            estadoInmersion.audio = 'desbloqueado';
-          }
-
           comprobarEstado();
         });
 
         document.addEventListener('fullscreenchange', comprobarEstado);
-        window.addEventListener('astrovisor:audio-iniciado', () => {
-          estadoInmersion.audio = 'desbloqueado';
-          comprobarEstado();
+        window.addEventListener('astrovisor:narracion', (ev) => {
+          const st = ev.detail?.state;
+          if (st) {
+            if (['listo', 'cargando', 'reproduciendo', 'pausado', 'finalizado'].includes(st)) {
+              estadoInmersion.audio = 'desbloqueado';
+            } else if (st === 'bloqueado' || st === 'error') {
+              estadoInmersion.audio = 'bloqueado';
+            }
+            comprobarEstado();
+          }
         });
       }
     }
