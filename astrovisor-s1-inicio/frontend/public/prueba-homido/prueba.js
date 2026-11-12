@@ -69,6 +69,7 @@ import { rutaLibro2D } from './js/ruta-libro-2d.js';
   let stereoActive = false;
   let stereoComponent;
   let narracion = null; // último estado REAL del reproductor (narraciones.js); null = sin reproductor/audio
+  let actualizarInmersion = null;
   let sincronizando = false; // true mientras narraciones.js nos abre/cierra la ficha (no se le devuelve el evento)
   let layoutActual = null;
   let vistaLectura = 'ficha'; // ficha | estanteria | detalle; modo de visor continúa en 'ficha'
@@ -137,7 +138,7 @@ import { rutaLibro2D } from './js/ruta-libro-2d.js';
 
   function nombreDe(t) {
     if (t.accion === 'constelacion') return fichas.get(t.id)?.titulo || t.id;
-    return { volver: '← Volver al recorrido', audio: 'Escuchar narración', libros: 'Ver libros recomendados', libro: 'Abrir libro', 'volver-ficha': 'Volver a la constelación', 'volver-libros': 'Volver a los libros', 'consultar-libro': 'Consultar libro en 2D', pausa: estado.pausado ? 'Reanudar mirada' : 'Pausar mirada', salir: 'Salir a 2D' }[t.accion] || t.accion;
+    return { volver: '← Volver al recorrido', audio: 'Escuchar narración', repetir: 'Repetir narración desde el inicio', libros: 'Ver libros recomendados', libro: 'Abrir libro', 'volver-ficha': 'Volver a la constelación', 'volver-libros': 'Volver a los libros', 'consultar-libro': 'Consultar libro en 2D', pausa: estado.pausado ? 'Reanudar mirada' : 'Pausar mirada', salir: 'Salir a 2D' }[t.accion] || t.accion;
   }
 
   function mensajeEnReposo() {
@@ -152,7 +153,7 @@ import { rutaLibro2D } from './js/ruta-libro-2d.js';
   function objetivoEnVista(t) {
     if (t.accion === 'pausa' || t.accion === 'salir') return true;
     if (t.accion === 'constelacion') return estado.modo === 'recorrido';
-    if (['audio', 'volver', 'libros'].includes(t.accion)) return vistaLectura === 'ficha';
+    if (['audio', 'repetir', 'volver', 'libros'].includes(t.accion)) return vistaLectura === 'ficha';
     if (['libro', 'volver-ficha'].includes(t.accion)) return vistaLectura === 'estanteria';
     if (['consultar-libro', 'volver-libros'].includes(t.accion)) return vistaLectura === 'detalle';
     return false;
@@ -191,6 +192,7 @@ import { rutaLibro2D } from './js/ruta-libro-2d.js';
     if (t.accion === 'constelacion') abrirFicha(t.id);
     else if (t.accion === 'volver') cerrarFicha();
     else if (t.accion === 'audio') pedirAudio();
+    else if (t.accion === 'repetir') repetirAudio();
     else if (t.accion === 'pausa') alternarPausa();
     else if (t.accion === 'libros') abrirEstanteria();
     else if (t.accion === 'libro') abrirDetalleLibro(t.id);
@@ -306,7 +308,10 @@ import { rutaLibro2D } from './js/ruta-libro-2d.js';
     infoPanel3D.setAttribute('position', `${frente.x} ${FICHA_BASE_Y + PLANO_ALTO / 2} ${frente.z}`);
     infoPanel3D.setAttribute('rotation', `0 ${frente.rotY} 0`);
     pintarFicha(ficha);
-    activarGrupo(constelacionesEl, false);
+    // S5: Mantener constelaciones visibles de fondo y resaltar la activa
+    constelacionesEl.setAttribute('visible', 'true');
+    constelacionesEl.querySelectorAll('[data-action]').forEach((el) => el.classList.remove('selectable'));
+    constelaciones.forEach((c, cId) => c.resaltar(cId === id));
     activarGrupo(infoPanel3D, true);
     visorControls3D.setAttribute('position', `${frente.x} ${POS_CONTROLES_Y} ${frente.z}`);
     visorControls3D.setAttribute('rotation', `0 ${frente.rotY} 0`);
@@ -325,6 +330,7 @@ import { rutaLibro2D } from './js/ruta-libro-2d.js';
     activarGrupo(estanteriaEl, false);
     activarGrupo(infoPanel3D, false);
     activarGrupo(constelacionesEl, true);
+    constelaciones.forEach((c) => c.resaltar(false));
     visorControls3D.setAttribute('position', POS_CONTROLES.recorrido);
     visorControls3D.setAttribute('rotation', '0 0 0');
     refrescarRaycaster();
@@ -414,6 +420,13 @@ import { rutaLibro2D } from './js/ruta-libro-2d.js';
 
   // Audio: el reproductor es el de Luis (narraciones.js). Aquí solo se SOLICITA la acción (Escuchar/Pausar/Reanudar
   // según su estado) y se MUESTRA el estado que él confirma; no se reproduce nada desde la escena.
+  function repetirAudio() {
+    const ficha = fichas.get(estado.fichaId);
+    if (!ficha) return;
+    window.dispatchEvent(new CustomEvent('astrovisor:audio-repetir', { detail: { id: ficha.id, titulo: ficha.titulo, audio: adaptarAudio(ficha) } }));
+    eventLine('Botón de repetir: solicitud de reinicio enviada al narrador.');
+  }
+
   function pedirAudio() {
     const ficha = fichas.get(estado.fichaId);
     if (!ficha) return;
@@ -436,6 +449,7 @@ import { rutaLibro2D } from './js/ruta-libro-2d.js';
     cerrar: () => sincronizar(() => { if (estado.modo === 'ficha') cerrarFicha(); }),
     estadoNarracion(nuevo) {
       narracion = nuevo;
+      if (typeof actualizarInmersion === 'function') actualizarInmersion();
       if (estado.modo === 'ficha' && vistaLectura === 'ficha') pintarFicha(fichas.get(estado.fichaId));
     },
   };
@@ -733,6 +747,156 @@ import { rutaLibro2D } from './js/ruta-libro-2d.js';
     stereoStatus.textContent = stereoComponent
       ? 'Escena lista. Compatible con 2D y vista dividida Homido.'
       : 'Escena cargada sin componente estéreo.';
+
+    // S5: Modos directos desde URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const modoParam = urlParams.get('modo');
+    const diagParam = urlParams.get('diag') === '1';
+
+    const directExitBtn = $('directExitBtn');
+    if (directExitBtn) {
+      directExitBtn.addEventListener('click', salir);
+    }
+
+    const modoEfectivo = modoParam || 'libre';
+    if ((modoParam === 'libre' || modoParam === 'homido' || !modoParam) && !diagParam) {
+      document.body.classList.add('modo-directo');
+      if (directExitBtn) directExitBtn.hidden = false;
+    }
+
+    const btnActivar = $('btnActivarInmersion');
+    if (modoEfectivo === 'homido' && !diagParam && stereoComponent) {
+      stereoActive = true;
+      stereoComponent.enabledStereo = true;
+      host.classList.add('stereo-active');
+      document.body.classList.add('stereo-mode');
+      prepararPantallaCompleta();
+
+      if (btnActivar) {
+        const estadoInmersion = {
+          pantallaCompleta: false,
+          orientacion: typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function' ? 'pendiente' : 'no_requerido',
+          audio: 'pendiente',
+          intentoPrevio: false,
+        };
+
+        const comprobarEstado = () => {
+          estadoInmersion.pantallaCompleta = Boolean(document.fullscreenElement || document.webkitFullscreenElement);
+          
+          // Sincronización con el estado real del reproductor (narrador de audio/narration.js vía narraciones.js)
+          const estadoNarrador = narracion?.estado;
+          const activacionExitosa = Boolean(narracion?.activacion);
+          const reproduciendoOReanudado = ['reproduciendo', 'pausado', 'finalizado'].includes(estadoNarrador);
+
+          if (reproduciendoOReanudado || (estadoNarrador === 'listo' && activacionExitosa)) {
+            estadoInmersion.audio = 'desbloqueado';
+          } else if (estadoNarrador === 'bloqueado' || estadoNarrador === 'error') {
+            estadoInmersion.audio = 'bloqueado';
+          } else if (estadoNarrador === 'listo' && !activacionExitosa) {
+            // La simple selección de recurso en el narrador no equivale a audio desbloqueado o activación exitosa
+            estadoInmersion.audio = estadoInmersion.audio === 'bloqueado' ? 'bloqueado' : 'pendiente';
+          }
+
+          const fsOk = estadoInmersion.pantallaCompleta;
+          const oriOk = estadoInmersion.orientacion === 'concedido' || estadoInmersion.orientacion === 'no_requerido';
+          const audOk = estadoInmersion.audio === 'desbloqueado';
+
+          // No ocultar el botón únicamente porque se haya activado la pantalla completa:
+          // Solo se oculta cuando TODAS las capacidades requeridas (pantalla, orientación y audio) están activas.
+          if (fsOk && oriOk && audOk) {
+            btnActivar.hidden = true;
+          } else {
+            btnActivar.hidden = false;
+            if (estadoInmersion.intentoPrevio && (estadoInmersion.orientacion === 'denegado' || !fsOk || !audOk)) {
+              const faltantes = [];
+              if (!fsOk) faltantes.push('pantalla');
+              if (estadoInmersion.orientacion === 'denegado') faltantes.push('sensores');
+              if (!audOk) faltantes.push('audio');
+              btnActivar.textContent = `Reintentar activación (${faltantes.join(', ') || 'inmersión'})`;
+              btnActivar.classList.add('btn-reintentar');
+            } else {
+              btnActivar.textContent = 'Activar pantalla completa, sensores y audio';
+              btnActivar.classList.remove('btn-reintentar');
+            }
+          }
+        };
+
+        comprobarEstado();
+        actualizarInmersion = comprobarEstado;
+
+        btnActivar.addEventListener('click', async () => {
+          estadoInmersion.intentoPrevio = true;
+
+          // 1. SOLICITUD DE ORIENTACIÓN DIRECTA Y SÍNCRONA EN EL GESTO
+          // Se invoca antes de cualquier await o microtarea asíncrona para no perder la activación (User Gesture en WebKit)
+          let orientacionPromesa = null;
+          if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
+            try {
+              orientacionPromesa = DeviceOrientationEvent.requestPermission();
+            } catch (err) {
+              eventLine(`Orientación error síncrono: ${err.message || err.name}`);
+            }
+          }
+
+          // 2. ACTIVACIÓN DIRECTA DEL REPRODUCTOR REAL DE NARRACIONES EN EL GESTO
+          try {
+            const btnAudio = $('activateAudio');
+            if (btnAudio && !btnAudio.disabled) {
+              btnAudio.click();
+            } else {
+              window.dispatchEvent(new Event('astrovisor:activar-audio'));
+            }
+          } catch (err) {
+            eventLine(`Audio activación error: ${err.message || err.name}`);
+          }
+
+          // 3. SOLICITUD DE PANTALLA COMPLETA
+          let fsPromesa = null;
+          if (!document.fullscreenElement && host.requestFullscreen) {
+            fsPromesa = host.requestFullscreen().catch((err) => {
+              eventLine(`Pantalla completa no disponible: ${err.name || err.message}`);
+            });
+          }
+          if (screen.orientation && screen.orientation.lock) {
+            screen.orientation.lock('landscape').catch(() => {});
+          }
+
+          // 4. RESOLVER ORIENTACIÓN Y EVALUAR RESULTADOS POR SEPARADO SIN BLOQUEAR LA ESCENA
+          if (orientacionPromesa) {
+            try {
+              const res = await orientacionPromesa;
+              estadoInmersion.orientacion = res === 'granted' ? 'concedido' : 'denegado';
+              eventLine(`Permiso orientación: ${estadoInmersion.orientacion}`);
+            } catch (err) {
+              estadoInmersion.orientacion = 'denegado';
+              eventLine(`Permiso orientación denegado/error: ${err.message || err.name}`);
+            }
+          }
+
+          if (fsPromesa) {
+            await fsPromesa;
+          }
+
+          comprobarEstado();
+        });
+
+        document.addEventListener('fullscreenchange', comprobarEstado);
+        window.addEventListener('astrovisor:narracion', (ev) => {
+          const st = ev.detail?.state;
+          const act = Boolean(ev.detail?.activacion || narracion?.activacion);
+          if (st) {
+            if (['reproduciendo', 'pausado', 'finalizado'].includes(st) || (st === 'listo' && act)) {
+              estadoInmersion.audio = 'desbloqueado';
+            } else if (st === 'bloqueado' || st === 'error') {
+              estadoInmersion.audio = 'bloqueado';
+            } else if (st === 'listo' && !act) {
+              estadoInmersion.audio = estadoInmersion.audio === 'bloqueado' ? 'bloqueado' : 'pendiente';
+            }
+            comprobarEstado();
+          }
+        });
+      }
+    }
   }
   if (scene.hasLoaded) onSceneReady();
   else scene.addEventListener('loaded', onSceneReady, { once: true });

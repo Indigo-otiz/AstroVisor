@@ -40,27 +40,29 @@ watch(
             <path d="m16 2 4 10 10 4-10 4-4 10-4-10-10-4 10-4Z" fill="currentColor" /></svg
           >AstroVisor</RouterLink
         >
-        <nav aria-label="Navegación principal" class="nav-links">
-          <RouterLink to="/" exact-active-class="nav-current">Inicio</RouterLink>
-          <RouterLink to="/explorar" :class="{ 'nav-current': route.name === 'constelacion' }"
-            >Explorar</RouterLink
-          >
-          <RouterLink to="/visor">Homido</RouterLink>
-          <RouterLink to="/admin/acceso">Administración</RouterLink>
-        </nav>
+        <div class="header-actions">
+          <nav aria-label="Navegación principal" class="nav-links">
+            <RouterLink to="/" exact-active-class="nav-current">Inicio</RouterLink>
+            <RouterLink to="/explorar" :class="{ 'nav-current': route.name === 'constelacion' }"
+              >Explorar</RouterLink
+            >
+            <RouterLink to="/visor">Homido</RouterLink>
+            <RouterLink to="/admin/acceso">Administración</RouterLink>
+          </nav>
+
+          <div v-if="esPublica" class="presentation-tools">
+            <p id="presentation-help" class="sr-only">Texto más grande para compartir las historias en una pantalla.</p>
+            <button
+              class="presentation-toggle"
+              type="button"
+              aria-describedby="presentation-help"
+              :aria-pressed="presentacion"
+              @click="presentacion = !presentacion"
+            >Vista para proyección <span aria-hidden="true">{{ presentacion ? 'Activada' : 'Desactivada' }}</span></button>
+          </div>
+        </div>
       </div>
     </header>
-
-    <div v-if="esPublica" class="container presentation-tools">
-      <p id="presentation-help">Texto más grande para compartir las historias en una pantalla.</p>
-      <button
-        class="presentation-toggle"
-        type="button"
-        aria-describedby="presentation-help"
-        :aria-pressed="presentacion"
-        @click="presentacion = !presentacion"
-      >Vista para proyección <span aria-hidden="true">{{ presentacion ? 'Activada' : 'Desactivada' }}</span></button>
-    </div>
 
     <!-- Contenido principal -->
     <main id="contenido" tabindex="-1" :class="esAdmin ? 'admin-main' : 'container main-content'">
@@ -70,11 +72,13 @@ watch(
     <!-- Footer general: solo en vistas públicas -->
     <footer v-if="!esAdmin" class="container site-footer institutional-footer">
       <ul class="institutional-footer-logos" aria-label="Instituciones">
+        <li><img class="institutional-logo-cecan" src="/Nayarit_CECAN_Convivencia_Horizontal.png" width="11479" height="1968" alt="Gobierno del Estado de Nayarit y Consejo Estatal para la Cultura y las Artes de Nayarit (CECAN)" /></li>
         <li><img class="institutional-logo-library" src="/institucional/biblioteca-solon-arguello.png" width="1000" height="430" alt="Biblioteca Pública Central Estatal Solón Argüello" /></li>
         <li><img class="institutional-logo-tecnm" src="/Logo%20TecNMs.png" width="961" height="428" alt="Tecnológico Nacional de México" /></li>
         <li><img class="institutional-logo-tepic" src="/ITTepic_logo.jpg" width="225" height="225" alt="Instituto Tecnológico de Tepic" /></li>
       </ul>
       <p>Prototipo académico · Contenido de demostración.</p>
+      <p class="institutional-footer-auth"><em>Autorización institucional:</em> La formalización y autorización de uso para los logotipos oficiales de CECAN y Gobierno del Estado de Nayarit se encuentran en trámite ante las instancias correspondientes.</p>
     </footer>
   </div>
 </template>

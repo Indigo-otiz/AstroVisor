@@ -1,3 +1,15 @@
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
 .public-shell {
   --paper: #faf7f0;
   --ink: #1b2430;
@@ -22,7 +34,20 @@
 .public-shell .site-header {
   background: var(--paper);
   border-bottom: 1px solid #dedbd3;
-  padding: 20px 0;
+  padding: 14px 0;
+}
+.public-shell .header-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+.public-shell .header-actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px 18px;
 }
 .public-shell .brand {
   display: inline-flex;
@@ -62,7 +87,7 @@
   color: var(--blue);
 }
 .public-shell .main-content {
-  padding: 28px 0 48px;
+  padding: 20px 0 48px;
 }
 .public-shell h1 {
   font:
@@ -92,38 +117,34 @@
 
 /* La presentación se elige expresamente; solo afecta al recorrido público 2D. */
 .public-shell .presentation-tools {
-  display: flex;
+  display: inline-flex;
   align-items: center;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: 12px 24px;
-  padding-block: 16px;
-  border-bottom: 1px solid #dedbd3;
+  margin: 0;
+  padding: 0;
+  border: none;
 }
 .presentation-tools p {
   margin: 0;
-  color: var(--muted);
-  font-size: 1rem;
-  max-width: 48ch;
 }
 .presentation-toggle {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   flex-wrap: wrap;
-  gap: 4px 12px;
+  gap: 4px 8px;
   font: inherit;
-  font-size: 1rem;
+  font-size: 0.9444rem;
   font-weight: 650;
-  line-height: 1.5;
+  line-height: 1.4;
   color: var(--blue);
   background: transparent;
   border: 1px solid var(--blue);
   border-radius: 8px;
   min-height: 48px;
   max-width: 100%;
-  padding: 10px 18px;
+  padding: 8px 14px;
   cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease;
 }
 .presentation-toggle span {
   font-weight: 400;
@@ -351,10 +372,36 @@
 .public-home h1 {
   font-size: clamp(2.5556rem, 5vw, 3.7778rem);
 }
-.home-intro > p {
-  max-width: 34ch;
+.home-intro {
+  margin-bottom: 20px;
+}
+.home-heading-row {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 12px 18px;
+  margin-bottom: 6px;
+}
+.home-heading-row h1,
+.home-intro h1 {
+  margin: 0;
+  font-size: clamp(1.85rem, 3.2vw, 2.4rem);
+  line-height: 1.2;
+  color: var(--night);
+}
+.home-tagline {
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 1.15rem;
+  font-style: italic;
   color: var(--muted);
-  margin-bottom: 28px;
+  white-space: nowrap;
+}
+.home-lead,
+.home-intro > p {
+  max-width: 65ch;
+  color: var(--ink);
+  margin-bottom: 0;
+  line-height: 1.55;
 }
 .home-intro .home-access {
   margin: 18px 0 0;
@@ -550,6 +597,13 @@
 }
 
 @media (max-width: 960px) {
+  .portal-cards {
+    grid-template-columns: 1fr;
+  }
+  .home-heading-row {
+    flex-direction: column;
+    gap: 4px;
+  }
   .public-shell .header-content {
     gap: 12px;
   }
@@ -581,11 +635,26 @@
   .public-shell .brand {
     font-size: clamp(1.25rem, 8vw, 1.6667rem);
   }
-  .public-shell .nav-links {
+  .public-shell .header-actions {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
     margin-top: 12px;
+  }
+  .public-shell .nav-links {
+    margin-top: 0;
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(min(100%, 7em), 1fr));
     gap: 2px;
+  }
+  .public-shell .presentation-tools {
+    display: flex;
+    justify-content: flex-start;
+  }
+  .public-shell .presentation-toggle {
+    width: 100%;
+    justify-content: center;
   }
   .public-shell .nav-links a {
     font-size: 0.8889rem;
@@ -639,5 +708,404 @@
   }
   .public-state {
     padding: 32px 20px;
+  }
+}
+
+
+/* ==========================================================================
+   Estilos de Portada Sprint 5: Tres Tarjetas, Manuales y Créditos
+   ========================================================================== */
+
+.portal-section {
+  margin-top: 0;
+  padding-top: 0;
+  border-top: none;
+}
+.portal-manuals,
+.portal-credits {
+  margin-top: 40px;
+  padding-top: 32px;
+  border-top: 1px solid #dedbd3;
+}
+
+.portal-header {
+  margin-bottom: 28px;
+}
+
+.portal-header h2 {
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: clamp(1.6rem, 3.2vw, 2.2rem);
+  color: var(--night);
+  margin-bottom: 8px;
+}
+
+.portal-header p {
+  color: var(--muted);
+  max-width: 65ch;
+  margin: 0;
+  font-size: 1.05rem;
+}
+
+.portal-cards {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 20px;
+  align-items: stretch;
+}
+
+.portal-card {
+  background: #ffffff;
+  border: 2px solid #e1ded7;
+  border-radius: 16px;
+  padding: 20px 18px;
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+  position: relative;
+}
+
+.portal-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(11, 21, 48, 0.08);
+  border-color: var(--blue);
+}
+
+.portal-card-vr {
+  border-color: #2a3d75;
+  background: linear-gradient(180deg, #ffffff 0%, #f4f6fa 100%);
+}
+
+.portal-card-badge {
+  display: inline-block;
+  align-self: flex-start;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 3px 8px;
+  border-radius: 6px;
+  background: #e8edf4;
+  color: var(--blue);
+  margin-bottom: 8px;
+}
+
+.portal-card-badge.accent {
+  background: #fbf1d8;
+  color: #8c5b00;
+}
+
+.portal-card-badge.muted {
+  background: #eaecef;
+  color: var(--muted);
+}
+
+.portal-card h2.portal-card-title,
+.portal-card h3 {
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 1.3rem;
+  color: var(--night);
+  margin: 0 0 8px;
+  line-height: 1.25;
+}
+
+.portal-card-desc {
+  color: var(--ink);
+  font-size: 0.92rem;
+  line-height: 1.5;
+  margin-bottom: 14px;
+  flex-grow: 1;
+}
+
+.portal-card-features {
+  margin: 0 0 24px;
+  padding-left: 20px;
+  color: var(--muted);
+  font-size: 0.92rem;
+  line-height: 1.6;
+}
+
+.portal-card-note {
+  font-weight: 600;
+  font-size: 0.88rem;
+  color: var(--night);
+  margin: 0 0 12px;
+}
+
+.portal-card-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: auto;
+}
+
+.vr-actions {
+  gap: 8px;
+}
+
+.portal-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 48px;
+  padding: 10px 14px;
+  border-radius: 10px;
+  font-weight: 700;
+  font-size: 0.95rem;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+  text-align: center;
+}
+
+.portal-button.primary {
+  background: var(--blue);
+  color: #ffffff;
+  border: 2px solid var(--blue);
+}
+
+.portal-button.primary:hover {
+  background: #143563;
+  border-color: #143563;
+  color: #ffffff;
+}
+
+.portal-button.secondary {
+  background: #233560;
+  color: #ffffff;
+  border: 2px solid #233560;
+  flex-direction: column;
+  padding: 10px 14px;
+}
+
+.portal-button.secondary:hover {
+  background: #14203a;
+  border-color: #14203a;
+  color: #ffffff;
+}
+
+.portal-button.homido {
+  background: #8b3a00;
+  color: #ffffff;
+  border: 2px solid #8b3a00;
+  flex-direction: column;
+  padding: 10px 14px;
+}
+
+.portal-button.homido:hover {
+  background: #6b2d00;
+  border-color: #6b2d00;
+  color: #ffffff;
+}
+
+.portal-button.outline {
+  background: transparent;
+  color: var(--blue);
+  border: 2px solid var(--blue);
+}
+
+.portal-button.outline:hover {
+  background: #e8edf4;
+  color: var(--night);
+}
+
+.portal-button .btn-main {
+  font-size: 0.96rem;
+  font-weight: 700;
+}
+
+.portal-button .btn-sub {
+  font-size: 0.8rem;
+  font-weight: 400;
+  opacity: 0.9;
+}
+
+.portal-button .button-icon {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+}
+
+/* Manuales en video */
+.manuals-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 24px;
+}
+
+.manual-item {
+  background: #fdfcf9;
+  border: 1px solid #dedbd3;
+  border-radius: 12px;
+  padding: 22px 20px;
+  display: flex;
+  flex-direction: column;
+}
+
+.manual-badge-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #8c5b00;
+  background: #fff8e8;
+  border: 1px solid #eddcb9;
+  padding: 4px 10px;
+  border-radius: 6px;
+  margin-bottom: 12px;
+  align-self: flex-start;
+}
+
+.manual-badge-status .badge-dot {
+  width: 8px;
+  height: 8px;
+  background: #d97706;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.manual-item h3 {
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 1.25rem;
+  color: var(--night);
+  margin: 0 0 8px;
+}
+
+.manual-desc {
+  font-size: 0.92rem;
+  color: var(--ink);
+  line-height: 1.5;
+  margin-bottom: 16px;
+  flex-grow: 1;
+}
+
+.manual-details {
+  border-top: 1px dashed #dedbd3;
+  padding-top: 12px;
+  margin-top: auto;
+}
+
+.manual-details summary {
+  font-weight: 700;
+  font-size: 0.88rem;
+  color: var(--blue);
+  cursor: pointer;
+  padding: 6px 0;
+}
+
+.manual-details summary:hover {
+  text-decoration: underline;
+}
+
+.manual-transcript {
+  margin-top: 10px;
+  padding: 12px 14px;
+  background: #ffffff;
+  border: 1px solid #ebe8e1;
+  border-radius: 8px;
+  font-size: 0.88rem;
+  line-height: 1.55;
+  color: var(--ink);
+}
+
+.manual-transcript ol {
+  margin: 0;
+  padding-left: 20px;
+}
+
+.manual-transcript li {
+  margin-bottom: 8px;
+}
+
+.manual-transcript li:last-child {
+  margin-bottom: 0;
+}
+
+/* Créditos e Identidad */
+.portal-credits {
+  margin-bottom: 32px;
+}
+
+.credits-box {
+  background: #ffffff;
+  border: 1px solid #dedbd3;
+  border-radius: 14px;
+  padding: 26px 28px;
+}
+
+.credits-title {
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 1.4rem;
+  color: var(--night);
+  margin: 0 0 8px;
+}
+
+.credits-team {
+  font-size: 1rem;
+  color: var(--ink);
+  margin-bottom: 12px;
+}
+
+.team-list {
+  margin: 0 0 18px;
+  padding-left: 22px;
+  color: var(--ink);
+  font-size: 0.95rem;
+  line-height: 1.6;
+}
+
+.credits-affiliations p {
+  margin: 0 0 10px;
+  font-size: 0.92rem;
+  color: var(--muted);
+}
+
+.credits-disclaimer {
+  font-size: 0.84rem;
+  color: #6c757d;
+  background: #f7f6f2;
+  padding: 10px 14px;
+  border-radius: 6px;
+  border-left: 3px solid #b07800;
+  margin-top: 12px !important;
+}
+
+.credits-institutions-logos {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  margin: 14px 0;
+}
+
+.credits-logo-cecan {
+  max-width: 290px;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 11479 / 1968;
+  object-fit: contain;
+  display: block;
+}
+
+.institutional-logo-cecan {
+  width: 250px;
+  max-width: 100%;
+  height: auto;
+  aspect-ratio: 11479 / 1968;
+  object-fit: contain;
+  display: block;
+}
+
+.institutional-footer-auth {
+  font-size: 0.82rem;
+  color: #64748b;
+  margin-top: 6px !important;
+  line-height: 1.4;
+}
+
+@media (max-width: 768px) {
+  .portal-cards,
+  .manuals-grid {
+    grid-template-columns: 1fr;
   }
 }

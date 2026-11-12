@@ -23,7 +23,9 @@ function actualizar(estado) {
   if (estado.activacion) $('audioPreparation').textContent = estado.activacion
   if (estado.estado === 'bloqueado') $('audioPreparation').textContent = estado.mensaje
   visor()?.estadoNarracion(estado)
-  window.dispatchEvent(new CustomEvent('astrovisor:narracion', { detail: { state: estado.estado, title: actual?.titulo } }))
+  window.dispatchEvent(new CustomEvent('astrovisor:narracion', {
+    detail: { state: estado.estado, title: actual?.titulo, activacion: estado.activacion },
+  }))
 }
 narrador.observar(actualizar)
 function abrir(historia, desdeVisor = false) {
@@ -103,6 +105,19 @@ window.addEventListener('astrovisor:ficha-abierta', (event) => {
 })
 window.addEventListener('astrovisor:ficha-cerrada', () => cerrar({ desdeVisor: true }))
 window.addEventListener('astrovisor:audio-solicitado', controlarAudio)
+window.addEventListener('astrovisor:activar-audio', () => {
+  if (!audioDe(actual)) {
+    const primera = historias.find(audioDe)
+    if (!primera) return
+    narrador.seleccionar(audioDe(primera))
+  }
+  narrador.activar()
+})
+window.addEventListener('astrovisor:audio-repetir', () => {
+  if (!actual) return;
+  narrador.detener();
+  narrador.escuchar();
+});
 // La pausa de la mirada ('astrovisor:mirilla-pausa') NO pausa la narración: se controla solo con Pausar/Reanudar de la ficha.
 window.addEventListener('astrovisor:salida-visor', () => cerrar({ desdeVisor: true }))
 $('testScene').addEventListener('exit-vr', () => cerrar())

@@ -125,14 +125,31 @@ export function useEditorCatalogo({ obtenerToken, obtenerUsuario = () => '', alE
     if (!activo || !borrador.value || cargando.value || guardando.value || conflicto.value || necesitaRecarga.value || sesionExpirada.value) return false
     if (previsualizando.value || (requierePreview.value && !previsualizacion.value) || (seleccion.value.tipo === 'nuevo' && !borrador.value.relaciones.some((r) => r.seleccionada))) { error.value = 'Selecciona al menos una constelación y previsualiza la portada antes de guardar.'; return false }
     if(borrador.value.tipoPortada==='imagen-autorizada'&&(!borrador.value.portada.recursoId||!['procedencia','permiso','textoAlternativo'].every(k=>borrador.value.portada[k]?.trim()))){error.value='Prepara una imagen e indica procedencia, permiso y texto alternativo.';return false}
-    if (libroActual.value?.anio !== undefined && borrador.value.anio === '') { error.value = 'Indica el año; este formulario no permite eliminarlo.'; return false }
+    if (borrador.value.anio !== '' && borrador.value.anio !== null && borrador.value.anio !== undefined) {
+      const anioNum = Number(borrador.value.anio)
+      if (!Number.isInteger(anioNum) || anioNum < 1 || anioNum > 9999) {
+        error.value = 'Indica un año válido entre 1 y 9999.'
+        return false
+      }
+    }
     const { tipo, id } = seleccion.value
     const b = borrador.value
+    const tieneAnio = b.anio !== '' && b.anio !== null && b.anio !== undefined && !Number.isNaN(Number(b.anio))
+    const anioNormalizado = tieneAnio ? Number(b.anio) : (libroActual.value?.anio !== undefined ? null : undefined)
     const portada=b.tipoPortada==='ilustrativa'?{tipo:'ilustrativa',plantilla:b.portada.plantilla,paleta:b.portada.paleta}:b.portada
-    const datos = tipo === 'nuevo' ? { id: b.id, titulo: b.titulo, autor: b.autor, anio: Number(b.anio), enlacePublico: b.enlacePublico, portada: { ...portada },
-      relaciones: b.relaciones.filter((r) => r.seleccionada).map(({ constelacionId, motivo }) => ({ constelacionId, motivo })) } : tipo === 'libro' ? { ...(borrador.value.anio === '' ? {} : { anio: Number(borrador.value.anio) }),
-      enlacePublico: borrador.value.enlacePublico, relaciones: borrador.value.relaciones.map((r) => ({ constelacionId: r.constelacionId, motivo: r.motivo })) }
-      : { resumen: borrador.value.resumen, comoReconocerla: borrador.value.comoReconocerla }
+    const datos = tipo === 'nuevo' ? {
+      id: b.id,
+      titulo: b.titulo,
+      autor: b.autor,
+      ...(anioNormalizado !== undefined ? { anio: anioNormalizado } : {}),
+      enlacePublico: b.enlacePublico,
+      portada: { ...portada },
+      relaciones: b.relaciones.filter((r) => r.seleccionada).map(({ constelacionId, motivo }) => ({ constelacionId, motivo }))
+    } : tipo === 'libro' ? {
+      ...(anioNormalizado !== undefined ? { anio: anioNormalizado } : {}),
+      enlacePublico: borrador.value.enlacePublico,
+      relaciones: borrador.value.relaciones.map((r) => ({ constelacionId: r.constelacionId, motivo: r.motivo }))
+    } : { resumen: borrador.value.resumen, comoReconocerla: borrador.value.comoReconocerla }
     if(tipo==='libro'){
       for(const k of ['titulo','autor'])if(b[k]!==libroActual.value[k])datos[k]=b[k]
       if(portadaCambiada.value)datos.portada={...portada}

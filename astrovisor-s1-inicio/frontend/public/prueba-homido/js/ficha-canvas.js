@@ -64,59 +64,61 @@ export function calcularLayout(ctx, ficha, { aviso = null, etiquetaAudio = 'Escu
   }
 
   function construir(maxHistoria) {
-    const items = [{ k: 'caja', rect: { x: 20, y: 20, w: W - 40, h: H - 40 }, radio: 32, fill: '#FFFFFF', stroke: '#D0D5DD', sw: 4 }]
+    // Fondo de la ficha: azul noche con opacidad/borde estilizado
+    const items = [{ k: 'caja', rect: { x: 20, y: 20, w: W - 40, h: H - 40 }, radio: 32, fill: '#0d1833', stroke: '#384d7a', sw: 4 }]
     const zonas = {}
     let y = MARGEN
 
     if (ficha.demostracion) {
-      items.push({ k: 'caja', rect: { x: MARGEN, y, w: 290, h: 52 }, radio: 10, fill: '#EEECFA', stroke: '#C9B8FF', sw: 2 })
-      items.push({ k: 'texto', lineas: ['Dato de muestra'], x: MARGEN + 145, y: y + 26, lh: 30, font: fuente(TAM.etiqueta, true), color: '#4A3F99', align: 'center', base: 'middle' })
-      y += 52 + 26
+      items.push({ k: 'caja', rect: { x: MARGEN, y, w: 290, h: 52 }, radio: 10, fill: '#1e1a3d', stroke: '#8a77d1', sw: 2 })
+      items.push({ k: 'texto', lineas: ['Dato de muestra'], x: MARGEN + 145, y: y + 26, lh: 30, font: fuente(TAM.etiqueta, true), color: '#d8d0fc', align: 'center', base: 'middle' })
+      y += 52 + 20
     }
 
     const titulo = medir(TAM.titulo, true, ficha.titulo)
-    items.push({ k: 'texto', lineas: titulo, x: MARGEN, y, lh: 80, font: fuente(TAM.titulo, true), color: '#1B2430', align: 'left', base: 'top' })
-    y += titulo.length * 80 + 4
+    items.push({ k: 'texto', lineas: titulo, x: MARGEN, y, lh: 80, font: fuente(TAM.titulo, true), color: '#FFFFFF', align: 'left', base: 'top' })
+    y += titulo.length * 80 + 36
 
-    const resumen = medir(TAM.resumen, false, ficha.resumen)
-    items.push({ k: 'texto', lineas: resumen, x: MARGEN, y, lh: 46, font: fuente(TAM.resumen), color: '#4A5565', align: 'left', base: 'top' })
-    y += resumen.length * 46 + 24
-
-    const historia = medir(TAM.historia, false, historiaParaVisor(ficha, maxHistoria))
-    items.push({ k: 'texto', lineas: historia, x: MARGEN, y, lh: 54, font: fuente(TAM.historia), color: '#2D3748', align: 'left', base: 'top' })
-    y += historia.length * 54 + 26
-
-    // Invitación al recorrido de lecturas; jamás se muestran existencias no confirmadas.
+    // Invitación a lecturas recomendadas
     const hayLibro = Array.isArray(ficha.libros) &&
-      ficha.libros.some((l) => typeof l?.titulo === 'string' && l.titulo.trim());
-    const altoLecturas = 160;
+      ficha.libros.some((l) => typeof l?.titulo === 'string' && l.titulo.trim())
+    const altoLecturas = 150
     items.push({ k: 'caja', rect: { x: MARGEN, y, w: anchoUtil, h: altoLecturas },
-      radio: 18, fill: '#FFF3D9', stroke: '#D9A240', sw: 3 });
+      radio: 18, fill: '#1c180e', stroke: '#c99632', sw: 3 })
     if (hayLibro) {
       items.push({ k: 'texto', lineas: ['¿Te gustaría descubrir más?'],
-        x: MARGEN + 26, y: y + 20, lh: 35, font: fuente(31, true),
-        color: '#6B470C', align: 'left', base: 'top' });
-      const libros = { x: MARGEN + 24, y: y + 66, w: anchoUtil - 48, h: 78 };
-      zonas.libros = libros;
+        x: MARGEN + 26, y: y + 16, lh: 35, font: fuente(30, true),
+        color: '#f5c056', align: 'left', base: 'top' })
+      const libros = { x: MARGEN + 24, y: y + 58, w: anchoUtil - 48, h: 74 }
+      zonas.libros = libros
       items.push({ k: 'boton', rect: libros, fill: '#1F4E8C',
-        texto: '★  Ver libros recomendados', font: fuente(36, true),
-        color: '#FFFFFF', padIzq: 0 });
+        texto: '★  Ver libros recomendados', font: fuente(34, true),
+        color: '#FFFFFF', padIzq: 0 })
     } else {
       items.push({ k: 'texto', lineas: medir(TAM.cuerpo, false, BIBLIO_PENDIENTE),
         x: MARGEN + 26, y: y + 45, lh: 46, font: fuente(TAM.cuerpo),
-        color: '#604B22', align: 'left', base: 'top' });
+        color: '#edd7a8', align: 'left', base: 'top' })
     }
-    y += altoLecturas + 22;
+    y += altoLecturas + 22
 
-    // Audio: botón + aviso de estado
-    const audio = { x: MARGEN, y, w: 460, h: 84 }
+    // Fila de controles de Audio: Escuchar/Pausa + Repetir + aviso de estado
+    const wBotonAudio = 480
+    const wBotonRepetir = 280
+    const audio = { x: MARGEN, y, w: wBotonAudio, h: 84 }
+    const repetir = { x: MARGEN + wBotonAudio + 18, y, w: wBotonRepetir, h: 84 }
     zonas.audio = audio
-    items.push({ k: 'boton', rect: audio, fill: '#1F4E8C', texto: `▶  ${etiquetaAudio}`, font: fuente(TAM.boton - 4, true), color: '#FFFFFF', padIzq: audio.h })
+    zonas.repetir = repetir
+
+    items.push({ k: 'boton', rect: audio, fill: '#1F4E8C', texto: `▶  ${etiquetaAudio}`, font: fuente(TAM.boton - 4, true), color: '#FFFFFF', padIzq: 0 })
+    items.push({ k: 'boton', rect: repetir, fill: '#2A3D75', texto: '↺  Repetir', font: fuente(TAM.boton - 4, true), color: '#FFFFFF', padIzq: 0 })
+
     if (aviso) {
-      const caja = { x: audio.x + audio.w + 24, y, w: anchoUtil - audio.w - 24, h: 84 }
-      const lineasAviso = medir(TAM.aviso, false, aviso, caja.w - 32)
-      items.push({ k: 'caja', rect: caja, radio: 10, fill: '#FFF9E6', stroke: '#F5B301', sw: 2 })
-      items.push({ k: 'texto', lineas: lineasAviso, x: caja.x + 16, y: caja.y + (caja.h - lineasAviso.length * 34) / 2, lh: 34, font: fuente(TAM.aviso), color: '#614700', align: 'left', base: 'top' })
+      const xAviso = repetir.x + repetir.w + 18
+      const wAviso = anchoUtil - (wBotonAudio + wBotonRepetir + 36)
+      const caja = { x: xAviso, y, w: wAviso, h: 84 }
+      const lineasAviso = medir(TAM.aviso, false, aviso, caja.w - 24)
+      items.push({ k: 'caja', rect: caja, radio: 10, fill: '#241b08', stroke: '#F5B301', sw: 2 })
+      items.push({ k: 'texto', lineas: lineasAviso, x: caja.x + 12, y: caja.y + (caja.h - lineasAviso.length * 32) / 2, lh: 32, font: fuente(TAM.aviso), color: '#ffe699', align: 'left', base: 'top' })
     }
     y += 84
 
