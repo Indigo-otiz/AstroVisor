@@ -77,16 +77,7 @@ export function calcularLayout(ctx, ficha, { aviso = null, etiquetaAudio = 'Escu
 
     const titulo = medir(TAM.titulo, true, ficha.titulo)
     items.push({ k: 'texto', lineas: titulo, x: MARGEN, y, lh: 80, font: fuente(TAM.titulo, true), color: '#FFFFFF', align: 'left', base: 'top' })
-    y += titulo.length * 80 + 4
-
-    const resumen = medir(TAM.resumen, false, ficha.resumen)
-    items.push({ k: 'texto', lineas: resumen, x: MARGEN, y, lh: 46, font: fuente(TAM.resumen), color: '#CBD5E1', align: 'left', base: 'top' })
-    y += resumen.length * 46 + 20
-
-    // En VR el audio es el canal protagónico; se resume el texto para mantener la escena despejada
-    const historia = medir(TAM.historia, false, historiaParaVisor(ficha, maxHistoria))
-    items.push({ k: 'texto', lineas: historia, x: MARGEN, y, lh: 52, font: fuente(TAM.historia), color: '#94A3B8', align: 'left', base: 'top' })
-    y += historia.length * 52 + 24
+    y += titulo.length * 80 + 36
 
     // Invitación a lecturas recomendadas
     const hayLibro = Array.isArray(ficha.libros) &&
@@ -156,7 +147,7 @@ function trazarRecta(ctx, { x, y, w, h }, r) {
   ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h)
   ctx.lineTo(x + r, y + h)
   ctx.quadraticCurveTo(x, y + h, x, y + h - r)
-  ctx.lineTo(x + r, y + h)
+  ctx.lineTo(x, y + r)
   ctx.quadraticCurveTo(x, y, x + r, y)
   ctx.closePath()
 }

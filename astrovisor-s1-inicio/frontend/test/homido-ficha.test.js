@@ -32,12 +32,12 @@ test('ajustarLineas respeta el ancho máximo', () => {
   assert.equal(lineas.join(' '), 'uno dos tres cuatro cinco seis siete ocho nueve diez')
 })
 
-test('cada constelación dibuja su propio título y resumen, y ninguno de otra', () => {
+test('cada constelación dibuja su propio título y controles inmersivos, sin pared de texto en VR', () => {
   for (const ficha of demo) {
     const { ctx, dibujado } = ctxFalso()
     dibujarFicha(ctx, calcularLayout(ctx, ficha))
     assert.ok(dibujado.includes(ficha.titulo))
-    assert.ok(dibujado.join(' ').includes(ficha.resumen.split(' ').slice(0, 3).join(' ')))
+    assert.equal(dibujado.join(' ').includes(ficha.resumen.split(' ').slice(0, 3).join(' ')), false, 'VR omite resumen extenso')
     for (const otra of demo.filter((f) => f.id !== ficha.id)) assert.ok(!dibujado.includes(otra.titulo))
     assert.ok(dibujado.includes('Dato de muestra'))
   }

@@ -137,7 +137,7 @@ import { rutaLibro2D } from './js/ruta-libro-2d.js';
 
   function nombreDe(t) {
     if (t.accion === 'constelacion') return fichas.get(t.id)?.titulo || t.id;
-    return { volver: '← Volver al recorrido', audio: 'Escuchar narración', libros: 'Ver libros recomendados', libro: 'Abrir libro', 'volver-ficha': 'Volver a la constelación', 'volver-libros': 'Volver a los libros', 'consultar-libro': 'Consultar libro en 2D', pausa: estado.pausado ? 'Reanudar mirada' : 'Pausar mirada', salir: 'Salir a 2D' }[t.accion] || t.accion;
+    return { volver: '← Volver al recorrido', audio: 'Escuchar narración', repetir: 'Repetir narración desde el inicio', libros: 'Ver libros recomendados', libro: 'Abrir libro', 'volver-ficha': 'Volver a la constelación', 'volver-libros': 'Volver a los libros', 'consultar-libro': 'Consultar libro en 2D', pausa: estado.pausado ? 'Reanudar mirada' : 'Pausar mirada', salir: 'Salir a 2D' }[t.accion] || t.accion;
   }
 
   function mensajeEnReposo() {
@@ -152,7 +152,7 @@ import { rutaLibro2D } from './js/ruta-libro-2d.js';
   function objetivoEnVista(t) {
     if (t.accion === 'pausa' || t.accion === 'salir') return true;
     if (t.accion === 'constelacion') return estado.modo === 'recorrido';
-    if (['audio', 'volver', 'libros'].includes(t.accion)) return vistaLectura === 'ficha';
+    if (['audio', 'repetir', 'volver', 'libros'].includes(t.accion)) return vistaLectura === 'ficha';
     if (['libro', 'volver-ficha'].includes(t.accion)) return vistaLectura === 'estanteria';
     if (['consultar-libro', 'volver-libros'].includes(t.accion)) return vistaLectura === 'detalle';
     return false;
@@ -756,17 +756,34 @@ import { rutaLibro2D } from './js/ruta-libro-2d.js';
       directExitBtn.addEventListener('click', salir);
     }
 
-    if ((modoParam === 'libre' || modoParam === 'homido') && !diagParam) {
+    const modoEfectivo = modoParam || 'libre';
+    if ((modoParam === 'libre' || modoParam === 'homido' || !modoParam) && !diagParam) {
       document.body.classList.add('modo-directo');
       if (directExitBtn) directExitBtn.hidden = false;
     }
 
-    if (modoParam === 'homido' && !diagParam && stereoComponent) {
+    const btnActivar = $('btnActivarInmersion');
+    if (modoEfectivo === 'homido' && !diagParam && stereoComponent) {
       stereoActive = true;
       stereoComponent.enabledStereo = true;
       host.classList.add('stereo-active');
       document.body.classList.add('stereo-mode');
       prepararPantallaCompleta();
+
+      if (btnActivar) {
+        const actualizarBotonActivar = () => {
+          btnActivar.hidden = !!document.fullscreenElement;
+        };
+        actualizarBotonActivar();
+        btnActivar.addEventListener('click', async () => {
+          await prepararPantallaCompleta();
+          if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
+            try { await DeviceOrientationEvent.requestPermission(); } catch (_) {}
+          }
+          btnActivar.hidden = true;
+        });
+        document.addEventListener('fullscreenchange', actualizarBotonActivar);
+      }
     }
   }
   if (scene.hasLoaded) onSceneReady();

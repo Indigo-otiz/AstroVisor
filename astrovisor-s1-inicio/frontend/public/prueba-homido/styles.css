@@ -708,3 +708,31 @@ body.modo-directo .scene-host {
 .vr-overlay-content button:hover {
   background: #163d70;
 }
+
+.btn-activar-inmersion {
+  position: absolute;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1000;
+  background: rgba(13, 24, 51, 0.92);
+  color: #F8FAFC;
+  border: 2px solid #F5B301;
+  border-radius: 9999px;
+  padding: 14px 28px;
+  font-family: inherit;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
+  min-height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+.btn-activar-inmersion:focus-visible,
+.btn-activar-inmersion:hover {
+  background: #1e3a8a;
+  outline: 3px solid #60A5FA;
+}
