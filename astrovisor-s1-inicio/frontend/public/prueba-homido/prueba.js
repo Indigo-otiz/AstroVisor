@@ -191,6 +191,7 @@ import { rutaLibro2D } from './js/ruta-libro-2d.js';
     if (t.accion === 'constelacion') abrirFicha(t.id);
     else if (t.accion === 'volver') cerrarFicha();
     else if (t.accion === 'audio') pedirAudio();
+    else if (t.accion === 'repetir') repetirAudio();
     else if (t.accion === 'pausa') alternarPausa();
     else if (t.accion === 'libros') abrirEstanteria();
     else if (t.accion === 'libro') abrirDetalleLibro(t.id);
@@ -306,7 +307,10 @@ import { rutaLibro2D } from './js/ruta-libro-2d.js';
     infoPanel3D.setAttribute('position', `${frente.x} ${FICHA_BASE_Y + PLANO_ALTO / 2} ${frente.z}`);
     infoPanel3D.setAttribute('rotation', `0 ${frente.rotY} 0`);
     pintarFicha(ficha);
-    activarGrupo(constelacionesEl, false);
+    // S5: Mantener constelaciones visibles de fondo y resaltar la activa
+    constelacionesEl.setAttribute('visible', 'true');
+    constelacionesEl.querySelectorAll('[data-action]').forEach((el) => el.classList.remove('selectable'));
+    constelaciones.forEach((c, cId) => c.resaltar(cId === id));
     activarGrupo(infoPanel3D, true);
     visorControls3D.setAttribute('position', `${frente.x} ${POS_CONTROLES_Y} ${frente.z}`);
     visorControls3D.setAttribute('rotation', `0 ${frente.rotY} 0`);
@@ -325,6 +329,7 @@ import { rutaLibro2D } from './js/ruta-libro-2d.js';
     activarGrupo(estanteriaEl, false);
     activarGrupo(infoPanel3D, false);
     activarGrupo(constelacionesEl, true);
+    constelaciones.forEach((c) => c.resaltar(false));
     visorControls3D.setAttribute('position', POS_CONTROLES.recorrido);
     visorControls3D.setAttribute('rotation', '0 0 0');
     refrescarRaycaster();
@@ -414,6 +419,13 @@ import { rutaLibro2D } from './js/ruta-libro-2d.js';
 
   // Audio: el reproductor es el de Luis (narraciones.js). Aquí solo se SOLICITA la acción (Escuchar/Pausar/Reanudar
   // según su estado) y se MUESTRA el estado que él confirma; no se reproduce nada desde la escena.
+  function repetirAudio() {
+    const ficha = fichas.get(estado.fichaId);
+    if (!ficha) return;
+    window.dispatchEvent(new CustomEvent('astrovisor:audio-repetir', { detail: { id: ficha.id, titulo: ficha.titulo, audio: adaptarAudio(ficha) } }));
+    eventLine('Botón de repetir: solicitud de reinicio enviada al narrador.');
+  }
+
   function pedirAudio() {
     const ficha = fichas.get(estado.fichaId);
     if (!ficha) return;
@@ -733,6 +745,29 @@ import { rutaLibro2D } from './js/ruta-libro-2d.js';
     stereoStatus.textContent = stereoComponent
       ? 'Escena lista. Compatible con 2D y vista dividida Homido.'
       : 'Escena cargada sin componente estéreo.';
+
+    // S5: Modos directos desde URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const modoParam = urlParams.get('modo');
+    const diagParam = urlParams.get('diag') === '1';
+
+    const directExitBtn = $('directExitBtn');
+    if (directExitBtn) {
+      directExitBtn.addEventListener('click', salir);
+    }
+
+    if ((modoParam === 'libre' || modoParam === 'homido') && !diagParam) {
+      document.body.classList.add('modo-directo');
+      if (directExitBtn) directExitBtn.hidden = false;
+    }
+
+    if (modoParam === 'homido' && !diagParam && stereoComponent) {
+      stereoActive = true;
+      stereoComponent.enabledStereo = true;
+      host.classList.add('stereo-active');
+      document.body.classList.add('stereo-mode');
+      prepararPantallaCompleta();
+    }
   }
   if (scene.hasLoaded) onSceneReady();
   else scene.addEventListener('loaded', onSceneReady, { once: true });

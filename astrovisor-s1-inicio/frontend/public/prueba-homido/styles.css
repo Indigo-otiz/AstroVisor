@@ -589,3 +589,122 @@ body.stereo-mode .diag-panel {
     width: auto;
   }
 }
+
+
+/* ==========================================================================
+   Modos Directos y Controles VR Sprint 5 (S5-02)
+   ========================================================================== */
+
+body.modo-directo {
+  overflow: hidden;
+  background: #0b1530;
+  margin: 0;
+  padding: 0;
+}
+
+body.modo-directo .site-header,
+body.modo-directo #main > h1,
+body.modo-directo #main > p.lead,
+body.modo-directo #main > #fuenteDatos,
+body.modo-directo #main > .notice,
+body.modo-directo #main > .controls-panel,
+body.modo-directo #main > .reading-panel,
+body.modo-directo #main > .log-panel,
+body.modo-directo #main > [aria-labelledby="scene-title"] > .scene-header,
+body.modo-directo #main > p.small {
+  display: none !important;
+}
+
+body.modo-directo .scene-host {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  height: 100dvh !important;
+  min-height: 0 !important;
+  max-height: none !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  z-index: 900 !important;
+  background: #071426 !important;
+  margin: 0 !important;
+  box-shadow: none !important;
+}
+
+.direct-exit-button {
+  position: fixed;
+  top: 16px;
+  left: 16px;
+  z-index: 1000;
+  background: rgba(11, 21, 48, 0.88);
+  color: #ffffff;
+  border: 2px solid #3a4d7a;
+  border-radius: 8px;
+  padding: 10px 18px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  backdrop-filter: blur(4px);
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.direct-exit-button:hover,
+.direct-exit-button:focus-visible {
+  background: #1f4e8c;
+  border-color: #f5b301;
+  outline: none;
+}
+
+.vr-interaction-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 999;
+  background: rgba(7, 20, 38, 0.92);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+.vr-overlay-content {
+  background: #0f1a36;
+  border: 2px solid #f5b301;
+  border-radius: 16px;
+  padding: 32px 28px;
+  max-width: 480px;
+  text-align: center;
+  color: #ffffff;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.6);
+}
+
+.vr-overlay-content p {
+  font-size: 1.15rem;
+  line-height: 1.5;
+  margin: 0 0 24px;
+  color: #fff4cf;
+}
+
+.vr-overlay-content button {
+  background: #1f4e8c;
+  color: #ffffff;
+  border: 2px solid #f5b301;
+  border-radius: 10px;
+  padding: 14px 28px;
+  font-size: 1.1rem;
+  font-weight: 700;
+  cursor: pointer;
+  min-height: 48px;
+}
+
+.vr-overlay-content button:hover {
+  background: #163d70;
+}
