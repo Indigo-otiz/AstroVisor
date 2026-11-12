@@ -80,6 +80,32 @@ test('S5-03: alta de libro con año válido incluye anio como entero', async (t)
   assert.equal(typeof peticionBody.anio, 'number')
 })
 
+test('S5-03: edición de libro preexistente permite limpiar el año (dejarlo en blanco) enviando null para desvincularlo', async (t) => {
+  let patchBody = null
+  t.mock.method(globalThis, 'fetch', async (url, options) => {
+    if (options?.method === 'PATCH') {
+      patchBody = JSON.parse(options.body)
+      return new Response(JSON.stringify({ ok: true, revision: 2, respaldoPublico: 'publicado', revisionPublicada: 2 }), {
+        headers: { ETag: '"catalogo-2"' },
+      })
+    }
+    return respuesta()
+  })
+
+  const editor = useEditorCatalogo({ obtenerToken: () => 'token-test' })
+  await editor.cargar()
+  editor.seleccionarLibro('star-lore') // star-lore tiene anio: 1911 originalmente
+  assert.equal(editor.borrador.value.anio, 1911)
+
+  // El usuario limpia el campo año
+  editor.borrador.value.anio = ''
+
+  const guardado = await editor.guardar()
+  assert.equal(guardado, true, 'Debe permitir guardar la edición tras limpiar el año')
+  assert.ok(patchBody, 'Debe haber emitido la petición PATCH')
+  assert.equal(patchBody.anio, null, 'Debe enviar anio: null para eliminar el año previo en el backend')
+})
+
 test('S5-03: rechaza año inválido menor a 1 o mayor a 9999 sin emitir petición', async (t) => {
   let llamadasPost = 0
   t.mock.method(globalThis, 'fetch', async (url, options) => {

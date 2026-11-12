@@ -132,14 +132,10 @@ export function useEditorCatalogo({ obtenerToken, obtenerUsuario = () => '', alE
         return false
       }
     }
-    if (libroActual.value?.anio !== undefined && (borrador.value.anio === '' || borrador.value.anio === null || borrador.value.anio === undefined)) {
-      error.value = 'Indica el año; este formulario no permite eliminarlo.'
-      return false
-    }
     const { tipo, id } = seleccion.value
     const b = borrador.value
     const tieneAnio = b.anio !== '' && b.anio !== null && b.anio !== undefined && !Number.isNaN(Number(b.anio))
-    const anioNormalizado = tieneAnio ? Number(b.anio) : undefined
+    const anioNormalizado = tieneAnio ? Number(b.anio) : (libroActual.value?.anio !== undefined ? null : undefined)
     const portada=b.tipoPortada==='ilustrativa'?{tipo:'ilustrativa',plantilla:b.portada.plantilla,paleta:b.portada.paleta}:b.portada
     const datos = tipo === 'nuevo' ? {
       id: b.id,
