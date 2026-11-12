@@ -70,11 +70,13 @@ watch(
     <!-- Footer general: solo en vistas públicas -->
     <footer v-if="!esAdmin" class="container site-footer institutional-footer">
       <ul class="institutional-footer-logos" aria-label="Instituciones">
+        <li><img class="institutional-logo-cecan" src="/Nayarit_CECAN_Convivencia_Horizontal.png" width="11479" height="1968" alt="Gobierno del Estado de Nayarit y Consejo Estatal para la Cultura y las Artes de Nayarit (CECAN)" /></li>
         <li><img class="institutional-logo-library" src="/institucional/biblioteca-solon-arguello.png" width="1000" height="430" alt="Biblioteca Pública Central Estatal Solón Argüello" /></li>
         <li><img class="institutional-logo-tecnm" src="/Logo%20TecNMs.png" width="961" height="428" alt="Tecnológico Nacional de México" /></li>
         <li><img class="institutional-logo-tepic" src="/ITTepic_logo.jpg" width="225" height="225" alt="Instituto Tecnológico de Tepic" /></li>
       </ul>
       <p>Prototipo académico · Contenido de demostración.</p>
+      <p class="institutional-footer-auth"><em>Autorización institucional:</em> El recurso gráfico de CECAN y Gobierno de Nayarit se incorpora conforme a la maqueta de co-patrocinio cultural aprobada; la formalización de autorización de uso continúa en trámite con las dependencias correspondientes.</p>
     </footer>
   </div>
 </template>

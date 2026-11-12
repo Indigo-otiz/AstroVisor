@@ -997,6 +997,38 @@
   margin-top: 12px !important;
 }
 
+.credits-institutions-logos {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  margin: 14px 0;
+}
+
+.credits-logo-cecan {
+  max-width: 290px;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 11479 / 1968;
+  object-fit: contain;
+  display: block;
+}
+
+.institutional-logo-cecan {
+  width: 250px;
+  max-width: 100%;
+  height: auto;
+  aspect-ratio: 11479 / 1968;
+  object-fit: contain;
+  display: block;
+}
+
+.institutional-footer-auth {
+  font-size: 0.82rem;
+  color: #64748b;
+  margin-top: 6px !important;
+  line-height: 1.4;
+}
+
 @media (max-width: 768px) {
   .portal-cards,
   .manuals-grid {

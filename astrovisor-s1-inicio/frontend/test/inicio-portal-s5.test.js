@@ -59,4 +59,27 @@ test('S5-06: InicioView acredita formalmente al Equipo 8 y deslinde de CECAN/Gob
   // Deslinde de CECAN / Gobierno como dependencia externa
   assert.ok(content.includes('CECAN y Gobierno del Estado'), 'Debe mencionar la nota de trazabilidad de CECAN/Gobierno');
   assert.ok(content.includes('dependencia externa pendiente de autorización'), 'Debe deslindar la dependencia externa');
+  assert.ok(content.includes('Nayarit_CECAN_Convivencia_Horizontal.png'), 'Debe incluir el logo de CECAN en créditos de inicio');
+});
+
+test('S5-06: App.vue incorpora el logotipo oficial horizontal de CECAN en el pie institucional', () => {
+  const appPath = path.resolve(__dirname, '../src/App.vue');
+  const content = fs.readFileSync(appPath, 'utf8');
+
+  assert.ok(
+    content.includes('Nayarit_CECAN_Convivencia_Horizontal.png'),
+    'El pie institucional debe incluir el logotipo horizontal de CECAN/Gobierno'
+  );
+  assert.ok(
+    content.includes('institutional-logo-cecan'),
+    'Debe aplicar la clase institutional-logo-cecan'
+  );
+  assert.ok(
+    content.includes('Consejo Estatal para la Cultura y las Artes de Nayarit (CECAN)'),
+    'Debe incluir texto alternativo accesible'
+  );
+  assert.ok(
+    content.includes('Autorización institucional'),
+    'Debe dejar constancia explícita del estado de trámite de autorización'
+  );
 });

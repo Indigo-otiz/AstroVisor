@@ -190,8 +190,17 @@ import ConstellationArt from '../components/ConstellationArt.vue'
         <p>
           En vinculación con la <strong>Biblioteca Pública Central Estatal Solón Argüello</strong> y el <strong>Instituto Tecnológico de Tepic (TecNM)</strong>.
         </p>
+        <div class="credits-institutions-logos">
+          <img
+            class="credits-logo-cecan"
+            src="/Nayarit_CECAN_Convivencia_Horizontal.png"
+            width="11479"
+            height="1968"
+            alt="Gobierno del Estado de Nayarit y Consejo Estatal para la Cultura y las Artes de Nayarit (CECAN)"
+          />
+        </div>
         <p class="credits-disclaimer">
-          <em>Nota de trazabilidad institucional:</em> Los logotipos oficiales y avales gubernamentales de CECAN y Gobierno del Estado se encuentran clasificados como dependencia externa pendiente de autorización y entrega de activos oficiales. Todo el contenido actual es de carácter demostrativo.
+          <em>Nota de trazabilidad institucional:</em> Se incorpora el logotipo oficial horizontal de CECAN y Gobierno del Estado, clasificado como dependencia externa pendiente de autorización formal definitiva de uso. Todo el contenido actual es de carácter demostrativo.
         </p>
       </div>
     </div>
