@@ -12,7 +12,7 @@
 
 | Componente | Comando ejecutado | Pruebas ejecutadas | Aprobadas | Falladas | Estado |
 | :--- | :--- | :---: | :---: | :---: | :---: |
-| **Frontend Suite** | `npm run test:web --prefix astrovisor-s1-inicio` | 173 | 173 | 0 | **PASA** |
+| **Frontend Suite** | `npm run test:web --prefix astrovisor-s1-inicio` | 175 | 175 | 0 | **PASA** |
 | **Backend Suite Oficial** | `node --test [backend/test/*.test.js]` | 145 | 145 | 0 | **PASA** |
 | **Empaquetado de Producción** | `npm run build --prefix astrovisor-s1-inicio` | Vite Build | Éxito (2.46 s) | 0 | **PASA** |
 | **Especificación OpenSpec** | `openspec validate s5-astrovisor-experiencias-contenido --strict` | Validación estricta | 0 errores | 0 | **PASA** |
@@ -66,7 +66,7 @@ A continuación se registra el resultado real obtenido en cada caso de prueba de
 | **T22** | Controles, tipografías y objetivos táctiles cumplen tamaño mínimo de 48 px en vistas adaptadas a móviles y escritorios. | **PASA** | Verificado en CSS (`min-height: 48px`, `padding`, tamaños de fuente `>= 1rem` en botones y tarjetas). |
 | **T23** | Tres manuales en video disponibles en el inicio con reproducción y subtítulos/transcripción pedagógica. | **PENDIENTE DE GRABACIÓN** | **Registro formal transparente:** Guiones pedagógicos completos (Web, VR, Administración) y componentes visuales con transcripciones integradas en `InicioView.vue`. Los archivos de video reales (`.mp4`/`.webm`) no han sido grabados y quedan formalmente documentados como pendientes. |
 | **T24** | Créditos académicos del Equipo 8 y logotipos oficiales de IT Tepic, CECAN y Gobierno de Nayarit presentes en web y VR con trazabilidad. | **PASA PARCIAL / IMPLEMENTADO CON AUTORIZACIÓN EN TRÁMITE** | Créditos del Equipo 8 integrados en portada y pie de página; logotipo `ITTepic_logo.jpg` renderizado en panel VR y pie web. Se integró `Nayarit_CECAN_Convivencia_Horizontal.png` en el pie de página (`App.vue`) y créditos (`InicioView.vue`), y `Nayarit_CECAN_Convivencia_Horizontal_LetrasBlancas.png` en el visor VR (`index.html` en `visorControls3D` con proporción panorámica 5.83:1 sin tapar el cielo). Se preserva la nota formal de trazabilidad indicando que la formalización definitiva de autorización continúa en trámite institucional. |
-| **T25** | Batería completa de pruebas automatizadas, compilación de producción y verificación de diff sin archivos ajenos comprometidos. | **PASA** | 173 tests web aprobados (100%), 145 tests backend aprobados (100%), compilación limpia en Vite (2.46 s), sin modificaciones a archivos untracked locales ajenos. |
+| **T25** | Batería completa de pruebas automatizadas, compilación de producción y verificación de diff sin archivos ajenos comprometidos. | **PASA** | 175 tests web aprobados (100%), 145 tests backend aprobados (100%), compilación limpia en Vite (2.34 s), sin modificaciones a archivos untracked locales ajenos. |
 
 ---
 
