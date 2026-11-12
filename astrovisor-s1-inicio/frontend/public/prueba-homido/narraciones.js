@@ -23,7 +23,9 @@ function actualizar(estado) {
   if (estado.activacion) $('audioPreparation').textContent = estado.activacion
   if (estado.estado === 'bloqueado') $('audioPreparation').textContent = estado.mensaje
   visor()?.estadoNarracion(estado)
-  window.dispatchEvent(new CustomEvent('astrovisor:narracion', { detail: { state: estado.estado, title: actual?.titulo } }))
+  window.dispatchEvent(new CustomEvent('astrovisor:narracion', {
+    detail: { state: estado.estado, title: actual?.titulo, activacion: estado.activacion },
+  }))
 }
 narrador.observar(actualizar)
 function abrir(historia, desdeVisor = false) {

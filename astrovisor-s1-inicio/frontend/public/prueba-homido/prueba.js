@@ -785,10 +785,16 @@ import { rutaLibro2D } from './js/ruta-libro-2d.js';
           
           // Sincronización con el estado real del reproductor (narrador de audio/narration.js vía narraciones.js)
           const estadoNarrador = narracion?.estado;
-          if (estadoNarrador && ['listo', 'cargando', 'reproduciendo', 'pausado', 'finalizado'].includes(estadoNarrador)) {
+          const activacionExitosa = Boolean(narracion?.activacion);
+          const reproduciendoOReanudado = ['reproduciendo', 'pausado', 'finalizado'].includes(estadoNarrador);
+
+          if (reproduciendoOReanudado || (estadoNarrador === 'listo' && activacionExitosa)) {
             estadoInmersion.audio = 'desbloqueado';
           } else if (estadoNarrador === 'bloqueado' || estadoNarrador === 'error') {
             estadoInmersion.audio = 'bloqueado';
+          } else if (estadoNarrador === 'listo' && !activacionExitosa) {
+            // La simple selección de recurso en el narrador no equivale a audio desbloqueado o activación exitosa
+            estadoInmersion.audio = estadoInmersion.audio === 'bloqueado' ? 'bloqueado' : 'pendiente';
           }
 
           const fsOk = estadoInmersion.pantallaCompleta;
@@ -877,11 +883,14 @@ import { rutaLibro2D } from './js/ruta-libro-2d.js';
         document.addEventListener('fullscreenchange', comprobarEstado);
         window.addEventListener('astrovisor:narracion', (ev) => {
           const st = ev.detail?.state;
+          const act = Boolean(ev.detail?.activacion || narracion?.activacion);
           if (st) {
-            if (['listo', 'cargando', 'reproduciendo', 'pausado', 'finalizado'].includes(st)) {
+            if (['reproduciendo', 'pausado', 'finalizado'].includes(st) || (st === 'listo' && act)) {
               estadoInmersion.audio = 'desbloqueado';
             } else if (st === 'bloqueado' || st === 'error') {
               estadoInmersion.audio = 'bloqueado';
+            } else if (st === 'listo' && !act) {
+              estadoInmersion.audio = estadoInmersion.audio === 'bloqueado' ? 'bloqueado' : 'pendiente';
             }
             comprobarEstado();
           }

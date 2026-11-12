@@ -148,6 +148,53 @@ test('S5-02: btnActivarInmersion solicita orientación síncronamente en gesto y
   );
 });
 
+test('S5-02: estado listo sin activación no equivale a audio desbloqueado', () => {
+  const pruebaPath = path.resolve(__dirname, '../public/prueba-homido/prueba.js');
+  const content = fs.readFileSync(pruebaPath, 'utf8');
+
+  assert.ok(
+    !content.includes("['listo', 'cargando', 'reproduciendo', 'pausado', 'finalizado'].includes(estadoNarrador)"),
+    'No debe equiparar indiscriminadamente el estado listo con audio desbloqueado sin comprobar activación'
+  );
+  assert.ok(
+    content.includes('activacionExitosa') || content.includes('narracion?.activacion'),
+    'Debe comprobar narracion?.activacion para confirmar la activación exitosa'
+  );
+
+  // Simulación del evaluador de estado de audio
+  function resolverEstadoAudio(narracion, audioPrevio = 'pendiente') {
+    const estadoNarrador = narracion?.estado;
+    const activacionExitosa = Boolean(narracion?.activacion);
+    const reproduciendoOReanudado = ['reproduciendo', 'pausado', 'finalizado'].includes(estadoNarrador);
+
+    if (reproduciendoOReanudado || (estadoNarrador === 'listo' && activacionExitosa)) {
+      return 'desbloqueado';
+    } else if (estadoNarrador === 'bloqueado' || estadoNarrador === 'error') {
+      return 'bloqueado';
+    } else if (estadoNarrador === 'listo' && !activacionExitosa) {
+      return audioPrevio === 'bloqueado' ? 'bloqueado' : 'pendiente';
+    }
+    return audioPrevio;
+  }
+
+  // 1. Simple selección de historia sin activar ni reproducir
+  const seleccionSinActivar = { estado: 'listo', activacion: '', mensaje: 'Escucha la historia a tu ritmo.' };
+  assert.notEqual(resolverEstadoAudio(seleccionSinActivar), 'desbloqueado');
+  assert.equal(resolverEstadoAudio(seleccionSinActivar), 'pendiente');
+
+  // 2. Activación exitosa (audio preparado)
+  const activacionExitosa = { estado: 'listo', activacion: 'Audio preparado. Selecciona Escuchar...', mensaje: 'Lista para escuchar desde el inicio.' };
+  assert.equal(resolverEstadoAudio(activacionExitosa), 'desbloqueado');
+
+  // 3. Reproducción en curso
+  const reproduciendo = { estado: 'reproduciendo', activacion: '', mensaje: 'Reproduciendo narración.' };
+  assert.equal(resolverEstadoAudio(reproduciendo), 'desbloqueado');
+
+  // 4. Audio bloqueado
+  const bloqueado = { estado: 'bloqueado', activacion: '', mensaje: 'El navegador bloqueó el audio.' };
+  assert.equal(resolverEstadoAudio(bloqueado), 'bloqueado');
+});
+
 test('S5-06: VR index.html integra identidad CECAN/Nayarit con letras blancas y proporción 5.83:1', () => {
   const htmlPath = path.resolve(__dirname, '../public/prueba-homido/index.html');
   const html = fs.readFileSync(htmlPath, 'utf8');
