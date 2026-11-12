@@ -771,18 +771,110 @@ import { rutaLibro2D } from './js/ruta-libro-2d.js';
       prepararPantallaCompleta();
 
       if (btnActivar) {
-        const actualizarBotonActivar = () => {
-          btnActivar.hidden = !!document.fullscreenElement;
+        const estadoInmersion = {
+          pantallaCompleta: false,
+          orientacion: typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function' ? 'pendiente' : 'no_requerido',
+          audio: 'bloqueado',
+          intentoPrevio: false,
         };
-        actualizarBotonActivar();
-        btnActivar.addEventListener('click', async () => {
-          await prepararPantallaCompleta();
-          if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
-            try { await DeviceOrientationEvent.requestPermission(); } catch (_) {}
+
+        const comprobarEstado = () => {
+          estadoInmersion.pantallaCompleta = Boolean(document.fullscreenElement || document.webkitFullscreenElement);
+          if (window.__astroAudioCtx && window.__astroAudioCtx.state === 'running') {
+            estadoInmersion.audio = 'desbloqueado';
           }
-          btnActivar.hidden = true;
+          const fsOk = estadoInmersion.pantallaCompleta;
+          const oriOk = estadoInmersion.orientacion === 'concedido' || estadoInmersion.orientacion === 'no_requerido';
+          const audOk = estadoInmersion.audio === 'desbloqueado';
+
+          // No ocultar el botón únicamente porque se haya activado la pantalla completa:
+          // Solo se oculta cuando TODAS las capacidades requeridas (pantalla, orientación y audio) están activas.
+          if (fsOk && oriOk && audOk) {
+            btnActivar.hidden = true;
+          } else {
+            btnActivar.hidden = false;
+            if (estadoInmersion.intentoPrevio && (estadoInmersion.orientacion === 'denegado' || !fsOk || !audOk)) {
+              const faltantes = [];
+              if (!fsOk) faltantes.push('pantalla');
+              if (estadoInmersion.orientacion === 'denegado') faltantes.push('sensores');
+              if (!audOk) faltantes.push('audio');
+              btnActivar.textContent = `Reintentar activación (${faltantes.join(', ') || 'inmersión'})`;
+              btnActivar.classList.add('btn-reintentar');
+            } else {
+              btnActivar.textContent = 'Activar pantalla completa, sensores y audio';
+              btnActivar.classList.remove('btn-reintentar');
+            }
+          }
+        };
+
+        comprobarEstado();
+
+        btnActivar.addEventListener('click', async () => {
+          estadoInmersion.intentoPrevio = true;
+
+          // 1. SOLICITUD DE ORIENTACIÓN DIRECTA Y SÍNCRONA EN EL GESTO
+          // Se invoca antes de cualquier await o microtarea asíncrona para no perder la activación (User Gesture en WebKit)
+          let orientacionPromesa = null;
+          if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
+            try {
+              orientacionPromesa = DeviceOrientationEvent.requestPermission();
+            } catch (err) {
+              eventLine(`Orientación error síncrono: ${err.message || err.name}`);
+            }
+          }
+
+          // 2. ACTIVACIÓN DIRECTA DE AUDIO EN EL MISMO GESTO
+          try {
+            const AudioCtx = window.AudioContext || window.webkitAudioContext;
+            if (AudioCtx) {
+              if (!window.__astroAudioCtx) {
+                window.__astroAudioCtx = new AudioCtx();
+              }
+              if (window.__astroAudioCtx.state === 'suspended') {
+                window.__astroAudioCtx.resume().catch(() => {});
+              }
+            }
+          } catch (_) {}
+
+          // 3. SOLICITUD DE PANTALLA COMPLETA
+          let fsPromesa = null;
+          if (!document.fullscreenElement && host.requestFullscreen) {
+            fsPromesa = host.requestFullscreen().catch((err) => {
+              eventLine(`Pantalla completa no disponible: ${err.name || err.message}`);
+            });
+          }
+          if (screen.orientation && screen.orientation.lock) {
+            screen.orientation.lock('landscape').catch(() => {});
+          }
+
+          // 4. RESOLVER ORIENTACIÓN Y EVALUAR RESULTADOS POR SEPARADO SIN BLOQUEAR LA ESCENA
+          if (orientacionPromesa) {
+            try {
+              const res = await orientacionPromesa;
+              estadoInmersion.orientacion = res === 'granted' ? 'concedido' : 'denegado';
+              eventLine(`Permiso orientación: ${estadoInmersion.orientacion}`);
+            } catch (err) {
+              estadoInmersion.orientacion = 'denegado';
+              eventLine(`Permiso orientación denegado/error: ${err.message || err.name}`);
+            }
+          }
+
+          if (fsPromesa) {
+            await fsPromesa;
+          }
+
+          if (window.__astroAudioCtx && window.__astroAudioCtx.state === 'running') {
+            estadoInmersion.audio = 'desbloqueado';
+          }
+
+          comprobarEstado();
         });
-        document.addEventListener('fullscreenchange', actualizarBotonActivar);
+
+        document.addEventListener('fullscreenchange', comprobarEstado);
+        window.addEventListener('astrovisor:audio-iniciado', () => {
+          estadoInmersion.audio = 'desbloqueado';
+          comprobarEstado();
+        });
       }
     }
   }

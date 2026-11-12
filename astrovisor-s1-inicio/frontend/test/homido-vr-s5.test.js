@@ -96,3 +96,61 @@ test('S5-02: ficha inmersiva omite pared de texto (resumen e historia extensa) e
   assert.ok(canvas.includes('zonas.repetir'), 'Debe conservar el botón repetir');
   assert.ok(canvas.includes('zonas.volver'), 'Debe conservar el botón volver');
 });
+
+test('S5-02: btnActivarInmersion solicita orientación síncronamente en gesto y evalúa estados por separado', () => {
+  const pruebaPath = path.resolve(__dirname, '../public/prueba-homido/prueba.js');
+  const content = fs.readFileSync(pruebaPath, 'utf8');
+
+  // 1. Orientación directa y síncrona en el gesto sin await previo
+  const handlerIdx = content.indexOf("btnActivar.addEventListener('click'");
+  assert.ok(handlerIdx !== -1, 'Debe registrar listener de clic en btnActivarInmersion');
+  const handlerCode = content.slice(handlerIdx, handlerIdx + 2500);
+  const codeSinComentarios = handlerCode.replace(/\/\/.*|\/\*[\s\S]*?\*\//g, '');
+
+  const orientacionCallIdx = codeSinComentarios.indexOf('DeviceOrientationEvent.requestPermission()');
+  const firstAwaitIdx = codeSinComentarios.indexOf('await ');
+  assert.ok(orientacionCallIdx !== -1, 'Debe solicitar DeviceOrientationEvent.requestPermission');
+  assert.ok(
+    firstAwaitIdx !== -1 && orientacionCallIdx < firstAwaitIdx,
+    'DeviceOrientationEvent.requestPermission debe ejecutarse síncronamente antes de cualquier await para no perder el User Gesture'
+  );
+
+  // 2. Comprobación por separado de pantalla completa, orientación y audio
+  assert.ok(content.includes('estadoInmersion.pantallaCompleta'), 'Debe comprobar pantalla completa');
+  assert.ok(content.includes('estadoInmersion.orientacion'), 'Debe comprobar orientación');
+  assert.ok(content.includes('estadoInmersion.audio'), 'Debe comprobar disponibilidad de audio');
+
+  // 3. No ocultar únicamente por pantalla completa
+  assert.ok(
+    content.includes('fsOk && oriOk && audOk'),
+    'El botón solo debe ocultarse cuando las tres condiciones se cumplen'
+  );
+
+  // 4. Permitir reintento tras rechazo sin bloquear la escena
+  assert.ok(
+    content.includes('btn-reintentar') && content.includes('Reintentar activación'),
+    'Debe ofrecer reintento dinámico si algún permiso es denegado o no disponible'
+  );
+});
+
+test('S5-06: VR index.html integra identidad CECAN/Nayarit con letras blancas y proporción 5.83:1', () => {
+  const htmlPath = path.resolve(__dirname, '../public/prueba-homido/index.html');
+  const html = fs.readFileSync(htmlPath, 'utf8');
+
+  assert.ok(
+    html.includes('Nayarit_CECAN_Convivencia_Horizontal_LetrasBlancas.png'),
+    'Debe cargar el asset oficial de letras blancas en a-assets'
+  );
+  assert.ok(
+    html.includes('id="cecanLogo3D"'),
+    'Debe definir el elemento 3D cecanLogo3D en visorControls3D'
+  );
+  assert.ok(
+    html.includes('width="1.05" height="0.18"'),
+    'Debe conservar la proporción panorámica exacta 5.83:1'
+  );
+  assert.ok(
+    html.includes('transparent: true'),
+    'Debe ser transparente para no obstruir el cielo'
+  );
+});

@@ -736,3 +736,8 @@ body.modo-directo .scene-host {
   background: #1e3a8a;
   outline: 3px solid #60A5FA;
 }
+.btn-activar-inmersion.btn-reintentar {
+  border-color: #F59E0B;
+  background: rgba(30, 24, 16, 0.94);
+  color: #FEF3C7;
+}
