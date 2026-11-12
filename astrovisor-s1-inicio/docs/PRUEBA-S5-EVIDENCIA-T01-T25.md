@@ -39,7 +39,7 @@ A continuación se registra el resultado real obtenido en cada caso de prueba de
 | ID | Descripción del caso | Resultado | Evidencia / Observaciones técnicas |
 | :---: | :--- | :---: | :--- |
 | **T07** | Orión, Osa Mayor y Escorpio seleccionables; mirada con retícula de 3 s y feedback progresivo (0%, 33%, 66%, 100%); ratón/táctil operables. | **PASA** | Componente gaze verificado en `homido-vr-s5.test.js` y `homido-estanteria-3d.test.js`. |
-| **T08** | Al abrir una ficha, el cielo y las constelaciones permanecen visibles en 3D; la constelación activa se resalta; sin pared de texto obstructiva. | **PASA** | `abrirFicha()` en `prueba.js` mantiene `constelacionesEl.setAttribute('visible', 'true')` y llama a `resaltar(cId === id)`. Validado por test unitario específico en `homido-vr-s5.test.js`. |
+| **T08** | Al abrir una ficha, el cielo y las constelaciones permanecen visibles en 3D; la constelación activa se resalta; sin pared de texto obstructiva. | **PASA** | `abrirFicha()` en `prueba.js` mantiene `constelacionesEl.setAttribute('visible', 'true')` y llama a `resaltar(cId === id)`. Validado por test unitario específico en `homido-vr-s5.test.js` y auditoría en navegador. |
 | **T09** | Controles de audio: Escuchar, Pausar / Reanudar y Repetir desde el segundo 0 reflejan estado real; no existen dos audios simultáneos. | **PASA** | Botón Repetir integrado en `ficha-canvas.js` y conectado a evento `astrovisor:audio-repetir` en `narraciones.js`. `narrador.escuchar()` reinicia a `currentTime = 0`. |
 | **T10** | «Pausar mirada» deshabilita la selección de constelaciones sin interrumpir la narración de audio en curso. | **PASA** | Desacoplamiento estricto en `prueba.js`: la suspensión del controlador de mirada no emite `narrador.detener()`. |
 | **T11** | La estantería de libros en VR presenta formato simplificado: portada, título, autor y etiqueta DEMO, con opción clara de retorno. | **PASA** | Renderizado en canvas 3D sin tablas de signatura ni datos de inventario engañosos. |
@@ -70,6 +70,22 @@ A continuación se registra el resultado real obtenido en cada caso de prueba de
 
 ---
 
-## 3. Conclusión de Calidad del Sprint 5
+## 3. Evidencias Visuales de Navegador Compartidas
+
+A continuación se indexan las capturas reales obtenidas mediante Google Chrome Headless sobre los artefactos de producción:
+
+| Experiencia auditada | Resolución | Archivo relativo |
+| :--- | :---: | :--- |
+| **Portada Escritorio Completa** (3 accesos, manuales y créditos) | 1280×2200 px | [`./evidencias-s5/01-inicio-escritorio-completo.png`](./evidencias-s5/01-inicio-escritorio-completo.png) |
+| **Portada Móvil Completa** (diseño apilado vertical y botones ≥ 48 px) | 390×3200 px | [`./evidencias-s5/02-inicio-movil-completo.png`](./evidencias-s5/02-inicio-movil-completo.png) |
+| **VR Modo Libre** (viewport 100%, salida directa, sin paneles técnicos) | 1280×800 px | [`./evidencias-s5/03-vr-libre-escritorio.png`](./evidencias-s5/03-vr-libre-escritorio.png) |
+| **VR Modo Libre Móvil** (paisaje 844×390 px) | 844×390 px | [`./evidencias-s5/04-vr-libre-movil.png`](./evidencias-s5/04-vr-libre-movil.png) |
+| **VR Modo Homido Estéreo** (pantalla dividida, paralaje, sin paneles) | 844×390 px | [`./evidencias-s5/05-vr-homido-estereo.png`](./evidencias-s5/05-vr-homido-estereo.png) |
+| **Ficha VR con Cielo Visible** (Orión, estrellas de fondo, botón Repetir) | 1280×800 px | [`./evidencias-s5/05-vr-ficha-cielo-visible.png`](./evidencias-s5/05-vr-ficha-cielo-visible.png) |
+| **Estantería de Libros VR** (portadas 3D simplificadas, aviso DEMO) | 1280×800 px | [`./evidencias-s5/06-vr-estanteria-libros.png`](./evidencias-s5/06-vr-estanteria-libros.png) |
+
+---
+
+## 4. Conclusión de Calidad del Sprint 5
 
 La integración técnica de Sprint 5 satisface la totalidad de los requisitos funcionales, de arquitectura y de accesibilidad aprobados en el OpenSpec. Los compromisos sobre transparencia en entregables no simulados (manuales en video y logotipos institucionales externos) se cumplen con rigor absoluto, sin afirmaciones falsas de completitud.
