@@ -76,7 +76,7 @@ watch(
         <li><img class="institutional-logo-tepic" src="/ITTepic_logo.jpg" width="225" height="225" alt="Instituto Tecnológico de Tepic" /></li>
       </ul>
       <p>Prototipo académico · Contenido de demostración.</p>
-      <p class="institutional-footer-auth"><em>Autorización institucional:</em> El recurso gráfico de CECAN y Gobierno de Nayarit se incorpora conforme a la maqueta de co-patrocinio cultural aprobada; la formalización de autorización de uso continúa en trámite con las dependencias correspondientes.</p>
+      <p class="institutional-footer-auth"><em>Autorización institucional:</em> La formalización y autorización de uso para los logotipos oficiales de CECAN y Gobierno del Estado de Nayarit se encuentran en trámite ante las instancias correspondientes.</p>
     </footer>
   </div>
 </template>
