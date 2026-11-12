@@ -40,27 +40,29 @@ watch(
             <path d="m16 2 4 10 10 4-10 4-4 10-4-10-10-4 10-4Z" fill="currentColor" /></svg
           >AstroVisor</RouterLink
         >
-        <nav aria-label="Navegación principal" class="nav-links">
-          <RouterLink to="/" exact-active-class="nav-current">Inicio</RouterLink>
-          <RouterLink to="/explorar" :class="{ 'nav-current': route.name === 'constelacion' }"
-            >Explorar</RouterLink
-          >
-          <RouterLink to="/visor">Homido</RouterLink>
-          <RouterLink to="/admin/acceso">Administración</RouterLink>
-        </nav>
+        <div class="header-actions">
+          <nav aria-label="Navegación principal" class="nav-links">
+            <RouterLink to="/" exact-active-class="nav-current">Inicio</RouterLink>
+            <RouterLink to="/explorar" :class="{ 'nav-current': route.name === 'constelacion' }"
+              >Explorar</RouterLink
+            >
+            <RouterLink to="/visor">Homido</RouterLink>
+            <RouterLink to="/admin/acceso">Administración</RouterLink>
+          </nav>
+
+          <div v-if="esPublica" class="presentation-tools">
+            <p id="presentation-help" class="sr-only">Texto más grande para compartir las historias en una pantalla.</p>
+            <button
+              class="presentation-toggle"
+              type="button"
+              aria-describedby="presentation-help"
+              :aria-pressed="presentacion"
+              @click="presentacion = !presentacion"
+            >Vista para proyección <span aria-hidden="true">{{ presentacion ? 'Activada' : 'Desactivada' }}</span></button>
+          </div>
+        </div>
       </div>
     </header>
-
-    <div v-if="esPublica" class="container presentation-tools">
-      <p id="presentation-help">Texto más grande para compartir las historias en una pantalla.</p>
-      <button
-        class="presentation-toggle"
-        type="button"
-        aria-describedby="presentation-help"
-        :aria-pressed="presentacion"
-        @click="presentacion = !presentacion"
-      >Vista para proyección <span aria-hidden="true">{{ presentacion ? 'Activada' : 'Desactivada' }}</span></button>
-    </div>
 
     <!-- Contenido principal -->
     <main id="contenido" tabindex="-1" :class="esAdmin ? 'admin-main' : 'container main-content'">

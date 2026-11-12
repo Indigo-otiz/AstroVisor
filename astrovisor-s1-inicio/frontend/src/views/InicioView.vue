@@ -1,46 +1,25 @@
-<script setup>
-import ConstellationArt from '../components/ConstellationArt.vue'
-</script>
-
 <template>
-  <!-- Cabecera de bienvenida -->
-  <section class="public-home" aria-labelledby="home-title">
-    <div class="home-intro">
-      <h1 id="home-title" tabindex="-1">Cada estrella,<br />una historia.</h1>
-      <p class="home-lead">
-        AstroVisor es una plataforma web educativa diseñada para acercar el cielo nocturno y sus relatos culturales a personas adultas mayores y visitantes de la biblioteca.
-      </p>
-      <p class="home-access">
-        Diseñado con tipografía legible, alto contraste, audio narrado y opciones de visualización autónomas.
-      </p>
+  <!-- Encabezado breve e introducción -->
+  <header class="home-intro" aria-labelledby="home-title">
+    <div class="home-heading-row">
+      <h1 id="home-title" tabindex="-1">Explora AstroVisor</h1>
+      <span class="home-tagline">Cada estrella, una historia</span>
     </div>
-    <div class="home-sky" aria-hidden="true">
-      <ConstellationArt id="orion" />
-      <span>Orión</span>
-      <p>Un cielo de historias por descubrir</p>
-    </div>
-  </section>
+    <p class="home-lead">
+      Descubre constelaciones e historias del cielo. Elige cómo deseas comenzar.
+    </p>
+  </header>
 
   <!-- Tres accesos principales -->
-  <section class="portal-section" aria-labelledby="portal-heading">
-    <div class="portal-header">
-      <h2 id="portal-heading">Formas de explorar AstroVisor</h2>
-      <p>Elige la experiencia adecuada según tu dispositivo y preferencia. No necesitas registrarte ni crear cuentas para explorar.</p>
-    </div>
-
+  <section class="portal-section" aria-labelledby="home-title">
     <div class="portal-cards">
       <!-- Tarjeta 1: Web Educativa -->
-      <article class="portal-card" aria-labelledby="card-web-title">
+      <article class="portal-card" id="tarjeta-explorar" aria-labelledby="card-web-title">
         <div class="portal-card-badge">Computadora o Proyector</div>
-        <h3 id="card-web-title">Experiencia Web Educativa</h3>
+        <h2 id="card-web-title" class="portal-card-title">Experiencia Web Educativa</h2>
         <p class="portal-card-desc">
-          Recorrido astronómico convencional en pantalla 2D. Conoce las constelaciones, escucha narraciones, lee historias con texto ampliado y consulta libros recomendados.
+          Recorrido en pantalla con constelaciones, narraciones en audio, historias culturales y libros recomendados de la biblioteca.
         </p>
-        <ul class="portal-card-features">
-          <li>Operable con teclado y ratón</li>
-          <li>Vista para proyección disponible</li>
-          <li>Lectura y transcripciones completas</li>
-        </ul>
         <div class="portal-card-actions">
           <RouterLink class="portal-button primary" to="/explorar">
             Explorar en pantalla
@@ -50,17 +29,16 @@ import ConstellationArt from '../components/ConstellationArt.vue'
       </article>
 
       <!-- Tarjeta 2: Experiencia VR (Dos acciones directas) -->
-      <article class="portal-card portal-card-vr" aria-labelledby="card-vr-title">
+      <article class="portal-card portal-card-vr" id="tarjeta-vr" aria-labelledby="card-vr-title">
         <div class="portal-card-badge accent">Entorno 3D e Inmersión</div>
-        <h3 id="card-vr-title">Experiencia Inmersiva 3D</h3>
+        <h2 id="card-vr-title" class="portal-card-title">Experiencia Inmersiva 3D</h2>
         <p class="portal-card-desc">
-          Observa las estrellas en un entorno tridimensional de 360 grados. El cielo permanece visible mientras escuchas la narración de cada constelación.
+          Exploración del cielo nocturno en 360 grados. Elige la modalidad de visualización según tu dispositivo:
         </p>
-        <p class="portal-card-note">Selecciona una modalidad para entrar directamente a la escena:</p>
         <div class="portal-card-actions vr-actions">
           <a class="portal-button secondary" href="/prueba-homido/index.html?modo=libre">
             <span class="btn-main">Pantalla completa · mouse o dedo</span>
-            <span class="btn-sub">Recorrido 3D monoscópico sin visor</span>
+            <span class="btn-sub">Recorrido 3D en pantalla sin visor</span>
           </a>
           <a class="portal-button homido" href="/prueba-homido/index.html?modo=homido">
             <span class="btn-main">Visor Homido · pantalla dividida</span>
@@ -70,17 +48,12 @@ import ConstellationArt from '../components/ConstellationArt.vue'
       </article>
 
       <!-- Tarjeta 3: Administración -->
-      <article class="portal-card" aria-labelledby="card-admin-title">
+      <article class="portal-card" id="tarjeta-admin" aria-labelledby="card-admin-title">
         <div class="portal-card-badge muted">Gestión y Catálogo</div>
-        <h3 id="card-admin-title">Administración</h3>
+        <h2 id="card-admin-title" class="portal-card-title">Administración</h2>
         <p class="portal-card-desc">
-          Panel exclusivo para el personal bibliotecario y docente. Permite gestionar libros, vincularlos con constelaciones y consultar el catálogo documental persistente.
+          Panel para personal bibliotecario y docente. Permite registrar y gestionar libros vinculados a constelaciones.
         </p>
-        <ul class="portal-card-features">
-          <li>Acceso mediante credenciales seguras</li>
-          <li>Registro de libros con año opcional</li>
-          <li>Protección de contratos y auditoría</li>
-        </ul>
         <div class="portal-card-actions">
           <RouterLink class="portal-button outline" to="/admin">
             Abrir administración

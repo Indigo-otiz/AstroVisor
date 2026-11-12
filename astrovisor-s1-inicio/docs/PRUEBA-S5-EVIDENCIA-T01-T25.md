@@ -27,7 +27,7 @@ A continuación se registra el resultado real obtenido en cada caso de prueba de
 
 | ID | Descripción del caso | Resultado | Evidencia / Observaciones técnicas |
 | :---: | :--- | :---: | :--- |
-| **T01** | Desde `/`, las tres tarjetas principales se identifican de inmediato; los manuales se ubican debajo sin sustituir la navegación primaria. | **PASA** | Verificado en `InicioView.vue` y prueba `inicio-portal-s5.test.js`. Grid accesible de 3 columnas (`#tarjeta-explorar`, `#tarjeta-vr`, `#tarjeta-admin`) precedido por enlace de salto de foco (`#main-content`). |
+| **T01** | Desde `/`, las tres tarjetas principales se identifican de inmediato en el primer viewport en escritorio (1366×768 y 1280×800 sin scroll vertical); hero decorativo de Orión eliminado; manuales y créditos debajo sin desplazar la navegación primaria (Corrección UX/UI S5-01). | **PASA** | Verificado en `InicioView.vue`, `App.vue` y prueba `inicio-portal-s5.test.js`. Header con conmutador de proyección compacto, grid accesible de 3 columnas (`#tarjeta-explorar`, `#tarjeta-vr`, `#tarjeta-admin`), diseño responsivo móvil 1 col en 390×844 y capturas de viewport en `evidencias-s5/`. |
 | **T02** | «Explorar en pantalla» abre `/explorar` y permite visitar ficha/libros, regresar y alternar vista de proyección sin regresiones. | **PASA** | Enrutador Vue activo, preservación de `ExplorarView.vue`, `BibliotecaView.vue` y estilos `.proyeccion-activa`. Cobertura en `catalogo-integracion.test.js`. |
 | **T03** | «Pantalla completa · mouse o dedo» entra en cielo 3D no dividido mediante `/prueba-homido/index.html?modo=libre` sin pantallas intermedias. | **PASA** | `prueba.js` detecta `params.get('modo') === 'libre'`, oculta paneles técnicos (`modo-directo`), inicia canvas a pantalla completa y añade botón de retorno visible `#directExitBtn`. |
 | **T04** | «Visor Homido · pantalla dividida» entra en cielo estereoscópico directo mediante `/prueba-homido/index.html?modo=homido`. | **PASA** | Parámetro `modo=homido` activa vista VR dual sin requerir interacción en páginas de diagnóstico técnicas previas. Incluye botón flotante directo `#btnActivarInmersion` con solicitud de permisos de orientación ejecutada síncronamente en el gesto del usuario (sin `await` previo para preservar User Gesture en WebKit/Safari), comprobación independiente de pantalla completa, orientación y audio real del reproductor (sincronizado con `narrador` de `narraciones.js` mediante el evento `astrovisor:narracion` y sin AudioContext ficticio), persistencia del botón si faltan condiciones (no se oculta solo por pantalla completa) y soporte de reintento dinámico sin bloquear la escena 3D. |
@@ -72,12 +72,15 @@ A continuación se registra el resultado real obtenido en cada caso de prueba de
 
 ## 3. Evidencias Visuales de Navegador Compartidas
 
-A continuación se indexan las capturas reales obtenidas mediante Google Chrome Headless sobre los artefactos de producción:
+A continuación se indexan las capturas reales obtenidas mediante Google Chrome Headless sobre los artefactos de producción, verificando la visibilidad del primer viewport según la decisión UX/UI S5-01:
 
 | Experiencia auditada | Resolución | Archivo relativo |
 | :--- | :---: | :--- |
-| **Portada Escritorio Completa** (3 accesos, manuales y créditos) | 1280×2200 px | [`./evidencias-s5/01-inicio-escritorio-completo.png`](./evidencias-s5/01-inicio-escritorio-completo.png) |
-| **Portada Móvil Completa** (diseño apilado vertical y botones ≥ 48 px) | 390×3200 px | [`./evidencias-s5/02-inicio-movil-completo.png`](./evidencias-s5/02-inicio-movil-completo.png) |
+| **Primer Viewport Escritorio 1366** (3 accesos y botones visibles sin scroll) | 1366×768 px | [`./evidencias-s5/01-inicio-escritorio-viewport-1366.png`](./evidencias-s5/01-inicio-escritorio-viewport-1366.png) |
+| **Primer Viewport Escritorio 1280** (3 accesos y botones visibles sin scroll) | 1280×800 px | [`./evidencias-s5/01-inicio-escritorio-viewport-1280.png`](./evidencias-s5/01-inicio-escritorio-viewport-1280.png) |
+| **Primer Viewport Móvil** (acceso web visible tras encabezado) | 390×844 px | [`./evidencias-s5/02-inicio-movil-viewport-390.png`](./evidencias-s5/02-inicio-movil-viewport-390.png) |
+| **Portada Escritorio Completa** (3 accesos, manuales y créditos) | 1280×2000 px | [`./evidencias-s5/01-inicio-escritorio-completo.png`](./evidencias-s5/01-inicio-escritorio-completo.png) |
+| **Portada Móvil Completa** (diseño apilado vertical y botones ≥ 48 px) | 390×2800 px | [`./evidencias-s5/02-inicio-movil-completo.png`](./evidencias-s5/02-inicio-movil-completo.png) |
 | **VR Modo Libre** (viewport 100%, salida directa, sin paneles técnicos) | 1280×800 px | [`./evidencias-s5/03-vr-libre-escritorio.png`](./evidencias-s5/03-vr-libre-escritorio.png) |
 | **VR Modo Libre Móvil** (paisaje 844×390 px) | 844×390 px | [`./evidencias-s5/04-vr-libre-movil.png`](./evidencias-s5/04-vr-libre-movil.png) |
 | **VR Modo Homido Estéreo** (pantalla dividida, paralaje, sin paneles) | 844×390 px | [`./evidencias-s5/05-vr-homido-estereo.png`](./evidencias-s5/05-vr-homido-estereo.png) |

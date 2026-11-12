@@ -5,10 +5,10 @@
 - [x] 1.2 Verificar que el catálogo runtime y las semillas no sufran modificaciones destructivas en sus transcripciones o textos.
 
 ## 2. S5-01: Diseño de Portada, UX/UI y Accesibilidad (Karime)
-- [x] 2.1 Diseñar la arquitectura visual de tres tarjetas de acceso directo con alto contraste y lenguaje claro para adultos mayores.
-- [x] 2.2 Diseñar la presentación de las dos acciones directas de la tarjeta VR («Pantalla completa · mouse o dedo» y «Visor Homido · pantalla dividida»).
+- [x] 2.1 Diseñar la arquitectura visual de tres tarjetas de acceso directo con alto contraste y lenguaje claro para adultos mayores, eliminando el hero decorativo de Orión para garantizar visibilidad directa en el primer viewport (1366×768 y 1280×800) según corrección UX/UI S5-01.
+- [x] 2.2 Diseñar la presentación de las dos acciones directas de la tarjeta VR («Pantalla completa · mouse o dedo» y «Visor Homido · pantalla dividida») y reubicar el control de proyección discretamente en la cabecera.
 - [x] 2.3 Validar que el salto de foco y la navegación por teclado (Tab/Shift+Tab/Enter) funcionen sin pérdidas de foco tras cambios de ruta.
-- [x] 2.4 Verificar contrastes cromáticos y objetivos táctiles mínimos de 48 px en botones de navegación y acciones principales.
+- [x] 2.4 Verificar contrastes cromáticos y objetivos táctiles mínimos de 48 px en botones de navegación y acciones principales en resoluciones 1366×768, 1280×800 y 390×844.
 
 ## 3. S5-03: Implementación Web y Contrato Bibliográfico (Carlos)
 - [x] 3.1 Implementar en `InicioView.vue` las tres tarjetas principales conectadas a `/explorar`, enlaces directos a `/prueba-homido/` y `/admin`.

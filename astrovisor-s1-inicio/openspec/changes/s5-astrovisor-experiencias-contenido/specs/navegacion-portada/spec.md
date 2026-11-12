@@ -2,9 +2,20 @@
 
 ## Purpose
 
-Proporcionar una entrada accesible y comprensible para personas adultas mayores y visitantes generales, estructurada exactamente en tres accesos principales con navegación directa hacia la experiencia web, la experiencia inmersiva y la administración.
+Proporcionar una entrada accesible y comprensible para personas adultas mayores y visitantes generales, estructurada exactamente en tres accesos principales con navegación directa hacia la experiencia web, la experiencia inmersiva y la administración, garantizando visibilidad inmediata en el primer viewport en escritorio sin desplazamiento vertical.
 
 ## ADDED Requirements
+
+### Requirement: Jerarquía visual y visibilidad inmediata en primer viewport
+La vista principal `/` SHALL priorizar el acceso a las tres experiencias de exploración situándolas en el primer viewport en resoluciones de escritorio estándar (1366×768 y 1280×800) sin desplazamiento vertical, incorporando el control de proyección en la cabecera general y eliminando bloques decorativos previos.
+
+#### Scenario: Visibilidad en primer viewport en resoluciones de escritorio estándar
+- **WHEN** el usuario accede a la portada `/` en resoluciones de 1366×768 o 1280×800
+- **THEN** las tres tarjetas de navegación y todos sus botones de acción son visibles simultáneamente dentro del primer viewport, sin requerir desplazamiento vertical (scroll).
+
+#### Scenario: Disposición vertical responsiva en dispositivo móvil
+- **WHEN** el usuario accede a la portada `/` en resolución móvil de 390×844
+- **THEN** las tarjetas se presentan en una columna vertical continua comenzando inmediatamente después del encabezado breve, con objetivos táctiles de al menos 48 px y sin controles de selección ocultos tras pestañas o carruseles.
 
 ### Requirement: Tres accesos principales diferenciados
 La vista principal `/` SHALL presentar tres tarjetas de acceso independientes y claramente diferenciadas visualmente y mediante marcado semántico:
@@ -33,4 +44,4 @@ La interfaz de portada SHALL ser operable mediante teclado con foco visible cont
 
 #### Scenario: Navegación secuencial por teclado
 - **WHEN** el usuario navega utilizando la tecla Tab
-- **THEN** el foco visual se desplaza de forma predecible a través de las tres tarjetas, sus botones y la sección inferior de manuales, con un indicador de foco claramente contrastado.
+- **THEN** el foco visual se desplaza de forma predecible a través de la cabecera, las tres tarjetas, sus botones y la sección inferior de manuales, con un indicador de foco claramente contrastado.
