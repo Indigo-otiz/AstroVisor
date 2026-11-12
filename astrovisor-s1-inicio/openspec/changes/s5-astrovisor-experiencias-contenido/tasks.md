@@ -1,8 +1,8 @@
 # Tasks — S5: AstroVisor — Tareas de Implementación y Validación
 
 ## 1. S5-07: Matriz de Contenido y Trazabilidad (Índigo)
-- [ ] 1.1 Documentar la matriz formal de contenido por experiencia (Web, VR libre, Homido, Admin) en la propuesta y documentación técnica.
-- [ ] 1.2 Verificar que el catálogo runtime y las semillas no sufran modificaciones destructivas en sus transcripciones o textos.
+- [x] 1.1 Documentar la matriz formal de contenido por experiencia (Web, VR libre, Homido, Admin) en la propuesta y documentación técnica.
+- [x] 1.2 Verificar que el catálogo runtime y las semillas no sufran modificaciones destructivas en sus transcripciones o textos.
 
 ## 2. S5-01: Diseño de Portada, UX/UI y Accesibilidad (Karime)
 - [ ] 2.1 Diseñar la arquitectura visual de tres tarjetas de acceso directo con alto contraste y lenguaje claro para adultos mayores.
