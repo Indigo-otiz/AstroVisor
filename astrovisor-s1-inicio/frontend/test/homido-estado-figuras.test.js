@@ -41,9 +41,9 @@ test('la pausa bloquea la mirada pero no Pausa, Salir ni el clic', () => {
   assert.equal(e.permitido('volver', 'mirada'), true)
 })
 
-test('hay figuras para las tres constelaciones y tienen formas distintas', () => {
-  assert.deepEqual(Object.keys(FIGURAS).sort(), ['escorpio', 'orion', 'osa-mayor'])
-  assert.deepEqual(Object.values(FIGURAS).map((f) => f.estrellas.length).sort((a, b) => a - b), [7, 8, 15])
+test('hay figuras para las constelaciones y tienen formas distintas', () => {
+  assert.deepEqual(Object.keys(FIGURAS).sort(), ['boyero', 'can-mayor', 'escorpio', 'orion', 'osa-mayor'])
+  assert.deepEqual(Object.values(FIGURAS).map((f) => f.estrellas.length).sort((a, b) => a - b), [6, 7, 7, 8, 15])
 })
 
 test('catálogo: datos astronómicos completos y razonables, y trazos con índices válidos', () => {

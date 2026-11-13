@@ -66,7 +66,7 @@ export async function verificarPaquete(dir,{io=fs}={}) {
   return {manifiesto,recorridos,libros}
 }
 const svgPermitidos=new Set(['star-lore','field-stars','half-hours'].map(id=>`/libros-demo/${id}.svg`))
-const audiosPermitidos=new Set(['orion','osa-mayor','escorpio'].map(id=>`/audio/${id}-kokoro-v1.wav`))
+const audiosPermitidos=new Set(['orion','osa-mayor','escorpio','can-mayor','boyero'].map(id=>`/audio/${id}-kokoro-v1.wav`))
 async function preparar(c,io) {
   const archivos=new Map(),recorridos=proyectarRecorridos(c),libros=proyectarLibros(c)
   const copiar=async src=>{

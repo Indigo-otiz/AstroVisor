@@ -266,13 +266,13 @@ test('proceso nuevo adquiere escritor y sirve por HTTP el cambio confirmado prev
   assert.equal((await fin)[0], 0)
 })
 
-test('actualizar motivos por libro o recorrido conserva nueve relaciones y metadatos de referencia', async (t) => {
+test('actualizar motivos por libro o recorrido conserva relaciones y metadatos de referencia', async (t) => {
   const { guardar, datos } = await entorno(t)
   const antes = await obtenerCatalogo({ directorio: datos })
   assert.equal((await guardar('/api/admin/libros/star-lore', { relaciones: [{ constelacionId: 'orion', motivo: 'Motivo revisado' }] })).status, 200)
   assert.equal((await guardar('/api/admin/recorridos/orion', { libroRefs: [{ libroId: 'half-hours', motivo: 'Otra lectura' }] }, '"catalogo-2"')).status, 200)
   const despues = await obtenerCatalogo({ directorio: datos })
-  assert.equal(despues.recorridos.flatMap((r) => r.libroRefs).length, 9)
+  assert.equal(despues.recorridos.flatMap((r) => r.libroRefs).length, 13)
   assert.deepEqual(despues.recorridos[0].libroRefs[0].referencia, antes.recorridos[0].libroRefs[0].referencia)
   assert.equal(despues.recorridos[0].libroRefs[0].motivo, 'Motivo revisado')
   assert.equal(despues.recorridos[0].libroRefs.find((r) => r.libroId === 'half-hours').motivo, 'Otra lectura')

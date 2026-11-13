@@ -30,7 +30,7 @@ test('GET público conserva recorridos y expone catálogo completo o filtrado si
   assert.equal(recorridos.status, 200)
   const anterior = JSON.parse(await readFile(new URL('../../content/recorridos.json', import.meta.url), 'utf8'))
   const actual = await recorridos.json()
-  assert.equal(actual.flatMap(r => r.libros).length, 9)
+  assert.equal(actual.flatMap(r => r.libros).length, 13)
   const heredado = actual.map(({ revisionCatalogo, libros, ...r }) => ({ ...r, libros: libros.filter(l => l.referenciaHeredada).map(({ libroId, constelacionId, motivo, demostracion, referenciaHeredada, portada, ...l }) => l) }))
   assert.deepEqual(heredado, anterior)
   const libros = await fetch(`${base}/api/contenidos/libros`)

@@ -7,8 +7,8 @@ const leer = (ruta) => JSON.parse(readFileSync(new URL(ruta, import.meta.url), '
 const demo = leer('../public/prueba-homido/data/recorridos-demo.json')
 const respuesta = (cuerpo, ok = true) => ({ ok, status: ok ? 200 : 500, json: async () => cuerpo })
 
-test('el respaldo local cumple el contrato y trae las tres constelaciones', () => {
-  assert.deepEqual(validarRecorridos(demo).map((f) => f.id), ['orion', 'osa-mayor', 'escorpio'])
+test('el respaldo local cumple el contrato y trae las constelaciones', () => {
+  assert.deepEqual(validarRecorridos(demo).map((f) => f.id), ['orion', 'osa-mayor', 'escorpio', 'can-mayor', 'boyero'])
   assert.ok(demo.every((f) => f.demostracion === true))
 })
 
@@ -31,7 +31,7 @@ test('cargarDatos cae al respaldo local si la API falla, devuelve basura o HTML'
   ]) {
     const r = await cargarDatos({ fetchFn: async (url, o) => (url.includes('/api/') ? api(url, o) : respuesta(demo)) })
     assert.equal(r.fuente, 'local')
-    assert.equal(r.datos.length, 3)
+    assert.equal(r.datos.length, demo.length)
     assert.ok(r.motivo)
   }
 })

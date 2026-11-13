@@ -26,7 +26,7 @@ test('semilla unificada: conserva los libros, nueve relaciones y contrato anteri
   assert.deepEqual(semilla, crearCatalogoInicial(recorridos, libros))
   assert.deepEqual(proyectarLibros(semilla), libros)
   assert.deepEqual(contratoHeredado(proyectarRecorridos(semilla)), recorridos)
-  assert.equal(semilla.recorridos.reduce((n, r) => n + r.libroRefs.length, 0), 9)
+  assert.equal(semilla.recorridos.reduce((n, r) => n + r.libroRefs.length, 0), 13)
   assert.deepEqual(semilla.libros.map((l) => l.id), ['star-lore', 'field-stars', 'half-hours'])
 })
 

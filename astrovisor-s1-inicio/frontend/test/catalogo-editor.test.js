@@ -23,7 +23,7 @@ test('editor carga catálogo, presenta relaciones y cancelar no escribe', async 
   assert.equal(e.cargando.value, true)
   await carga
   e.seleccionarLibro('star-lore')
-  assert.equal(e.borrador.value.relaciones.length, 3)
+  assert.equal(e.borrador.value.relaciones.length, 4)
   assert.equal(e.borrador.value.titulo, semilla.libros[0].titulo)
   assert.equal(e.puedeEditarTexto.value, false)
   e.borrador.value.anio = 1912

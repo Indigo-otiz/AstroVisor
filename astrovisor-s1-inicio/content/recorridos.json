@@ -103,5 +103,75 @@
         "demostracion": true
       }
     ]
+  },
+  {
+    "id": "can-mayor",
+    "titulo": "Can Mayor",
+    "resumen": "Identifica al fiel compañero de caza en el cielo y a Sirio, la estrella más brillante de la noche.",
+    "historia": "En la tradición clásica, el Can Mayor representa a Lélape, el perro más veloz que acompañaba al cazador Orión a través del firmamento. En su pecho brilla Sirio, una estrella tan luminosa y cercana que los pueblos antiguos la usaban para marcar las estaciones del año y la crecida de los ríos. Esta figura une estrellas brillantes que recuerdan la lealtad y el viaje de las historias compartidas entre generaciones.",
+    "comoReconocerla": "Ubica primero el cinturón de tres estrellas de Orión y sigue esa línea recta hacia abajo y hacia la izquierda: encontrarás a Sirio, inconfundible por su intenso brillo azulado y parpadeante. A su alrededor, un grupo de estrellas dibuja el cuerpo y las patas del perro cazador.",
+    "demostracion": true,
+    "libros": [
+      {
+        "titulo": "Star Lore of All Ages",
+        "autor": "William Tyler Olcott",
+        "anio": 1911,
+        "url": "https://archive.org/details/starloreofallage00olco",
+        "licencia": "Dominio público (Project Gutenberg / Public Domain)",
+        "etiqueta": "Referencia de demostración",
+        "aclaracion": "Ejemplar de acceso público consultable en Internet; no disponible para préstamo físico ni propiedad de la biblioteca."
+      }
+    ],
+    "multimedia": [
+      {
+        "tipo": "audio",
+        "src": "/audio/can-mayor-kokoro-v1.wav",
+        "formato": "audio/wav",
+        "transcripcion": "En la tradición clásica, el Can Mayor representa a Lélape, el perro más veloz que acompañaba al cazador Orión a través del firmamento. En su pecho brilla Sirio, una estrella tan luminosa y cercana que los pueblos antiguos la usaban para marcar las estaciones del año y la crecida de los ríos. Esta figura une estrellas brillantes que recuerdan la lealtad y el viaje de las historias compartidas entre generaciones.",
+        "autorTexto": "Equipo AstroVisor (autoría colectiva).",
+        "procedencia": "Guion elaborado por el equipo AstroVisor a partir de tradición clásica.",
+        "voz": "Voz sintética en español.",
+        "permisoTexto": "Elaboración propia del equipo AstroVisor.",
+        "permiso": "Elaboración propia del equipo AstroVisor para fines educativos.",
+        "estadoDerechos": "declarado-por-equipo",
+        "licenciaVozFuente": "https://huggingface.co/hexgrad/Kokoro-82M",
+        "demostracion": true
+      }
+    ]
+  },
+  {
+    "id": "boyero",
+    "titulo": "Boyero",
+    "resumen": "Descubre al guardián del cielo y a la brillante estrella Arturo, guía en las noches despejadas.",
+    "historia": "El Boyero es imaginado en diversas tradiciones como un pastor o campesino que guía los rebaños en el cielo nocturno y vigila a las osas que giran alrededor del polo norte celeste. Su corazón resplandece con Arturo, una estrella gigante de color anaranjado que es una de las más luminosas visibles a simple vista. Su relato ayudaba a agricultores y navegantes a orientarse durante la primavera y el verano.",
+    "comoReconocerla": "Localiza las tres estrellas que forman el mango curvo de la Osa Mayor y sigue esa curva natural por el cielo: te conducirá directamente a Arturo, brillante y de tono cálido anaranjado. A partir de ella se extiende una figura en forma de diamante o cometa que forma al Boyero.",
+    "demostracion": true,
+    "libros": [
+      {
+        "titulo": "A Field Book of the Stars",
+        "autor": "William Tyler Olcott",
+        "anio": 1914,
+        "url": "https://archive.org/details/fieldbookofstars00olcorich",
+        "licencia": "Dominio público (Public Domain)",
+        "etiqueta": "Referencia de demostración",
+        "aclaracion": "Ejemplar de acceso público consultable en Internet; no disponible para préstamo físico ni propiedad de la biblioteca."
+      }
+    ],
+    "multimedia": [
+      {
+        "tipo": "audio",
+        "src": "/audio/boyero-kokoro-v1.wav",
+        "formato": "audio/wav",
+        "transcripcion": "El Boyero es imaginado en diversas tradiciones como un pastor o campesino que guía los rebaños en el cielo nocturno y vigila a las osas que giran alrededor del polo norte celeste. Su corazón resplandece con Arturo, una estrella gigante de color anaranjado que es una de las más luminosas visibles a simple vista. Su relato ayudaba a agricultores y navegantes a orientarse durante la primavera y el verano.",
+        "autorTexto": "Equipo AstroVisor (autoría colectiva).",
+        "procedencia": "Guion elaborado por el equipo AstroVisor a partir de tradición clásica.",
+        "voz": "Voz sintética en español.",
+        "permisoTexto": "Elaboración propia del equipo AstroVisor.",
+        "permiso": "Elaboración propia del equipo AstroVisor para fines educativos.",
+        "estadoDerechos": "declarado-por-equipo",
+        "licenciaVozFuente": "https://huggingface.co/hexgrad/Kokoro-82M",
+        "demostracion": true
+      }
+    ]
   }
 ]

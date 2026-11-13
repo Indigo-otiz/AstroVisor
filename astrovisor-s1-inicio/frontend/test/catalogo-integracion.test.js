@@ -91,7 +91,7 @@ test('servicios Vue → Express: edición autorizada, 412, lectura pública y pe
   assert.ok((await listarLibros('osa-mayor')).some((l) => l.id === 'guia-nueva'))
   alta.cancelarPeticiones()
   const persistido = await obtenerCatalogo({ directorio: datos })
-  assert.equal(persistido.recorridos.flatMap((r) => r.libroRefs).filter((r) => r.libroId !== 'guia-nueva').length, 9)
+  assert.equal(persistido.recorridos.flatMap((r) => r.libroRefs).filter((r) => r.libroId !== 'guia-nueva').length, 13)
   assert.deepEqual(persistido.recorridos.map((r) => r.multimedia), original.recorridos.map((r) => r.multimedia))
   await new Promise((r) => server.close(r)); await app.locals.cerrarEscritor()
   const modulo = new URL('../../backend/src/index.js', import.meta.url).href
