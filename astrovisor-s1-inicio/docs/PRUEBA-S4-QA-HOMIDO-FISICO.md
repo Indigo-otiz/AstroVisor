@@ -79,7 +79,40 @@
 
 ---
 
-## 5. Criterios de Aceptación y Revisión Cruzada
+## 5. Hallazgos Críticos de Usabilidad y Experiencia de Usuario (Enfoque en Personas Adultas Mayores)
+
+Durante las pruebas físicas de usabilidad y recorrido que realicé tanto en el visor Homido como en las vistas asociadas, evalué detenidamente la interacción asumiendo el perfil y las necesidades de nuestros usuarios principales: **personas adultas mayores**.
+
+Aunque el sistema cumple con los criterios técnicos de funcionamiento en hardware, identifiqué barreras de usabilidad y accesibilidad importantes que complican la experiencia y generan frustración o cansancio en este perfil de usuario:
+
+### 5.1. Flujo excesivamente largo (demasiados pasos para llegar al objetivo)
+- **Problema detectado:** Para consultar una constelación o escuchar su narración se requiere pasar por demasiadas pantallas previas, permisos y transiciones intermedias (concesión de sensores -> activación de audio -> cambio a vista dividida -> calibración/colocación en visor -> búsqueda en cielo 3D -> dwell de 3 s -> ficha -> acción secundaria).
+- **Impacto en adultos mayores:** Provoca desorientación y fatiga antes de siquiera comenzar la experiencia. Un adulto mayor puede perder el hilo fácilmente o desistir al sentir que es un camino largo y enredado.
+- **Recomendación:** Simplificar la ruta crítica a un flujo más directo y guiado («un toque o una mirada directa al contenido»), minimizando pasos de configuración técnica previa.
+
+### 5.2. Sobrecarga y exceso de botones de acción simultáneos
+- **Problema detectado:** Al desplegarse la interfaz y las fichas de contenido, se presentan demasiados botones interactivos compitiendo en el mismo espacio visual (reproducir audio, pausar audio, ver libros recomendados, pausar mirilla, volver a libros, volver a constelación, salir a 2D, etc.).
+- **Impacto en adultos mayores:** Genera sobrecarga cognitiva y parálisis de decisión. Además, al interactuar con retícula de mirada (dwell) o pantalla táctil, tener tantos elementos cercanos eleva drásticamente el riesgo de selecciones involuntarias por fijación de mirada accidental mientras la persona simplemente intenta leer o explorar.
+- **Recomendación:** Jerarquizar y simplificar la interfaz. Mantener visible solo **una acción principal destacada** en cada pantalla (por ejemplo, «Escuchar historia») y ocultar o reubicar opciones secundarias para no saturar el campo visual.
+
+### 5.3. Estructura y navegación complejas y difíciles de entender
+- **Problema detectado:** La relación espacial entre el cielo 3D, las fichas flotantes, la estantería de libros y el retorno a la vista anterior no sigue un modelo mental evidente ni intuitivo.
+- **Impacto en adultos mayores:** A las personas mayores les cuesta trabajo comprender en qué nivel de la aplicación están situadas, qué elemento está activo o cómo regresar al punto de partida sin perderse o desubicarse.
+- **Recomendación:** Incorporar una señalización de retorno obvia, indicadores claros de ubicación («Estás viendo: Constelación de Orión») y una navegación lineal y predecible.
+
+### 5.4. Tipografía y estilo de letra confusos
+- **Problema detectado:** El tipo de letra seleccionado, su grosor y el espaciado en los textos descriptivos dentro del visor y en los paneles resultan difíciles de leer y confusos a la vista.
+- **Impacto en adultos mayores:** Al visualizarse a través de las lentes convexas del visor Homido o en pantallas móviles, la tipografía causa desenfoque, fatiga visual inmediata y dificultad para descifrar palabras rápidamente, especialmente para personas con presbicia o disminución de agudeza visual.
+- **Recomendación:** Cambiar a una tipografía sans-serif limpia y accesible, con trazos más definidos y robustos, mayor interlineado y tamaños de fuente considerablemente más grandes con alto contraste sobre fondos oscuros.
+
+### 5.5. Exceso de texto y densidad informativa
+- **Problema detectado:** Las fichas contienen bloques densos de párrafos descriptivos con demasiada letra acumulada en un espacio reducido.
+- **Impacto en adultos mayores:** Leer párrafos extensos dentro de un visor o en la pantalla no es adecuado para personas mayores; genera cansancio visual acelerado, mareo por fijación prolongada y rechazo a la experiencia.
+- **Recomendación:** Disminuir radicalmente la cantidad de texto escrito. Para adultos mayores no debe haber tanta letra: la información debe presentarse sintetizada en cápsulas breves o viñetas directas, otorgándole el papel principal a la **narración por voz / audio hablado**, que es el medio más humano, cómodo y accesible para ellos.
+
+---
+
+## 6. Criterios de Aceptación y Revisión Cruzada
 
 | Criterio | Estado | Comprobación |
 | :--- | :---: | :--- |
@@ -88,10 +121,11 @@
 | **Audio real escuchado y pausado en hardware** | **Cumple** | Verificación auditiva humana en altavoces/auriculares |
 | **Experiencia 2D de fallback funcional y accesible** | **Cumple** | Salida a web plana con tipografía y contraste para adultos mayores |
 | **Video de contingencia de 5 minutos disponible** | **Cumple** | Archivo y capturas listos para la Expo del 5 de noviembre |
+| **Evaluación de usabilidad para personas adultas mayores** | **Registrada** | Documentadas 5 áreas críticas de mejora en interfaz y flujos |
 
 ### Firma de Revisión Cruzada
 
 - **Responsable de la Ejecución (QA):** Karime Lizbeth Rendón Vázquez — Fecha: `09 / 11 / 2026`
 - **Revisor Cruzado (Par Técnico):** *(Agendado para validación presencial de equipo previa a la entrega final)*
-- **Dictamen del Revisor:** [x] Aprobado para Revisión Técnica y Expo
-- **Observaciones del Revisor:** Protocolo ejecutado en hardware físico Samsung Galaxy S25; evidencias gráficas y de audio consolidadas satisfactoriamente.
+- **Dictamen del Revisor:** [x] Aprobado para Revisión Técnica y Expo (con observaciones de usabilidad registradas para optimización)
+- **Observaciones del Revisor:** Protocolo ejecutado en hardware físico Samsung Galaxy S25; evidencias consolidadas satisfactoriamente. Se registran observaciones de accesibilidad y experiencia de usuario para personas adultas mayores como insumos prioritarios para las siguientes tareas de mejora.
