@@ -89,7 +89,7 @@ onMounted(() => {
             </svg>
           </div>
           <h3>Prepara tu teléfono</h3>
-          <p>Abre el visor en tu celular. Antes de colocarte las gafas, toca <strong>«Activar audio»</strong> y autoriza los sensores de movimiento.</p>
+          <p>Desde Inicio, elige <strong>«Explorar con Homido»</strong>. Antes de colocar el teléfono en el visor, toca <strong>«Activar audio»</strong> y, si aparece, <strong>«Permitir movimiento»</strong>.</p>
         </div>
 
         <div class="visor-step-card">
@@ -103,7 +103,7 @@ onMounted(() => {
             </svg>
           </div>
           <h3>Ajusta el visor Homido</h3>
-          <p>Toca <strong>«Probar vista dividida»</strong>, coloca el teléfono horizontalmente dentro del visor y ajusta las correas con calma.</p>
+          <p>La vista se divide al entrar. Gira el teléfono a horizontal, colócalo dentro del visor y ajusta las correas con calma.</p>
         </div>
 
         <div class="visor-step-card">

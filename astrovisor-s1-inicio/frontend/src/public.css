@@ -445,7 +445,14 @@
   color: var(--muted);
   font-size: 1rem;
 }
-.home-guide > a {
+.home-visor-links {
+  display: grid;
+  gap: .65rem;
+  justify-items: start;
+}
+
+.home-guide > a,
+.home-visor-links a {
   flex-shrink: 0;
   font-size: 0.9444rem;
 }

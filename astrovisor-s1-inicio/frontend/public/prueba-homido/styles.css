@@ -360,7 +360,8 @@ button:focus-visible, .button:focus-visible {
 }
 
 /* --- PANTALLA COMPLETA ESTEREOSCÓPICA --- */
-.scene-host.stereo-active {
+.scene-host.stereo-active,
+:root:not([data-visor="diagnostico"]) .scene-host {
   position: fixed;
   top: 0;
   left: 0;
@@ -406,6 +407,100 @@ body.stereo-mode #exitButton {
 body.stereo-mode {
   overflow: hidden;
   overscroll-behavior: none;
+}
+
+.scene-toolbar {
+  display: none;
+}
+
+.file-instruction {
+  display: none;
+}
+
+[data-visor="archivo"] :is(.screen-instruction, .homido-instruction, #testScene, .scene-actions),
+[data-carga-visor="fallo"] #testScene {
+  display: none;
+}
+
+[data-visor="archivo"] .file-instruction {
+  display: block;
+  max-width: 57ch;
+}
+
+:root:not([data-visor="diagnostico"]) body {
+  overflow: hidden;
+  background: #071426;
+}
+
+:root:not([data-visor="diagnostico"]) :is(.site-header, .page-intro, .notice, .controls-panel, .scene-header, .reading-panel, .log-panel, .visor-page-footer, #exitButton) {
+  display: none;
+}
+
+:root:not([data-visor="diagnostico"]) .scene-toolbar {
+  display: flex;
+  position: absolute;
+  inset: 0 0 auto;
+  z-index: 2;
+  align-items: start;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: .6rem 1.25rem;
+  padding: max(.85rem, env(safe-area-inset-top)) max(1rem, env(safe-area-inset-right)) .75rem max(1rem, env(safe-area-inset-left));
+  color: #fff;
+  background: #0b1530;
+  border-bottom: 1px solid #384869;
+}
+
+.scene-instructions h1 {
+  margin: 0;
+  color: inherit;
+  font-size: clamp(1.2rem, 2.3vw, 1.65rem);
+  line-height: 1.2;
+}
+
+.scene-instructions p {
+  margin: .2rem 0 0;
+  color: #e5ecfa;
+  line-height: 1.35;
+}
+
+.scene-instructions :is(#publicNotice, #publicAudioNotice) {
+  color: #ffdc86;
+  max-width: 48ch;
+}
+
+.scene-actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: .5rem;
+}
+
+.scene-actions .button,
+.scene-actions button {
+  min-height: 44px;
+  padding: .45rem .8rem;
+  border: 1px solid #8ca4cb;
+  border-radius: .55rem;
+  background: #1b2a50;
+  color: #fff;
+  font-size: 1rem;
+}
+
+.scene-actions #activateAudio {
+  background: #f5ce6d;
+  color: #101b32;
+  border-color: #f5ce6d;
+}
+
+.scene-actions :is(button, a):focus-visible {
+  outline: 2px solid #f5ce6d;
+  outline-offset: 3px;
+}
+
+[data-visor="pantalla"] .homido-instruction,
+[data-visor="homido"] .screen-instruction {
+  display: none;
 }
 
 /* --- PANEL DE LECTURA 2D DE HISTORIAS --- */

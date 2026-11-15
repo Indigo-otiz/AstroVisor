@@ -1,0 +1,57 @@
+{
+  "navegador": "157.0.8103.51",
+  "raton": {
+    "pantallaCompleta": true,
+    "fichas": [
+      "Osa Mayor",
+      "Escorpio"
+    ],
+    "pausaSegundos": 0.417466,
+    "repeticionDesdeInicio": true,
+    "portada": true,
+    "regresoAlCielo": true,
+    "libro2D": "/explorar/escorpio/libros/field-stars"
+  },
+  "tacto": {
+    "viewport": "393 × 851",
+    "arrastre": true,
+    "toque": true,
+    "ficha": "Orión",
+    "audio": true,
+    "salida": true
+  },
+  "homido": {
+    "viewport": "915 × 412",
+    "estereo": true,
+    "permisosSimulados": true,
+    "bloqueoAudioInducido": true,
+    "dwellMilisegundosObservados": 3869,
+    "pausaMiradaSinPausarAudio": true,
+    "salida": true
+  },
+  "compatibilidad": {
+    "urlHistorica": true,
+    "guia": true,
+    "diagnostico": true,
+    "errorDatos": true
+  },
+  "respaldo": {
+    "copiaPublicada": true,
+    "audioBlob": true,
+    "transcripcionConAudioNoDisponible": true
+  },
+  "fecha": "2026-11-14 America/Mexico_City",
+  "baseGit": "1354c70e084d2baba5edcd168ada583fa8276a7f",
+  "fuentesSHA256": {
+    "frontend/public/prueba-homido/index.html": "69164e72ab9297dd628c579f38a90534f8aff8c4b14c5a3caca9122d313223d7",
+    "frontend/public/prueba-homido/js/estanteria-3d.js": "914b7ca8b0eb8ee06c8ba8d65b96db9552892ef233cff0684a6fb0a532d5af52",
+    "frontend/public/prueba-homido/js/ficha-canvas.js": "f304260dc7bdc5aceaafc264473a601853b2377f95c74ed0f43611f80e3cd891",
+    "frontend/public/prueba-homido/js/visor-estado.js": "0bc3c9cdbde74afd1fc0f8a9ed5c9687c8e81fa38965b0af21c1e936c9981c0e",
+    "frontend/public/prueba-homido/narraciones.js": "c6cfb38844131833ecd342f3969754435c4ebe0273e25973fec1171f213ce2aa",
+    "frontend/public/prueba-homido/prueba.js": "23131e03cfda865ae127f826fedec196c73c1a5101e9e5c4aeb88f9bf44f1d5c",
+    "frontend/public/prueba-homido/styles.css": "63b4dd7a831fed130908d94cff79c0827327b0307ec75f4da8805d0bbef31b3d",
+    "frontend/src/public.css": "d401cda6a688e3adcf370b68aa63411d54ac42ee41691a62eea277b6878c2e2a",
+    "frontend/src/views/InicioView.vue": "f5856f9328bdba5fbd4f2b5efcaf4028cf9f71a3dde7b25387b84f2810d7ddef",
+    "frontend/src/views/VisorView.vue": "c5cb90d1958aa417582ff9c3c5e4b76fece3aa3aa4f71ea61acd7a35b3f96cfa"
+  }
+}

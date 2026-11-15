@@ -13,7 +13,7 @@ export function extraerLibros(recorridos,preferido='') {
     for(const l of ficha.libros) {
     if(!idBibliograficoValido(l?.libroId)||l.constelacionId!==ficha.id||typeof l.titulo!=='string'||!l.titulo.trim()) continue;
     salida.push({...l,id:l.libroId,libroId:l.libroId,constelacionId:ficha.id,constelacionTitulo:ficha.titulo,
-      titulo:l.titulo.trim(),autor:typeof l.autor==='string'?l.autor.trim():'Autor no indicado',
+      titulo:l.titulo.trim(),autor:(typeof l.autor==='string' && l.autor.trim()) || 'Autor no indicado',
       demostracion:l.demostracion ?? ficha.demostracion});
     }
   }
@@ -26,11 +26,11 @@ function crear(doc,tag,attrs,padre) {
   Object.entries(attrs).forEach(([k,v])=>el.setAttribute(k,v));
   padre.appendChild(el); return el;
 }
-export function ajustarTextoCubierta(ctx,texto,ancho,maxLineas,fuentes) {
+export function ajustarTextoCubierta(ctx,texto,ancho,maxLineas,fuentes,cabe = () => true) {
   for(const font of fuentes) {
     ctx.font=font;
     const lineas=ajustarLineas(ctx,texto,ancho);
-    if(lineas.length<=maxLineas&&lineas.every(l=>ctx.measureText(l).width<=ancho)) return {font,lineas};
+    if(lineas.length<=maxLineas&&cabe(font,lineas.length)&&lineas.every(l=>ctx.measureText(l).width<=ancho)) return {font,lineas};
   }
   return {font:fuentes[fuentes.length-1],lineas:['Texto completo','en la ficha 2D']};
 }
@@ -58,7 +58,7 @@ function cubierta(doc,libro) {
   doc.querySelector('a-assets').appendChild(c);return '#'+c.id;
 }
 /** Portadas como planos A-Frame delante de una repisa; selección con el mismo dwell del visor. */
-export function crearEstanteria3D(doc,grupo,libros,ligar) {
+export function crearEstanteria3D(doc,grupo,libros,ligar,pantalla = false) {
   const nodos=new Map();
   crear(doc,'a-plane',{width:3.64,height:2.45,position:'0 0.14 -0.17',
     material:'shader: flat; color: #17283E; side: double'},grupo);
@@ -67,7 +67,7 @@ export function crearEstanteria3D(doc,grupo,libros,ligar) {
   vincularEtiqueta(crear(doc,'a-plane',{position:'0 1.14 0.02'},grupo),
     'La biblioteca de las estrellas',{ancho:3.15,alto:0.32});
   vincularEtiqueta(crear(doc,'a-plane',{position:'0 0.88 0.02'},grupo),
-    'Mira una portada durante 3 segundos',{ancho:3.15,alto:0.22});
+    pantalla ? 'Pulsa una portada' : 'Mira una portada durante 3 segundos',{ancho:3.15,alto:0.22});
   const volver=crear(doc,'a-plane',{position:'0 -1.08 0.14',width:1.88,height:0.32,
     'data-action':'volver-ficha','data-ring':'ring-volver-ficha',material:'shader: flat; color: #1F4E8C'},grupo);
   vincularEtiqueta(crear(doc,'a-plane',{position:'0 0 0.027'},volver),
@@ -92,32 +92,30 @@ export function crearEstanteria3D(doc,grupo,libros,ligar) {
     ordenados.forEach((l,i)=>nodos.get(l.id).setAttribute('position',xs[i]+' 0 0.07'));
   }};
 }
-export function calcularDetalleLibro(ctx,libro) {
-  const W=CANVAS.ancho,H=CANVAS.alto,items=[],zonas={};
-  const font=(n,b=false)=>(b?'bold ':'')+n+'px system-ui,sans-serif';
-  const texto=(s,y,t,color='#1B2430',bold=false)=>{
-    ctx.font=font(t,bold);const lineas=ajustarLineas(ctx,s,1200);
-    items.push({k:'texto',lineas,x:90,y,lh:t+14,font:ctx.font,color,align:'left',base:'top'});
-    return y+lineas.length*(t+14);
-  };
-  const textoAjustado=(s,y,tamanos,color,bold)=>{
-    const ajuste=ajustarTextoCubierta(ctx,s,1200,2,tamanos.map(t=>font(t,bold)));
-    const t=Number(/(\d+)px/.exec(ajuste.font)[1]);
-    items.push({k:'texto',lineas:ajuste.lineas,x:90,y,lh:t+14,font:ajuste.font,color,align:'left',base:'top'});
-    return y+ajuste.lineas.length*(t+14);
-  };
-  items.push({k:'caja',rect:{x:20,y:20,w:W-40,h:H-40},radio:30,fill:'#FFFFFF',stroke:'#CED7E1',sw:4});
-  let y=texto('LECTURA DE DEMOSTRACIÓN',88,31,'#725113',true);
-  y=textoAjustado(libro.titulo,y+30,[63,55,47,39,33],'#142641',true);
-  y=textoAjustado(libro.autor,y+15,[37,33,29,25],'#3D4D62',false);
-  y=texto('¿Por qué leerlo?',y+35,42,'#142641',true);
-  y=texto('Continúa descubriendo las historias del cielo y las estrellas con esta lectura.',y+20,36);
-  const ultimo=texto('La biblioteca aún no ha confirmado un ejemplar físico ni su ubicación.',y+42,31,'#664A13');
-  const consultar={x:75,y:860,w:1250,h:100},volver={x:310,y:1000,w:780,h:96};
-  zonas['consultar-libro']=consultar;zonas['volver-libros']=volver;
-  items.push({k:'boton',rect:consultar,fill:'#1F4E8C',
-    texto:'Consultar información en 2D',font:font(38,true),color:'#FFFFFF',padIzq:0});
-  items.push({k:'boton',rect:volver,fill:'#354C69',
-    texto:'← Volver a los libros',font:font(35,true),color:'#FFFFFF',padIzq:0});
-  return {ancho:W,alto:H,items,zonas,desborda:ultimo>820};
+export function calcularDetalleLibro(ctx, libro) {
+  const items = []
+  const zonas = {
+    'consultar-libro': { x: 500, y: 770, w: 770, h: 112 },
+    'volver-libros': { x: 500, y: 912, w: 770, h: 92 },
+  }
+  const portada = { x: 142, y: 291, w: 285, h: 428 }
+  const fuente = (tam, negrita) => `${negrita ? 'bold ' : ''}${tam}px system-ui, sans-serif`
+  const interlineado = (font) => Number(/(\d+)px/.exec(font)[1]) + 12
+  const texto = (valor, y, tamanos, color, negrita, limite) => {
+    const ajuste = ajustarTextoCubierta(ctx, valor, 735, 3, tamanos.map((tam) => fuente(tam, negrita)),
+      (font, filas) => y + interlineado(font) * filas <= limite)
+    const alto = interlineado(ajuste.font)
+    items.push({ k: 'texto', lineas: ajuste.lineas, x: 500, y, lh: alto, font: ajuste.font, color, align: 'left', base: 'top' })
+    return y + ajuste.lineas.length * alto
+  }
+  items.push({ k: 'caja', rect: { x: 94, y: 202, w: 1212, h: 845 }, radio: 26, fill: '#101d37', stroke: '#7790b6', sw: 4 })
+  if (libro.demostracion) texto('DEMO', 285, [38], '#f5ce6d', true, 340)
+  const finalTitulo = texto(libro.titulo, 354, [74, 65, 56, 47, 39, 32], '#fff', true, 600)
+  const finalAutor = texto(libro.autor || 'Autor no indicado', finalTitulo + 24, [49, 41, 35, 30], '#dce7f8', false, 745)
+  items.push(
+    { k: 'boton', rect: zonas['consultar-libro'], fill: '#f5ce6d', texto: 'Consultar en 2D', font: fuente(47, true), color: '#111b31', padIzq: 70 },
+    { k: 'boton', rect: zonas['volver-libros'], fill: '#233657', stroke: '#7790b6', sw: 3,
+      texto: 'Volver a los libros', font: fuente(43, true), color: '#fff', padIzq: 62 },
+  )
+  return { ...CANVAS, items, zonas, portada, desborda: finalAutor > 745 }
 }
