@@ -29,9 +29,13 @@ function actualizar(estado) {
   if (estado.estado === 'bloqueado') $('audioPreparation').textContent = estado.mensaje
   if (homido) {
     const bloqueado = estado.estado === 'bloqueado'
-    $('activateAudio').hidden = Boolean(estado.activacion) && !bloqueado
-    $('publicAudioNotice').hidden = !bloqueado
-    $('publicAudioNotice').textContent = bloqueado ? 'Toca Activar audio para continuar.' : ''
+    const btnActAudio = $('activateAudio')
+    if (btnActAudio) btnActAudio.hidden = Boolean(estado.activacion) && !bloqueado
+    const noticeAudio = $('publicAudioNotice')
+    if (noticeAudio) {
+      noticeAudio.hidden = !bloqueado
+      noticeAudio.textContent = bloqueado ? 'Toca Activar audio para continuar.' : ''
+    }
   }
   visor()?.estadoNarracion(estado)
   window.dispatchEvent(new CustomEvent('astrovisor:narracion', {

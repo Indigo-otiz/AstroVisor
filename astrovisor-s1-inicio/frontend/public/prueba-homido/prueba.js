@@ -57,23 +57,10 @@ import { rutaLibro2D } from './js/ruta-libro-2d.js';
   const publicExit = $('publicExit');
 
   function avisar(mensaje) {
-    avisoPublico.textContent = mensaje;
-    avisoPublico.hidden = !mensaje;
-  }
-
-  if (pantalla) {
-    camaraRig.setAttribute('look-controls', { magicWindowTrackingEnabled: false, touchEnabled: false, mouseEnabled: false });
-    gazeCursor.removeAttribute('cursor');
-    gazeCursor.removeAttribute('raycaster');
-    $('reticleGroup').setAttribute('visible', false);
-  } else if (!diagnostico) {
-    $('publicSceneTitle').textContent = 'Historias del cielo · Homido';
-    const activateAudio = $('activateAudio');
-    $('publicActions').prepend(activateAudio, permissionButton);
-    activateAudio.textContent = 'Activar audio';
-    permissionButton.textContent = 'Permitir movimiento';
-    permissionButton.hidden = typeof window.DeviceOrientationEvent?.requestPermission !== 'function';
-    if (!window.isSecureContext) avisar('Abre el visor en HTTPS para usar el movimiento del teléfono.');
+    if (avisoPublico) {
+      avisoPublico.textContent = mensaje;
+      avisoPublico.hidden = !mensaje;
+    }
   }
 
   const constelacionesEl = $('constelaciones');
@@ -529,7 +516,7 @@ import { rutaLibro2D } from './js/ruta-libro-2d.js';
     selectionStatus.textContent = '✔ Salida confirmada. Regresando al modo web 2D...';
     window.location.assign(url);
   }
-  publicExit.addEventListener('click', (event) => {
+  if (publicExit) publicExit.addEventListener('click', (event) => {
     if (event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) return;
     event.preventDefault();
     salir();
@@ -1050,12 +1037,12 @@ import { rutaLibro2D } from './js/ruta-libro-2d.js';
     activarEstereo();
     prepararPantallaCompleta();
   });
-  fullscreenButton.addEventListener('click', () => {
+  if (fullscreenButton) fullscreenButton.addEventListener('click', () => {
     if (document.fullscreenElement) liberarPantalla();
     else prepararPantallaCompleta();
   });
   document.addEventListener('fullscreenchange', () => {
-    fullscreenButton.textContent = document.fullscreenElement ? 'Salir de pantalla completa' : 'Pantalla completa';
+    if (fullscreenButton) fullscreenButton.textContent = document.fullscreenElement ? 'Salir de pantalla completa' : 'Pantalla completa';
     if (!document.fullscreenElement && !saliendo) liberarPantalla();
   });
 
