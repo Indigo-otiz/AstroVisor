@@ -4,9 +4,9 @@ import { leerSemilla } from '../src/services/documentRepository.js'
 import { proyectarRecorridos } from '../src/services/catalogo.js'
 import { editarCatalogo } from '../src/services/catalogoEdicion.js'
 
-test('Homido proyecta nueve relaciones por ID y conserva la bibliografía heredada y las portadas', async () => {
+test('Homido proyecta relaciones por ID y conserva la bibliografía heredada y las portadas', async () => {
   const c = await leerSemilla(), salida = proyectarRecorridos(c)
-  assert.equal(salida.flatMap(r => r.libros).length, 9)
+  assert.equal(salida.flatMap(r => r.libros).length, 13)
   for (const r of salida) {
     assert.equal(r.revisionCatalogo, 1)
     for (const l of r.libros) {
@@ -29,8 +29,8 @@ test('libro nuevo compartido y título actualizado conservan IDs, audio y campos
   c.recorridos[0].libroRefs[0].referencia.administracion = 'PRIVADO-NO-PUBLICAR'
   c.libros.at(-1).administracion = 'PRIVADO-NO-PUBLICAR'
   const salida = proyectarRecorridos(c)
-  assert.equal(salida.flatMap(r => r.libros).length, 11)
-  assert.equal(salida.flatMap(r => r.libros).filter(l => l.libroId === 'star-lore').length, 3)
+  assert.equal(salida.flatMap(r => r.libros).length, 15)
+  assert.equal(salida.flatMap(r => r.libros).filter(l => l.libroId === 'star-lore').length, 4)
   assert.ok(salida.flatMap(r => r.libros).filter(l => l.libroId === 'star-lore').every(l => l.titulo === 'Título revisado'))
   for (const id of ['orion', 'escorpio']) {
     const l = salida.find(r => r.id === id).libros.find(l => l.libroId === 'aaa-nuevo')

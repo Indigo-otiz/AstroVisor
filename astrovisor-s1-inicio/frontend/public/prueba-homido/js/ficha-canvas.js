@@ -23,7 +23,7 @@ export function presentarAudio(narracion) {
     etiqueta: puedePausar ? 'Pausar' : puedeReanudar ? 'Reanudar' : estado === 'finalizado' ? 'Repetir' : 'Escuchar',
     aviso: MENSAJES_NARRACION[estado] ?? narracion.mensaje,
     activo: puedePausar || puedeReanudar || puedeEscuchar,
-    repetir: estado === 'pausado',
+    repetir: Boolean(puedePausar || puedeReanudar || puedeEscuchar || estado === 'pausado' || estado === 'finalizado'),
   }
 }
 
@@ -73,11 +73,22 @@ export function calcularLayout(ctx, ficha, audio = { etiqueta: 'Escuchar', activ
   const textoEstado = audio.aviso || (!hayLibro ? BIBLIO_PENDIENTE : '')
   if (textoEstado) agregarTexto(textoEstado, 660 + altoTitulo, 41, '#dce7f8')
 
-  const principal = { x: x + 46, y: 835, w: 508, h: 138 }
-  if (audio.activo) boton('audio', audio.etiqueta, principal, true)
-  if (audio.repetir) boton('repetir', 'Repetir', { x: 680, y: 835, w: 380, h: 138 })
-  if (hayLibro) boton('libros', 'Ver libros', { x: x + 46, y: 1001, w: 435, h: 131 })
-  boton('volver', 'Volver al cielo', { x: 656, y: 1001, w: 598, h: 131 })
+  const audioRect = { x: x + 46, y: 835, w: 508, h: 138 }
+  const repetir = { x: 680, y: 835, w: 380, h: 138 }
+  zonas.audio = audioRect
+  if (audio.activo) boton('audio', audio.etiqueta, audioRect, true)
+  if (audio.repetir) {
+    zonas.repetir = repetir
+    boton('repetir', 'Repetir', repetir)
+  }
+  if (hayLibro) {
+    const libros = { x: x + 46, y: 1001, w: 435, h: 131 }
+    zonas.libros = libros
+    boton('libros', 'Ver libros', libros)
+  }
+  const volver = { x: 656, y: 1001, w: 598, h: 131 }
+  zonas.volver = volver
+  boton('volver', 'Volver al cielo', volver)
   return { ...CANVAS, items, zonas }
 }
 

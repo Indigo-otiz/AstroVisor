@@ -56,6 +56,7 @@ export function crearNarrador({ media = new Audio(), ventana = globalThis.window
     if (destruido) return
     cancelar()
     recurso = nuevo
+    activacion = ''
     reiniciar()
     if (recurso) media.src = recurso.src
     else media.removeAttribute('src')

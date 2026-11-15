@@ -35,9 +35,11 @@ h2 { font-size: 1.35rem; }
 .institutional-footer-logos li { min-width: 0; max-width: 100%; }
 .institutional-footer-logos img { display: block; max-width: 100%; height: auto; object-fit: contain; }
 .institutional-logo-library { width: 300px; }
+.institutional-logo-cecan { width: 260px; max-width: 100%; height: auto; object-fit: contain; }
 .institutional-logo-tecnm { width: 270px; }
 .institutional-logo-tepic { width: 96px; }
 .institutional-footer p { margin: 0; }
+.institutional-footer-auth { font-size: 0.8rem; color: #64748b; margin-top: 0.5rem !important; line-height: 1.4; }
 @media (max-width: 600px) { .institutional-footer-logos { justify-content: center; gap: 1.5rem; } }
 .narrow { max-width: 730px; }
 .skip-link { position: absolute; left: -9999px; top: .25rem; background: #fff; color: #111; padding: .6rem; z-index: 20; }

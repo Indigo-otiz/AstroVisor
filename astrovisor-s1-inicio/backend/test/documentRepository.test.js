@@ -18,7 +18,7 @@ test('el repositorio documental devuelve recorridos de demostración', async () 
   assert.ok(recorridos.every(x => typeof x.id === 'string' && typeof x.titulo === 'string'))
   assert.ok(recorridos.every(x => x.demostracion === true))
   assert.equal(new Set(recorridos.map(x => x.id)).size, recorridos.length)
-  assert.deepEqual(recorridos.map(x => x.id), ['orion', 'osa-mayor', 'escorpio'])
+  assert.deepEqual(recorridos.map(x => x.id), ['orion', 'osa-mayor', 'escorpio', 'can-mayor', 'boyero'])
   for (const recorrido of recorridos) {
     for (const campo of ['titulo', 'resumen', 'historia', 'comoReconocerla']) {
       assert.equal(typeof recorrido[campo], 'string')
@@ -74,7 +74,7 @@ test('el contrato por ID incluye nueve relaciones y conserva los campos del resp
     }
   }
   const demoJson = JSON.parse(await readFile(new URL('../../frontend/public/prueba-homido/data/recorridos-demo.json', import.meta.url), 'utf8'))
-  assert.equal(recorridos.flatMap(r => r.libros).length, 9)
+  assert.equal(recorridos.flatMap(r => r.libros).length, 13)
   const heredado = recorridos.map(({ revisionCatalogo, libros, ...r }) => ({ ...r, libros: libros.filter(l => l.referenciaHeredada).map(({ libroId, constelacionId, motivo, demostracion, referenciaHeredada, portada, ...l }) => l) }))
   assert.deepEqual(demoJson, heredado, 'Los campos bibliográficos previos permanecen intactos; el respaldo no se ha actualizado')
 })

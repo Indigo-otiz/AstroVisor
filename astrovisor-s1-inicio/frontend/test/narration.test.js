@@ -105,3 +105,14 @@ test('ocultar pausa; pagehide reinicia y destruir retira observadores y listener
   ventana.dispatchEvent(new Event('pagehide')); media.dispatchEvent(new Event('timeupdate'))
   assert.equal(llamadas, antes)
 })
+test('seleccionar reinicia activacion para que otra constelacion no herede audio preparado', async (t) => {
+  const { media, narrador } = preparar(t)
+  await narrador.activar()
+  assert.equal(narrador.snapshot().estado, 'listo')
+  assert.equal(narrador.snapshot().activacion, 'Audio preparado. Selecciona Escuchar; si se bloquea, toca el control de nuevo.')
+  const otraConstelacion = { ...recurso, src: '/audio/escorpio.wav' }
+  narrador.seleccionar(otraConstelacion)
+  assert.equal(narrador.snapshot().recurso.src, '/audio/escorpio.wav')
+  assert.equal(narrador.snapshot().estado, 'listo')
+  assert.equal(narrador.snapshot().activacion, '', 'Al seleccionar otro recurso se debe reiniciar activacion')
+})

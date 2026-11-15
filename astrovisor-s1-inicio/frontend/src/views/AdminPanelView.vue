@@ -431,8 +431,8 @@ onBeforeUnmount(cancelarPeticiones)
               <figure v-if="previsualizacion" class="portada-preview"><img :src="previsualizacion" :alt="borrador.tipoPortada === 'imagen-autorizada' ? borrador.portada.textoAlternativo || 'Previsualización de imagen preparada' : `Previsualización ilustrativa de ${borrador.titulo}`" width="225" height="320" /><figcaption>{{ borrador.tipoPortada === 'imagen-autorizada' ? 'Imagen preparada; asociación pendiente de guardar.' : 'Portada ilustrativa, no original.' }}</figcaption></figure>
             </template>
             <template v-if="libroActual || seleccion.tipo === 'nuevo'">
-              <label for="editor-anio">Año de publicación</label>
-              <input id="editor-anio" v-model.number="borrador.anio" type="number" min="1" max="9999" :required="seleccion.tipo === 'nuevo' || libroActual?.anio !== undefined" />
+              <label for="editor-anio">Año de publicación (opcional)</label>
+              <input id="editor-anio" v-model.number="borrador.anio" type="number" min="1" max="9999" />
               <label for="editor-enlace">Enlace público de la obra (HTTPS)</label>
               <input id="editor-enlace" v-model="borrador.enlacePublico" type="url" required maxlength="2048" pattern="https://.+" />
               <div v-for="relacion in borrador.relaciones" :key="relacion.constelacionId" class="catalogo-motivo">

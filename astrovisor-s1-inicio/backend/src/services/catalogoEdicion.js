@@ -45,6 +45,7 @@ export function editarCatalogo(catalogo, { tipo, id, datos }) {
   if (!idValido(nuevo ? datos.id : id)) throw fallo(400, 'ID inválido')
   if (libro && ['titulo','autor'].some(k => Object.hasOwn(datos,k) && (typeof datos[k] !== 'string' || !datos[k].trim() || datos[k].length > 200))) throw fallo(400, 'Título o autor inválidos')
   if (libro && Object.hasOwn(datos, 'tema') && (typeof datos.tema !== 'string' || !/^#[0-9a-fA-F]{6}$/.test(datos.tema))) throw fallo(400, 'Color inválido')
+  if (libro && Object.hasOwn(datos, 'anio') && datos.anio !== null && datos.anio !== undefined && (!Number.isInteger(datos.anio) || datos.anio < 1 || datos.anio > 9999)) throw fallo(400, 'Año inválido')
   if (nuevo && catalogo.libros.some((l) => l.id === datos.id)) throw fallo(409, 'ID de libro duplicado')
   if (libro && datos.enlacePublico !== undefined && catalogo.libros.some((l) => l.id !== (nuevo ? datos.id : id) && l.enlacePublico === datos.enlacePublico)) throw fallo(409, 'Referencia bibliográfica duplicada')
   let destino
@@ -78,7 +79,15 @@ export function editarCatalogo(catalogo, { tipo, id, datos }) {
     throw fallo(409, 'Cambio de historia requiere revisión coordinada de narración')
   }
   const campos = libro ? camposLibro : ['titulo', 'resumen', 'historia', 'comoReconocerla']
-  for (const k of campos) if (Object.hasOwn(datos, k)) destino[k] = datos[k]
+  for (const k of campos) {
+    if (Object.hasOwn(datos, k)) {
+      if (k === 'anio' && (datos.anio === null || datos.anio === undefined || datos.anio === '')) {
+        delete destino.anio
+      } else {
+        destino[k] = datos[k]
+      }
+    }
+  }
   if (nuevo || Object.hasOwn(datos, 'relaciones')) referencias(catalogo, datos.relaciones, destino, true)
   if (!libro && Object.hasOwn(datos, 'libroRefs')) referencias(catalogo, datos.libroRefs, destino, false)
 }
