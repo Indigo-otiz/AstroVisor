@@ -9,13 +9,13 @@ import { calcularLayout, CANVAS } from '../public/prueba-homido/js/ficha-canvas.
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-test('S5-02: index.html incluye los elementos directos y el logo de IT Tepic', () => {
+test('S5-02: index.html incluye los elementos directos y los dos emblemas en relieve', () => {
   const htmlPath = path.resolve(__dirname, '../public/prueba-homido/index.html');
   const html = fs.readFileSync(htmlPath, 'utf8');
 
   assert.ok(html.includes('id="directExitBtn"'), 'Debe existir directExitBtn');
   assert.ok(html.includes('id="itTepicLogo3D"'), 'Debe existir itTepicLogo3D');
-  assert.ok(html.includes('ITTepic_logo.jpg'), 'Debe cargar el asset de IT Tepic');
+  assert.ok(html.includes('id="bibliotecaLogo3D"'), 'Debe existir el emblema de la biblioteca');
   assert.ok(html.includes('id="btnActivarInmersion"'), 'Debe existir control de activación directa de Homido');
 });
 
@@ -195,24 +195,14 @@ test('S5-02: estado listo sin activación no equivale a audio desbloqueado', () 
   assert.equal(resolverEstadoAudio(bloqueado), 'bloqueado');
 });
 
-test('S5-06: VR index.html integra identidad CECAN/Nayarit con letras blancas y proporción 5.83:1', () => {
+test('la escena conserva solo los dos emblemas nuevos fuera de los controles móviles', () => {
   const htmlPath = path.resolve(__dirname, '../public/prueba-homido/index.html');
   const html = fs.readFileSync(htmlPath, 'utf8');
 
-  assert.ok(
-    html.includes('Nayarit_CECAN_Convivencia_Horizontal_LetrasBlancas.png'),
-    'Debe cargar el asset oficial de letras blancas en a-assets'
-  );
-  assert.ok(
-    html.includes('id="cecanLogo3D"'),
-    'Debe definir el elemento 3D cecanLogo3D en visorControls3D'
-  );
-  assert.ok(
-    html.includes('width="1.05" height="0.18"'),
-    'Debe conservar la proporción panorámica exacta 5.83:1'
-  );
-  assert.ok(
-    html.includes('transparent: true'),
-    'Debe ser transparente para no obstruir el cielo'
-  );
+  assert.ok(html.includes('id="institutionalLogos3D"'));
+  assert.ok(html.includes('relieve-institucional="src: ./logos/tepic.json'));
+  assert.ok(html.includes('relieve-institucional="src: ./logos/biblioteca.json'));
+  assert.ok(!/cecanLogo|itTepicLogo"|<a-image/.test(html));
+  const controles = html.slice(html.indexOf('id="visorControls3D"'), html.indexOf('id="infoPanel3D"'));
+  assert.ok(!controles.includes('Logo3D'));
 });
