@@ -23,7 +23,9 @@ Estado: plan aprobado en el chat. Las casillas marcadas se respaldan en docs/PRU
 
 - [x] 4.1 Ejecutar npm run test:web, npm test, npm run build, openspec validate logos-institucionales-relieve-3d --strict y git diff --check; registrar resultados y fallos reales.
 - [x] 4.2 Comprobar build servido, apertura/cierre de ficha, narración y salida en pantalla y estéreo; confirmar que los logos no se desplazan con los controles y registrar evidencias y pendientes físicos.
-- [ ] 4.3 Revisar el diff y publicar únicamente la rama del cambio; abrir PR contra main con alcance, verificaciones, capturas y limitaciones, sin push directo ni merge a main; entregar su enlace.
+- [x] 4.3 Revisar el diff y publicar únicamente la rama del cambio; abrir PR contra main con alcance, verificaciones, capturas y limitaciones, sin push directo ni merge a main; entregar su enlace.
+
+Entrega: PR #14 — https://github.com/Indigo-otiz/AstroVisor/pull/14
 
 ## Workflow follow-up
 
