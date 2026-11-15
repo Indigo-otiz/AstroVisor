@@ -59,4 +59,29 @@ export const CATALOGO = {
     // pinzas y cabeza, cuerpo hasta Antares, cola y aguijón
     trazos: [[0, 1, 2], [1, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14]],
   },
+  'can-mayor': {
+    estrellas: [
+      e('Sirio', 101.28715533, -16.71611586, -1.46, -1.46), // α CMa (Sirio)
+      e('Mirzam', 95.67494474, -17.95591875, 1.98, 1.75), // β CMa
+      e('Muliphein', 106.04415843, -15.63294314, 4.11, 4.15), // γ CMa
+      e('Wezen', 107.09785860, -26.39320641, 1.83, 2.51), // δ CMa
+      e('Adhara', 104.65645062, -28.97208611, 1.50, 1.29), // ε CMa
+      e('Furud', 95.07844058, -30.06338421, 3.02, 2.78), // ζ CMa
+      e('Aludra', 111.02381640, -29.30310860, 2.45, 2.37), // η CMa
+    ],
+    // cabeza y cuello con Sirio, lomo a Wezen y Aludra, patas a Mirzam, Adhara y Furud
+    trazos: [[1, 0, 2], [0, 3, 6], [3, 4, 5]],
+  },
+  boyero: {
+    estrellas: [
+      e('Arturo', 213.91529881, 19.18240905, -0.05, 1.18), // α Boo (Arturo)
+      e('Nekkar', 225.47466840, 40.39050965, 3.49, 4.43), // β Boo
+      e('Seginus', 217.96200210, 38.30831613, 3.03, 3.22), // γ Boo
+      e('Princeps', 228.90560756, 33.31388658, 3.46, 4.42), // δ Boo
+      e('Izar', 221.24675549, 27.07423984, 2.35, 3.32), // ε Boo
+      e('Muphrid', 208.77708790, 18.39763750, 2.68, 3.26), // η Boo
+    ],
+    // silueta de diamante / cometa desde Arturo hasta Nekkar e Izar, más Muphrid
+    trazos: [[0, 4, 3, 1, 2, 4], [0, 5]],
+  },
 }

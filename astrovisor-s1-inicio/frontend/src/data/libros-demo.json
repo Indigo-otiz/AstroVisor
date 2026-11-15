@@ -17,7 +17,8 @@
     "recomendaciones": {
       "orion": "Descubre relatos antiguos sobre las estrellas y por qué imaginamos a Orión en el cielo.",
       "osa-mayor": "Conoce las leyendas que acompañan a las figuras de la Osa Mayor.",
-      "escorpio": "Explora cómo distintas historias dieron nombre y significado a las constelaciones."
+      "escorpio": "Explora cómo distintas historias dieron nombre y significado a las constelaciones.",
+      "can-mayor": "Relatos antiguos sobre el Can Mayor y el resplandor de Sirio en la historia."
     }
   },
   {
@@ -38,7 +39,9 @@
     "recomendaciones": {
       "orion": "Observa cómo una guía clásica describe y organiza las estrellas del cielo nocturno.",
       "osa-mayor": "Continúa la observación de la Osa Mayor con una guía de estrellas.",
-      "escorpio": "Conoce otros dibujos del firmamento y aprende a buscar sus estrellas."
+      "escorpio": "Conoce otros dibujos del firmamento y aprende a buscar sus estrellas.",
+      "can-mayor": "Guía práctica para ubicar a Sirio y las estrellas del Can Mayor.",
+      "boyero": "Observa el trazado en cometa de Boyero y la posición estelar de Arturo."
     }
   },
   {
@@ -59,7 +62,8 @@
     "recomendaciones": {
       "orion": "Dedica una lectura corta a reconocer las figuras del cielo y sus relaciones.",
       "osa-mayor": "Amplía tu recorrido con explicaciones sencillas sobre grupos de estrellas.",
-      "escorpio": "Después de observar Escorpio, sigue explorando el cielo nocturno con esta lectura."
+      "escorpio": "Después de observar Escorpio, sigue explorando el cielo nocturno con esta lectura.",
+      "boyero": "Guía estelar para reconocer la silueta del Boyero junto a la Osa Mayor."
     }
   }
 ]
