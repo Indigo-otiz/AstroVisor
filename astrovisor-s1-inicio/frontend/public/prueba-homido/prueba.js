@@ -147,11 +147,14 @@ import { rutaLibro2D } from './js/ruta-libro-2d.js';
 
   // --- Objetivos de mirada: cada elemento con data-action; elementos con la misma acción+id comparten carga ---
   function objetivoDe(el) {
-    const accion = el.getAttribute('data-action');
+    if (!el) return null;
+    const targetEl = el.closest ? el.closest('[data-action]') : (el.getAttribute && el.getAttribute('data-action') ? el : null);
+    if (!targetEl || !targetEl.getAttribute) return null;
+    const accion = targetEl.getAttribute('data-action');
     if (!accion) return null;
-    const id = el.getAttribute('data-id') || '';
-    const ringId = el.getAttribute('data-ring');
-    return { key: `${accion}:${id}`, accion, id, el, anillo: ringId ? $(ringId) : null };
+    const id = targetEl.getAttribute('data-id') || '';
+    const ringId = targetEl.getAttribute('data-ring');
+    return { key: `${accion}:${id}`, accion, id, el: targetEl, anillo: ringId ? $(ringId) : null };
   }
 
   function nombreDe(t) {
@@ -218,7 +221,7 @@ import { rutaLibro2D } from './js/ruta-libro-2d.js';
     else if (t.accion === 'volver-ficha') volverAFicha();
     else if (t.accion === 'volver-libros') volverAEstanteria();
     else if (t.accion === 'consultar-libro') consultarLibro2D();
-    else if (t.accion === 'salir') salir();
+    else if (t.accion === 'salir') salir('/');
   }
 
   /** Muestra/oculta un grupo y solo hace "selectable" lo visible, para que el raycaster no vea objetos ocultos. */
@@ -456,7 +459,7 @@ import { rutaLibro2D } from './js/ruta-libro-2d.js';
     eventLine('Botón de repetir: solicitud de reinicio enviada al narrador.');
   }
 
-  function pedirAudio() {
+  function pedirAudio(accion = 'audio') {
     const ficha = fichas.get(estado.fichaId);
     if (!ficha) return;
     window.dispatchEvent(new CustomEvent('astrovisor:audio-solicitado', { detail: { id: ficha.id, titulo: ficha.titulo, audio: adaptarAudio(ficha), accion } }));
@@ -517,8 +520,8 @@ import { rutaLibro2D } from './js/ruta-libro-2d.js';
     }
   }
 
-  function salir(destino = '/explorar') {
-    const url = typeof destino === 'string' && destino ? destino : '/explorar';
+  function salir(destino = '/') {
+    const url = typeof destino === 'string' && destino ? destino : '/';
     if (saliendo) return;
     try {
       desmontarVisor();
@@ -526,7 +529,7 @@ import { rutaLibro2D } from './js/ruta-libro-2d.js';
       console.error('Error al desmontar visor:', e);
     }
     if (selectionStatus) {
-      selectionStatus.textContent = '✔ Salida confirmada. Regresando al modo web 2D...';
+      selectionStatus.textContent = '✔ Salida confirmada. Regresando a la pantalla de inicio...';
     }
     try {
       window.location.assign(url);
@@ -566,8 +569,11 @@ import { rutaLibro2D } from './js/ruta-libro-2d.js';
     gazeCursor.addEventListener('raycaster-intersection', (evt) => {
       if (dwell.activo) return;
       const els = evt.detail && evt.detail.els;
-      const t = els && els.length ? objetivoDe(els[0]) : null;
-      if (t) dwell.enfocar(t);
+      if (!els || !els.length) return;
+      for (const el of els) {
+        const t = objetivoDe(el);
+        if (t && dwell.enfocar(t)) break;
+      }
     });
     gazeCursor.addEventListener('raycaster-intersection-cleared', (evt) => {
       const activo = dwell.activo;
@@ -579,6 +585,10 @@ import { rutaLibro2D } from './js/ruta-libro-2d.js';
 
   ligar(pauseBtn3D);
   ligar(exitBtn3D);
+  const pause3DLabel = $('pause3DLabel');
+  if (pause3DLabel) ligar(pause3DLabel);
+  const exit3DLabel = $('exit3DLabel');
+  if (exit3DLabel) ligar(exit3DLabel);
 
   if (diagnostico) setTimeout(() => { userReady = true; comprobarFoco(); }, 600);
   window.addEventListener('mousemove', () => { userReady = true; comprobarFoco(); }, { once: true });
@@ -615,7 +625,8 @@ import { rutaLibro2D } from './js/ruta-libro-2d.js';
           obj = obj.parent;
           el = obj.el;
         }
-        const target = el && objetivoDe(el);
+        const targetEl = el?.closest ? el.closest('[data-action]') : el;
+        const target = targetEl && objetivoDe(targetEl);
         if (target && estado.permitido(target.accion, 'clic') && objetivoEnVista(target)) {
           userReady = true;
           dwell.cancelar();
