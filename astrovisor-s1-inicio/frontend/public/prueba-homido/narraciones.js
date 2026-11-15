@@ -2,12 +2,17 @@ import { audioDe, crearNarrador } from '../audio/narration.js'
 import { cargarDatosCompartidos } from './js/datos.js'
 
 const $ = (id) => document.getElementById(id)
+const homido = document.documentElement.dataset.visor === 'homido'
 const narrador = crearNarrador()
 let historias = [], actual = null, anterior = null, ultimaVista = '', cargando = false
 const visor = () => window.astrovisorVisor
-function controlarAudio() {
+function controlarAudio(event) {
   if (!actual) return
   const estado = narrador.snapshot()
+  if (event?.detail?.accion === 'repetir') {
+    if (estado.puedeReanudar) narrador.escuchar()
+    return
+  }
   if (estado.puedePausar) narrador.pausar()
   else if (estado.puedeReanudar) narrador.reanudar()
   else if (estado.puedeEscuchar) narrador.escuchar()
@@ -18,10 +23,16 @@ function actualizar(estado) {
   ultimaVista = clave
   $('listenStory').hidden = !estado.recurso
   $('listenStory').disabled = !estado.puedeEscuchar && !estado.puedePausar && !estado.puedeReanudar
-  $('listenStory').textContent = estado.puedePausar ? 'Pausar' : estado.puedeReanudar ? 'Reanudar' : 'Escuchar'
+  $('listenStory').textContent = estado.puedePausar ? 'Pausar' : estado.puedeReanudar ? 'Reanudar' : estado.estado === 'finalizado' ? 'Repetir' : 'Escuchar'
   $('storyAudioStatus').textContent = estado.mensaje
   if (estado.activacion) $('audioPreparation').textContent = estado.activacion
   if (estado.estado === 'bloqueado') $('audioPreparation').textContent = estado.mensaje
+  if (homido) {
+    const bloqueado = estado.estado === 'bloqueado'
+    $('activateAudio').hidden = Boolean(estado.activacion) && !bloqueado
+    $('publicAudioNotice').hidden = !bloqueado
+    $('publicAudioNotice').textContent = bloqueado ? 'Toca Activar audio para continuar.' : ''
+  }
   visor()?.estadoNarracion(estado)
   window.dispatchEvent(new CustomEvent('astrovisor:narracion', { detail: { state: estado.estado, title: actual?.titulo } }))
 }
