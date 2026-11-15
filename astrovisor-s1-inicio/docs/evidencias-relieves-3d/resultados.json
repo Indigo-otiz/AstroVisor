@@ -1,0 +1,91 @@
+{
+  "geometria": {
+    "profundidad": 0.10000000149011612,
+    "hueco": 0,
+    "superficie": 1,
+    "liberados": 4,
+    "frenteTexturado": true
+  },
+  "recursos": [
+    {
+      "id": "itTepicLogo3D",
+      "capas": 7,
+      "triangulos": 22016,
+      "dimensiones": [
+        2.236357118116345,
+        2.472888571023941,
+        1.2711427222385172
+      ]
+    },
+    {
+      "id": "bibliotecaLogo3D",
+      "capas": 2,
+      "triangulos": 17556,
+      "dimensiones": [
+        4.384544733551307,
+        1.814800035953522,
+        1.3940735953285621
+      ]
+    }
+  ],
+  "ciclo": {
+    "falloAislado": true,
+    "cancelado": true
+  },
+  "flujo": {
+    "ficha": true,
+    "cerrada": true,
+    "reprodujo": true,
+    "pausada": true,
+    "estadosAudio": [
+      "listo",
+      "cargando",
+      "listo",
+      "cargando",
+      "reproduciendo",
+      "pausado"
+    ],
+    "mensajeAudio": "Narración en pausa. Reanudar continúa donde la dejaste.",
+    "medios": [
+      {
+        "src": "http://127.0.0.1:5194/audio/orion-kokoro-v1.wav",
+        "readyState": 4,
+        "networkState": 1,
+        "paused": true,
+        "tiempo": 0
+      }
+    ],
+    "fijos": true
+  },
+  "ojos": [
+    [
+      {
+        "id": "itTepicLogo3D",
+        "maxX": 0.9234772033719433,
+        "maxY": 0.3021385308654923
+      },
+      {
+        "id": "bibliotecaLogo3D",
+        "maxX": 0.8819355473824624,
+        "maxY": 0.2262972122038522
+      }
+    ],
+    [
+      {
+        "id": "itTepicLogo3D",
+        "maxX": 0.9318327183796755,
+        "maxY": 0.3021385308654923
+      },
+      {
+        "id": "bibliotecaLogo3D",
+        "maxX": 0.8723336723289257,
+        "maxY": 0.2262972122038522
+      }
+    ]
+  ],
+  "errores": [],
+  "salida": "Inicio",
+  "fechaUTC": "2026-11-15T07:04:32.794Z",
+  "navegador": "Chrome/157.0.8103.51",
+  "entorno": "Chrome headless; pantalla y estéreo simulado; sin visor físico"
+}

@@ -40,6 +40,7 @@ module.exports = async function servirS4() {
     web = await preview({ root:path.join(root,'frontend'), configFile:path.join(root,'frontend/vite.config.js'),
       preview:{ host:'127.0.0.1',port:5194,strictPort:true,proxy:{'/api':'http://127.0.0.1:3094'} } })
     const response = await fetch('http://127.0.0.1:5194/api/contenidos/recorridos')
+    await response.arrayBuffer() // Consumir la respuesta antes de cerrar conexiones (Node 24/Undici).
     if (!response.ok) throw new Error('Catálogo temporal S4 no disponible')
     return cerrar
   } catch (error) { await cerrar(); throw error }

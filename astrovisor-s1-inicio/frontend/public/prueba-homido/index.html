@@ -15,6 +15,7 @@
   <link rel="stylesheet" href="./styles.css" />
   <!-- A-Frame 1.8.0 local (ver vendor/LEEME.md): sin dependencia de CDN -->
   <script src="./vendor/aframe.min.js"></script>
+  <script type="module" src="./js/logos-3d.js"></script>
   <script>
     /* Solo con ?diag=1&aa=0: el antialiasing se decide al crear el renderer, así que se fija antes de que A-Frame lo cree. */
     (function () {
@@ -147,13 +148,22 @@
         <a-scene id="testScene" embedded vr-mode-ui="enabled: false" renderer="antialias: true; colorManagement: true;">
           <a-assets>
             <canvas id="cardCanvas" width="1400" height="1200"></canvas>
-            <img id="itTepicLogo" src="./../ITTepic_logo.jpg" alt="Instituto Tecnológico de Tepic" />
-            <img id="cecanLogoVR" src="./../Nayarit_CECAN_Convivencia_Horizontal_LetrasBlancas.png" alt="Gobierno del Estado de Nayarit y Consejo Estatal para la Cultura y las Artes de Nayarit (CECAN)" />
           </a-assets>
 
           <a-entity light="type: ambient; intensity: 1.2"></a-entity>
-          <a-entity id="constelaciones"></a-entity>
-
+          <a-entity id="constelaciones"></a-entity>
+
+          <!-- Emblemas fijos detrás de la orientación inicial; no son objetivos de mirada. -->
+          <a-entity id="institutionalLogos3D" position="0 2.3 5" rotation="0 180 0">
+            <a-entity id="itTepicLogo3D" position="-2.8 0 -0.2" rotation="0 28 0"
+              aria-label="Instituto Tecnológico de Tepic"
+              relieve-institucional="src: ./logos/tepic.json; ancho: 2.6"></a-entity>
+            <a-entity id="bibliotecaLogo3D" position="1.4 0 0" rotation="0 -16 0"
+              aria-label="Solón Argüello — Biblioteca Pública Central Estatal"
+              relieve-institucional="src: ./logos/biblioteca.json; ancho: 5.2"></a-entity>
+            <a-entity light="type: point; color: #fff1d8; intensity: 2; distance: 12; decay: 1" position="-3 4 4"></a-entity>
+          </a-entity>
+
           <a-entity id="visorControls3D" position="0 0.45 -3.5">
             <a-plane position="-1.0 0 -0.01" width="1.78" height="0.5" color="#FFFFFF" material="shader: flat"></a-plane>
             <a-plane id="pauseBtn3D" class="selectable" position="-1.0 0 0" data-action="pausa" data-ring="pauseProgressRing" width="1.7" height="0.42" color="#1B2A5A" material="shader: flat">
@@ -165,10 +175,6 @@
               <a-ring id="exitProgressRing" visible="false" position="-0.6 0 0.02" data-rin="0.13" data-rout="0.19" radius-inner="0.13" radius-outer="0.19" theta-start="90" theta-length="0.001" color="#F5B301" material="shader: flat; side: double; opacity: 0.95"></a-ring>
               <a-plane id="exit3DLabel" class="selectable" data-action="salir" data-ring="exitProgressRing" position="0.12 0 0.03"></a-plane>
             </a-plane>
-            <!-- Identidad IT Tepic y CECAN/Nayarit en VR (S5-06) -->
-            <a-plane position="0 -0.22 -0.01" width="0.66" height="0.20" color="#FFFFFF" material="shader: flat"></a-plane>
-            <a-image id="itTepicLogo3D" src="#itTepicLogo" position="0 -0.22 0.01" width="0.62" height="0.18" material="shader: flat; transparent: true"></a-image>
-            <a-image id="cecanLogo3D" src="#cecanLogoVR" position="0 -0.42 0.01" width="1.05" height="0.18" material="shader: flat; transparent: true"></a-image>
           </a-entity>
 
           <a-entity id="infoPanel3D" visible="false" position="0 2.3 -3.0">
