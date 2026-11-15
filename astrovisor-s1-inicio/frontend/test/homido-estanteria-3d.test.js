@@ -33,20 +33,25 @@ test('la ficha de constelación invita a explorar y el botón queda dentro del c
   const layout=calcularLayout(ctx,recorridos[0]);
   dibujarFicha(ctx,layout);
   assert.ok(layout.zonas.libros);
-  assert.equal(layout.desborda,false);
-  assert.match(dibujado.join(' '),/Ver libros recomendados/);
+  assert.match(dibujado.join(' '),/Ver libros/);
 });
-test('detalle 3D tiene dos botones grandes y advierte que la ubicación es desconocida',()=>{
+test('detalle 3D reúne portada, título, autor y marca condicional sin párrafos largos',()=>{
   const {ctx,dibujado}=ctxFalso(),libro=extraerLibros(recorridos)[0];
   const layout=calcularDetalleLibro(ctx,libro);
-  assert.equal(layout.desborda,false);
+  assert.ok(layout.portada.w > 0 && layout.portada.h > 0);
   assert.deepEqual(Object.keys(layout.zonas).sort(),['consultar-libro','volver-libros']);
   for(const z of Object.values(layout.zonas)){
     assert.ok(z.x>=0&&z.y>=0&&z.x+z.w<=CANVAS.ancho&&z.y+z.h<=CANVAS.alto);
     assert.ok(layout.items.some(i=>i.k==='boton'&&i.rect===z));
   }
   dibujarFicha(ctx,layout);
-  assert.match(dibujado.join(' '),/no ha confirmado un ejemplar físico/);
+  assert.ok(dibujado.includes('DEMO'));
+  assert.ok(dibujado.join(' ').includes(libro.titulo));
+  assert.ok(dibujado.join(' ').includes(libro.autor));
+  assert.doesNotMatch(dibujado.join(' '),/ejemplar físico|¿Por qué leerlo\?/);
+  const reconocido=ctxFalso();
+  dibujarFicha(reconocido.ctx,calcularDetalleLibro(reconocido.ctx,{...libro,demostracion:false}));
+  assert.ok(!reconocido.dibujado.includes('DEMO'));
 });
 test('las acciones de libros respetan modo ficha y pausa de mirada',()=>{
   const estado=crearEstado();

@@ -21,9 +21,13 @@ import { rutaLibro2D } from './js/ruta-libro-2d.js';
 (function () {
   'use strict';
   const $ = (id) => document.getElementById(id);
+  const modo = document.documentElement.dataset.visor;
+  const diagnostico = modo === 'diagnostico';
+  const pantalla = modo === 'pantalla';
   const logEl = $('log');
   const logs = [];
   const eventLine = (message) => {
+    if (!diagnostico) return;
     const stamp = new Date().toLocaleTimeString('es-MX', { hour12: false });
     logs.push(`[${stamp}] ${message}`);
     if (logEl) {
@@ -47,6 +51,30 @@ import { rutaLibro2D } from './js/ruta-libro-2d.js';
   const selectionStatus = $('selectionStatus');
   const angles = $('angles');
   const gazeCursor = $('gazeCursor');
+  const camaraRig = $('cameraRig');
+  const avisoPublico = $('publicNotice');
+  const fullscreenButton = $('fullscreenButton');
+  const publicExit = $('publicExit');
+
+  function avisar(mensaje) {
+    avisoPublico.textContent = mensaje;
+    avisoPublico.hidden = !mensaje;
+  }
+
+  if (pantalla) {
+    camaraRig.setAttribute('look-controls', { magicWindowTrackingEnabled: false, touchEnabled: false, mouseEnabled: false });
+    gazeCursor.removeAttribute('cursor');
+    gazeCursor.removeAttribute('raycaster');
+    $('reticleGroup').setAttribute('visible', false);
+  } else if (!diagnostico) {
+    $('publicSceneTitle').textContent = 'Historias del cielo · Homido';
+    const activateAudio = $('activateAudio');
+    $('publicActions').prepend(activateAudio, permissionButton);
+    activateAudio.textContent = 'Activar audio';
+    permissionButton.textContent = 'Permitir movimiento';
+    permissionButton.hidden = typeof window.DeviceOrientationEvent?.requestPermission !== 'function';
+    if (!window.isSecureContext) avisar('Abre el visor en HTTPS para usar el movimiento del teléfono.');
+  }
 
   const constelacionesEl = $('constelaciones');
   const visorControls3D = $('visorControls3D');
@@ -55,6 +83,7 @@ import { rutaLibro2D } from './js/ruta-libro-2d.js';
   const infoPanel3D = $('infoPanel3D');
   const estanteriaEl = $('estanteria3D');
   const cardPlane = $('cardPlane');
+  const detailCover = $('detailCover');
   const cardCanvas = $('cardCanvas');
 
   const etiquetaPausa = vincularEtiqueta($('pause3DLabel'), 'Pausar mirada', { ancho: 1.2, alto: 0.3 });
@@ -68,18 +97,19 @@ import { rutaLibro2D } from './js/ruta-libro-2d.js';
   let lastUpdate = 0;
   let stereoActive = false;
   let stereoComponent;
+  let bloqueoPantalla = null;
+  let movimientoAutorizado = !pantalla && typeof window.DeviceOrientationEvent?.requestPermission !== 'function';
   let narracion = null; // último estado REAL del reproductor (narraciones.js); null = sin reproductor/audio
   let sincronizando = false; // true mientras narraciones.js nos abre/cierra la ficha (no se le devuelve el evento)
-  let layoutActual = null;
   let vistaLectura = 'ficha'; // ficha | estanteria | detalle; modo de visor continúa en 'ficha'
   let libroSeleccionado = null;
   let recorridosBibliograficos = [];
   let estanteria = null;
   let userReady = false; // evita autodisparos mientras la persona acomoda el visor
+  let saliendo = false;
 
   // Geometría de la escena (m): la ficha termina en y=0.9 y los controles quedan debajo, sin tocarla
   const FICHA_BASE_Y = 0.9;
-  const POS_CONTROLES = { recorrido: '0 0.45 -3.5' };
   const POS_CONTROLES_Y = 0.45;
 
   // --- Retroalimentación auditiva (Web Audio) ---
@@ -137,14 +167,14 @@ import { rutaLibro2D } from './js/ruta-libro-2d.js';
 
   function nombreDe(t) {
     if (t.accion === 'constelacion') return fichas.get(t.id)?.titulo || t.id;
-    return { volver: '← Volver al recorrido', audio: 'Escuchar narración', libros: 'Ver libros recomendados', libro: 'Abrir libro', 'volver-ficha': 'Volver a la constelación', 'volver-libros': 'Volver a los libros', 'consultar-libro': 'Consultar libro en 2D', pausa: estado.pausado ? 'Reanudar mirada' : 'Pausar mirada', salir: 'Salir a 2D' }[t.accion] || t.accion;
+    return { volver: 'Volver al cielo', audio: presentarAudio(narracion).etiqueta, repetir: 'Repetir', libros: 'Ver libros', libro: 'Abrir libro', 'volver-ficha': 'Volver a la constelación', 'volver-libros': 'Volver a los libros', 'consultar-libro': 'Consultar libro en 2D', pausa: estado.pausado ? 'Reanudar mirada' : 'Pausar mirada', salir: 'Salir a 2D' }[t.accion] || t.accion;
   }
 
   function mensajeEnReposo() {
     if (estado.pausado) return 'Mirada en PAUSA. Enfoca "Reanudar mirada" para continuar, o "Salir a 2D" para salir.';
     if (estado.modo === 'ficha' && vistaLectura === 'estanteria') return 'Biblioteca de las estrellas: mira una portada 3 segundos o vuelve a la constelación.';
     if (estado.modo === 'ficha' && vistaLectura === 'detalle') return 'Libro seleccionado: consulta en 2D o vuelve a los libros con la mirada.';
-    if (estado.modo === 'ficha') return `Ficha de ${fichas.get(estado.fichaId)?.titulo ?? ''} abierta. Enfoca "← Volver al recorrido" durante 3 s o tócalo.`;
+    if (estado.modo === 'ficha') return `Ficha de ${fichas.get(estado.fichaId)?.titulo ?? ''} abierta. Enfoca "Volver al cielo" durante 3 s o tócalo.`;
     return 'Mirada activa: enfoca una constelación o un botón durante 3 s para seleccionarlo.';
   }
 
@@ -152,14 +182,15 @@ import { rutaLibro2D } from './js/ruta-libro-2d.js';
   function objetivoEnVista(t) {
     if (t.accion === 'pausa' || t.accion === 'salir') return true;
     if (t.accion === 'constelacion') return estado.modo === 'recorrido';
-    if (['audio', 'volver', 'libros'].includes(t.accion)) return vistaLectura === 'ficha';
+    if (['audio', 'repetir', 'volver', 'libros'].includes(t.accion)) return vistaLectura === 'ficha';
     if (['libro', 'volver-ficha'].includes(t.accion)) return vistaLectura === 'estanteria';
     if (['consultar-libro', 'volver-libros'].includes(t.accion)) return vistaLectura === 'detalle';
     return false;
   }
 
   const dwell = crearDwell({
-    puedeEnfocar: (t) => userReady && estado.permitido(t.accion, 'mirada') && objetivoEnVista(t),
+    puedeEnfocar: (t) => !pantalla && !saliendo && userReady && t.el.classList.contains('selectable') &&
+      estado.permitido(t.accion, 'mirada') && objetivoEnVista(t),
     onInicio: (t) => {
       eventLine(`Mirada fija sobre [${nombreDe(t)}] — iniciando carga de 3 s`);
       if (t.accion === 'constelacion') constelaciones.get(t.id)?.resaltar(true);
@@ -187,10 +218,10 @@ import { rutaLibro2D } from './js/ruta-libro-2d.js';
 
   // --- Acciones (las mismas para mirada y para clic/toque) ---
   function ejecutar(t, via) {
-    if (!estado.permitido(t.accion, via) || !objetivoEnVista(t)) return;
+    if (saliendo || !t.el.classList.contains('selectable') || !estado.permitido(t.accion, via) || !objetivoEnVista(t)) return;
     if (t.accion === 'constelacion') abrirFicha(t.id);
     else if (t.accion === 'volver') cerrarFicha();
-    else if (t.accion === 'audio') pedirAudio();
+    else if (t.accion === 'audio' || t.accion === 'repetir') pedirAudio(t.accion);
     else if (t.accion === 'pausa') alternarPausa();
     else if (t.accion === 'libros') abrirEstanteria();
     else if (t.accion === 'libro') abrirDetalleLibro(t.id);
@@ -203,7 +234,9 @@ import { rutaLibro2D } from './js/ruta-libro-2d.js';
   /** Muestra/oculta un grupo y solo hace "selectable" lo visible, para que el raycaster no vea objetos ocultos. */
   function activarGrupo(grupo, activo) {
     grupo.setAttribute('visible', activo ? 'true' : 'false');
-    grupo.querySelectorAll('[data-action]').forEach((el) => el.classList.toggle('selectable', activo));
+    grupo.querySelectorAll('[data-action]').forEach((el) => {
+      el.classList.toggle('selectable', activo && el.getAttribute('visible') !== false);
+    });
   }
 
   function refrescarRaycaster() {
@@ -214,7 +247,7 @@ import { rutaLibro2D } from './js/ruta-libro-2d.js';
   }
 
   function comprobarFoco() {
-    if (!userReady || estado.pausado || dwell.activo) return;
+    if (pantalla || saliendo || !userReady || dwell.activo) return;
     const rc = gazeCursor && gazeCursor.components && gazeCursor.components.raycaster;
     const els = rc && rc.intersectedEls;
     if (!els) return;
@@ -229,28 +262,36 @@ import { rutaLibro2D } from './js/ruta-libro-2d.js';
     if (mesh && mesh.material && mesh.material.map) {
       mesh.material.map.needsUpdate = true;
     } else if (cardPlane) {
-      cardPlane.setAttribute('material', 'shader: flat; src: #cardCanvas; transparent: true');
+      cardPlane.setAttribute('material', 'shader: flat; src: #cardCanvas; transparent: true; depthWrite: false');
     }
   }
 
   /** Reutiliza un único canvas para ficha de constelación y detalle de libro. */
   function pintarLayout(layout) {
-    layoutActual = layout;
     dibujarFicha(cardCanvas.getContext('2d'), layout);
     actualizarTextura();
+    detailCover.setAttribute('visible', Boolean(layout.portada));
+    if (layout.portada) {
+      const portada = zonaAMundo(layout.portada);
+      detailCover.setAttribute('position', `${portada.x} ${portada.y} 0.02`);
+      detailCover.setAttribute('width', portada.ancho);
+      detailCover.setAttribute('height', portada.alto);
+      detailCover.setAttribute('material', `shader: flat; src: #cubierta-vr-${libroSeleccionado.id}`);
+    }
     infoPanel3D.querySelectorAll('[id^="zona-"][data-action]').forEach((zona) => {
       zona.classList.remove('selectable');
       zona.setAttribute('visible', 'false');
     });
     for (const [nombre, rect] of Object.entries(layout.zonas)) colocarZona(nombre, rect);
+    gazeCursor.components?.raycaster?.refreshObjects();
   }
 
   function pintarFicha(ficha) {
     if (vistaLectura !== 'ficha' || !ficha) return;
     const ctx = cardCanvas.getContext('2d');
     const audio = presentarAudio(narracion);
-    const layout = calcularLayout(ctx, ficha, { aviso: audio.aviso, etiquetaAudio: audio.etiqueta });
-    if (layout.desborda) eventLine('Aviso: el contenido de ' + ficha.id + ' no cabe completo en la ficha.');
+    const hayLibro = extraerLibros(recorridosBibliograficos, ficha.id).length > 0;
+    const layout = calcularLayout(ctx, ficha, audio, hayLibro);
     pintarLayout(layout);
   }
 
@@ -302,14 +343,10 @@ import { rutaLibro2D } from './js/ruta-libro-2d.js';
     if (!sincronizando) narracion = null; // hasta que el reproductor confirme el audio de ESTA ficha (si nos abre él, su estado ya llegó)
     selectionCount++;
     // La ficha y sus controles aparecen frente a donde mira la persona (las constelaciones están a ±40°)
-    const frente = frenteAlFrente(3.0);
-    infoPanel3D.setAttribute('position', `${frente.x} ${FICHA_BASE_Y + PLANO_ALTO / 2} ${frente.z}`);
-    infoPanel3D.setAttribute('rotation', `0 ${frente.rotY} 0`);
+    colocarVistaFrente(infoPanel3D);
     pintarFicha(ficha);
-    activarGrupo(constelacionesEl, false);
+    constelacionesEl.querySelectorAll('.selectable').forEach((el) => el.classList.remove('selectable'));
     activarGrupo(infoPanel3D, true);
-    visorControls3D.setAttribute('position', `${frente.x} ${POS_CONTROLES_Y} ${frente.z}`);
-    visorControls3D.setAttribute('rotation', `0 ${frente.rotY} 0`);
     refrescarRaycaster();
     selectionStatus.textContent = `✔ Selección #${selectionCount} completada. ${mensajeEnReposo()}`;
     eventLine(`✔ Selección #${selectionCount}: ficha de ${ficha.titulo} abierta.`);
@@ -325,8 +362,9 @@ import { rutaLibro2D } from './js/ruta-libro-2d.js';
     activarGrupo(estanteriaEl, false);
     activarGrupo(infoPanel3D, false);
     activarGrupo(constelacionesEl, true);
-    visorControls3D.setAttribute('position', POS_CONTROLES.recorrido);
-    visorControls3D.setAttribute('rotation', '0 0 0');
+    visorControls3D.object3D.position.set(0, POS_CONTROLES_Y, -3.5);
+    visorControls3D.object3D.rotation.set(0, 0, 0);
+    visorControls3D.object3D.scale.setScalar(1);
     refrescarRaycaster();
     selectionStatus.textContent = mensajeEnReposo();
     eventLine('Regreso al recorrido de constelaciones.');
@@ -335,12 +373,22 @@ import { rutaLibro2D } from './js/ruta-libro-2d.js';
 
   /** El panel y la estantería siempre se colocan delante de la dirección actual de la mirada. */
   function colocarVistaFrente(grupo) {
-    const frente = frenteAlFrente(3.0);
-    const y = grupo === estanteriaEl ? 1.9 : FICHA_BASE_Y + PLANO_ALTO / 2;
-    grupo.setAttribute('position', frente.x + ' ' + y + ' ' + frente.z);
-    grupo.setAttribute('rotation', '0 ' + frente.rotY + ' 0');
-    visorControls3D.setAttribute('position', frente.x + ' ' + POS_CONTROLES_Y + ' ' + frente.z);
-    visorControls3D.setAttribute('rotation', '0 ' + frente.rotY + ' 0');
+    const camera = scene.camera;
+    const { Quaternion, Vector3, MathUtils } = AFRAME.THREE;
+    const giro = camera.getWorldQuaternion(new Quaternion());
+    const origen = camera.getWorldPosition(new Vector3());
+    const distancia = 3.4;
+    const aspecto = camera.aspect / (stereoActive ? 2 : 1);
+    const anchoVisible = 2 * distancia * Math.tan(MathUtils.degToRad(camera.fov) / 2) * aspecto;
+    const escala = Math.min(1, anchoVisible * .91 / 3.78);
+    const posicionar = (el, y) => {
+      const relativo = new Vector3(0, y * escala, -distancia).applyQuaternion(giro);
+      el.object3D.position.copy(origen).add(relativo);
+      el.object3D.quaternion.copy(giro);
+      el.object3D.scale.setScalar(escala);
+    };
+    posicionar(grupo, vistaLectura === 'ficha' && grupo === infoPanel3D ? .14 : 0);
+    posicionar(visorControls3D, -1.48);
   }
 
   function abrirEstanteria() {
@@ -350,7 +398,7 @@ import { rutaLibro2D } from './js/ruta-libro-2d.js';
     dwell.cancelar();
     estanteriaEl.replaceChildren();
     document.querySelectorAll('[data-portada-homido]').forEach(c => c.remove());
-    estanteria = crearEstanteria3D(document, estanteriaEl, libros, ligar);
+    estanteria = crearEstanteria3D(document, estanteriaEl, libros, ligar, pantalla);
     vistaLectura = 'estanteria';
     colocarVistaFrente(estanteriaEl);
     estanteria.mostrar(estado.fichaId);
@@ -403,21 +451,15 @@ import { rutaLibro2D } from './js/ruta-libro-2d.js';
 
   function consultarLibro2D() {
     if (vistaLectura !== 'detalle' || !libroSeleccionado) return;
-    const url = rutaLibro2D(libroSeleccionado);
-    dwell.cancelar();
-    cerrarFicha(); // el evento ficha-cerrada detiene la narración de Luis
-    if (stereoActive) void exitStereo();
-    else window.dispatchEvent(new Event('astrovisor:salida-visor'));
-    eventLine('Consultar libro fuera del visor: ' + url);
-    window.location.href = url;
+    salir(rutaLibro2D(libroSeleccionado));
   }
 
   // Audio: el reproductor es el de Luis (narraciones.js). Aquí solo se SOLICITA la acción (Escuchar/Pausar/Reanudar
   // según su estado) y se MUESTRA el estado que él confirma; no se reproduce nada desde la escena.
-  function pedirAudio() {
+  function pedirAudio(accion) {
     const ficha = fichas.get(estado.fichaId);
     if (!ficha) return;
-    window.dispatchEvent(new CustomEvent('astrovisor:audio-solicitado', { detail: { id: ficha.id, titulo: ficha.titulo, audio: adaptarAudio(ficha) } }));
+    window.dispatchEvent(new CustomEvent('astrovisor:audio-solicitado', { detail: { id: ficha.id, titulo: ficha.titulo, audio: adaptarAudio(ficha), accion } }));
     eventLine(`Botón de narración: solicitud enviada al reproductor (${adaptarAudio(ficha) ? 'audio asociado' : 'sin audio asociado'}).`);
   }
 
@@ -459,20 +501,26 @@ import { rutaLibro2D } from './js/ruta-libro-2d.js';
   }
 
   function desmontarVisor() {
+    saliendo = true;
+    dwell.cancelar();
     window.removeEventListener('deviceorientation', listenOrientation);
-    liberarPantalla();
-    window.dispatchEvent(new Event('astrovisor:salida-visor'));
+    const controles = camaraRig.components?.['look-controls'];
+    controles?.magicWindowControls?.disconnect();
+    controles?.pause();
+    exitStereo();
   }
 
-  function salir() {
+  function salir(url = '/explorar') {
+    if (saliendo) return;
     desmontarVisor();
     selectionStatus.textContent = '✔ Salida confirmada. Regresando al modo web 2D...';
-    eventLine('✔ Salida a 2D y liberación de sensores completada.');
-    setTimeout(() => {
-      if (stereoActive) exitStereo();
-      window.location.href = '/explorar';
-    }, 250);
+    window.location.assign(url);
   }
+  publicExit.addEventListener('click', (event) => {
+    if (event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) return;
+    event.preventDefault();
+    salir();
+  });
 
   // --- Eventos de mirada y de clic/toque sobre cada elemento con data-action ---
   function soltar(el) {
@@ -481,6 +529,7 @@ import { rutaLibro2D } from './js/ruta-libro-2d.js';
   }
 
   function ligar(el) {
+    if (pantalla) return;
     const enfocar = () => { const t = objetivoDe(el); if (t) dwell.enfocar(t); };
     el.addEventListener('mouseenter', enfocar);
     el.addEventListener('raycaster-intersected', enfocar);
@@ -514,9 +563,49 @@ import { rutaLibro2D } from './js/ruta-libro-2d.js';
   ligar(pauseBtn3D);
   ligar(exitBtn3D);
 
-  setTimeout(() => { userReady = true; comprobarFoco(); }, 600);
+  if (diagnostico) setTimeout(() => { userReady = true; comprobarFoco(); }, 600);
   window.addEventListener('mousemove', () => { userReady = true; comprobarFoco(); }, { once: true });
   window.addEventListener('touchstart', () => { userReady = true; comprobarFoco(); }, { once: true });
+
+  function enlazarPuntero() {
+    const canvas = scene.canvas;
+    const { yawObject, pitchObject } = camaraRig.components['look-controls'];
+    const raycaster = new AFRAME.THREE.Raycaster();
+    const punto = new AFRAME.THREE.Vector2();
+    let gesto;
+    canvas.addEventListener('pointerdown', (event) => {
+      if (!event.isPrimary || event.button !== 0) return;
+      gesto = { id: event.pointerId, x: event.clientX, y: event.clientY, arrastrando: false };
+      canvas.setPointerCapture(event.pointerId);
+    });
+    canvas.addEventListener('pointermove', (event) => {
+      if (gesto?.id !== event.pointerId) return;
+      const dx = event.clientX - gesto.x;
+      const dy = event.clientY - gesto.y;
+      if (!gesto.arrastrando && Math.hypot(dx, dy) <= 10) return;
+      gesto = { id: gesto.id, x: event.clientX, y: event.clientY, arrastrando: true };
+      const sensibilidad = Math.PI / Math.max(240, canvas.clientHeight);
+      yawObject.rotation.y += dx * sensibilidad;
+      pitchObject.rotation.x = AFRAME.THREE.MathUtils.clamp(pitchObject.rotation.x + dy * sensibilidad, -Math.PI / 2, Math.PI / 2);
+    });
+    canvas.addEventListener('lostpointercapture', (event) => {
+      if (gesto?.id === event.pointerId) gesto = null;
+    });
+    canvas.addEventListener('pointerup', (event) => {
+      if (gesto?.id !== event.pointerId) return;
+      const { x, y, arrastrando } = gesto;
+      gesto = null;
+      if (arrastrando || Math.hypot(x - event.clientX, y - event.clientY) > 10 || !scene.camera) return;
+      const rect = canvas.getBoundingClientRect();
+      punto.set((event.clientX - rect.left) / rect.width * 2 - 1, 1 - (event.clientY - rect.top) / rect.height * 2);
+      raycaster.setFromCamera(punto, scene.camera);
+      const mallas = Array.from(scene.querySelectorAll('.selectable'), (el) => el.getObject3D('mesh')).filter(Boolean);
+      const impacto = raycaster.intersectObjects(mallas, false)[0];
+      const el = impacto?.object.el;
+      const objetivo = el && objetivoDe(el);
+      if (objetivo) ejecutar(objetivo, 'clic');
+    });
+  }
 
   function mostrarAvisoError3D(titulo, mensaje) {
     if (!cardCanvas) return;
@@ -572,7 +661,7 @@ import { rutaLibro2D } from './js/ruta-libro-2d.js';
 
     visorControls3D.setAttribute('position', `${frente.x} ${POS_CONTROLES_Y} ${frente.z}`);
     visorControls3D.setAttribute('rotation', `0 ${frente.rotY} 0`);
-    activarGrupo(visorControls3D, true);
+    activarGrupo(visorControls3D, !pantalla);
     setTimeout(() => {
       actualizarTextura();
       refrescarRaycaster();
@@ -597,6 +686,7 @@ import { rutaLibro2D } from './js/ruta-libro-2d.js';
       carga = await cargarDatosCompartidos();
     } catch (error) {
       await esperar;
+      avisar('No pudimos cargar las historias. Puedes volver a la web 2D.');
       selectionStatus.textContent = 'No se pudieron cargar las constelaciones. Usa "Salir a 2D".';
       if ($('fuenteDatos')) $('fuenteDatos').textContent = 'No hay una fuente de contenidos disponible.';
       eventLine(`Error al cargar datos: ${error.message}`);
@@ -625,7 +715,7 @@ import { rutaLibro2D } from './js/ruta-libro-2d.js';
     recorridosBibliograficos = lista;
     activarGrupo(estanteriaEl, false);
     activarGrupo(constelacionesEl, true);
-    activarGrupo(visorControls3D, true);
+    activarGrupo(visorControls3D, !pantalla);
     refrescarRaycaster();
     eventLine(`Recorrido listo con ${lista.length} constelaciones: ${lista.map((f) => f.titulo).join(', ')}.`);
     selectionStatus.textContent = mensajeEnReposo();
@@ -662,7 +752,12 @@ import { rutaLibro2D } from './js/ruta-libro-2d.js';
     }
     if (orientationEvents === 1) eventLine('Se recibió el primer evento de orientación con datos.');
   };
-  window.addEventListener('deviceorientation', listenOrientation);
+  function iniciarMovimiento() {
+    if (saliendo || !movimientoAutorizado) return;
+    const controles = camaraRig.components?.['look-controls'];
+    if (controles?.data.magicWindowTrackingEnabled) controles.magicWindowControls?.connect();
+    window.addEventListener('deviceorientation', listenOrientation);
+  }
 
   permissionButton.addEventListener('click', () => {
     if (!window.DeviceOrientationEvent) {
@@ -673,13 +768,23 @@ import { rutaLibro2D } from './js/ruta-libro-2d.js';
     if (typeof window.DeviceOrientationEvent.requestPermission === 'function') {
       window.DeviceOrientationEvent.requestPermission()
         .then((result) => {
+          if (saliendo) return;
+          if (result === 'granted') {
+            movimientoAutorizado = true;
+            iniciarMovimiento();
+          }
           eventLine(`Permiso de orientación: ${result}`);
           status.textContent = result === 'granted'
             ? 'Permiso concedido. Mueve el teléfono para enfocar el punto.'
             : 'Permiso denegado. Puedes usar la pantalla táctil o el mouse.';
+          if (!diagnostico) {
+            permissionButton.hidden = result === 'granted';
+            avisar(result === 'granted' ? '' : 'El movimiento está bloqueado. Permítelo en el navegador o vuelve a la web 2D.');
+          }
         })
         .catch((error) => {
           status.textContent = 'Error al pedir permiso. Revisa la configuración del navegador.';
+          avisar('No se pudo activar el movimiento. Revisa los permisos o vuelve a la web 2D.');
           eventLine(`Error de permiso: ${error.message || ''}`);
         });
     } else {
@@ -690,6 +795,7 @@ import { rutaLibro2D } from './js/ruta-libro-2d.js';
 
   // A-Frame Estereoscópico
   if (!window.AFRAME) {
+    avisar('No se pudo abrir la escena. Puedes leer las historias en la web 2D.');
     stereoStatus.textContent = 'A-Frame no pudo cargarse.';
     return;
   }
@@ -709,7 +815,7 @@ import { rutaLibro2D } from './js/ruta-libro-2d.js';
       const vistas = vistasOjos(size.x, size.y);
       const camera = this.el.camera;
       camera.updateWorldMatrix(true, false);
-      this.stereoCamera.aspect = vistas.aspecto;
+      this.stereoCamera.aspect = vistas.aspecto / camera.aspect;
       this.stereoCamera.update(camera);
       renderer.setScissorTest(true);
       for (const [vista, ojo] of [[vistas.izquierdo, this.stereoCamera.cameraL], [vistas.derecho, this.stereoCamera.cameraR]]) {
@@ -733,13 +839,32 @@ import { rutaLibro2D } from './js/ruta-libro-2d.js';
     stereoStatus.textContent = stereoComponent
       ? 'Escena lista. Compatible con 2D y vista dividida Homido.'
       : 'Escena cargada sin componente estéreo.';
+    const camara = camaraRig.components['look-controls'];
+    if (!movimientoAutorizado) camara?.magicWindowControls?.disconnect();
+    else iniciarMovimiento();
+    if (pantalla) {
+      if (camara?.pitchObject) camara.pitchObject.rotation.x = AFRAME.THREE.MathUtils.degToRad(15);
+      enlazarPuntero();
+    }
+    else if (!diagnostico && stereoComponent) activarEstereo();
+    if (!diagnostico) fullscreenButton.hidden = !document.fullscreenEnabled;
   }
   if (scene.hasLoaded) onSceneReady();
   else scene.addEventListener('loaded', onSceneReady, { once: true });
+  window.addEventListener('pagehide', () => { if (!saliendo) desmontarVisor(); });
+  window.addEventListener('pageshow', (event) => {
+    if (!event.persisted || !saliendo) return;
+    saliendo = false;
+    camaraRig.components['look-controls']?.play();
+    iniciarMovimiento();
+    if (!pantalla && !diagnostico) activarEstereo();
+    refrescarRaycaster();
+  });
 
-  async function exitStereo() {
+  function exitStereo() {
     if (estado.modo === 'ficha') cerrarFicha();
     window.dispatchEvent(new Event('astrovisor:salida-visor'));
+    liberarPantalla();
     if (!stereoActive) return;
     stereoActive = false;
     if (stereoComponent) stereoComponent.enabledStereo = false;
@@ -749,11 +874,10 @@ import { rutaLibro2D } from './js/ruta-libro-2d.js';
     stereoButton.disabled = false;
     stereoStatus.textContent = 'Vista dividida desactivada. Continuando en modo 2D.';
     eventLine('Vista dividida desactivada.');
-    liberarPantalla();
     window.dispatchEvent(new Event('resize'));
   }
 
-  stereoButton.addEventListener('click', () => {
+  function activarEstereo() {
     if (!stereoComponent || !scene.hasLoaded) return;
     stereoActive = true;
     stereoComponent.enabledStereo = true;
@@ -763,22 +887,41 @@ import { rutaLibro2D } from './js/ruta-libro-2d.js';
     stereoButton.disabled = true;
     stereoStatus.textContent = 'Vista dividida ACTIVADA: gira el teléfono a horizontal.';
     eventLine('Vista dividida activada.');
-    prepararPantallaCompleta();
     requestAnimationFrame(() => {
       if (scene && scene.resize) scene.resize();
       window.dispatchEvent(new Event('resize'));
     });
+  }
+  stereoButton.addEventListener('click', () => {
+    activarEstereo();
+    prepararPantallaCompleta();
+  });
+  fullscreenButton.addEventListener('click', () => {
+    if (document.fullscreenElement) liberarPantalla();
+    else prepararPantallaCompleta();
+  });
+  document.addEventListener('fullscreenchange', () => {
+    fullscreenButton.textContent = document.fullscreenElement ? 'Salir de pantalla completa' : 'Pantalla completa';
+    if (!document.fullscreenElement && !saliendo) liberarPantalla();
   });
 
   // Mejoras para el visor: pantalla completa, horizontal fijo y pantalla encendida (según soporte del navegador)
-  let bloqueoPantalla = null;
   async function prepararPantallaCompleta() {
     const intentar = async (nombre, fn) => {
-      try { await fn(); eventLine(`${nombre}: activado.`); } catch (e) { eventLine(`${nombre}: no disponible (${e.name || e.message}).`); }
+      try { await fn(); eventLine(`${nombre}: activado.`); return true; }
+      catch (e) { eventLine(`${nombre}: no disponible (${e.name || e.message}).`); return false; }
     };
-    if (host.requestFullscreen) await intentar('Pantalla completa', () => host.requestFullscreen());
-    if (screen.orientation && screen.orientation.lock) await intentar('Bloqueo horizontal', () => screen.orientation.lock('landscape'));
-    if (navigator.wakeLock) await intentar('Pantalla siempre encendida', async () => { bloqueoPantalla = await navigator.wakeLock.request('screen'); });
+    const completa = host.requestFullscreen && await intentar('Pantalla completa', () => host.requestFullscreen());
+    if (saliendo || !completa) {
+      if (!saliendo) avisar('El navegador no abrió la pantalla completa. Puedes continuar aquí.');
+      return;
+    }
+    if (stereoActive && screen.orientation?.lock) await intentar('Bloqueo horizontal', () => screen.orientation.lock('landscape'));
+    if (!saliendo && stereoActive && navigator.wakeLock) await intentar('Pantalla siempre encendida', async () => {
+      const bloqueo = await navigator.wakeLock.request('screen');
+      if (saliendo || !document.fullscreenElement) await bloqueo.release();
+      else bloqueoPantalla = bloqueo;
+    });
     if (window.innerHeight > window.innerWidth) stereoStatus.textContent = 'Gira el teléfono a horizontal para ver las dos mitades.';
     window.dispatchEvent(new Event('resize'));
   }
@@ -792,7 +935,7 @@ import { rutaLibro2D } from './js/ruta-libro-2d.js';
   document.addEventListener('keydown', (event) => {
     if (event.key === 'Escape') {
       if (estado.modo === 'ficha') cerrarFicha();
-      else if (stereoActive) exitStereo();
+      else if (stereoActive && diagnostico) exitStereo();
     }
   });
 

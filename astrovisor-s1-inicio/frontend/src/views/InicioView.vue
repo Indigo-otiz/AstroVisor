@@ -28,7 +28,10 @@ import ConstellationArt from '../components/ConstellationArt.vue'
         cuando quieras.
       </p>
     </div>
-    <RouterLink class="public-text-link" to="/visor">Conocer el modo Homido</RouterLink>
+    <div class="home-visor-links">
+      <a class="public-text-link" href="/prueba-homido/index.html?modo=pantalla">Explorar en pantalla completa</a>
+      <a class="public-text-link" href="/prueba-homido/index.html?modo=homido">Explorar con Homido</a>
+    </div>
   </section>
   <p class="public-demo">
     Contenido de demostración. Los materiales finales de la biblioteca están pendientes.

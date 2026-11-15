@@ -32,38 +32,36 @@ test('ajustarLineas respeta el ancho máximo', () => {
   assert.equal(lineas.join(' '), 'uno dos tres cuatro cinco seis siete ocho nueve diez')
 })
 
-test('cada constelación dibuja su propio título y resumen, y ninguno de otra', () => {
+test('la ficha inmersiva muestra el título sin repetir el relato ni el resumen', () => {
   for (const ficha of demo) {
     const { ctx, dibujado } = ctxFalso()
     dibujarFicha(ctx, calcularLayout(ctx, ficha))
     assert.ok(dibujado.includes(ficha.titulo))
-    assert.ok(dibujado.join(' ').includes(ficha.resumen.split(' ').slice(0, 3).join(' ')))
+    assert.ok(!dibujado.join(' ').includes(ficha.resumen.split(' ').slice(0, 3).join(' ')))
     for (const otra of demo.filter((f) => f.id !== ficha.id)) assert.ok(!dibujado.includes(otra.titulo))
-    assert.ok(dibujado.includes('Dato de muestra'))
   }
 })
 
 test('el layout cabe en el lienzo, sin desbordar ni superponer zonas', () => {
   for (const ficha of demo) {
     const { ctx } = ctxFalso()
-    const l = calcularLayout(ctx, ficha, { aviso: AVISO_SIN_AUDIO })
-    assert.equal(l.desborda, false, ficha.id)
-    assert.ok(dentro(l.zonas.audio) && dentro(l.zonas.volver) && dentro(l.zonas.libros))
-    assert.equal(solapan(l.zonas.audio, l.zonas.volver), false)
-    assert.equal(solapan(l.zonas.libros, l.zonas.audio), false)
+    const l = calcularLayout(ctx, ficha, { etiqueta: 'Reanudar', activo: true, repetir: true, aviso: 'En pausa' })
+    assert.deepEqual(Object.keys(l.zonas), ['audio', 'repetir', 'libros', 'volver'])
+    const objetivos = Object.values(l.zonas)
+    objetivos.forEach((rect, i) => {
+      assert.ok(dentro(rect), ficha.id)
+      assert.ok(objetivos.slice(i + 1).every((otro) => !solapan(rect, otro)), ficha.id)
+    })
+    assert.ok(l.items.filter((item) => item.rect).every(({ rect }) => rect.y >= CANVAS.alto / 2))
     for (const it of l.items) if (it.rect) assert.ok(dentro(it.rect), `${ficha.id}: caja fuera del lienzo`)
   }
 })
 
-test('un texto muy largo se resume para el visor (sin reducir la tipografía) y sigue cabiendo', () => {
+test('ocultar el relato inmersivo conserva una historia larga en los datos fuente', () => {
   const { ctx } = ctxFalso()
   const larga = { ...demo[0], historia: 'Una oración de relleno bastante larga para la prueba. '.repeat(40) }
-  const l = calcularLayout(ctx, larga)
-  assert.equal(l.desborda, false)
-  assert.ok(l.maxHistoria <= 360)
+  assert.deepEqual(calcularLayout(ctx, larga), calcularLayout(ctx, demo[0]))
   assert.ok(larga.historia.length > 360, 'el texto completo no se altera')
-  const fuentes = l.items.filter((i) => i.k === 'texto').map((i) => Number(/(\d+)px/.exec(i.font)[1]))
-  assert.ok(Math.min(...fuentes) >= 24)
 })
 
 test('sin libros muestra estado pendiente honesto, sin atribuir libros a la biblioteca', () => {
@@ -79,7 +77,7 @@ test('con libros invita a explorar la estantería sin atribuir existencias', () 
   const l = calcularLayout(ctx, { ...demo[0], libros: [{ titulo: 'Atlas del cielo', autor: 'Autora X' }] })
   dibujarFicha(ctx, l)
   const texto = dibujado.join(' ')
-  assert.ok(texto.includes('Ver libros recomendados'))
+  assert.ok(texto.includes('Ver libros'))
   assert.ok(l.zonas.libros)
   assert.ok(!/signatura|MARC|disponible para préstamo/i.test(texto))
 })
@@ -87,10 +85,10 @@ test('con libros invita a explorar la estantería sin atribuir existencias', () 
 test('el aviso de audio aparece solo cuando se indica', () => {
   const a = ctxFalso()
   dibujarFicha(a.ctx, calcularLayout(a.ctx, demo[0]))
-  assert.ok(!a.dibujado.join(' ').includes('narración aún no'))
+  assert.ok(!a.dibujado.join(' ').includes('Audio no disponible'))
   const b = ctxFalso()
   dibujarFicha(b.ctx, calcularLayout(b.ctx, demo[0], { aviso: AVISO_SIN_AUDIO }))
-  assert.ok(b.dibujado.join(' ').includes('narración aún no'))
+  assert.ok(b.dibujado.join(' ').includes('Audio no disponible'))
 })
 
 test('las zonas de mirada salen del mismo layout: el centro del botón dibujado coincide', () => {

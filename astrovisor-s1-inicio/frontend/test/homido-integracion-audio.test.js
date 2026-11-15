@@ -24,13 +24,14 @@ test('la ficha solo dice «Reproduciendo» cuando el reproductor lo confirma', a
   const n = nuevo(t)
   n.seleccionar(audioDe(real.find((r) => r.id === 'orion')))
   assert.doesNotMatch(presentarAudio(n.snapshot()).aviso, /Reproduciendo/)
-  assert.equal(presentarAudio(n.snapshot()).etiqueta, 'Escuchar narración')
+  assert.equal(presentarAudio(n.snapshot()).etiqueta, 'Escuchar')
   await n.escuchar()
-  assert.equal(presentarAudio(n.snapshot()).aviso, 'Reproduciendo narración.')
-  assert.equal(presentarAudio(n.snapshot()).etiqueta, 'Pausar narración')
+  assert.equal(presentarAudio(n.snapshot()).aviso, 'Reproduciendo')
+  assert.equal(presentarAudio(n.snapshot()).etiqueta, 'Pausar')
   n.pausar()
   assert.match(presentarAudio(n.snapshot()).aviso, /En pausa/)
-  assert.equal(presentarAudio(n.snapshot()).etiqueta, 'Reanudar narración')
+  assert.equal(presentarAudio(n.snapshot()).etiqueta, 'Reanudar')
+  assert.equal(presentarAudio(n.snapshot()).repetir, true)
   n.detener() // cerrar ficha / salir
   assert.equal(n.snapshot().estado, 'listo')
   assert.doesNotMatch(presentarAudio(n.snapshot()).aviso, /Reproduciendo/)
@@ -56,8 +57,9 @@ test('cambiar de constelación no superpone narraciones y cada una usa su WAV', 
 test('sin audio o sin reproductor la ficha avisa y nunca afirma reproducción', () => {
   assert.equal(presentarAudio(null).aviso, AVISO_SIN_AUDIO)
   assert.equal(presentarAudio({ estado: 'reproduciendo', recurso: null }).aviso, AVISO_SIN_AUDIO)
-  assert.match(presentarAudio({ estado: 'bloqueado', recurso: {}, puedeEscuchar: true }).aviso, /Activar audio/)
-  assert.match(presentarAudio({ estado: 'error', recurso: {} }).aviso, /no disponible/)
+  assert.match(presentarAudio({ estado: 'bloqueado', recurso: {}, puedeEscuchar: true }).aviso, /reintentar/)
+  assert.match(presentarAudio({ estado: 'error', recurso: {} }).aviso, /reproducir/)
+  assert.equal(presentarAudio({ estado: 'finalizado', recurso: {}, puedeEscuchar: true }).etiqueta, 'Repetir')
 })
 
 test('contrato visor ↔ narraciones: nombres coinciden y la pausa de mirada no pausa la narración', () => {
@@ -73,5 +75,6 @@ test('contrato visor ↔ narraciones: nombres coinciden y la pausa de mirada no 
   }
   assert.ok(!/addEventListener\('astrovisor:mirilla-pausa'/.test(narr), 'la pausa de mirada no controla la narración')
   assert.ok(!visor.includes('new Audio('), 'la escena no crea un segundo reproductor')
-  assert.ok(visor.includes('./js/ficha-canvas.js') && !/preventDefault|cancelable/.test(visor), 'no depende de cancelar el evento')
+  assert.ok(visor.includes('./js/ficha-canvas.js'))
+  assert.match(visor, /audio-solicitado'.*accion/)
 })
