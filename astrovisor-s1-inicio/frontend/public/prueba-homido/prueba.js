@@ -85,7 +85,7 @@ import { rutaLibro2D } from './js/ruta-libro-2d.js';
   let stereoActive = false;
   let stereoComponent;
   let bloqueoPantalla = null;
-  let movimientoAutorizado = !pantalla && typeof window.DeviceOrientationEvent?.requestPermission !== 'function';
+  let movimientoAutorizado = typeof window.DeviceOrientationEvent?.requestPermission !== 'function';
   let narracion = null; // último estado REAL del reproductor (narraciones.js); null = sin reproductor/audio
   let actualizarInmersion = null;
   let sincronizando = false; // true mientras narraciones.js nos abre/cierra la ficha (no se le devuelve el evento)
@@ -98,6 +98,7 @@ import { rutaLibro2D } from './js/ruta-libro-2d.js';
 
   // Geometría de la escena (m): la ficha termina en y=0.9 y los controles quedan debajo, sin tocarla
   const FICHA_BASE_Y = 0.9;
+  const POS_CONTROLES = { recorrido: '0 0.45 -3.5' };
   const POS_CONTROLES_Y = 0.45;
 
   // --- Retroalimentación auditiva (Web Audio) ---
@@ -177,7 +178,7 @@ import { rutaLibro2D } from './js/ruta-libro-2d.js';
   }
 
   const dwell = crearDwell({
-    puedeEnfocar: (t) => !pantalla && !saliendo && userReady && t.el.classList.contains('selectable') &&
+    puedeEnfocar: (t) => !saliendo && userReady && t.el.classList.contains('selectable') &&
       estado.permitido(t.accion, 'mirada') && objetivoEnVista(t),
     onInicio: (t) => {
       eventLine(`Mirada fija sobre [${nombreDe(t)}] — iniciando carga de 3 s`);
@@ -236,7 +237,7 @@ import { rutaLibro2D } from './js/ruta-libro-2d.js';
   }
 
   function comprobarFoco() {
-    if (pantalla || saliendo || !userReady || dwell.activo) return;
+    if (saliendo || !userReady || dwell.activo) return;
     const rc = gazeCursor && gazeCursor.components && gazeCursor.components.raycaster;
     const els = rc && rc.intersectedEls;
     if (!els) return;
@@ -502,19 +503,36 @@ import { rutaLibro2D } from './js/ruta-libro-2d.js';
 
   function desmontarVisor() {
     saliendo = true;
-    dwell.cancelar();
-    window.removeEventListener('deviceorientation', listenOrientation);
-    const controles = camaraRig.components?.['look-controls'];
-    controles?.magicWindowControls?.disconnect();
-    controles?.pause();
-    exitStereo();
+    try { dwell.cancelar(); } catch {}
+    try { window.removeEventListener('deviceorientation', listenOrientation); } catch {}
+    try {
+      const controles = camaraRig?.components?.['look-controls'];
+      controles?.magicWindowControls?.disconnect?.();
+      controles?.pause?.();
+    } catch {}
+    try {
+      exitStereo();
+    } catch (e) {
+      console.error('Error al salir de estéreo:', e);
+    }
   }
 
-  function salir(url = '/explorar') {
+  function salir(destino = '/explorar') {
+    const url = typeof destino === 'string' && destino ? destino : '/explorar';
     if (saliendo) return;
-    desmontarVisor();
-    selectionStatus.textContent = '✔ Salida confirmada. Regresando al modo web 2D...';
-    window.location.assign(url);
+    try {
+      desmontarVisor();
+    } catch (e) {
+      console.error('Error al desmontar visor:', e);
+    }
+    if (selectionStatus) {
+      selectionStatus.textContent = '✔ Salida confirmada. Regresando al modo web 2D...';
+    }
+    try {
+      window.location.assign(url);
+    } catch {
+      window.location.href = url;
+    }
   }
   if (publicExit) publicExit.addEventListener('click', (event) => {
     if (event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) return;
@@ -529,7 +547,6 @@ import { rutaLibro2D } from './js/ruta-libro-2d.js';
   }
 
   function ligar(el) {
-    if (pantalla) return;
     const enfocar = () => { const t = objetivoDe(el); if (t) dwell.enfocar(t); };
     el.addEventListener('mouseenter', enfocar);
     el.addEventListener('raycaster-intersected', enfocar);
@@ -569,41 +586,43 @@ import { rutaLibro2D } from './js/ruta-libro-2d.js';
 
   function enlazarPuntero() {
     const canvas = scene.canvas;
-    const { yawObject, pitchObject } = camaraRig.components['look-controls'];
+    if (!canvas) return;
     const raycaster = new AFRAME.THREE.Raycaster();
     const punto = new AFRAME.THREE.Vector2();
-    let gesto;
+    let pointerDownPos = null;
+
     canvas.addEventListener('pointerdown', (event) => {
       if (!event.isPrimary || event.button !== 0) return;
-      gesto = { id: event.pointerId, x: event.clientX, y: event.clientY, arrastrando: false };
-      canvas.setPointerCapture(event.pointerId);
+      pointerDownPos = { x: event.clientX, y: event.clientY };
     });
-    canvas.addEventListener('pointermove', (event) => {
-      if (gesto?.id !== event.pointerId) return;
-      const dx = event.clientX - gesto.x;
-      const dy = event.clientY - gesto.y;
-      if (!gesto.arrastrando && Math.hypot(dx, dy) <= 10) return;
-      gesto = { id: gesto.id, x: event.clientX, y: event.clientY, arrastrando: true };
-      const sensibilidad = Math.PI / Math.max(240, canvas.clientHeight);
-      yawObject.rotation.y += dx * sensibilidad;
-      pitchObject.rotation.x = AFRAME.THREE.MathUtils.clamp(pitchObject.rotation.x + dy * sensibilidad, -Math.PI / 2, Math.PI / 2);
-    });
-    canvas.addEventListener('lostpointercapture', (event) => {
-      if (gesto?.id === event.pointerId) gesto = null;
-    });
+
     canvas.addEventListener('pointerup', (event) => {
-      if (gesto?.id !== event.pointerId) return;
-      const { x, y, arrastrando } = gesto;
-      gesto = null;
-      if (arrastrando || Math.hypot(x - event.clientX, y - event.clientY) > 10 || !scene.camera) return;
+      if (!pointerDownPos) return;
+      const dx = Math.hypot(event.clientX - pointerDownPos.x, event.clientY - pointerDownPos.y);
+      pointerDownPos = null;
+      if (dx > 12 || !scene.camera) return; // Si arrastró, fue rotación de cámara, no clic directo
+
       const rect = canvas.getBoundingClientRect();
-      punto.set((event.clientX - rect.left) / rect.width * 2 - 1, 1 - (event.clientY - rect.top) / rect.height * 2);
+      punto.set(((event.clientX - rect.left) / rect.width) * 2 - 1, -((event.clientY - rect.top) / rect.height) * 2 + 1);
       raycaster.setFromCamera(punto, scene.camera);
+
       const mallas = Array.from(scene.querySelectorAll('.selectable'), (el) => el.getObject3D('mesh')).filter(Boolean);
-      const impacto = raycaster.intersectObjects(mallas, false)[0];
-      const el = impacto?.object.el;
-      const objetivo = el && objetivoDe(el);
-      if (objetivo) ejecutar(objetivo, 'clic');
+      const impactos = raycaster.intersectObjects(mallas, true);
+      if (impactos.length > 0) {
+        let obj = impactos[0].object;
+        let el = obj.el;
+        while (!el && obj.parent) {
+          obj = obj.parent;
+          el = obj.el;
+        }
+        const target = el && objetivoDe(el);
+        if (target && estado.permitido(target.accion, 'clic') && objetivoEnVista(target)) {
+          userReady = true;
+          dwell.cancelar();
+          playConfirmationSound();
+          ejecutar(target, 'clic');
+        }
+      }
     });
   }
 
@@ -661,7 +680,7 @@ import { rutaLibro2D } from './js/ruta-libro-2d.js';
 
     visorControls3D.setAttribute('position', `${frente.x} ${POS_CONTROLES_Y} ${frente.z}`);
     visorControls3D.setAttribute('rotation', `0 ${frente.rotY} 0`);
-    activarGrupo(visorControls3D, !pantalla);
+    activarGrupo(visorControls3D, true);
     setTimeout(() => {
       actualizarTextura();
       refrescarRaycaster();
@@ -715,7 +734,7 @@ import { rutaLibro2D } from './js/ruta-libro-2d.js';
     recorridosBibliograficos = lista;
     activarGrupo(estanteriaEl, false);
     activarGrupo(constelacionesEl, true);
-    activarGrupo(visorControls3D, !pantalla);
+    activarGrupo(visorControls3D, true);
     refrescarRaycaster();
     eventLine(`Recorrido listo con ${lista.length} constelaciones: ${lista.map((f) => f.titulo).join(', ')}.`);
     selectionStatus.textContent = mensajeEnReposo();
@@ -847,7 +866,7 @@ import { rutaLibro2D } from './js/ruta-libro-2d.js';
 
     const directExitBtn = $('directExitBtn');
     if (directExitBtn) {
-      directExitBtn.addEventListener('click', salir);
+      directExitBtn.addEventListener('click', () => salir('/'));
     }
 
     const modoEfectivo = modoParam || 'libre';
@@ -857,6 +876,8 @@ import { rutaLibro2D } from './js/ruta-libro-2d.js';
     }
 
     const btnActivar = $('btnActivarInmersion');
+    enlazarPuntero();
+
     if (modoEfectivo === 'homido' && !diagParam && stereoComponent) {
       stereoActive = true;
       stereoComponent.enabledStereo = true;
@@ -1003,7 +1024,11 @@ import { rutaLibro2D } from './js/ruta-libro-2d.js';
   });
 
   function exitStereo() {
-    if (estado.modo === 'ficha') cerrarFicha();
+    try {
+      if (estado.modo === 'ficha') cerrarFicha();
+    } catch (e) {
+      console.error('Error al cerrar ficha en exitStereo:', e);
+    }
     window.dispatchEvent(new Event('astrovisor:salida-visor'));
     liberarPantalla();
     if (!stereoActive) return;
@@ -1011,9 +1036,9 @@ import { rutaLibro2D } from './js/ruta-libro-2d.js';
     if (stereoComponent) stereoComponent.enabledStereo = false;
     host.classList.remove('stereo-active');
     document.body.classList.remove('stereo-mode');
-    exitButton.hidden = true;
-    stereoButton.disabled = false;
-    stereoStatus.textContent = 'Vista dividida desactivada. Continuando en modo 2D.';
+    if (exitButton) exitButton.hidden = true;
+    if (stereoButton) stereoButton.disabled = false;
+    if (stereoStatus) stereoStatus.textContent = 'Vista dividida desactivada. Continuando en modo 2D.';
     eventLine('Vista dividida desactivada.');
     window.dispatchEvent(new Event('resize'));
   }
