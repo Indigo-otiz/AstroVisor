@@ -9,6 +9,7 @@ try {
 }
 
 const entradas = JSON.parse(await readFile(new URL('../content/libros-biblioteca.json', import.meta.url), 'utf8'))
+const autorSinConfirmar = 'Autor sin confirmar'
 const hash = createHash('sha256')
 for (const { id } of entradas) {
   const foto = await readFile(new URL(`../frontend/public/portadas-biblioteca/${id}.jpg`, import.meta.url))
@@ -31,24 +32,32 @@ try {
       recorridosFaltantes.push(recorrido)
     }
   }
-  for (const entrada of entradas) {
-    const previo = libros.get(entrada.id)
+  const autoresConfirmados = new Map()
+  for (const { id, autor } of entradas) {
+    const previo = libros.get(id)
     if (previo && previo.portada?.tipo !== 'fotografia-ejemplar') {
-      throw new Error(`El ID ${entrada.id} pertenece a otro registro.`)
+      throw new Error(`El ID ${id} pertenece a otro registro.`)
+    }
+    if (previo?.autor === autorSinConfirmar && autor && autor !== autorSinConfirmar) {
+      autoresConfirmados.set(id, autor)
     }
   }
   const pendientes = entradas.filter(({ id, constelacionId }) =>
     !libros.has(id) || !recorridos.get(constelacionId)?.libroRefs.some(ref => ref.libroId === id))
-  if (pendientes.length || actual.huellaPortadasBiblioteca !== huellaPortadasBiblioteca) {
+  if (pendientes.length || autoresConfirmados.size || actual.huellaPortadasBiblioteca !== huellaPortadasBiblioteca) {
     const resultado = await escritor.guardar({
       revision: actual.revision,
       actor: 'importar-libros-biblioteca',
       cambiar(catalogo) {
         catalogo.recorridos.push(...recorridosFaltantes)
         catalogo.huellaPortadasBiblioteca = huellaPortadasBiblioteca
+        for (const libro of catalogo.libros) {
+          const autor = autoresConfirmados.get(libro.id)
+          if (autor !== undefined) libro.autor = autor
+        }
         for (const { id, titulo, autor, constelacionId, motivo } of pendientes) {
           if (!libros.has(id)) catalogo.libros.push({
-            id, titulo, autor: autor ?? 'Autor sin confirmar', demostracion: false,
+            id, titulo, autor: autor ?? autorSinConfirmar, demostracion: false,
             portada: { tipo: 'fotografia-ejemplar' },
             portadaIlustrativa: `/portadas-biblioteca/${id}.jpg`,
             marc21: { campo001: id, campo003: 'ASTROVISOR', signatura852: null, ubicacion852: null },
@@ -58,7 +67,7 @@ try {
         }
       },
     })
-    console.log(`Revisión ${resultado.catalogo.revision}. Libros o relaciones incorporados: ${pendientes.length}. Portadas del lote registradas.`)
+    console.log(`Revisión ${resultado.catalogo.revision}. Libros o relaciones incorporados: ${pendientes.length}. Autores completados: ${autoresConfirmados.size}. Portadas del lote registradas.`)
   } else console.log(`Los libros y las portadas ya están actualizados. Revisión ${actual.revision}.`)
 } finally {
   await escritor.cerrar()

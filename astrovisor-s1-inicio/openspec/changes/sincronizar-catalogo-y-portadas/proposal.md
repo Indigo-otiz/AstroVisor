@@ -8,6 +8,7 @@ Los 15 libros fotografiados y sus asociaciones ya están en `main`, pero las ins
 
 - Sustituir las 15 fotografías por sus portadas frontales recortadas y conservar los IDs.
 - Completar la importación en catálogos existentes, incluidas las fichas de Can Mayor o el Boyero si hacen falta para guardar las relaciones de sus libros.
+- Completar los autores pendientes de libros ya importados con los créditos del inventario.
 - Publicar los recortes en una revisión verificable para Homido. Casiopea y el Cisne se cancelaron para este trabajo.
 
 ## Capabilities
