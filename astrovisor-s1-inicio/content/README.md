@@ -39,3 +39,7 @@ La versión inicial usaba Piper es_MX-ald-medium. Se conservan los WAV sin sufij
 Las tres constelaciones (`orion`, `osa-mayor`, `escorpio`) incorporan en el arreglo `libros` obras reales de acceso público en Internet (Project Gutenberg e Internet Archive). Se rotulan expresamente como `Referencia de demostración`.
 
 La biblioteca **no se atribuye como poseedora** de las obras físicas ni se afirma disponibilidad de préstamo. La ficha del visor Homido adapta y muestra el título y autor verificados desde este registro documental. El detalle completo de fuentes, enlaces y condiciones de uso libres de derechos patrimoniales se encuentra en [BIBLIOGRAFIA.md](BIBLIOGRAFIA.md).
+
+## Importar el lote de libros fotografiados
+
+Las 15 fichas y sus portadas se distribuyen en cinco grupos de tres. En un catálogo existente, detén la API para liberar el escritor y ejecuta `npm run importar:libros-biblioteca` con el directorio habitual en `ASTROVISOR_DATA_DIR`. Para una instalación nueva, primero ejecuta `npm run init:catalogo`. La importación es idempotente y conserva los registros editados. Reinicia la API y publica el respaldo local con `npm run exportar:homido` cuando corresponda. La estantería 3D muestra las tres portadas fotografiadas de la ficha. La web también conserva las referencias de demostración.

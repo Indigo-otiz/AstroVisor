@@ -46,7 +46,7 @@ const rutaEstanteria = computed(() => ({ name: 'biblioteca', params: { id: id.va
         <p>¿Te gustaría conocer más sobre {{ nombre }}? Elige un libro y descubre por qué podría interesarte.</p>
       </div>
       <p class="biblioteca-aviso" role="note">
-        <strong>Libros de demostración.</strong> Son referencias de lectura pública. No hemos confirmado que la biblioteca tenga ejemplares de estos títulos. Las portadas indican si son ilustrativas o imágenes con permiso declarado.
+        Las fichas indican cuáles portadas son fotografías de ejemplares y cuáles forman parte de las referencias de demostración.
       </p>
 
       <p v-if="!libros.length" role="status">Todavía no hay libros recomendados para esta constelación. Puedes volver a su historia o consultar más tarde.</p>
@@ -77,7 +77,8 @@ const rutaEstanteria = computed(() => ({ name: 'biblioteca', params: { id: id.va
       <div class="biblioteca-detalle">
         <figure class="biblioteca-detalle-portada">
           <img :src="libro.portadaIlustrativa" :alt="alternativaPortada(libro)" width="450" height="640" />
-          <figcaption v-if="libro.portada?.tipo === 'imagen-autorizada'">Imagen con permiso declarado. Procedencia: {{ libro.portada.procedencia }}. Permiso: {{ libro.portada.permiso }}.</figcaption>
+          <figcaption v-if="libro.portada?.tipo === 'fotografia-ejemplar'">Fotografía de la portada del ejemplar.</figcaption>
+          <figcaption v-else-if="libro.portada?.tipo === 'imagen-autorizada'">Imagen con permiso declarado. Procedencia: {{ libro.portada.procedencia }}. Permiso: {{ libro.portada.permiso }}.</figcaption>
           <figcaption v-else>Ilustración de demostración; no es la cubierta de una edición física.</figcaption>
         </figure>
         <div class="biblioteca-detalle-info">
@@ -90,7 +91,7 @@ const rutaEstanteria = computed(() => ({ name: 'biblioteca', params: { id: id.va
             <h2 id="encontrar-libro">¿Dónde encontrarlo?</h2>
             <p><strong>Ubicación y signatura:</strong> todavía no contamos con datos de la biblioteca.</p>
             <p>No podemos confirmar la disponibilidad de un ejemplar físico. Si te interesa este título, consulta al personal de la biblioteca.</p>
-            <details class="biblioteca-marc">
+            <details v-if="libro.demostracion" class="biblioteca-marc">
               <summary>Ver ejemplo de identificador MARC 21</summary>
               <p><strong>Campo 001 (simulado):</strong> {{ libro.marc21.campo001 }}</p>
               <p><strong>Campo 003 (simulado):</strong> {{ libro.marc21.campo003 }}</p>
@@ -98,7 +99,7 @@ const rutaEstanteria = computed(() => ({ name: 'biblioteca', params: { id: id.va
               <p>Estos códigos solo ilustran cómo podría relacionarse AstroVisor con un catálogo. No identifican registros reales.</p>
             </details>
           </section>
-          <a class="public-button biblioteca-boton" :href="libro.enlacePublico" target="_blank" rel="noopener noreferrer">
+          <a v-if="libro.enlacePublico" class="public-button biblioteca-boton" :href="libro.enlacePublico" target="_blank" rel="noopener noreferrer">
             Consultar obra en línea (sitio externo)
           </a>
         </div>

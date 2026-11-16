@@ -9,6 +9,7 @@
   "scripts": {
     "exportar:homido": "node scripts/exportar-homido.mjs",
     "dev:homido:respaldo": "node scripts/servir-homido-dev.mjs",
+    "importar:libros-biblioteca": "node scripts/importar-libros-biblioteca.mjs",
     "init:catalogo": "node scripts/inicializar-catalogo.mjs",
     "configurar:admin": "node scripts/configurar-admin.mjs",
     "test:web": "npm run test --workspace frontend",

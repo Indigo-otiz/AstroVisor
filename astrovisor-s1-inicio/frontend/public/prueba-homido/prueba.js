@@ -864,6 +864,12 @@ import { rutaLibro2D } from './js/ruta-libro-2d.js';
   if (leerParametros(location.search).activo) iniciarDiagnostico({ scene, log: eventLine }); // ?diag=1: modo temporal de aislamiento
 
   function onSceneReady() {
+    const relieves = $('institutionalLogos3D').object3D.position;
+    const camara = camaraRig.object3D.position;
+    const controles = camaraRig.components['look-controls'];
+    if (controles?.pitchObject) {
+      controles.pitchObject.rotation.x = Math.atan2(relieves.y - camara.y, camara.z - relieves.z);
+    }
     if (!stereoComponent) stereoComponent = scene.components['experimental-stereo'];
     stereoButton.disabled = !stereoComponent;
     stereoStatus.textContent = stereoComponent

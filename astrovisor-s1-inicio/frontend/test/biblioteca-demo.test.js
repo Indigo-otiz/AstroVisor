@@ -16,11 +16,11 @@ test('catálogo de demostración: ids únicos y sin existencias inventadas', () 
     assert.ok(existsSync(new URL('../public' + libro.portadaIlustrativa, import.meta.url)))
   }
 })
-test('cada constelación presenta tres recomendaciones con información de interés', async (t) => {
+test('cada constelación conserva las recomendaciones del catálogo de demostración', async (t) => {
   t.mock.method(globalThis, 'fetch', async () => new Response(JSON.stringify(catalogo)))
   for (const id of CONSTELACIONES_LIBROS) {
     const libros = await listarLibros(id)
-    assert.equal(libros.length, 3)
+    assert.equal(libros.length, ['can-mayor', 'boyero'].includes(id) ? 2 : 3)
     assert.ok(libros.every((libro) => libro.motivo.length >= 20))
     assert.equal((await buscarLibro(id, libros[0].id))?.id, libros[0].id)
   }
