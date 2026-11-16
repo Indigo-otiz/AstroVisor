@@ -5,11 +5,11 @@
 import { CATALOGO } from './catalogo-estelar.js'
 
 export const FIGURAS = {
-  orion: { ...CATALOGO.orion, direccion: { az: -70, el: 25 } }, // grados: azimut (0 = frente, + a la derecha) y elevación
-  'osa-mayor': { ...CATALOGO['osa-mayor'], direccion: { az: 12, el: 34 } },
-  escorpio: { ...CATALOGO.escorpio, direccion: { az: 100, el: 21 } },
+  orion: { ...CATALOGO.orion, direccion: { az: -59, el: 25 } }, // grados: azimut (0 = frente, + a la derecha) y elevación
+  'osa-mayor': { ...CATALOGO['osa-mayor'], direccion: { az: 57, el: 34 } },
+  escorpio: { ...CATALOGO.escorpio, direccion: { az: 118, el: 21 } },
   'can-mayor': { ...CATALOGO['can-mayor'], direccion: { az: -180, el: 22 } },
-  boyero: { ...CATALOGO.boyero, direccion: { az: -130, el: 28 } },
+  boyero: { ...CATALOGO.boyero, direccion: { az: -121, el: 28 } },
 }
 
 export const CAJA = { ancho: 1.8, alto: 1.1 } // tamaño local máximo de una figura
