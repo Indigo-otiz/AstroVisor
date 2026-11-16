@@ -9,11 +9,12 @@ const servir = require('./servidor-pruebas-s4.cjs');
 const pausa = ms => new Promise(r => setTimeout(r, ms));
 
 async function main() {
-  const cerrar = await servir();
+  const url = process.env.ASTROVISOR_QA_URL || 'http://127.0.0.1:5194';
+  const cerrar = process.env.ASTROVISOR_QA_URL ? async () => {} : await servir();
   const perfil = await fs.mkdtemp(path.join(os.tmpdir(), 'astrovisor-relieves-'));
-  const salida = path.resolve(__dirname, '../docs/evidencias-relieves-3d');
+  const salida = process.env.ASTROVISOR_QA_EVIDENCE || path.resolve(__dirname, '../docs/evidencias-relieves-3d');
   const chrome = spawn(path.join(process.env.ProgramFiles, 'Google/Chrome/Application/chrome.exe'), [
-    '--headless=new', '--no-first-run', '--no-default-browser-check', '--remote-debugging-port=0',
+    '--headless=new', '--mute-audio', '--no-first-run', '--no-default-browser-check', '--remote-debugging-port=0',
     '--enable-unsafe-swiftshader', '--disable-background-media-suspend', `--user-data-dir=${perfil}`, 'about:blank',
   ], { stdio: 'ignore', windowsHide: true });
   let socket;
@@ -73,7 +74,7 @@ async function main() {
     };
     const abrir = async (modo, ancho, alto) => {
       await enviar('Emulation.setDeviceMetricsOverride', { width: ancho, height: alto, deviceScaleFactor: 1, mobile: false });
-      await enviar('Page.navigate', { url: `http://127.0.0.1:5194/prueba-homido/index.html?modo=${modo}` });
+      await enviar('Page.navigate', { url: `${url}/prueba-homido/index.html?modo=${modo}` });
       await enviar('Page.bringToFront');
       await esperar(() => document.querySelectorAll('[relieve-institucional]').length === 2 &&
         [...document.querySelectorAll('[relieve-institucional]')].every(e => e.getObject3D('relieve')) &&
@@ -85,8 +86,18 @@ async function main() {
       controles.pitchObject.rotation.x = p;
     }, yaw, pitch);
 
-    await abrir('pantalla', 1440, 900);
+    await abrir('libre', 1440, 900);
     await captura('01-entrada-pantalla');
+    const fichas = await evaluar(() => {
+      const figuras = [...document.querySelectorAll('#constelaciones .constelacion')];
+      return figuras.map(figura => {
+        window.AstroVisorHomido.abrirFicha(figura.dataset.id);
+        const titulo = document.querySelector('#storyTitle').textContent;
+        window.astrovisorVisor.cerrar();
+        return titulo;
+      });
+    });
+    assert.deepEqual(fichas.sort(), ['Boyero', 'Can Mayor', 'Escorpio', 'Orión', 'Osa Mayor'].sort());
     const geometria = await evaluar(async () => {
       const THREE = AFRAME.THREE;
       const { crearRelieve, liberarRelieve } = await import('./js/logos-3d.js');
@@ -115,9 +126,8 @@ async function main() {
     assert.equal(geometria.frenteTexturado, true, 'El frente debe conservar los colores de la fuente');
     assert.equal(geometria.liberados, 4);
 
-    await orientar(Math.PI, 0.12);
     await captura('02-relieves-pantalla');
-    await orientar(Math.PI - 0.42, 0.1);
+    await orientar(-0.25, 0.268);
     await captura('03-relieve-oblicuo');
     const recursos = await evaluar(() => [...document.querySelectorAll('[relieve-institucional]')].map(el => {
       const grupo = el.getObject3D('relieve');
@@ -188,11 +198,10 @@ async function main() {
         mensajeAudio: document.querySelector('#storyAudioStatus').textContent, medios,
         fijos: JSON.stringify(antes) === JSON.stringify(logos.object3D.matrixWorld.toArray()) };
     });
-    assert.ok(flujo.ficha && flujo.cerrada && flujo.reprodujo && flujo.pausada && flujo.fijos, JSON.stringify(flujo));
+
 
     await abrir('homido', 844, 390);
     await evaluar(() => document.querySelector('#vrOverlayBtn').click());
-    await orientar(Math.PI, 0.12);
     await captura('04-relieves-estereo');
     const ojos = await evaluar(() => {
       const scene = document.querySelector('a-scene');
@@ -220,6 +229,7 @@ async function main() {
     await evaluar(() => document.querySelector('#directExitBtn').click());
     await esperar(() => location.pathname === '/');
     assert.deepEqual(errores, []);
+    assert.ok(flujo.ficha && flujo.cerrada && flujo.reprodujo && flujo.pausada && flujo.fijos, JSON.stringify(flujo));
     const navegador = await enviar('Browser.getVersion');
     const informe = { geometria, recursos, ciclo, flujo, ojos, errores, salida: 'Inicio',
       fechaUTC: new Date().toISOString(), navegador: navegador.product,
