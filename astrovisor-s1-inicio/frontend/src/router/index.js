@@ -8,6 +8,8 @@ import AdminAccesoView from '../views/AdminAccesoView.vue'
 import AdminPanelView from '../views/AdminPanelView.vue'
 import { useAuth } from '../composables/useAuth.js'
 
+const Visor3DView = () => import('../views/Visor3DView.vue')
+
 const routes = [
   { path: '/', component: InicioView, name: 'inicio' },
   { path: '/explorar', component: ExplorarView, name: 'explorar' },
@@ -15,6 +17,7 @@ const routes = [
   { path: '/explorar/:id/libros', component: BibliotecaView, name: 'biblioteca' },
   { path: '/explorar/:id/libros/:libroId', component: BibliotecaView, name: 'libro' },
   { path: '/visor', component: VisorView, name: 'visor' },
+  { path: '/visor-3d', component: Visor3DView, name: 'visor-3d' },
   { path: '/admin/acceso', component: AdminAccesoView, name: 'admin-acceso' },
   { path: '/admin', component: AdminPanelView, name: 'admin', meta: { requiresAdmin: true } },
   { path: '/:pathMatch(.*)*', redirect: '/' },

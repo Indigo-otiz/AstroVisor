@@ -9,6 +9,8 @@ const router = useRouter()
 const { userDisplayName, username, signOut, token, invalidarSesion } = useAuth()
 
 const isIniciando3D = ref(false)
+const modoTransicion3D = ref('ligera')
+let timer3D = null
 const { catalogo, seleccion, borrador, cargando, guardando, error, mensaje, conflicto, necesitaRecarga,
   libroActual, recorridoActual, cargar, seleccionarLibro, seleccionarRecorrido, cancelarEdicion, guardar, cancelarPeticiones,
   hayBorradorPendiente, recuperarBorrador, descartarBorradorPendiente, nuevoLibro, previsualizar, previsualizacion, previsualizando,subirImagen,puedeEditarTexto,requierePreview } = useEditorCatalogo({
@@ -24,13 +26,25 @@ async function handleLogout() {
 }
 
 function handleElegir3DLigera() {
+  modoTransicion3D.value = 'ligera'
   isIniciando3D.value = true
-  setTimeout(() => {
+  clearTimeout(timer3D)
+  timer3D = setTimeout(() => {
     router.push('/visor')
   }, 2200)
 }
 
+function handleElegir3DMejor() {
+  modoTransicion3D.value = 'mejor'
+  isIniciando3D.value = true
+  clearTimeout(timer3D)
+  timer3D = setTimeout(() => {
+    router.push('/visor-3d')
+  }, 2200)
+}
+
 function handleCancelar3D() {
+  clearTimeout(timer3D)
   isIniciando3D.value = false
 }
 
@@ -71,8 +85,12 @@ onBeforeUnmount(cancelarPeticiones)
           </svg>
         </div>
 
-        <h2 class="loading-title">Iniciando 3D ligera...</h2>
-        <p class="loading-subtitle">Esto puede tardar unos segundos.</p>
+        <h2 class="loading-title">
+          {{ modoTransicion3D === 'mejor' ? 'Iniciando 3D de alta fidelidad...' : 'Iniciando 3D ligera...' }}
+        </h2>
+        <p class="loading-subtitle">
+          {{ modoTransicion3D === 'mejor' ? 'Cargando bóveda Three.js y estrellas...' : 'Esto puede tardar unos segundos.' }}
+        </p>
 
         <button type="button" class="btn-cancelar-transicion" @click="handleCancelar3D">
           Cancelar
@@ -295,34 +313,32 @@ onBeforeUnmount(cancelarPeticiones)
           <div class="exp-card">
             <div class="exp-preview-screen">
               <svg viewBox="0 0 160 100" class="screen-svg">
-                <rect x="15" y="15" width="130" height="70" rx="14" fill="#0f1f38" stroke="#94a3b8" stroke-width="2" />
+                <rect x="15" y="15" width="130" height="70" rx="14" fill="#0f1f38" stroke="#f5c842" stroke-width="2" />
                 <circle cx="50" cy="50" r="22" fill="#1e293b" stroke="#ffffff" stroke-width="1.5" />
                 <circle cx="110" cy="50" r="22" fill="#1e293b" stroke="#ffffff" stroke-width="1.5" />
-                <circle cx="50" cy="50" r="14" fill="none" stroke="#60a5fa" stroke-width="1" stroke-dasharray="2,2" />
-                <circle cx="110" cy="50" r="14" fill="none" stroke="#60a5fa" stroke-width="1" stroke-dasharray="2,2" />
-                <circle cx="48" cy="48" r="3" fill="#f6ad55" />
-                <circle cx="108" cy="48" r="3" fill="#f6ad55" />
+                <circle cx="50" cy="50" r="14" fill="none" stroke="#f5c842" stroke-width="1" stroke-dasharray="2,2" />
+                <circle cx="110" cy="50" r="14" fill="none" stroke="#f5c842" stroke-width="1" stroke-dasharray="2,2" />
+                <circle cx="48" cy="48" r="3" fill="#f5c842" />
+                <circle cx="108" cy="48" r="3" fill="#f5c842" />
               </svg>
             </div>
 
             <div class="exp-info">
               <h3 class="exp-name">3D mejor</h3>
               <p class="exp-tagline">Versión de mayor detalle</p>
-              <p class="exp-details">Para celulares potentes. Más detalle y mejor imagen.</p>
+              <p class="exp-details">Para celulares potentes y PC. Bóveda profunda Three.js, halos estelares y narración natural.</p>
 
               <div class="badge-wrapper">
-                <span class="status-badge prep">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="badge-check">
-                    <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
-                    <line x1="12" y1="9" x2="12" y2="13" />
-                    <line x1="12" y1="17" x2="12.01" y2="17" />
+                <span class="status-badge available">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" class="badge-check">
+                    <polyline points="20 6 9 17 4 12" />
                   </svg>
-                  En preparación
+                  Disponible
                 </span>
               </div>
 
-              <button type="button" class="btn-action disabled" disabled>
-                No disponible aún
+              <button type="button" class="btn-action solid" @click="handleElegir3DMejor">
+                Elegir esta versión
               </button>
             </div>
           </div>
