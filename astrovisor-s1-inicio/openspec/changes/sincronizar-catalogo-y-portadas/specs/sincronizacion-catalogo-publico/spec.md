@@ -15,6 +15,11 @@ La importación SHALL añadir las publicaciones faltantes y vincularlas con los 
 - **WHEN** se ejecuta el importador sobre un catálogo sin los 15 libros o sin alguno de los recorridos que referencian
 - **THEN** la API ofrece una ficha por libro y conserva las relaciones bibliográficas existentes y las del lote.
 
+#### Scenario: Un libro existente tiene el autor pendiente
+
+- **WHEN** se importa el lote y el inventario tiene créditos para fichas que muestran «Autor sin confirmar»
+- **THEN** la nueva revisión completa esos campos y conserva los autores ya registrados. Repetir la importación con el mismo lote mantiene la revisión.
+
 ### Requirement: Publicar portadas recortadas
 
 La web y Homido SHALL mostrar las 15 portadas frontales según los IDs del catálogo.

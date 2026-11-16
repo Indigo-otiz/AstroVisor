@@ -82,3 +82,33 @@ test('las portadas renovadas se publican en una revisión nueva y conservan el p
     assert.deepEqual(await fs.readFile(join(revisionNueva, 'portadas', `${id}.jpg`)), esperada)
   }
 })
+
+test('completa los autores pendientes de un lote ya publicado y conserva los autores editados', async t => {
+  const { opciones, importar, guardarFixture } = await prepararCatalogo(t)
+  importar()
+  const anterior = await obtenerCatalogo(opciones)
+  const ids = ['mi-gran-libro-del-espacio', 'para-comprender-el-universo', 'viaje-al-espacio', 'conacyt-la-tierra', 'por-que-la-luna']
+  const autoresEsperados = new Map(inventario.filter(l => ids.includes(l.id)).map(l => [l.id, l.autor]))
+  assert.equal(autoresEsperados.size, 5)
+  assert.ok([...autoresEsperados.values()].every(autor => autor && autor !== 'Autor sin confirmar'))
+  for (const libro of anterior.libros) {
+    if (autoresEsperados.has(libro.id)) libro.autor = 'Autor sin confirmar'
+  }
+  const editado = anterior.libros.find(l => l.id === 'cazador-de-estrellas')
+  editado.autor = 'Autor registrado por la biblioteca'
+  await guardarFixture(anterior)
+  assert.equal((await exportarHomido(opciones)).revision, 2)
+
+  assert.match(importar(), /Revisión 3.*incorporados: 0.*Autores completados: 5/)
+  const actualizado = await obtenerCatalogo(opciones)
+  assert.equal(actualizado.huellaPortadasBiblioteca, anterior.huellaPortadasBiblioteca)
+  assert.deepEqual(actualizado.recorridos, anterior.recorridos)
+  assert.equal((await exportarHomido(opciones)).revision, 3)
+  const { libros: publicados } = await verificarPaquete(join(opciones.destino, 'revisiones', '3'))
+  autoresEsperados.set(editado.id, editado.autor)
+  for (const [id, autor] of autoresEsperados) {
+    assert.equal(actualizado.libros.find(l => l.id === id).autor, autor)
+    assert.equal(publicados.find(l => l.id === id).autor, autor)
+  }
+  assert.match(importar(), /ya están actualizados. Revisión 3/)
+})
