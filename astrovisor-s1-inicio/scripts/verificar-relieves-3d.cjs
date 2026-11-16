@@ -86,7 +86,58 @@ async function main() {
       controles.pitchObject.rotation.x = p;
     }, yaw, pitch);
 
+    const comprobarVistaEstelar = async (cantidadOjos) => {
+      const vista = await evaluar(() => {
+        const scene = document.querySelector('a-scene');
+        const camera = scene.camera;
+        const stereo = scene.components['experimental-stereo'];
+        camera.updateWorldMatrix(true, false);
+        stereo.stereoCamera.update(camera);
+        const ojos = stereo.enabledStereo ? [stereo.stereoCamera.cameraL, stereo.stereoCamera.cameraR] : [camera];
+        const { Vector3 } = AFRAME.THREE;
+        const can = document.querySelector('#constelaciones [data-id="can-mayor"].constelacion');
+        const rotulo = [...can.children].find(el => el.object3D.position.y === -0.82);
+        const emblemas = [...document.querySelectorAll('#institutionalLogos3D [relieve-institucional]')];
+        const botones = ['pauseBtn3D', 'exitBtn3D'].map(id => document.getElementById(id).object3D);
+        const terreno = document.querySelector('[horizonte-nocturno]').getObject3D('horizonte').children[1];
+        const rayo = new AFRAME.THREE.Raycaster();
+        const abajo = new Vector3(0, -1, 0);
+        terreno.updateWorldMatrix(true, false);
+        const controlesSobreTerreno = botones.every(boton => {
+          const borde = boton.getWorldPosition(new Vector3());
+          borde.y -= 0.25;
+          rayo.set(new Vector3(borde.x, 2, borde.z), abajo);
+          const impacto = rayo.intersectObject(terreno)[0];
+          return impacto && borde.y > impacto.point.y;
+        });
+        return ojos.map(ojo => {
+          ojo.matrixWorldInverse.copy(ojo.matrixWorld).invert();
+          const frente = new Vector3(0, 0, -1).transformDirection(ojo.matrixWorld);
+          const origen = new Vector3().setFromMatrixPosition(ojo.matrixWorld);
+          const profundidad = punto => frente.dot(punto.clone().sub(origen));
+          const visible = (objeto, x = 0, y = 0) => {
+            objeto.updateWorldMatrix(true, false);
+            const punto = new Vector3(x, y, 0).applyMatrix4(objeto.matrixWorld);
+            if (profundidad(punto) <= 0) return false;
+            punto.project(ojo);
+            return Math.abs(punto.x) < 1 && Math.abs(punto.y) < 1 && Math.abs(punto.z) < 1;
+          };
+          return {
+            figura: visible(can.object3D),
+            rotulo: visible(rotulo.object3D),
+            controles: botones.every(boton => [-0.89, 0.89].every(x => [-0.25, 0.25].every(y => visible(boton, x, y)))),
+            controlesSobreTerreno,
+            emblemasDetras: emblemas.length === 2 && emblemas.every(el => profundidad(el.object3D.getWorldPosition(new Vector3())) < 0)
+          };
+        });
+      });
+      assert.equal(vista.length, cantidadOjos);
+      assert.ok(vista.every(ojo => Object.values(ojo).every(Boolean)), JSON.stringify(vista));
+      return vista;
+    };
+
     await abrir('libre', 1440, 900);
+    const estrellasPantalla = await comprobarVistaEstelar(1);
     await captura('01-entrada-pantalla');
     const fichas = await evaluar(() => {
       const figuras = [...document.querySelectorAll('#constelaciones .constelacion')];
@@ -98,6 +149,8 @@ async function main() {
       });
     });
     assert.deepEqual(fichas.sort(), ['Boyero', 'Can Mayor', 'Escorpio', 'Orión', 'Osa Mayor'].sort());
+    const trasCerrarFicha = await comprobarVistaEstelar(1);
+    await orientar(0, 0.283);
     const geometria = await evaluar(async () => {
       const THREE = AFRAME.THREE;
       const { crearRelieve, liberarRelieve } = await import('./js/logos-3d.js');
@@ -169,6 +222,7 @@ async function main() {
     });
     assert.deepEqual(ciclo, { falloAislado: true, cancelado: true });
 
+    await orientar(59 * Math.PI / 180, 15 * Math.PI / 180);
     await evaluar(() => {
       const logos = document.querySelector('#institutionalLogos3D');
       window.__flujoRelieve = { antes: logos.object3D.matrixWorld.toArray(), estadosAudio: [] };
@@ -178,12 +232,12 @@ async function main() {
       window.__flujoRelieve.ficha = document.querySelector('#infoPanel3D').getAttribute('visible');
       document.querySelector('#activateAudio').click();
     });
-    await pausa(300);
+    await esperar(() => {
+      const boton = document.querySelector('#listenStory');
+      return !boton.disabled && boton.textContent === 'Escuchar';
+    });
     await evaluar(() => document.querySelector('#listenStory').click());
-    for (let i = 0; i < 50; i++) {
-      if (await evaluar(() => window.__flujoRelieve.estadosAudio.includes('reproduciendo'))) break;
-      await pausa(100);
-    }
+    await esperar(() => window.__flujoRelieve.estadosAudio.includes('reproduciendo'));
     const flujo = await evaluar(() => {
       const { antes, estadosAudio, ficha } = window.__flujoRelieve;
       const logos = document.querySelector('#institutionalLogos3D');
@@ -202,6 +256,9 @@ async function main() {
 
     await abrir('homido', 844, 390);
     await evaluar(() => document.querySelector('#vrOverlayBtn').click());
+    const estrellasEstereo = await comprobarVistaEstelar(2);
+    await captura('04-entrada-estereo');
+    await orientar(0, 0.283);
     await captura('04-relieves-estereo');
     const ojos = await evaluar(() => {
       const scene = document.querySelector('a-scene');
@@ -231,7 +288,7 @@ async function main() {
     assert.deepEqual(errores, []);
     assert.ok(flujo.ficha && flujo.cerrada && flujo.reprodujo && flujo.pausada && flujo.fijos, JSON.stringify(flujo));
     const navegador = await enviar('Browser.getVersion');
-    const informe = { geometria, recursos, ciclo, flujo, ojos, errores, salida: 'Inicio',
+    const informe = { estrellasPantalla, estrellasEstereo, trasCerrarFicha, geometria, recursos, ciclo, flujo, ojos, errores, salida: 'Inicio',
       fechaUTC: new Date().toISOString(), navegador: navegador.product,
       entorno: 'Chrome headless; pantalla y estéreo simulado; sin visor físico' };
     await fs.writeFile(path.join(salida, 'resultados.json'), JSON.stringify(informe, null, 2) + '\n');

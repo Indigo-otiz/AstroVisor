@@ -104,6 +104,8 @@ import { rutaLibro2D } from './js/ruta-libro-2d.js';
   // Geometría de la escena (m): la ficha termina en y=0.9 y los controles quedan debajo, sin tocarla
   const FICHA_BASE_Y = 0.9;
   const POS_CONTROLES_Y = 0.45;
+  const direccionInicial = FIGURAS['can-mayor'].direccion;
+  const controlesRecorrido = posicionEnEsfera(direccionInicial.az, 0, 3.5, POS_CONTROLES_Y);
 
   // --- Retroalimentación auditiva (Web Audio) ---
   function playConfirmationSound() {
@@ -367,9 +369,7 @@ import { rutaLibro2D } from './js/ruta-libro-2d.js';
     activarGrupo(infoPanel3D, false);
     activarGrupo(constelacionesEl, true);
     constelaciones.forEach((c) => c.resaltar(false));
-    visorControls3D.object3D.position.set(0, POS_CONTROLES_Y, -3.5);
-    visorControls3D.object3D.rotation.set(0, 0, 0);
-    visorControls3D.object3D.scale.setScalar(1);
+    colocarControlesRecorrido();
     refrescarRaycaster();
     selectionStatus.textContent = mensajeEnReposo();
     eventLine('Regreso al recorrido de constelaciones.');
@@ -378,6 +378,14 @@ import { rutaLibro2D } from './js/ruta-libro-2d.js';
 
   function limitesVistaActiva() {
     return vistaLectura === 'estanteria' ? LIMITES_ESTANTERIA : limitesFicha;
+  }
+
+  function colocarControlesRecorrido() {
+    const { x, y, z, rotY } = controlesRecorrido;
+    const controles = visorControls3D.object3D;
+    controles.position.set(x, y, z);
+    controles.rotation.set(0, rotY * Math.PI / 180, 0);
+    controles.scale.setScalar(1);
   }
 
   function grupoVistaActiva() {
@@ -900,12 +908,12 @@ import { rutaLibro2D } from './js/ruta-libro-2d.js';
   if (leerParametros(location.search).activo) iniciarDiagnostico({ scene, log: eventLine }); // ?diag=1: modo temporal de aislamiento
 
   function onSceneReady() {
-    const relieves = $('institutionalLogos3D').object3D.position;
-    const camara = camaraRig.object3D.position;
     const controles = camaraRig.components['look-controls'];
-    if (controles?.pitchObject) {
-      controles.pitchObject.rotation.x = Math.atan2(relieves.y - camara.y, camara.z - relieves.z);
+    if (controles?.yawObject && controles.pitchObject) {
+      controles.yawObject.rotation.y = -direccionInicial.az * Math.PI / 180;
+      controles.pitchObject.rotation.x = (direccionInicial.el - 10) * Math.PI / 180;
     }
+    colocarControlesRecorrido();
     if (!stereoComponent) stereoComponent = scene.components['experimental-stereo'];
     stereoButton.disabled = !stereoComponent;
     stereoStatus.textContent = stereoComponent
