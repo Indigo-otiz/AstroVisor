@@ -188,7 +188,7 @@ function totalLibros(recorrido) {
         </div>
         <h3>¿Prefieres contemplar estas constelaciones en 360 grados?</h3>
         <p>
-          Accede al Modo Homido directamente con tu visor móvil o explora desde el navegador para experimentar la posición del cielo en 3D calculada para Nayarit.
+          Accede al Modo Homido directamente con tu visor móvil o explora desde el navegador para contemplar las constelaciones en un entorno tridimensional interactivo.
         </p>
       </div>
 
@@ -199,44 +199,6 @@ function totalLibros(recorrido) {
         <a class="portal-button homido" href="/prueba-homido/index.html?modo=homido">
           <span class="btn-main">Bóveda VR Homido</span>
         </a>
-      </div>
-    </section>
-
-    <!-- Logos institucionales -->
-    <section class="logos-institucionales-section">
-      <h3 class="logos-institucionales-title">Instituciones Colaboradoras</h3>
-      <p class="logos-institucionales-desc">
-        Divulgación científica y patrimonio astronómico en vinculación con bibliotecas públicas e institutos tecnológicos.
-      </p>
-      <div class="logos-institucionales-grid">
-        <div class="logos-institucionales-item">
-          <img
-            src="/Nayarit_CECAN_Convivencia_Horizontal.png"
-            alt="Gobierno del Estado de Nayarit y Consejo Estatal para la Cultura y las Artes de Nayarit (CECAN)"
-            loading="lazy"
-          />
-        </div>
-        <div class="logos-institucionales-item">
-          <img
-            src="/institucional/biblioteca-solon-arguello.png"
-            alt="Biblioteca Pública Central Estatal Solón Argüello"
-            loading="lazy"
-          />
-        </div>
-        <div class="logos-institucionales-item">
-          <img
-            src="/Logo%20TecNMs.png"
-            alt="Tecnológico Nacional de México"
-            loading="lazy"
-          />
-        </div>
-        <div class="logos-institucionales-item">
-          <img
-            src="/ITTepic_logo.jpg"
-            alt="Instituto Tecnológico de Tepic"
-            loading="lazy"
-          />
-        </div>
       </div>
     </section>
   </section>

@@ -550,59 +550,34 @@ onBeforeUnmount(() => {
 
     <div></div>
 
-    <!-- Bottom Overlay: Institutional Logos & Experience Buttons -->
+    <!-- Bottom Overlay: Experience Buttons -->
     <div class="hero-bottom">
-      <!-- Logos institucionales -->
-      <div class="hero-logos-wrapper">
-        <img
-          class="hero-logo-img"
-          src="/Nayarit_CECAN_Convivencia_Horizontal.png"
-          alt="Gobierno del Estado de Nayarit y CECAN"
-          loading="lazy"
-        />
-        <div class="hero-logo-divider"></div>
-        <img
-          class="hero-logo-img"
-          src="/institucional/biblioteca-solon-arguello.png"
-          alt="Biblioteca Pública Central Estatal Solón Argüello"
-          loading="lazy"
-        />
-        <div class="hero-logo-divider"></div>
-        <img
-          class="hero-logo-img"
-          src="/Logo%20TecNMs.png"
-          alt="Tecnológico Nacional de México"
-          loading="lazy"
-        />
-        <div class="hero-logo-divider"></div>
-        <img
-          class="hero-logo-img"
-          src="/ITTepic_logo.jpg"
-          alt="Instituto Tecnológico de Tepic"
-          loading="lazy"
-        />
-      </div>
-
       <!-- Action Buttons -->
       <div class="hero-action-buttons">
         <RouterLink class="hero-btn-web" to="/explorar">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"/>
+          <svg class="hero-btn-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
           </svg>
-          <span>Experiencia Web</span>
+          <div class="hero-btn-texts">
+            <span class="hero-btn-title">Explorar en Pantalla</span>
+            <span class="hero-btn-subtitle">Constelaciones, relatos y libros</span>
+          </div>
         </RouterLink>
 
-        <!-- Experiencia VR con 3 opciones: 2D, 3D Lite y 3D Mejorada -->
+        <!-- Experiencia VR con 3 opciones: 2D, 3D Lite y 3D Versión Completa -->
         <button
           id="btnVRExperiencia"
           class="hero-btn-vr"
           type="button"
           @click="mostrarModalVR = true"
         >
-          <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+          <svg class="hero-btn-icon" fill="currentColor" viewBox="0 0 24 24">
             <path d="M21 6H3c-1.1 0-2 .9-2 2v8c0 1.1.9 2 2 2h4.5l2.5-3 2.5 3H21c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm-14 7c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm10 0c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2z"/>
           </svg>
-          <span>Experiencia VR</span>
+          <div class="hero-btn-texts">
+            <span class="hero-btn-title">Entrar al Visor 3D / VR</span>
+            <span class="hero-btn-subtitle">Cielo en 360° · Con o sin lentes</span>
+          </div>
         </button>
       </div>
     </div>
@@ -616,7 +591,7 @@ onBeforeUnmount(() => {
     </a>
   </section>
 
-  <!-- Modal de Experiencia VR con 3 Opciones: 2D, 3D Lite y Mejorada -->
+  <!-- Modal de Experiencia VR con 3 Opciones -->
   <div
     v-if="mostrarModalVR"
     class="vr-modal-backdrop"
@@ -627,7 +602,10 @@ onBeforeUnmount(() => {
   >
     <div class="vr-modal-container">
       <div class="vr-modal-header">
-        <h2 id="modal-vr-title" class="vr-modal-title">Elige tu Experiencia Inmersiva VR</h2>
+        <div>
+          <h2 id="modal-vr-title" class="vr-modal-title">¿Cómo deseas explorar el cielo?</h2>
+          <p class="vr-modal-subtitle">Elige la modalidad que mejor se adapte a tu dispositivo</p>
+        </div>
         <button
           class="vr-modal-close"
           type="button"
@@ -639,49 +617,49 @@ onBeforeUnmount(() => {
       </div>
 
       <div class="vr-modal-grid">
-        <!-- Opción 1: 2D / Homido Estereoscópico -->
+        <!-- Opción 1: Visor Físico -->
         <a
           class="vr-modal-card"
           href="/prueba-homido/index.html?modo=homido"
         >
           <div>
-            <span class="vr-modal-card-badge">Opción 1 · Visor Físico</span>
-            <h3>Visor 2D / Homido</h3>
+            <span class="vr-modal-card-badge">Opción 1 · Para Gafas o Visor</span>
+            <h3>Visor para Celular (Homido)</h3>
             <p>
-              Estereoscopía clásica con pantalla dividida (A-Frame). Coloca tu smartphone dentro del visor Homido o Google Cardboard para contemplar la bóveda en doble lente.
+              Divide la pantalla en dos imágenes para colocar tu celular dentro de un visor Homido, Google Cardboard o gafas VR y contemplar las estrellas en 3D estereoscópico.
             </p>
           </div>
-          <span class="vr-modal-card-action">Iniciar Visor 2D / Homido &rarr;</span>
+          <span class="vr-modal-card-action">Iniciar con Visor &rarr;</span>
         </a>
 
-        <!-- Opción 2: 3D Lite -->
+        <!-- Opción 2: 3D Versión Lite -->
         <a
           class="vr-modal-card"
           href="/prueba-homido/index.html?modo=libre"
         >
           <div>
-            <span class="vr-modal-card-badge">Opción 2 · Sin Visor</span>
-            <h3>3D Lite (Ligera)</h3>
+            <span class="vr-modal-card-badge">Opción 2 · Sin Lentes</span>
+            <h3>3D Versión Lite (Ligera)</h3>
             <p>
-              Exploración 360 grados ágil para cualquier celular o computadora. Navega con el mouse o con la yema del dedo sin necesidad de gafas ni accesorios.
+              Exploración ágil en 360 grados para cualquier celular o computadora. Gira el firmamento arrastrando con el dedo o el mouse sin necesidad de accesorios ni gafas.
             </p>
           </div>
-          <span class="vr-modal-card-action">Iniciar 3D Lite &rarr;</span>
+          <span class="vr-modal-card-action">Iniciar Versión Lite &rarr;</span>
         </a>
 
-        <!-- Opción 3: 3D Mejorada (Three.js) -->
+        <!-- Opción 3: 3D Versión Completa (Full) -->
         <RouterLink
           class="vr-modal-card accent"
           to="/visor-3d"
         >
           <div>
-            <span class="vr-modal-card-badge gold">Opción 3 · Inmersión Total</span>
-            <h3>3D Mejorada (Three.js)</h3>
+            <span class="vr-modal-card-badge gold">Opción 3 · Inmersión Total (Full)</span>
+            <h3>3D Versión Completa (Full)</h3>
             <p>
-              Motor gráfico avanzado con halos estelares volumétricos, bóveda celeste dinámica, iluminación realista y narración guiada paso a paso.
+              La experiencia visual más completa: bóveda celeste profunda, iluminación realista de estrellas, estantería interactiva de libros y narración de voz guiada.
             </p>
           </div>
-          <span class="vr-modal-card-action">Iniciar 3D Mejorada &rarr;</span>
+          <span class="vr-modal-card-action">Iniciar Versión Completa &rarr;</span>
         </RouterLink>
       </div>
     </div>

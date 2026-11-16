@@ -89,7 +89,7 @@ onBeforeUnmount(cancelarPeticiones)
           {{ modoTransicion3D === 'mejor' ? 'Iniciando 3D de alta fidelidad...' : 'Iniciando 3D ligera...' }}
         </h2>
         <p class="loading-subtitle">
-          {{ modoTransicion3D === 'mejor' ? 'Cargando bóveda Three.js y estrellas...' : 'Esto puede tardar unos segundos.' }}
+          {{ modoTransicion3D === 'mejor' ? 'Cargando bóveda 3D y estrellas...' : 'Esto puede tardar unos segundos.' }}
         </p>
 
         <button type="button" class="btn-cancelar-transicion" @click="handleCancelar3D">
@@ -326,7 +326,7 @@ onBeforeUnmount(cancelarPeticiones)
             <div class="exp-info">
               <h3 class="exp-name">3D mejor</h3>
               <p class="exp-tagline">Versión de mayor detalle</p>
-              <p class="exp-details">Para celulares potentes y PC. Bóveda profunda Three.js, halos estelares y narración natural.</p>
+              <p class="exp-details">Para celulares y PC. Bóveda profunda 3D, halos estelares y narración natural.</p>
 
               <div class="badge-wrapper">
                 <span class="status-badge available">
