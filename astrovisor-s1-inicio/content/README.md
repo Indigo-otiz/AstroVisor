@@ -42,4 +42,8 @@ La biblioteca **no se atribuye como poseedora** de las obras físicas ni se afir
 
 ## Importar el lote de libros fotografiados
 
-Las 15 fichas y sus portadas se distribuyen en cinco grupos de tres. En un catálogo existente, detén la API para liberar el escritor y ejecuta `npm run importar:libros-biblioteca` con el directorio habitual en `ASTROVISOR_DATA_DIR`. Para una instalación nueva, primero ejecuta `npm run init:catalogo`. La importación es idempotente y conserva los registros editados. Reinicia la API y publica el respaldo local con `npm run exportar:homido` cuando corresponda. La estantería 3D muestra las tres portadas fotografiadas de la ficha. La web también conserva las referencias de demostración.
+Las 15 fichas y sus portadas recortadas se distribuyen en cinco grupos de tres. Desde `astrovisor-s1-inicio`, ejecuta estos pasos con la misma configuración que usa la API.
+
+1. En una instalación existente, detén la API para liberar el escritor. `ASTROVISOR_DATA_DIR` debe apuntar a la carpeta privada que contiene su `catalogo.json`. Para una instalación nueva, ejecuta primero `npm run init:catalogo`.
+2. Ejecuta `npm run importar:libros-biblioteca`. El comando completa las asociaciones del lote y conserva los registros editados. Si el catálogo es anterior a Can Mayor o el Boyero, incorpora las fichas que requieren los libros de esos grupos. Repetir el comando con el mismo contenido conserva la revisión.
+3. Ejecuta `npm run build` si sirves la web compilada y vuelve a iniciar la API. Si la instalación usa respaldo Homido, ejecuta `npm run exportar:homido` con la configuración de publicación habitual. Corre la importación antes de exportar incluso si los libros ya aparecen, para registrar los JPEG recortados en una revisión nueva.

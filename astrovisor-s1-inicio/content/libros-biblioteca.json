@@ -17,18 +17,21 @@
     "constelacionId": "orion",
     "id": "mi-gran-libro-del-espacio",
     "titulo": "Mi gran libro del espacio",
+    "autor": "Roger Priddy",
     "motivo": "Lectura complementaria. Una introducción ilustrada para continuar explorando el espacio."
   },
   {
     "constelacionId": "osa-mayor",
     "id": "para-comprender-el-universo",
     "titulo": "Para comprender el Universo",
+    "autor": "Nathalie Fredette y Claude Lafleur",
     "motivo": "Lectura complementaria. Una guía general para situar la observación del cielo en el contexto del universo."
   },
   {
     "constelacionId": "osa-mayor",
     "id": "viaje-al-espacio",
     "titulo": "Viaje al espacio",
+    "autor": "Ian Graham",
     "motivo": "Lectura complementaria. Una lectura ilustrada sobre la exploración espacial."
   },
   {
@@ -84,12 +87,14 @@
     "constelacionId": "boyero",
     "id": "conacyt-la-tierra",
     "titulo": "CONACYT te cuenta: La Tierra",
+    "autor": "Albert Ducrocq",
     "motivo": "Lectura complementaria. Una lectura sobre la Tierra, nuestro punto de observación del cielo."
   },
   {
     "constelacionId": "boyero",
     "id": "por-que-la-luna",
     "titulo": "¿Por qué la Luna cambia de forma?",
+    "autor": "Helen Orme",
     "motivo": "Lectura complementaria. Una introducción a las fases de la Luna y a la observación del cielo."
   },
   {
