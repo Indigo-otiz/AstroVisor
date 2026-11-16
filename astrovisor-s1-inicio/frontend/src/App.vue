@@ -67,7 +67,7 @@ watch(
     </header>
 
     <!-- Contenido principal -->
-    <main id="contenido" tabindex="-1" :class="{ 'admin-main': esAdmin, 'inmersive-main': esInmersiva, 'container main-content': !esAdmin && !esInmersiva }">
+    <main id="contenido" tabindex="-1" :class="{ 'admin-main': esAdmin, 'inmersive-main': esInmersiva, 'inicio-main': route.name === 'inicio', 'container main-content': !esAdmin && !esInmersiva && route.name !== 'inicio' }">
       <RouterView :key="route.path" />
     </main>
 
@@ -79,7 +79,7 @@ watch(
         <li><img class="institutional-logo-tecnm" src="/Logo%20TecNMs.png" width="961" height="428" alt="Tecnológico Nacional de México" /></li>
         <li><img class="institutional-logo-tepic" src="/ITTepic_logo.jpg" width="225" height="225" alt="Instituto Tecnológico de Tepic" /></li>
       </ul>
-      <p>Prototipo académico · Contenido de demostración.</p>
+      <p>AstroVisor · Prototipo académico de divulgación astronómica y cultural.</p>
       <p class="institutional-footer-auth"><em>Autorización institucional:</em> La formalización y autorización de uso para los logotipos oficiales de CECAN y Gobierno del Estado de Nayarit se encuentran en trámite ante las instancias correspondientes.</p>
     </footer>
   </div>

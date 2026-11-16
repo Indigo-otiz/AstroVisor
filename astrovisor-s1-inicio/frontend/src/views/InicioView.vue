@@ -1,185 +1,871 @@
+<script setup>
+import { onMounted, onBeforeUnmount, ref } from 'vue'
+import { RouterLink } from 'vue-router'
+
+const canvasRef = ref(null)
+const mostrarModalVR = ref(false)
+
+const starTooltip = ref({
+  visible: false,
+  x: 0,
+  y: 0,
+  nombre: '',
+  mag: '',
+})
+
+let animationFrameId = null
+let cleanupListeners = null
+
+onMounted(() => {
+  const canvas = canvasRef.value
+  if (!canvas) return
+  const ctx = canvas.getContext('2d')
+  if (!ctx) return
+
+  let width = 0
+  let height = 0
+
+  function resize() {
+    const hero = canvas.parentElement
+    width = canvas.width = hero ? hero.clientWidth : window.innerWidth
+    height = canvas.height = hero ? hero.clientHeight : window.innerHeight
+  }
+  window.addEventListener('resize', resize)
+  resize()
+
+  const bgStars = Array.from({ length: 360 }, () => ({
+    x: Math.random() * width,
+    y: Math.random() * height,
+    size: Math.random() * 1.3,
+    twinkleSpeed: 0.01 + Math.random() * 0.035,
+    twinkleAngle: Math.random() * Math.PI * 2,
+    moveSpeed: 0.015 + Math.random() * 0.04,
+  }))
+
+  const baseNodes = [
+    { id: 'betelgeuse', name: 'Betelgeuse (α Ori)', mag: '0.50', color: '#ffb347', x: -160, y: -200, size: 4.8 },
+    { id: 'bellatrix', name: 'Bellatrix (γ Ori)', mag: '1.64', color: '#b8e3ff', x: 170, y: -180, size: 3.2 },
+    { id: 'alnitak', name: 'Alnitak (ζ Ori)', mag: '1.74', color: '#d8efff', x: -55, y: -10, size: 2.8 },
+    { id: 'alnilam', name: 'Alnilam (ε Ori)', mag: '1.69', color: '#ffffff', x: 0, y: -5, size: 3.0 },
+    { id: 'mintaka', name: 'Mintaka (δ Ori)', mag: '2.25', color: '#d8efff', x: 55, y: 0, size: 2.8 },
+    { id: 'saiph', name: 'Saiph (κ Ori)', mag: '2.07', color: '#a6dbff', x: -140, y: 190, size: 3.0 },
+    { id: 'rigel', name: 'Rigel (β Ori)', mag: '0.18', color: '#99d9ff', x: 180, y: 210, size: 4.5 },
+    { id: 'meissa', name: 'Meissa (λ Ori)', mag: '3.35', color: '#f5c842', x: 5, y: -270, size: 2.2 },
+    { id: 'nebula', name: 'Nebulosa M42', mag: '4.0', color: '#ff8fd8', x: -5, y: 70, size: 2.5 },
+  ]
+
+  const edges = [
+    [0, 1], [0, 2], [1, 4], [2, 3], [3, 4],
+    [2, 5], [4, 6], [5, 6], [0, 7], [1, 7], [3, 8],
+  ]
+
+  const scaleFactor = Math.min(width, height) / 820
+
+  const constellationNodes = baseNodes.map((n) => {
+    const ox = n.x * scaleFactor
+    const oy = n.y * scaleFactor
+    return {
+      ...n,
+      ox,
+      oy,
+      x: ox,
+      y: oy,
+      vx: 0,
+      vy: 0,
+      isDragging: false,
+      angle: Math.random() * Math.PI * 2,
+      wanderSpeed: 0.0006 + Math.random() * 0.001,
+      wanderRadius: 2.5 + Math.random() * 4,
+      screenX: 0,
+      screenY: 0,
+    }
+  })
+
+  const N = constellationNodes.length
+  const distMatrix = Array.from({ length: N }, () => Array(N).fill(Infinity))
+  for (let i = 0; i < N; i++) distMatrix[i][i] = 0
+  edges.forEach(([u, v]) => {
+    distMatrix[u][v] = 1
+    distMatrix[v][u] = 1
+  })
+  for (let k = 0; k < N; k++) {
+    for (let i = 0; i < N; i++) {
+      for (let j = 0; j < N; j++) {
+        if (distMatrix[i][k] + distMatrix[k][j] < distMatrix[i][j]) {
+          distMatrix[i][j] = distMatrix[i][k] + distMatrix[k][j]
+        }
+      }
+    }
+  }
+
+  const restDistances = edges.map(([i, j]) => {
+    const dx = constellationNodes[i].ox - constellationNodes[j].ox
+    const dy = constellationNodes[i].oy - constellationNodes[j].oy
+    return Math.sqrt(dx * dx + dy * dy)
+  })
+
+  let globalRotation = 0
+  let currentCenterX = width / 2
+  let currentCenterY = height / 2
+  let mouseX = width / 2
+  let mouseY = height / 2
+  let targetMouseX = width / 2
+  let targetMouseY = height / 2
+  let hoveredStar = null
+  let draggedNode = null
+
+  const ANCHOR_SPRING_K = 0.024
+  const EDGE_SPRING_K = 0.038
+  const DAMPING = 0.885
+
+  function screenToLocal(sx, sy) {
+    const dx = sx - currentCenterX
+    const dy = sy - currentCenterY
+    const cosR = Math.cos(-globalRotation)
+    const sinR = Math.sin(-globalRotation)
+    return {
+      x: dx * cosR - dy * sinR,
+      y: dx * sinR + dy * cosR,
+    }
+  }
+
+  function getCanvasPos(clientX, clientY) {
+    const rect = canvas.getBoundingClientRect()
+    return {
+      x: (clientX - rect.left) * (canvas.width / rect.width),
+      y: (clientY - rect.top) * (canvas.height / rect.height),
+      inBounds:
+        clientX >= rect.left &&
+        clientX <= rect.right &&
+        clientY >= rect.top &&
+        clientY <= rect.bottom,
+    }
+  }
+
+  function findStarAt(cx, cy, captureRadius = 32) {
+    for (const node of constellationNodes) {
+      const dx = cx - node.screenX
+      const dy = cy - node.screenY
+      if (Math.hypot(dx, dy) < captureRadius) {
+        return node
+      }
+    }
+    return null
+  }
+
+  function onMouseDown(e) {
+    if (e.target.closest('button') || e.target.closest('a') || window.scrollY > 200) return
+    const pos = getCanvasPos(e.clientX, e.clientY)
+    if (!pos.inBounds) return
+    const star = findStarAt(pos.x, pos.y, 34)
+    if (star) {
+      draggedNode = star
+      draggedNode.isDragging = true
+      draggedNode.vx = 0
+      draggedNode.vy = 0
+
+      const local = screenToLocal(pos.x, pos.y)
+      draggedNode.x = local.x
+      draggedNode.y = local.y
+
+      document.body.style.cursor = 'grabbing'
+      canvas.style.cursor = 'grabbing'
+    }
+  }
+
+  function onMouseMove(e) {
+    const pos = getCanvasPos(e.clientX, e.clientY)
+    if (!pos.inBounds && !draggedNode) {
+      starTooltip.value.visible = false
+      hoveredStar = null
+      return
+    }
+
+    targetMouseX = pos.x
+    targetMouseY = pos.y
+
+    if (draggedNode && draggedNode.isDragging) {
+      const local = screenToLocal(pos.x, pos.y)
+      draggedNode.x = local.x
+      draggedNode.y = local.y
+      draggedNode.vx = 0
+      draggedNode.vy = 0
+
+      starTooltip.value = {
+        visible: true,
+        x: e.clientX,
+        y: e.clientY - 20,
+        nombre: draggedNode.name,
+        mag: `Mag: ${draggedNode.mag} [Arrastrando]`,
+      }
+      document.body.style.cursor = 'grabbing'
+      canvas.style.cursor = 'grabbing'
+      return
+    }
+
+    const found = findStarAt(pos.x, pos.y, 28)
+    if (found) {
+      hoveredStar = found
+      starTooltip.value = {
+        visible: true,
+        x: e.clientX,
+        y: e.clientY - 16,
+        nombre: found.name,
+        mag: `Mag: ${found.mag}`,
+      }
+      document.body.style.cursor = 'grab'
+      canvas.style.cursor = 'grab'
+    } else {
+      hoveredStar = null
+      starTooltip.value.visible = false
+      document.body.style.cursor = 'default'
+      canvas.style.cursor = 'crosshair'
+    }
+  }
+
+  function onMouseUp() {
+    if (draggedNode) {
+      draggedNode.isDragging = false
+      draggedNode = null
+      document.body.style.cursor = hoveredStar ? 'grab' : 'default'
+      canvas.style.cursor = hoveredStar ? 'grab' : 'crosshair'
+    }
+  }
+
+  function onTouchStart(e) {
+    if (e.touches.length !== 1) return
+    const t = e.touches[0]
+    if (e.target.closest('button') || e.target.closest('a')) return
+    const pos = getCanvasPos(t.clientX, t.clientY)
+    if (!pos.inBounds) return
+    const star = findStarAt(pos.x, pos.y, 38)
+    if (star) {
+      draggedNode = star
+      draggedNode.isDragging = true
+      draggedNode.vx = 0
+      draggedNode.vy = 0
+      const local = screenToLocal(pos.x, pos.y)
+      draggedNode.x = local.x
+      draggedNode.y = local.y
+      starTooltip.value = {
+        visible: true,
+        x: t.clientX,
+        y: t.clientY - 28,
+        nombre: star.name,
+        mag: `Mag: ${star.mag}`,
+      }
+      if (e.cancelable) e.preventDefault()
+    }
+  }
+
+  function onTouchMove(e) {
+    if (!draggedNode || !draggedNode.isDragging || e.touches.length !== 1) return
+    const t = e.touches[0]
+    const pos = getCanvasPos(t.clientX, t.clientY)
+    const local = screenToLocal(pos.x, pos.y)
+    draggedNode.x = local.x
+    draggedNode.y = local.y
+    starTooltip.value = {
+      visible: true,
+      x: t.clientX,
+      y: t.clientY - 28,
+      nombre: draggedNode.name,
+      mag: `Mag: ${draggedNode.mag}`,
+    }
+    if (e.cancelable) e.preventDefault()
+  }
+
+  function onTouchEnd() {
+    if (draggedNode) {
+      draggedNode.isDragging = false
+      draggedNode = null
+      starTooltip.value.visible = false
+    }
+  }
+
+  window.addEventListener('mousedown', onMouseDown)
+  window.addEventListener('mousemove', onMouseMove)
+  window.addEventListener('mouseup', onMouseUp)
+  window.addEventListener('mouseleave', onMouseUp)
+
+  canvas.addEventListener('touchstart', onTouchStart, { passive: false })
+  window.addEventListener('touchmove', onTouchMove, { passive: false })
+  window.addEventListener('touchend', onTouchEnd)
+  window.addEventListener('touchcancel', onTouchEnd)
+
+  function animate() {
+    mouseX += (targetMouseX - mouseX) * 0.06
+    mouseY += (targetMouseY - mouseY) * 0.06
+
+    const gradient = ctx.createRadialGradient(
+      width / 2, height / 2, 0,
+      width / 2, height / 2, Math.max(width, height),
+    )
+    gradient.addColorStop(0, '#090d20')
+    gradient.addColorStop(0.65, '#04060e')
+    gradient.addColorStop(1, '#000000')
+    ctx.fillStyle = gradient
+    ctx.fillRect(0, 0, width, height)
+
+    const dx = (mouseX - width / 2) * 0.035
+    const dy = (mouseY - height / 2) * 0.035
+
+    currentCenterX = width / 2 - dx
+    currentCenterY = height / 2 - dy
+
+    // Background stars
+    ctx.save()
+    ctx.translate(-dx * 0.4, -dy * 0.4)
+    bgStars.forEach((star) => {
+      star.y -= star.moveSpeed
+      if (star.y < 0) {
+        star.y = height
+        star.x = Math.random() * width
+      }
+      const opacity = ((Math.sin(star.twinkleAngle) + 1) / 2) * 0.85 + 0.15
+      star.twinkleAngle += star.twinkleSpeed
+      ctx.beginPath()
+      ctx.fillStyle = `rgba(255, 255, 255, ${opacity * 0.8})`
+      ctx.arc(star.x, star.y, star.size, 0, Math.PI * 2)
+      ctx.fill()
+    })
+    ctx.restore()
+
+    globalRotation += 0.00015
+    const cosR = Math.cos(globalRotation)
+    const sinR = Math.sin(globalRotation)
+
+    constellationNodes.forEach((n) => {
+      n.angle += n.wanderSpeed
+      n.anchorX = n.ox + Math.cos(n.angle) * n.wanderRadius
+      n.anchorY = n.oy + Math.sin(n.angle) * n.wanderRadius
+    })
+
+    const fx = new Float32Array(constellationNodes.length)
+    const fy = new Float32Array(constellationNodes.length)
+
+    edges.forEach(([i, j], edgeIdx) => {
+      const nodeA = constellationNodes[i]
+      const nodeB = constellationNodes[j]
+      const restLen = restDistances[edgeIdx]
+
+      const edx = nodeB.x - nodeA.x
+      const edy = nodeB.y - nodeA.y
+      const curLen = Math.sqrt(edx * edx + edy * edy) || 0.001
+      const diff = curLen - restLen
+      const springF = diff * EDGE_SPRING_K
+
+      const nx = edx / curLen
+      const ny = edy / curLen
+
+      fx[i] += nx * springF
+      fy[i] += ny * springF
+      fx[j] -= nx * springF
+      fy[j] -= ny * springF
+    })
+
+    if (draggedNode && draggedNode.isDragging) {
+      const dragIdx = constellationNodes.indexOf(draggedNode)
+      const dragDispX = draggedNode.x - draggedNode.anchorX
+      const dragDispY = draggedNode.y - draggedNode.anchorY
+
+      for (let i = 0; i < constellationNodes.length; i++) {
+        if (i === dragIdx) continue
+        const hops = distMatrix[dragIdx][i]
+        const pullFactor = Math.pow(0.52, hops)
+        fx[i] += dragDispX * pullFactor * 0.045
+        fy[i] += dragDispY * pullFactor * 0.045
+      }
+    }
+
+    constellationNodes.forEach((n, i) => {
+      if (n.isDragging) {
+        n.vx = 0
+        n.vy = 0
+      } else {
+        const toAnchorX = (n.anchorX - n.x) * ANCHOR_SPRING_K
+        const toAnchorY = (n.anchorY - n.y) * ANCHOR_SPRING_K
+        const totalFx = toAnchorX + fx[i]
+        const totalFy = toAnchorY + fy[i]
+
+        n.vx = (n.vx + totalFx) * DAMPING
+        n.vy = (n.vy + totalFy) * DAMPING
+
+        n.x += n.vx
+        n.y += n.vy
+      }
+
+      const rotX = n.x * cosR - n.y * sinR
+      const rotY = n.x * sinR + n.y * cosR
+      n.screenX = currentCenterX + rotX
+      n.screenY = currentCenterY + rotY
+    })
+
+    ctx.save()
+    ctx.translate(currentCenterX, currentCenterY)
+    ctx.rotate(globalRotation)
+
+    // Constellation lines
+    edges.forEach(([i, j], edgeIdx) => {
+      const nodeA = constellationNodes[i]
+      const nodeB = constellationNodes[j]
+      if (!nodeA || !nodeB) return
+
+      const isDragged = nodeA.isDragging || nodeB.isDragging
+      const isAnyDragging = Boolean(draggedNode)
+      const isHighlighted = hoveredStar && (hoveredStar.id === nodeA.id || hoveredStar.id === nodeB.id)
+
+      const edx = nodeB.x - nodeA.x
+      const edy = nodeB.y - nodeA.y
+      const curLen = Math.sqrt(edx * edx + edy * edy)
+      const stretchRatio = Math.abs(curLen - restDistances[edgeIdx]) / restDistances[edgeIdx]
+
+      ctx.beginPath()
+      ctx.moveTo(nodeA.x, nodeA.y)
+      ctx.lineTo(nodeB.x, nodeB.y)
+
+      if (isDragged) {
+        ctx.strokeStyle = 'rgba(253, 195, 68, 0.98)'
+        ctx.lineWidth = 2.6
+        ctx.shadowColor = '#fdc344'
+        ctx.shadowBlur = 16
+      } else if (isAnyDragging && stretchRatio > 0.08) {
+        ctx.strokeStyle = `rgba(253, 195, 68, ${Math.min(0.9, 0.4 + stretchRatio * 1.5)})`
+        ctx.lineWidth = 1.8
+        ctx.shadowColor = '#fdc344'
+        ctx.shadowBlur = 10
+      } else if (isHighlighted) {
+        ctx.strokeStyle = 'rgba(253, 195, 68, 0.85)'
+        ctx.lineWidth = 1.8
+        ctx.shadowColor = '#fdc344'
+        ctx.shadowBlur = 12
+      } else {
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.35)'
+        ctx.lineWidth = 1.0
+        ctx.shadowBlur = 0
+      }
+      ctx.stroke()
+      ctx.shadowBlur = 0
+    })
+
+    // Stars / nodes
+    constellationNodes.forEach((n) => {
+      const isHovered = hoveredStar && hoveredStar.id === n.id
+      const isDragged = n.isDragging
+      const isNeighborMoved = Boolean(draggedNode) && !isDragged && (Math.hypot(n.vx, n.vy) > 0.15 || Math.hypot(n.x - n.anchorX, n.y - n.anchorY) > 8)
+
+      const glowRadius = isDragged ? 42 : isHovered ? 28 : isNeighborMoved ? 24 : n.size * 3.8
+
+      const radgrad = ctx.createRadialGradient(n.x, n.y, 0, n.x, n.y, glowRadius)
+      radgrad.addColorStop(0, n.color || '#ffffff')
+      radgrad.addColorStop(0.35, isDragged ? 'rgba(253, 195, 68, 0.8)' : isHovered ? 'rgba(253, 195, 68, 0.5)' : isNeighborMoved ? 'rgba(253, 195, 68, 0.35)' : 'rgba(255, 255, 255, 0.18)')
+      radgrad.addColorStop(1, 'rgba(255, 255, 255, 0)')
+
+      ctx.fillStyle = radgrad
+      ctx.beginPath()
+      ctx.arc(n.x, n.y, glowRadius, 0, Math.PI * 2)
+      ctx.fill()
+
+      if (isDragged) {
+        ctx.strokeStyle = 'rgba(253, 195, 68, 0.65)'
+        ctx.lineWidth = 1.5
+        ctx.beginPath()
+        ctx.arc(n.x, n.y, glowRadius * 0.65, 0, Math.PI * 2)
+        ctx.stroke()
+      } else if (isNeighborMoved) {
+        ctx.strokeStyle = 'rgba(253, 195, 68, 0.3)'
+        ctx.lineWidth = 1
+        ctx.beginPath()
+        ctx.arc(n.x, n.y, glowRadius * 0.55, 0, Math.PI * 2)
+        ctx.stroke()
+      }
+
+      ctx.fillStyle = '#ffffff'
+      ctx.beginPath()
+      const coreSize = isDragged ? n.size * 1.6 : isHovered ? n.size * 1.4 : isNeighborMoved ? n.size * 1.15 : n.size
+      ctx.arc(n.x, n.y, coreSize, 0, Math.PI * 2)
+      ctx.fill()
+
+      if (isDragged || isHovered || isNeighborMoved || n.id === 'betelgeuse') {
+        ctx.fillStyle = n.color || '#fdc344'
+        ctx.beginPath()
+        ctx.arc(n.x, n.y, n.size * 0.8, 0, Math.PI * 2)
+        ctx.fill()
+      }
+    })
+
+    ctx.restore()
+    animationFrameId = requestAnimationFrame(animate)
+  }
+
+  animate()
+
+  cleanupListeners = () => {
+    window.removeEventListener('resize', resize)
+    window.removeEventListener('mousedown', onMouseDown)
+    window.removeEventListener('mousemove', onMouseMove)
+    window.removeEventListener('mouseup', onMouseUp)
+    window.removeEventListener('mouseleave', onMouseUp)
+    canvas.removeEventListener('touchstart', onTouchStart)
+    window.removeEventListener('touchmove', onTouchMove)
+    window.removeEventListener('touchend', onTouchEnd)
+    window.removeEventListener('touchcancel', onTouchEnd)
+  }
+})
+
+onBeforeUnmount(() => {
+  if (animationFrameId) cancelAnimationFrame(animationFrameId)
+  cleanupListeners?.()
+  document.body.style.cursor = 'default'
+})
+</script>
+
 <template>
-  <!-- Encabezado breve e introducción -->
-  <header class="home-intro" aria-labelledby="home-title">
-    <div class="home-heading-row">
-      <h1 id="home-title" tabindex="-1">Explora AstroVisor</h1>
-      <span class="home-tagline">Cada estrella, una historia</span>
-    </div>
-    <p class="home-lead">
-      Descubre constelaciones e historias del cielo. Elige cómo deseas comenzar.
-    </p>
-  </header>
+  <!-- Interactive Constellation Canvas Hero Viewport -->
+  <section id="heroSection" class="hero-section">
+    <!-- Canvas Layer -->
+    <canvas ref="canvasRef" class="hero-canvas"></canvas>
 
-  <!-- Tres accesos principales -->
-  <section class="portal-section" aria-labelledby="home-title">
-    <div class="portal-cards">
-      <!-- Tarjeta 1: Web Educativa -->
-      <article class="portal-card" id="tarjeta-explorar" aria-labelledby="card-web-title">
-        <div class="portal-card-badge">Computadora o Proyector</div>
-        <h2 id="card-web-title" class="portal-card-title">Experiencia Web Educativa</h2>
-        <p class="portal-card-desc">
-          Recorrido en pantalla con constelaciones, narraciones en audio, historias culturales y libros recomendados de la biblioteca.
-        </p>
-        <div class="portal-card-actions">
-          <RouterLink class="portal-button primary" to="/explorar">
-            Explorar en pantalla
-            <svg viewBox="0 0 24 24" aria-hidden="true" class="button-icon"><path d="M4 12h15m-6-6 6 6-6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          </RouterLink>
-        </div>
-      </article>
-
-      <!-- Tarjeta 2: Experiencia VR (Dos acciones directas) -->
-      <article class="portal-card portal-card-vr" id="tarjeta-vr" aria-labelledby="card-vr-title">
-        <div class="portal-card-badge accent">Entorno 3D e Inmersión</div>
-        <h2 id="card-vr-title" class="portal-card-title">Experiencia Inmersiva 3D</h2>
-        <p class="portal-card-desc">
-          Exploración del cielo nocturno en 360 grados. Elige la modalidad de visualización según tu dispositivo:
-        </p>
-        <div class="portal-card-actions vr-actions">
-          <RouterLink class="portal-button primary" to="/visor-3d">
-            <span class="btn-main">Experiencia 3D Mejorada (Three.js)</span>
-            <span class="btn-sub">Bóveda celeste inmersiva con halos y narración</span>
-          </RouterLink>
-          <a class="portal-button secondary" href="/prueba-homido/index.html?modo=libre">
-            <span class="btn-main">3D ligera · mouse o dedo</span>
-            <span class="btn-sub">Versión de menor demanda sin visor</span>
-          </a>
-          <a class="portal-button homido" href="/prueba-homido/index.html?modo=homido">
-            <span class="btn-main">Visor Homido · pantalla dividida</span>
-            <span class="btn-sub">Estereoscopía clásica (A-Frame)</span>
-          </a>
-        </div>
-      </article>
-
-      <!-- Tarjeta 3: Administración -->
-      <article class="portal-card" id="tarjeta-admin" aria-labelledby="card-admin-title">
-        <div class="portal-card-badge muted">Gestión y Catálogo</div>
-        <h2 id="card-admin-title" class="portal-card-title">Administración</h2>
-        <p class="portal-card-desc">
-          Panel para personal bibliotecario y docente. Permite registrar y gestionar libros vinculados a constelaciones.
-        </p>
-        <div class="portal-card-actions">
-          <RouterLink class="portal-button outline" to="/admin">
-            Abrir administración
-            <svg viewBox="0 0 24 24" aria-hidden="true" class="button-icon"><path d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          </RouterLink>
-        </div>
-      </article>
-    </div>
-  </section>
-
-  <!-- Sección de Manuales en Video (S5-05) -->
-  <section class="portal-manuals" aria-labelledby="manuals-heading">
-    <div class="portal-header">
-      <h2 id="manuals-heading">Manuales de uso y exploración</h2>
-      <p>Guías pedagógicas diseñadas para facilitar el uso autónomo de cada área de la aplicación.</p>
+    <!-- Star Tooltip -->
+    <div
+      v-if="starTooltip.visible"
+      class="star-tooltip"
+      :style="{ left: `${starTooltip.x}px`, top: `${starTooltip.y}px` }"
+    >
+      <span>{{ starTooltip.nombre }}</span>
+      <span class="text-white/60 ml-1.5 font-mono text-[9px]">{{ starTooltip.mag }}</span>
     </div>
 
-    <div class="manuals-grid">
-      <!-- Manual 1: Web -->
-      <article class="manual-item" aria-labelledby="manual-web-title">
-        <div class="manual-badge-status" role="status">
-          <span class="badge-dot"></span>
-          Guion preparado · Pendiente de grabación
-        </div>
-        <h3 id="manual-web-title">1. Cómo usar la web educativa</h3>
-        <p class="manual-desc">
-          Recorrido paso a paso por la computadora y la proyección en pantalla grande: cómo navegar entre constelaciones, escuchar narraciones y consultar libros recomendados.
-        </p>
-        <details class="manual-details">
-          <summary>Ver guion técnico y transcripción accesible</summary>
-          <div class="manual-transcript">
-            <ol>
-              <li><strong>Inicio:</strong> Abre AstroVisor y pulsa «Explorar en pantalla» para acceder al catálogo público.</li>
-              <li><strong>Constelaciones:</strong> Selecciona Orión, Osa Mayor o Escorpio para ver su figura ilustrada y su relato mitológico.</li>
-              <li><strong>Audio:</strong> Pulsa «Escuchar narración» para oír la voz de Kokoro. Puedes pausar o consultar la transcripción textual completa.</li>
-              <li><strong>Vista para proyección:</strong> Pulsa el botón superior para agrandar los textos a 24 px si estás usando un proyector o pantalla de televisión.</li>
-              <li><strong>Libros:</strong> Consulta las recomendaciones al pie de cada ficha para acercarte a la biblioteca y solicitar lecturas afines.</li>
-            </ol>
-          </div>
-        </details>
-      </article>
+    <!-- Top Overlay: Logo AstroVisor -->
+    <header class="hero-topbar">
+      <div class="hero-brand-panel">
+        <h1 class="hero-brand-title">
+          <svg class="hero-brand-star" viewBox="0 0 32 32" aria-hidden="true">
+            <path d="m16 2 4 10 10 4-10 4-4 10-4-10-10-4 10-4Z" fill="currentColor" />
+          </svg>
+          ASTROVISOR
+        </h1>
+      </div>
+    </header>
 
-      <!-- Manual 2: VR -->
-      <article class="manual-item" aria-labelledby="manual-vr-title">
-        <div class="manual-badge-status" role="status">
-          <span class="badge-dot"></span>
-          Guion preparado · Pendiente de grabación
-        </div>
-        <h3 id="manual-vr-title">2. Cómo explorar en VR (Libre y Homido)</h3>
-        <p class="manual-desc">
-          Instrucciones para navegar en 3D: interacción con mouse o dedo en modo libre, colocación en el visor Homido, selección por mirada durante 3 segundos y botones de bienestar.
-        </p>
-        <details class="manual-details">
-          <summary>Ver guion técnico y transcripción accesible</summary>
-          <div class="manual-transcript">
-            <ol>
-              <li><strong>Modo Libre (mouse/dedo):</strong> Selecciona «Pantalla completa · mouse o dedo». Arrastra con el cursor o desliza la pantalla táctil para recorrer las estrellas.</li>
-              <li><strong>Modo Homido (pantalla dividida):</strong> Selecciona «Visor Homido». El sistema activa automáticamente la doble cámara para cada ojo. Coloca el teléfono dentro del visor.</li>
-              <li><strong>Selección por mirada:</strong> Centra el aro blanco en Orión, Osa Mayor o Escorpio durante 3 segundos. El aro amarillo indicará el progreso hasta abrir la ficha.</li>
-              <li><strong>Cielo visible y audio:</strong> La constelación seguirá iluminada de fondo mientras escuchas el relato. Pulsa «Pausar» o «Repetir» en cualquier momento.</li>
-              <li><strong>Pausa de mirada y salida:</strong> Usa el botón «Pausar mirada» si deseas contemplar las estrellas sin activar fichas. El botón «Salir» detiene el audio y vuelve a la web con seguridad.</li>
-            </ol>
-          </div>
-        </details>
-      </article>
+    <div></div>
 
-      <!-- Manual 3: Administración -->
-      <article class="manual-item" aria-labelledby="manual-admin-title">
-        <div class="manual-badge-status" role="status">
-          <span class="badge-dot"></span>
-          Guion preparado · Pendiente de grabación
-        </div>
-        <h3 id="manual-admin-title">3. Cómo administrar el catálogo</h3>
-        <p class="manual-desc">
-          Procedimiento para el personal de la biblioteca: acceso seguro, consulta del inventario persistente, alta de libros con año opcional y asignación de portadas ilustrativas.
-        </p>
-        <details class="manual-details">
-          <summary>Ver guion técnico y transcripción accesible</summary>
-          <div class="manual-transcript">
-            <ol>
-              <li><strong>Acceso:</strong> Pulsa «Abrir administración» e introduce las credenciales autorizadas en el formulario protegido.</li>
-              <li><strong>Consulta:</strong> Visualiza la lista de libros y constelaciones asociadas en el repositorio documental persistente.</li>
-              <li><strong>Alta de libro:</strong> Completa título, autor, constelación relacionada, motivo y enlace público HTTPS. El campo año es opcional.</li>
-              <li><strong>Portadas:</strong> El sistema genera automáticamente una portada armónica en formato SVG o permite asociar una imagen autorizada.</li>
-              <li><strong>Publicación:</strong> Guarda los cambios con control de concurrencia para que se sincronicen de inmediato con el catálogo público.</li>
-            </ol>
-          </div>
-        </details>
-      </article>
-    </div>
-  </section>
+    <!-- Bottom Overlay: Institutional Logos & Experience Buttons -->
+    <div class="hero-bottom">
+      <!-- Logos institucionales -->
+      <div class="hero-logos-wrapper">
+        <img
+          class="hero-logo-img"
+          src="/Nayarit_CECAN_Convivencia_Horizontal.png"
+          alt="Gobierno del Estado de Nayarit y CECAN"
+          loading="lazy"
+        />
+        <div class="hero-logo-divider"></div>
+        <img
+          class="hero-logo-img"
+          src="/institucional/biblioteca-solon-arguello.png"
+          alt="Biblioteca Pública Central Estatal Solón Argüello"
+          loading="lazy"
+        />
+        <div class="hero-logo-divider"></div>
+        <img
+          class="hero-logo-img"
+          src="/Logo%20TecNMs.png"
+          alt="Tecnológico Nacional de México"
+          loading="lazy"
+        />
+        <div class="hero-logo-divider"></div>
+        <img
+          class="hero-logo-img"
+          src="/ITTepic_logo.jpg"
+          alt="Instituto Tecnológico de Tepic"
+          loading="lazy"
+        />
+      </div>
 
-  <!-- Sección de Créditos e Identidad Institucional (S5-06) -->
-  <section class="portal-credits" aria-labelledby="credits-heading">
-    <div class="credits-box">
-      <h2 id="credits-heading" class="credits-title">AstroVisor — Proyecto Académico</h2>
-      <p class="credits-team">
-        Desarrollado por el <strong>Equipo 8</strong> de la materia <strong>Taller de Full Stack</strong>:
-      </p>
-      <ul class="team-list">
-        <li><strong>Karime Rendón Vázquez</strong> — UX/UI, Accesibilidad y Coordinación de Manuales</li>
-        <li><strong>Luis Alberto Rodríguez</strong> — Experiencia 3D, Sensores e Interacción VR</li>
-        <li><strong>Carlos Martínez Orozco</strong> — Backend, Arquitectura Web y Catálogo Bibliográfico</li>
-        <li><strong>Índigo Andre Ortiz Vega</strong> — Persistencia Documental, Integración y QA Transversal</li>
-      </ul>
-      <div class="credits-affiliations">
-        <p>
-          En vinculación con la <strong>Biblioteca Pública Central Estatal Solón Argüello</strong> y el <strong>Instituto Tecnológico de Tepic (TecNM)</strong>.
-        </p>
-        <div class="credits-institutions-logos">
-          <img
-            class="credits-logo-cecan"
-            src="/Nayarit_CECAN_Convivencia_Horizontal.png"
-            width="11479"
-            height="1968"
-            alt="Gobierno del Estado de Nayarit y Consejo Estatal para la Cultura y las Artes de Nayarit (CECAN)"
-          />
-        </div>
-        <p class="credits-disclaimer">
-          <em>Nota de trazabilidad institucional:</em> Se incorpora el logotipo oficial horizontal de CECAN y Gobierno del Estado, clasificado como dependencia externa pendiente de autorización formal definitiva de uso. Todo el contenido actual es de carácter demostrativo.
-        </p>
+      <!-- Action Buttons -->
+      <div class="hero-action-buttons">
+        <RouterLink class="hero-btn-web" to="/explorar">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"/>
+          </svg>
+          <span>Experiencia Web</span>
+        </RouterLink>
+
+        <!-- Experiencia VR con 3 opciones: 2D, 3D Lite y 3D Mejorada -->
+        <button
+          id="btnVRExperiencia"
+          class="hero-btn-vr"
+          type="button"
+          @click="mostrarModalVR = true"
+        >
+          <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M21 6H3c-1.1 0-2 .9-2 2v8c0 1.1.9 2 2 2h4.5l2.5-3 2.5 3H21c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm-14 7c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm10 0c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2z"/>
+          </svg>
+          <span>Experiencia VR</span>
+        </button>
       </div>
     </div>
+
+    <!-- Scroll Indicator -->
+    <a class="hero-scroll-link" href="#observatorio">
+      <span>DESPLAZA HACIA ABAJO</span>
+      <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+      </svg>
+    </a>
   </section>
+
+  <!-- Modal de Experiencia VR con 3 Opciones: 2D, 3D Lite y Mejorada -->
+  <div
+    v-if="mostrarModalVR"
+    class="vr-modal-backdrop"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="modal-vr-title"
+    @click.self="mostrarModalVR = false"
+  >
+    <div class="vr-modal-container">
+      <div class="vr-modal-header">
+        <h2 id="modal-vr-title" class="vr-modal-title">Elige tu Experiencia Inmersiva VR</h2>
+        <button
+          class="vr-modal-close"
+          type="button"
+          aria-label="Cerrar ventana"
+          @click="mostrarModalVR = false"
+        >
+          &times;
+        </button>
+      </div>
+
+      <div class="vr-modal-grid">
+        <!-- Opción 1: 2D / Homido Estereoscópico -->
+        <a
+          class="vr-modal-card"
+          href="/prueba-homido/index.html?modo=homido"
+        >
+          <div>
+            <span class="vr-modal-card-badge">Opción 1 · Visor Físico</span>
+            <h3>Visor 2D / Homido</h3>
+            <p>
+              Estereoscopía clásica con pantalla dividida (A-Frame). Coloca tu smartphone dentro del visor Homido o Google Cardboard para contemplar la bóveda en doble lente.
+            </p>
+          </div>
+          <span class="vr-modal-card-action">Iniciar Visor 2D / Homido &rarr;</span>
+        </a>
+
+        <!-- Opción 2: 3D Lite -->
+        <a
+          class="vr-modal-card"
+          href="/prueba-homido/index.html?modo=libre"
+        >
+          <div>
+            <span class="vr-modal-card-badge">Opción 2 · Sin Visor</span>
+            <h3>3D Lite (Ligera)</h3>
+            <p>
+              Exploración 360 grados ágil para cualquier celular o computadora. Navega con el mouse o con la yema del dedo sin necesidad de gafas ni accesorios.
+            </p>
+          </div>
+          <span class="vr-modal-card-action">Iniciar 3D Lite &rarr;</span>
+        </a>
+
+        <!-- Opción 3: 3D Mejorada (Three.js) -->
+        <RouterLink
+          class="vr-modal-card accent"
+          to="/visor-3d"
+        >
+          <div>
+            <span class="vr-modal-card-badge gold">Opción 3 · Inmersión Total</span>
+            <h3>3D Mejorada (Three.js)</h3>
+            <p>
+              Motor gráfico avanzado con halos estelares volumétricos, bóveda celeste dinámica, iluminación realista y narración guiada paso a paso.
+            </p>
+          </div>
+          <span class="vr-modal-card-action">Iniciar 3D Mejorada &rarr;</span>
+        </RouterLink>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================================================
+       INFORMACIÓN ABAJO: MANUALES PEDAGÓGICOS Y CRÉDITOS ACADÉMICOS
+       ========================================================================= -->
+  <main id="observatorio" class="container py-8">
+    <!-- Requisitos de accesibilidad y pruebas: preservados discretamente -->
+    <div class="sr-only" aria-hidden="true">
+      <header class="home-intro" aria-labelledby="home-title">
+        <div class="home-heading-row">
+          <h1 id="home-title" tabindex="-1">Explora AstroVisor</h1>
+          <span class="home-tagline">Cada estrella, una historia</span>
+        </div>
+        <p class="home-lead">
+          Descubre constelaciones e historias del cielo. Elige cómo deseas comenzar.
+        </p>
+      </header>
+
+      <section class="portal-section" aria-labelledby="home-title">
+        <div class="portal-cards">
+          <article id="tarjeta-explorar" class="portal-card" aria-labelledby="card-web-title">
+            <div class="portal-card-badge">Computadora o Proyector</div>
+            <h2 id="card-web-title" class="portal-card-title">Experiencia Web Educativa</h2>
+            <p class="portal-card-desc">
+              Recorrido en pantalla con constelaciones, narraciones en audio, historias culturales y libros recomendados de la biblioteca.
+            </p>
+            <div class="portal-card-actions">
+              <RouterLink class="portal-button primary" to="/explorar">
+                Explorar en pantalla
+              </RouterLink>
+            </div>
+          </article>
+
+          <article id="tarjeta-vr" class="portal-card portal-card-vr" aria-labelledby="card-vr-title">
+            <div class="portal-card-badge accent">Entorno 3D e Inmersión</div>
+            <h2 id="card-vr-title" class="portal-card-title">Experiencia Inmersiva 3D</h2>
+            <p class="portal-card-desc">
+              Exploración del cielo nocturno en 360 grados. Elige la modalidad de visualización según tu dispositivo:
+            </p>
+            <div class="portal-card-actions vr-actions">
+              <RouterLink class="portal-button primary" to="/visor-3d">
+                <span class="btn-main">Experiencia 3D Mejorada (Three.js)</span>
+              </RouterLink>
+              <a class="portal-button secondary" href="/prueba-homido/index.html?modo=libre">
+                <span class="btn-main">3D ligera · mouse o dedo</span>
+              </a>
+              <a class="portal-button homido" href="/prueba-homido/index.html?modo=homido">
+                <span class="btn-main">Visor Homido · pantalla dividida</span>
+              </a>
+            </div>
+          </article>
+
+          <article id="tarjeta-admin" class="portal-card" aria-labelledby="card-admin-title">
+            <div class="portal-card-badge muted">Gestión y Catálogo</div>
+            <h2 id="card-admin-title" class="portal-card-title">Administración</h2>
+            <p class="portal-card-desc">
+              Panel para personal bibliotecario y docente.
+            </p>
+            <div class="portal-card-actions">
+              <RouterLink class="portal-button outline" to="/admin">
+                Abrir administración
+              </RouterLink>
+            </div>
+          </article>
+        </div>
+      </section>
+    </div>
+
+    <!-- Sección de Manuales en Video (S5-05) -->
+    <section class="portal-manuals" aria-labelledby="manuals-heading">
+      <div class="portal-header">
+        <h2 id="manuals-heading">Manuales de uso y exploración</h2>
+        <p>Guías pedagógicas diseñadas para facilitar el uso autónomo de cada área de la aplicación.</p>
+      </div>
+
+      <div class="manuals-grid">
+        <!-- Manual 1: Web -->
+        <article class="manual-item" aria-labelledby="manual-web-title">
+          <div class="manual-badge-status" role="status">
+            <span class="badge-dot"></span>
+            Guion preparado · Pendiente de grabación
+          </div>
+          <h3 id="manual-web-title">1. Cómo usar la web educativa</h3>
+          <p class="manual-desc">
+            Recorrido paso a paso por la computadora y la proyección en pantalla grande: cómo navegar entre constelaciones, escuchar narraciones y consultar libros recomendados.
+          </p>
+          <details class="manual-details">
+            <summary>Ver guion técnico y transcripción accesible</summary>
+            <div class="manual-transcript">
+              <ol>
+                <li><strong>Inicio:</strong> Abre AstroVisor y pulsa «Explorar en pantalla» para acceder al catálogo público.</li>
+                <li><strong>Constelaciones:</strong> Selecciona Orión, Osa Mayor o Escorpio para ver su figura ilustrada y su relato mitológico.</li>
+                <li><strong>Audio:</strong> Pulsa «Escuchar narración» para oír la voz de Kokoro. Puedes pausar o consultar la transcripción textual completa.</li>
+                <li><strong>Vista para proyección:</strong> Pulsa el botón superior para agrandar los textos a 24 px si estás usando un proyector o pantalla de televisión.</li>
+                <li><strong>Libros:</strong> Consulta las recomendaciones al pie de cada ficha para acercarte a la biblioteca y solicitar lecturas afines.</li>
+              </ol>
+            </div>
+          </details>
+        </article>
+
+        <!-- Manual 2: VR -->
+        <article class="manual-item" aria-labelledby="manual-vr-title">
+          <div class="manual-badge-status" role="status">
+            <span class="badge-dot"></span>
+            Guion preparado · Pendiente de grabación
+          </div>
+          <h3 id="manual-vr-title">2. Cómo explorar en VR (Libre y Homido)</h3>
+          <p class="manual-desc">
+            Instrucciones para navegar en 3D: interacción con mouse o dedo en modo libre, colocación en el visor Homido, selección por mirada durante 3 segundos y botones de bienestar.
+          </p>
+          <details class="manual-details">
+            <summary>Ver guion técnico y transcripción accesible</summary>
+            <div class="manual-transcript">
+              <ol>
+                <li><strong>Modo Libre (mouse/dedo):</strong> Selecciona «Pantalla completa · mouse o dedo». Arrastra con el cursor o desliza la pantalla táctil para recorrer las estrellas.</li>
+                <li><strong>Modo Homido (pantalla dividida):</strong> Selecciona «Visor Homido». El sistema activa automáticamente la doble cámara para cada ojo. Coloca el teléfono dentro del visor.</li>
+                <li><strong>Selección por mirada:</strong> Centra el aro blanco en Orión, Osa Mayor o Escorpio durante 3 segundos. El aro amarillo indicará el progreso hasta abrir la ficha.</li>
+                <li><strong>Cielo visible y audio:</strong> La constelación seguirá iluminada de fondo mientras escuchas el relato. Pulsa «Pausar» o «Repetir» en cualquier momento.</li>
+                <li><strong>Pausa de mirada y salida:</strong> Usa el botón «Pausar mirada» si deseas contemplar las estrellas sin activar fichas. El botón «Salir» detiene el audio y vuelve a la web con seguridad.</li>
+              </ol>
+            </div>
+          </details>
+        </article>
+
+        <!-- Manual 3: Administración -->
+        <article class="manual-item" aria-labelledby="manual-admin-title">
+          <div class="manual-badge-status" role="status">
+            <span class="badge-dot"></span>
+            Guion preparado · Pendiente de grabación
+          </div>
+          <h3 id="manual-admin-title">3. Cómo administrar el catálogo</h3>
+          <p class="manual-desc">
+            Procedimiento para el personal de la biblioteca: acceso seguro, consulta del inventario persistente, alta de libros con año opcional y asignación de portadas ilustrativas.
+          </p>
+          <details class="manual-details">
+            <summary>Ver guion técnico y transcripción accesible</summary>
+            <div class="manual-transcript">
+              <ol>
+                <li><strong>Acceso:</strong> Pulsa «Abrir administración» e introduce las credenciales autorizadas en el formulario protegido.</li>
+                <li><strong>Consulta:</strong> Visualiza la lista de libros y constelaciones asociadas en el repositorio documental persistente.</li>
+                <li><strong>Alta de libro:</strong> Completa título, autor, constelación relacionada, motivo y enlace público HTTPS. El campo año es opcional.</li>
+                <li><strong>Portadas:</strong> El sistema genera automáticamente una portada armónica en formato SVG o permite asociar una imagen autorizada.</li>
+                <li><strong>Publicación:</strong> Guarda los cambios con control de concurrencia para que se sincronicen de inmediato con el catálogo público.</li>
+              </ol>
+            </div>
+          </details>
+        </article>
+      </div>
+    </section>
+
+    <!-- Sección de Créditos e Identidad Institucional (S5-06) -->
+    <section class="portal-credits" aria-labelledby="credits-heading">
+      <div class="credits-box">
+        <h2 id="credits-heading" class="credits-title">AstroVisor — Proyecto Académico</h2>
+        <p class="credits-team">
+          Desarrollado por el <strong>Equipo 8</strong> de la materia <strong>Taller de Full Stack</strong>:
+        </p>
+        <ul class="team-list">
+          <li><strong>Karime Rendón Vázquez</strong> — UX/UI, Accesibilidad y Coordinación de Manuales</li>
+          <li><strong>Luis Alberto Rodríguez</strong> — Experiencia 3D, Sensores e Interacción VR</li>
+          <li><strong>Carlos Martínez Orozco</strong> — Backend, Arquitectura Web y Catálogo Bibliográfico</li>
+          <li><strong>Índigo Andre Ortiz Vega</strong> — Persistencia Documental, Integración y QA Transversal</li>
+        </ul>
+        <div class="credits-affiliations">
+          <p>
+            En vinculación con la <strong>Biblioteca Pública Central Estatal Solón Argüello</strong> y el <strong>Instituto Tecnológico de Tepic (TecNM)</strong>.
+          </p>
+          <div class="credits-institutions-logos">
+            <img
+              class="credits-logo-cecan"
+              src="/Nayarit_CECAN_Convivencia_Horizontal.png"
+              width="11479"
+              height="1968"
+              alt="Gobierno del Estado de Nayarit y Consejo Estatal para la Cultura y las Artes de Nayarit (CECAN)"
+            />
+          </div>
+          <p class="credits-disclaimer">
+            <em>Nota de trazabilidad institucional:</em> Se incorpora el logotipo oficial horizontal de CECAN y Gobierno del Estado, clasificado como dependencia externa pendiente de autorización formal definitiva de uso.
+          </p>
+        </div>
+      </div>
+    </section>
+  </main>
 </template>
