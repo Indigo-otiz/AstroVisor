@@ -36,13 +36,17 @@
           Exploración del cielo nocturno en 360 grados. Elige la modalidad de visualización según tu dispositivo:
         </p>
         <div class="portal-card-actions vr-actions">
+          <RouterLink class="portal-button primary" to="/visor-3d">
+            <span class="btn-main">Experiencia 3D Mejorada (Three.js)</span>
+            <span class="btn-sub">Bóveda celeste inmersiva con halos y narración</span>
+          </RouterLink>
           <a class="portal-button secondary" href="/prueba-homido/index.html?modo=libre">
-            <span class="btn-main">Pantalla completa · mouse o dedo</span>
-            <span class="btn-sub">Recorrido 3D en pantalla sin visor</span>
+            <span class="btn-main">3D ligera · mouse o dedo</span>
+            <span class="btn-sub">Versión de menor demanda sin visor</span>
           </a>
           <a class="portal-button homido" href="/prueba-homido/index.html?modo=homido">
             <span class="btn-main">Visor Homido · pantalla dividida</span>
-            <span class="btn-sub">Estereoscopía y selección por mirada (3 s)</span>
+            <span class="btn-sub">Estereoscopía clásica (A-Frame)</span>
           </a>
         </div>
       </article>

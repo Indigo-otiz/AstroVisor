@@ -3,6 +3,7 @@ import { computed, nextTick, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import './public.css'
 const route = useRoute()
+const esInmersiva = computed(() => route.name === 'visor-3d')
 const esPublica = computed(() => ['inicio', 'explorar', 'constelacion', 'biblioteca', 'libro', 'visor'].includes(route.name))
 const esAdmin = computed(() => ['admin', 'admin-acceso'].includes(route.name))
 const presentacion = ref(false)
@@ -12,6 +13,7 @@ const titulos = {
   biblioteca: 'La biblioteca de las estrellas',
   libro: 'Información de libro',
   visor: 'Modo Homido',
+  'visor-3d': 'Experiencia 3D Mejorada',
   'admin-acceso': 'Acceso administrativo',
   admin: 'Panel de administración',
 }
@@ -32,8 +34,8 @@ watch(
   <div class="app-shell" :class="{ 'public-shell': esPublica, 'admin-shell': esAdmin, 'presentation-shell': esPublica && presentacion }">
     <a class="skip-link" href="#contenido">Saltar al contenido</a>
 
-    <!-- Header general: solo se muestra en vistas públicas, no en administración -->
-    <header v-if="!esAdmin" class="site-header">
+    <!-- Header general: solo se muestra en vistas públicas, no en administración ni en 3D inmersivo -->
+    <header v-if="!esAdmin && !esInmersiva" class="site-header">
       <div class="container header-content">
         <RouterLink class="brand" to="/"
           ><svg v-if="esPublica" class="brand-star" viewBox="0 0 32 32" aria-hidden="true">
@@ -65,12 +67,12 @@ watch(
     </header>
 
     <!-- Contenido principal -->
-    <main id="contenido" tabindex="-1" :class="esAdmin ? 'admin-main' : 'container main-content'">
+    <main id="contenido" tabindex="-1" :class="{ 'admin-main': esAdmin, 'inmersive-main': esInmersiva, 'container main-content': !esAdmin && !esInmersiva }">
       <RouterView :key="route.path" />
     </main>
 
-    <!-- Footer general: solo en vistas públicas -->
-    <footer v-if="!esAdmin" class="container site-footer institutional-footer">
+    <!-- Footer general: solo en vistas públicas (no en 3D inmersivo) -->
+    <footer v-if="!esAdmin && !esInmersiva" class="container site-footer institutional-footer">
       <ul class="institutional-footer-logos" aria-label="Instituciones">
         <li><img class="institutional-logo-cecan" src="/Nayarit_CECAN_Convivencia_Horizontal.png" width="11479" height="1968" alt="Gobierno del Estado de Nayarit y Consejo Estatal para la Cultura y las Artes de Nayarit (CECAN)" /></li>
         <li><img class="institutional-logo-library" src="/institucional/biblioteca-solon-arguello.png" width="1000" height="430" alt="Biblioteca Pública Central Estatal Solón Argüello" /></li>
@@ -82,3 +84,14 @@ watch(
     </footer>
   </div>
 </template>
+
+<style>
+.inmersive-main {
+  padding: 0 !important;
+  margin: 0 !important;
+  max-width: none !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  overflow: hidden !important;
+}
+</style>
