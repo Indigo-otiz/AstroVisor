@@ -116,9 +116,9 @@ test('las constelaciones están repartidas en direcciones distintas y sus áreas
 })
 
 test('las zonas de mirada quedan fuera del sector inicial de los relieves', () => {
-  const centroRelieves = { az: 0, el: 15.38 }
+  const centroRelieves = { az: 0, el: 16.22 }
   for (const figura of Object.values(FIGURAS)) {
-    assert.ok(separacionAngular(centroRelieves, figura.direccion) - radioAngularArea() > 20)
+    assert.ok(separacionAngular(centroRelieves, figura.direccion) - radioAngularArea() > 32)
   }
 })
 
