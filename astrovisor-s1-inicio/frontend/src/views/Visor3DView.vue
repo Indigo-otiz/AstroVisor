@@ -1353,11 +1353,11 @@ function handleDeviceOrientation(e) {
   }
 }
 
-// Emblemas Institucionales 3D auténticos detrás del observador (ITT, Solón Argüello y Nayarit CECAN)
+// Emblemas Institucionales 3D auténticos detrás del observador (ITT y Solón Argüello)
 async function initInstitutionalLogos3D() {
   const logosGroup = new THREE.Group()
   // Colocados detrás del observador en Z = +45, rotados 180° en Y para mirar directamente hacia la cámara
-  logosGroup.position.set(0, 6, 45)
+  logosGroup.position.set(0, 5, 45)
   logosGroup.rotation.set(0, Math.PI, 0)
 
   const textureLoader = new THREE.TextureLoader()
@@ -1371,9 +1371,9 @@ async function initInstitutionalLogos3D() {
         tex.colorSpace = THREE.SRGBColorSpace
         const relieveTepic = crearRelieve(THREE, tepicData, tex)
         if (relieveTepic) {
-          relieveTepic.scale.setScalar(12)
-          relieveTepic.position.set(-16, 2, 0)
-          relieveTepic.rotation.set(0, 0.35, 0)
+          relieveTepic.scale.setScalar(13)
+          relieveTepic.position.set(-11, 0, 0)
+          relieveTepic.rotation.set(0, 0.25, 0)
           logosGroup.add(relieveTepic)
         }
       })
@@ -1390,7 +1390,7 @@ async function initInstitutionalLogos3D() {
       const relieveBib = crearRelieve(THREE, bibData, null)
       if (relieveBib) {
         relieveBib.scale.setScalar(24)
-        relieveBib.position.set(12, 2, 0)
+        relieveBib.position.set(11, 0, 0)
         relieveBib.rotation.set(0, -0.25, 0)
         logosGroup.add(relieveBib)
       }
@@ -1399,23 +1399,9 @@ async function initInstitutionalLogos3D() {
     console.warn('Fallback para logo Biblioteca:', e)
   }
 
-  // 3. Emblema Gobierno del Estado de Nayarit / CECAN (Centro, abajo a Y = -6.5 para no sobreponerse con los otros)
-  textureLoader.load('/Nayarit_CECAN_Convivencia_Horizontal.png', (tex) => {
-    tex.colorSpace = THREE.SRGBColorSpace
-    const cecanGeo = new THREE.PlaneGeometry(28, 8.5)
-    const cecanMat = new THREE.MeshBasicMaterial({
-      map: tex,
-      transparent: true,
-      side: THREE.DoubleSide
-    })
-    const cecanMesh = new THREE.Mesh(cecanGeo, cecanMat)
-    cecanMesh.position.set(0, -6.5, 0)
-    logosGroup.add(cecanMesh)
-  })
-
   // Luz puntual dedicada para realzar los relieves 3D traseros
   const logoLight = new THREE.PointLight(0xfff5e6, 2.5, 70, 1)
-  logoLight.position.set(0, 8, 12)
+  logoLight.position.set(0, 6, 12)
   logosGroup.add(logoLight)
 
   scene.add(logosGroup)
@@ -2346,7 +2332,6 @@ onBeforeUnmount(() => {
 
         <!-- Emblemas institucionales oficiales en cabecera -->
         <div class="hud-logos-strip">
-          <img src="/Nayarit_CECAN_Convivencia_Horizontal.png" alt="Gobierno del Estado de Nayarit y CECAN" class="hud-logo-img" />
           <img src="/institucional/biblioteca-solon-arguello.png" alt="Biblioteca Solón Argüello" class="hud-logo-img" />
           <img src="/ITTepic_logo.jpg" alt="IT Tepic" class="hud-logo-img circular" />
         </div>
