@@ -2,9 +2,9 @@
 import { cargarRespaldoPublicado } from '../../public/prueba-homido/js/respaldo-publicado.js'
 import { portadaPublicadaValida } from '../../public/prueba-homido/js/paquete-publico.js'
 
-export const CONSTELACIONES_LIBROS = Object.freeze(['orion', 'osa-mayor', 'escorpio'])
-export const nombresConstelacion = Object.freeze({ orion: 'Orión', 'osa-mayor': 'Osa Mayor', escorpio: 'Escorpio' })
-export const alternativaPortada = libro => libro.portada?.tipo === 'imagen-autorizada' ? libro.portada.textoAlternativo : `Portada ilustrativa, no original: ${libro.titulo}`
+export const CONSTELACIONES_LIBROS = Object.freeze(['orion', 'osa-mayor', 'escorpio', 'can-mayor', 'boyero'])
+export const nombresConstelacion = Object.freeze({ orion: 'Orión', 'osa-mayor': 'Osa Mayor', escorpio: 'Escorpio', 'can-mayor': 'Can Mayor', boyero: 'Boyero' })
+export const alternativaPortada = libro => libro.portada?.tipo === 'fotografia-ejemplar' ? `Portada fotografiada: ${libro.titulo}` : libro.portada?.tipo === 'imagen-autorizada' ? libro.portada.textoAlternativo : `Portada ilustrativa, no original: ${libro.titulo}`
 
 export async function listarLibros(idConstelacion, { signal, alUsarRespaldo } = {}) {
   if (!CONSTELACIONES_LIBROS.includes(idConstelacion)) return []
@@ -23,6 +23,7 @@ export async function listarLibros(idConstelacion, { signal, alUsarRespaldo } = 
     catalogo = carga.libros; alUsarRespaldo(carga)
   }
   return catalogo.filter((libro) => typeof libro.recomendaciones?.[idConstelacion] === 'string')
+    .sort((a, b) => Number(a.demostracion) - Number(b.demostracion))
     .map((libro) => ({ ...libro, motivo: libro.recomendaciones[idConstelacion] }))
 }
 
@@ -33,14 +34,16 @@ export async function buscarLibro(idConstelacion, idLibro, opciones) {
 export function esLibroValido(libro) {
   if (!libro || typeof libro.id !== 'string' || !/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(libro.id)) return false
   try {
-    const url = new URL(libro.enlacePublico)
+    const fotografiado = libro.portada?.tipo === 'fotografia-ejemplar'
+    const url = fotografiado && libro.enlacePublico === undefined ? null : new URL(libro.enlacePublico)
     return ['titulo', 'autor'].every((k) => typeof libro[k] === 'string' && libro[k].trim())
       && typeof libro.demostracion === 'boolean' && typeof libro.marc21?.campo001 === 'string' && typeof libro.marc21.campo003 === 'string'
       && typeof libro.portadaIlustrativa === 'string' && (/^\/libros-demo\/[a-z0-9-]+\.svg$/.test(libro.portadaIlustrativa)
         || new RegExp(`^/api/contenidos/libros/${libro.id}/portada\\.svg\\?revision=[1-9][0-9]*$`).test(libro.portadaIlustrativa)
         || (libro.portada?.tipo==='imagen-autorizada' && ['png','jpeg'].includes(libro.portada.formato) && ['procedencia','permiso','textoAlternativo'].every(k=>typeof libro.portada[k]==='string'&&libro.portada[k].trim()) && new RegExp(`^/api/contenidos/libros/${libro.id}/portada\\.${libro.portada.formato==='png'?'png':'jpg'}\\?revision=[1-9][0-9]*$`).test(libro.portadaIlustrativa))
+        || (fotografiado && libro.portadaIlustrativa === `/portadas-biblioteca/${libro.id}.jpg`)
         || portadaPublicadaValida(libro.id, libro.portadaIlustrativa))
-      && url.protocol === 'https:' && !url.username && !url.password
+      && (url === null || (url.protocol === 'https:' && !url.username && !url.password))
   } catch { return false }
 }
 

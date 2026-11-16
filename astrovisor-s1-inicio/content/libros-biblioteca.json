@@ -1,0 +1,102 @@
+[
+  {
+    "constelacionId": "orion",
+    "id": "cazador-de-estrellas",
+    "titulo": "Cazador de estrellas",
+    "autor": "Silvia L. Cuesy",
+    "motivo": "Lectura complementaria. Una biografía ilustrada sobre la observación de las estrellas."
+  },
+  {
+    "constelacionId": "orion",
+    "id": "el-astronomo",
+    "titulo": "El astrónomo",
+    "autor": "Walt Whitman",
+    "motivo": "Lectura complementaria. Una lectura literaria sobre la experiencia de mirar el cielo."
+  },
+  {
+    "constelacionId": "orion",
+    "id": "mi-gran-libro-del-espacio",
+    "titulo": "Mi gran libro del espacio",
+    "motivo": "Lectura complementaria. Una introducción ilustrada para continuar explorando el espacio."
+  },
+  {
+    "constelacionId": "osa-mayor",
+    "id": "para-comprender-el-universo",
+    "titulo": "Para comprender el Universo",
+    "motivo": "Lectura complementaria. Una guía general para situar la observación del cielo en el contexto del universo."
+  },
+  {
+    "constelacionId": "osa-mayor",
+    "id": "viaje-al-espacio",
+    "titulo": "Viaje al espacio",
+    "motivo": "Lectura complementaria. Una lectura ilustrada sobre la exploración espacial."
+  },
+  {
+    "constelacionId": "osa-mayor",
+    "id": "ng-el-espacio",
+    "titulo": "National Geographic: El espacio",
+    "autor": "National Geographic",
+    "motivo": "Lectura complementaria. Un número de revista sobre nuestro lugar en el espacio."
+  },
+  {
+    "constelacionId": "escorpio",
+    "id": "esa-inmensa-galaxia",
+    "titulo": "Esa inmensa galaxia",
+    "autor": "Kjartan Poskitt",
+    "motivo": "Lectura complementaria. Una introducción a la galaxia como contexto para observar el cielo nocturno."
+  },
+  {
+    "constelacionId": "escorpio",
+    "id": "oscuro-muy-oscuro",
+    "titulo": "Oscuro, muy oscuro",
+    "autor": "Ruth Brown",
+    "motivo": "Lectura complementaria. Un cuento ilustrado para acompañar el tema de la oscuridad nocturna."
+  },
+  {
+    "constelacionId": "escorpio",
+    "id": "ng-destino-pluton",
+    "titulo": "National Geographic: Destino Plutón",
+    "autor": "National Geographic",
+    "motivo": "Lectura complementaria. Una lectura sobre la exploración de un mundo lejano del Sistema Solar."
+  },
+  {
+    "constelacionId": "can-mayor",
+    "id": "cosmografia-y-astrofisica",
+    "titulo": "Cosmografía y astrofísica",
+    "autor": "Salvador Mosquera R.",
+    "motivo": "Lectura complementaria. Un texto general para ampliar los conceptos de astronomía y astrofísica."
+  },
+  {
+    "constelacionId": "can-mayor",
+    "id": "el-sistema-solar-sitesa",
+    "titulo": "El Sistema Solar",
+    "autor": "Miguel Ángel Herrera y Julieta Fierro",
+    "motivo": "Lectura complementaria. Una guía sobre los cuerpos que componen nuestro Sistema Solar."
+  },
+  {
+    "constelacionId": "can-mayor",
+    "id": "ng-sistema-solar",
+    "titulo": "National Geographic: Sistema Solar",
+    "autor": "National Geographic",
+    "motivo": "Lectura complementaria. Un número ilustrado para explorar el entorno planetario."
+  },
+  {
+    "constelacionId": "boyero",
+    "id": "conacyt-la-tierra",
+    "titulo": "CONACYT te cuenta: La Tierra",
+    "motivo": "Lectura complementaria. Una lectura sobre la Tierra, nuestro punto de observación del cielo."
+  },
+  {
+    "constelacionId": "boyero",
+    "id": "por-que-la-luna",
+    "titulo": "¿Por qué la Luna cambia de forma?",
+    "motivo": "Lectura complementaria. Una introducción a las fases de la Luna y a la observación del cielo."
+  },
+  {
+    "constelacionId": "boyero",
+    "id": "el-libro-de-los-cientificos",
+    "titulo": "El libro de los científicos",
+    "autor": "Struan Reid y Patricia Fara",
+    "motivo": "Lectura complementaria. Un recorrido por la historia de la ciencia para ampliar el contexto de la observación."
+  }
+]

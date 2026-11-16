@@ -115,9 +115,11 @@ test('las constelaciones están repartidas en direcciones distintas y sus áreas
   assert.ok(new Set(dirs.map((d) => d.el)).size === dirs.length, 'distintas elevaciones, no una fila de menú')
 })
 
-test('al menos una constelación es visible en la vista inicial (campo de ±40° del frente)', () => {
-  const visibles = Object.values(FIGURAS).filter((f) => Math.abs(f.direccion.az) < 40 && f.direccion.el < 40)
-  assert.ok(visibles.length >= 1)
+test('las zonas de mirada quedan fuera del sector inicial de los relieves', () => {
+  const centroRelieves = { az: 0, el: 16.22 }
+  for (const figura of Object.values(FIGURAS)) {
+    assert.ok(separacionAngular(centroRelieves, figura.direccion) - radioAngularArea() > 32)
+  }
 })
 
 test('posicionEnEsfera: distancia constante, hacia el frente y encarando al observador', () => {

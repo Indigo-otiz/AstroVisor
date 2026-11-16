@@ -51,7 +51,7 @@ watch(tituloPagina, (titulo) => { document.title = `${titulo} · AstroVisor` }, 
           <section class="invitacion-lectura" aria-labelledby="invitacion-lectura-titulo">
             <p class="invitacion-lectura-etiqueta">Tu viaje por las estrellas continúa en los libros</p>
             <h2 id="invitacion-lectura-titulo">¿Te gustaría conocer más sobre {{ constelacion.titulo }}?</h2>
-            <p>Descubre tres lecturas recomendadas y explora una estantería digital creada para disfrutar con calma.</p>
+            <p>Descubre las lecturas recomendadas en la estantería digital.</p>
             <RouterLink class="public-button" :to="{ name: 'biblioteca', params: { id: constelacion.id } }">
               Ver libros recomendados sobre {{ constelacion.titulo }}
             </RouterLink>

@@ -424,6 +424,7 @@ onBeforeUnmount(cancelarPeticiones)
               <label for="tipo-portada">Tipo de portada</label>
               <select id="tipo-portada" v-model="borrador.tipoPortada">
                 <option v-if="libroActual && !libroActual.portada" value="heredada">Conservar SVG heredado</option>
+                <option v-if="libroActual?.portada?.tipo === 'fotografia-ejemplar'" value="fotografia-ejemplar">Conservar fotografía del ejemplar</option>
                 <option value="ilustrativa">Ilustrativa automática</option>
                 <option value="imagen-autorizada">Imagen propia autorizada (PNG/JPEG)</option>
               </select>
@@ -450,7 +451,7 @@ onBeforeUnmount(cancelarPeticiones)
               <label for="editor-anio">Año de publicación (opcional)</label>
               <input id="editor-anio" v-model.number="borrador.anio" type="number" min="1" max="9999" />
               <label for="editor-enlace">Enlace público de la obra (HTTPS)</label>
-              <input id="editor-enlace" v-model="borrador.enlacePublico" type="url" required maxlength="2048" pattern="https://.+" />
+              <input id="editor-enlace" v-model="borrador.enlacePublico" type="url" :required="borrador.tipoPortada !== 'fotografia-ejemplar'" maxlength="2048" pattern="https://.+" />
               <div v-for="relacion in borrador.relaciones" :key="relacion.constelacionId" class="catalogo-motivo">
                 <label v-if="seleccion.tipo === 'nuevo'" class="catalogo-check"><input v-model="relacion.seleccionada" type="checkbox" /> Asociar con {{ nombreRecorrido(relacion.constelacionId) }}</label>
                 <template v-if="seleccion.tipo !== 'nuevo' || relacion.seleccionada">

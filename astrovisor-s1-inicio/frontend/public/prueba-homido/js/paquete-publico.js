@@ -28,6 +28,7 @@ export function validarReferenciasPaquete(recorridos, libros, m) {
     exigir(typeof l?.id === 'string' && /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(l.id) && !ids.has(l.id) && typeof l.titulo === 'string' && typeof l.autor === 'string')
     ids.add(l.id); exigir(new RegExp(`^portadas/${l.id}\\.(svg|png|jpg)$`).test(l.portadaIlustrativa));
     if(l.portada?.tipo==='imagen-autorizada')exigir(l.portadaIlustrativa===`portadas/${l.id}.${l.portada.formato==='png'?'png':l.portada.formato==='jpeg'?'jpg':'invalido'}`)
+    else if(l.portada?.tipo==='fotografia-ejemplar')exigir(l.portadaIlustrativa===`portadas/${l.id}.jpg`)
     else exigir(l.portadaIlustrativa.endsWith('.svg'))
     activo(l.portadaIlustrativa)
   }

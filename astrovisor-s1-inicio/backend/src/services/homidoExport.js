@@ -67,6 +67,11 @@ export async function verificarPaquete(dir,{io=fs}={}) {
 }
 const svgPermitidos=new Set(['star-lore','field-stars','half-hours'].map(id=>`/libros-demo/${id}.svg`))
 const audiosPermitidos=new Set(['orion','osa-mayor','escorpio','can-mayor','boyero'].map(id=>`/audio/${id}-kokoro-v1.wav`))
+function extensionPortada(libro) {
+  if (libro.portada?.tipo === 'fotografia-ejemplar') return 'jpg'
+  if (libro.portada?.tipo === 'imagen-autorizada') return libro.portada.formato === 'png' ? 'png' : 'jpg'
+  return 'svg'
+}
 async function preparar(c,io) {
   const archivos=new Map(),recorridos=proyectarRecorridos(c),libros=proyectarLibros(c)
   const copiar=async src=>{
@@ -77,12 +82,13 @@ async function preparar(c,io) {
   for(const l of c.libros) {
     let bytes
     if(l.portada?.tipo==='imagen-autorizada')bytes=await leerImagen(l.portada)
+    else if(l.portada?.tipo==='fotografia-ejemplar')bytes=await copiar(l.portadaIlustrativa)
     else if(l.portada?.plantilla)bytes=Buffer.from(generarPortada(l))
     else {if(!svgPermitidos.has(l.portadaIlustrativa))throw fallo('Portada estática no autorizada');bytes=await copiar(l.portadaIlustrativa)}
-    archivos.set(`portadas/${l.id}.${l.portada?.tipo==='imagen-autorizada'?(l.portada.formato==='png'?'png':'jpg'):'svg'}`,bytes)
+    archivos.set(`portadas/${l.id}.${extensionPortada(l)}`,bytes)
   }
   for(const r of recorridos) {
-    for(const l of r.libros){const ficha=c.libros.find(x=>x.id===l.libroId);l.portada={...l.portada,src:`portadas/${l.libroId}.${ficha.portada?.tipo==='imagen-autorizada'?(ficha.portada.formato==='png'?'png':'jpg'):'svg'}`}}
+    for(const l of r.libros){const ficha=c.libros.find(x=>x.id===l.libroId);l.portada={...l.portada,src:`portadas/${l.libroId}.${extensionPortada(ficha)}`}}
     for(const a of r.multimedia) {
       if(!audiosPermitidos.has(a.src))throw fallo('Audio no autorizado para exportación')
       const ruta='audio/'+basename(a.src)
@@ -90,7 +96,7 @@ async function preparar(c,io) {
       a.src=ruta
     }
   }
-  for(const l of libros){const ficha=c.libros.find(x=>x.id===l.id);l.portadaIlustrativa=`portadas/${l.id}.${ficha.portada?.tipo==='imagen-autorizada'?(ficha.portada.formato==='png'?'png':'jpg'):'svg'}`}
+  for(const l of libros){const ficha=c.libros.find(x=>x.id===l.id);l.portadaIlustrativa=`portadas/${l.id}.${extensionPortada(ficha)}`}
   archivos.set('recorridos-demo.json',json(recorridos));archivos.set('libros.json',json(libros))
   return archivos
 }

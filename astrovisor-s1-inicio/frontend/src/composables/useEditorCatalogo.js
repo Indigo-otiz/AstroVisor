@@ -147,7 +147,7 @@ export function useEditorCatalogo({ obtenerToken, obtenerUsuario = () => '', alE
       relaciones: b.relaciones.filter((r) => r.seleccionada).map(({ constelacionId, motivo }) => ({ constelacionId, motivo }))
     } : tipo === 'libro' ? {
       ...(anioNormalizado !== undefined ? { anio: anioNormalizado } : {}),
-      enlacePublico: borrador.value.enlacePublico,
+      enlacePublico: b.tipoPortada === 'fotografia-ejemplar' ? b.enlacePublico?.trim() || null : b.enlacePublico,
       relaciones: borrador.value.relaciones.map((r) => ({ constelacionId: r.constelacionId, motivo: r.motivo }))
     } : { resumen: borrador.value.resumen, comoReconocerla: borrador.value.comoReconocerla }
     if(tipo==='libro'){

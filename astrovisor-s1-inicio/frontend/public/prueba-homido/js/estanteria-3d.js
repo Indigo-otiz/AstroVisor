@@ -18,7 +18,9 @@ export function extraerLibros(recorridos,preferido='') {
     }
   }
   const comparar=(a,b)=>a<b?-1:a>b?1:0;
-  salida.sort((a,b)=>Number(b.constelacionId===preferido)-Number(a.constelacionId===preferido)||comparar(a.libroId,b.libroId)||comparar(a.constelacionId,b.constelacionId));
+  const fotografiado = l => l.portada?.tipo === 'fotografia-ejemplar';
+  salida.sort((a,b)=>Number(b.constelacionId===preferido)-Number(a.constelacionId===preferido)
+    ||Number(fotografiado(b))-Number(fotografiado(a))||comparar(a.libroId,b.libroId)||comparar(a.constelacionId,b.constelacionId));
   return [...new Map(salida.map(l=>[l.libroId,null])).keys()].slice(0,3).map(id=>salida.find(l=>l.libroId===id));
 }
 function crear(doc,tag,attrs,padre) {
@@ -35,7 +37,8 @@ export function ajustarTextoCubierta(ctx,texto,ancho,maxLineas,fuentes,cabe = ()
   return {font:fuentes[fuentes.length-1],lineas:['Texto completo','en la ficha 2D']};
 }
 function cubierta(doc,libro) {
-  if (portadaPublicadaValida(libro.id,libro.portada?.src) || (libro.portada?.tipo==='imagen-autorizada' && new RegExp(`^/api/contenidos/libros/${libro.id}/portada\\.(png|jpg)\\?revision=[1-9][0-9]*$`).test(libro.portada.src))) {
+  const fotoLocal = libro.portada?.tipo === 'fotografia-ejemplar' && libro.portada.src === `/portadas-biblioteca/${libro.id}.jpg`;
+  if (fotoLocal || portadaPublicadaValida(libro.id,libro.portada?.src) || (libro.portada?.tipo==='imagen-autorizada' && new RegExp(`^/api/contenidos/libros/${libro.id}/portada\\.(png|jpg)\\?revision=[1-9][0-9]*$`).test(libro.portada.src))) {
     const imagen=crear(doc,'img',{id:'cubierta-vr-'+libro.id,src:libro.portada.src,'data-portada-homido':''},doc.querySelector('a-assets'));
     return '#'+imagen.id;
   }
