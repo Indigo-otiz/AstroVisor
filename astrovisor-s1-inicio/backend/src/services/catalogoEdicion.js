@@ -47,7 +47,7 @@ export function editarCatalogo(catalogo, { tipo, id, datos }) {
   if (libro && Object.hasOwn(datos, 'tema') && (typeof datos.tema !== 'string' || !/^#[0-9a-fA-F]{6}$/.test(datos.tema))) throw fallo(400, 'Color inválido')
   if (libro && Object.hasOwn(datos, 'anio') && datos.anio !== null && datos.anio !== undefined && (!Number.isInteger(datos.anio) || datos.anio < 1 || datos.anio > 9999)) throw fallo(400, 'Año inválido')
   if (nuevo && catalogo.libros.some((l) => l.id === datos.id)) throw fallo(409, 'ID de libro duplicado')
-  if (libro && datos.enlacePublico !== undefined && catalogo.libros.some((l) => l.id !== (nuevo ? datos.id : id) && l.enlacePublico === datos.enlacePublico)) throw fallo(409, 'Referencia bibliográfica duplicada')
+  if (libro && typeof datos.enlacePublico === 'string' && catalogo.libros.some((l) => l.id !== (nuevo ? datos.id : id) && l.enlacePublico === datos.enlacePublico)) throw fallo(409, 'Referencia bibliográfica duplicada')
   let destino
   if (nuevo) {
     let portada
@@ -83,6 +83,8 @@ export function editarCatalogo(catalogo, { tipo, id, datos }) {
     if (Object.hasOwn(datos, k)) {
       if (k === 'anio' && (datos.anio === null || datos.anio === undefined || datos.anio === '')) {
         delete destino.anio
+      } else if (k === 'enlacePublico' && datos[k] === null && destino.portada?.tipo === 'fotografia-ejemplar') {
+        delete destino.enlacePublico
       } else {
         destino[k] = datos[k]
       }

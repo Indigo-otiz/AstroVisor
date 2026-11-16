@@ -43,12 +43,16 @@ export function validarCatalogo(catalogo) {
     idsLibros.add(libro.id)
     exigir(texto(libro.titulo, 200) && texto(libro.autor, 200), 'título o autor inválido')
     exigir(libro.anio === undefined || (Number.isInteger(libro.anio) && libro.anio > 0 && libro.anio <= 9999), 'año inválido')
-    exigir(texto(libro.enlacePublico, 2048) && https(libro.enlacePublico), 'enlace de libro inválido')
+    const fotografiado = libro.portada?.tipo === 'fotografia-ejemplar'
+    exigir((fotografiado && libro.enlacePublico === undefined) || (texto(libro.enlacePublico, 2048) && https(libro.enlacePublico)), 'enlace de libro inválido')
     exigir(typeof libro.demostracion === 'boolean', 'falta identificación de demostración')
     exigir(objeto(libro.marc21) && texto(libro.marc21.campo001, 200) && texto(libro.marc21.campo003, 200), 'metadatos MARC inválidos')
     exigir(!('recomendaciones' in libro), 'las relaciones pertenecen al recorrido')
     if (libro.portada !== undefined) {
-      if (libro.portada.tipo === 'imagen-autorizada') {
+      if (fotografiado) {
+        exigir(libro.portadaIlustrativa === `/portadas-biblioteca/${libro.id}.jpg`, 'ruta de fotografía inválida')
+        activo(libro.portadaIlustrativa, /^\/portadas-biblioteca\/[a-z0-9-]+\.jpg$/)
+      } else if (libro.portada.tipo === 'imagen-autorizada') {
         configurarPortada(libro)
         exigir(libro.portadaIlustrativa === rutaPortada(libro), 'ruta de imagen inválida')
       } else {
@@ -125,6 +129,7 @@ export function proyectarRecorridos({ recorridos, libros, revision }) {
         libroId: l.id, constelacionId: recorrido.id, titulo: l.titulo, autor: l.autor, ...(l.anio === undefined ? {} : { anio: l.anio }), url: l.enlacePublico,
         motivo: r.motivo, demostracion: l.demostracion, referenciaHeredada: r.referencia !== undefined,
         portada: l.portada?.tipo === 'imagen-autorizada' ? { tipo: 'imagen-autorizada', origen: 'imagen', formato: l.portada.formato, src: rutaPortada(l, revision), procedencia:l.portada.procedencia, permiso:l.portada.permiso, textoAlternativo:l.portada.textoAlternativo }
+          : l.portada?.tipo === 'fotografia-ejemplar' ? { tipo: 'fotografia-ejemplar', src: l.portadaIlustrativa }
           : l.portada?.plantilla ? { tipo: 'ilustrativa', origen: 'plantilla', plantilla: l.portada.plantilla, paleta: l.portada.paleta }
           : { tipo: 'ilustrativa', origen: 'estatica', src: l.portadaIlustrativa } }
     }),
@@ -140,7 +145,7 @@ export function proyectarLibros({ recorridos, libros, revision }, constelacionId
     if (constelacionId !== undefined && !Object.hasOwn(recomendaciones, constelacionId)) return []
     const campos = ['id', 'titulo', 'autor', 'anio', 'enlacePublico', 'portadaIlustrativa', 'tema', 'demostracion', 'marc21']
     return [{ ...Object.fromEntries(campos.filter((c) => Object.hasOwn(libro, c)).map((c) => [c, libro[c]])), portadaIlustrativa: rutaPortada(libro, revision), recomendaciones,
-      ...(libro.portada?.tipo === 'imagen-autorizada' ? { portada:camposPublicos(libro.portada,['tipo','formato','procedencia','permiso','textoAlternativo']) } : {}),
+      ...(libro.portada?.tipo === 'imagen-autorizada' || libro.portada?.tipo === 'fotografia-ejemplar' ? { portada:camposPublicos(libro.portada,['tipo','formato','procedencia','permiso','textoAlternativo']) } : {}),
       ...(constelacionId === undefined ? {} : { motivo: recomendaciones[constelacionId] }) }]
   })
 }
