@@ -2,7 +2,7 @@
 
 ## 1. Composición y verificación
 
-- [x] 1.1 Ajustar el encuadre inicial y el grupo de relieves. Verificar su visibilidad completa en libre y Homido.
+- [x] 1.1 Agrupar los relieves y verificar su visibilidad completa al orientarse hacia ellos en libre y Homido.
 - [x] 1.2 Reubicar las figuras y comprobar la separación visual y la apertura de las cinco fichas.
 - [x] 1.3 Compilar y comprobar la escena en escritorio y en vista dividida horizontal. Registrar capturas y resultados.
 

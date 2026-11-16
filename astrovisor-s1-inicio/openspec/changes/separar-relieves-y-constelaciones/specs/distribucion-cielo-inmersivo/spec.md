@@ -6,14 +6,14 @@ Presentar los emblemas institucionales y las figuras estelares en una escena com
 
 ## ADDED Requirements
 
-### Requirement: Encuadre inicial de los relieves
+### Requirement: Relieves agrupados en un sector del cielo
 
-La cámara SHALL iniciar centrada en los dos relieves institucionales dentro del cielo.
+La escena SHALL mostrar los dos relieves institucionales agrupados en el sector opuesto al encuadre inicial.
 
-#### Scenario: Abrir el recorrido inmersivo
+#### Scenario: Girar hacia los relieves
 
-- **WHEN** el visitante abre el modo libre o el modo Homido
-- **THEN** ambos relieves aparecen completos y agrupados dentro del encuadre inicial.
+- **WHEN** el visitante gira desde el encuadre estelar inicial hacia los relieves en modo libre o Homido
+- **THEN** ambos relieves aparecen completos y agrupados.
 
 ### Requirement: Figuras estelares separadas de los relieves
 

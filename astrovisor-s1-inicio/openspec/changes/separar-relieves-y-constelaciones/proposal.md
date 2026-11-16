@@ -6,7 +6,7 @@ Los relieves institucionales pueden cubrir las figuras y sus rótulos durante el
 
 ## What Changes
 
-- Crear una composición inicial centrada en los dos relieves, con estrellas de fondo a su alrededor.
+- Agrupar los dos relieves en un sector del cielo, con estrellas de fondo a su alrededor.
 - Distribuir las cinco constelaciones en sectores visibles al girar desde la vista inicial.
 
 ## Capabilities

@@ -7,7 +7,7 @@ El grupo de relieves se coloca actualmente cerca de la cámara. La captura muest
 ## Decisions
 
 - Colocar ambos relieves juntos en un sector exclusivo del cielo, orientados hacia el visitante. Usar las estrellas de fondo para enmarcarlos y preservar las proporciones de cada emblema.
-- Centrar la cámara inicial en ese grupo. Usar el mismo encuadre inicial para libre y Homido y conservar los controles de cámara posteriores.
+- Mostrar el grupo de relieves al girar desde la vista estelar inicial, en libre y Homido.
 - Distribuir las constelaciones alrededor con suficiente separación para sus estrellas, nombres y objetivos de mirada. Comprobar la proyección efectiva en escritorio y pantalla horizontal dividida.
 
 ## Risks / Trade-offs
