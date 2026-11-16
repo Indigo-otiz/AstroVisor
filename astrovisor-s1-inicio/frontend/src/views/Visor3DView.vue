@@ -63,6 +63,7 @@ const mouseVec = new THREE.Vector2()
 let infoQuadroGroup = null
 let canvasQuadro = null
 let textureQuadro = null
+const bookImageCache = new Map()
 
 // Botones 3D asociados al Quadro
 let quadroBtn1 = null
@@ -103,8 +104,149 @@ function setObjectQuaternion(quaternion, alpha, beta, gamma, orient) {
   quaternion.multiply(q0.setFromAxisAngle(zee, -orient))
 }
 
-// Catálogo base de libros con datos completos y portadas SVG
+// Catálogo base de libros: Obras reales de la Biblioteca Solón Argüello con portadas fotografiadas
 const LIBROS_CATALOGO = {
+  // Orión
+  'cazador-de-estrellas': {
+    id: 'cazador-de-estrellas',
+    titulo: 'Cazador de estrellas',
+    autor: 'Silvia L. Cuesy',
+    portada: { tipo: 'fotografia-ejemplar', src: '/portadas-biblioteca/cazador-de-estrellas.jpg' },
+    motivo: 'Lectura complementaria. Una biografía ilustrada sobre la observación de las estrellas.',
+    demostracion: false,
+    marc21: { campo001: 'cazador-de-estrellas', campo003: 'SOLON-ARGÜELLO' }
+  },
+  'el-astronomo': {
+    id: 'el-astronomo',
+    titulo: 'El astrónomo',
+    autor: 'Walt Whitman',
+    portada: { tipo: 'fotografia-ejemplar', src: '/portadas-biblioteca/el-astronomo.jpg' },
+    motivo: 'Lectura complementaria. Una lectura literaria sobre la experiencia de mirar el cielo.',
+    demostracion: false,
+    marc21: { campo001: 'el-astronomo', campo003: 'SOLON-ARGÜELLO' }
+  },
+  'mi-gran-libro-del-espacio': {
+    id: 'mi-gran-libro-del-espacio',
+    titulo: 'Mi gran libro del espacio',
+    autor: 'Catherine D. Hughes',
+    portada: { tipo: 'fotografia-ejemplar', src: '/portadas-biblioteca/mi-gran-libro-del-espacio.jpg' },
+    motivo: 'Lectura complementaria. Una introducción ilustrada para continuar explorando el espacio.',
+    demostracion: false,
+    marc21: { campo001: 'mi-gran-libro-del-espacio', campo003: 'SOLON-ARGÜELLO' }
+  },
+  // Osa Mayor
+  'para-comprender-el-universo': {
+    id: 'para-comprender-el-universo',
+    titulo: 'Para comprender el Universo',
+    autor: 'Philippe de La Cotardière',
+    portada: { tipo: 'fotografia-ejemplar', src: '/portadas-biblioteca/para-comprender-el-universo.jpg' },
+    motivo: 'Lectura complementaria. Una guía general para situar la observación del cielo en el contexto del universo.',
+    demostracion: false,
+    marc21: { campo001: 'para-comprender-el-universo', campo003: 'SOLON-ARGÜELLO' }
+  },
+  'viaje-al-espacio': {
+    id: 'viaje-al-espacio',
+    titulo: 'Viaje al espacio',
+    autor: 'Carole Stott',
+    portada: { tipo: 'fotografia-ejemplar', src: '/portadas-biblioteca/viaje-al-espacio.jpg' },
+    motivo: 'Lectura complementaria. Una lectura ilustrada sobre la exploración espacial.',
+    demostracion: false,
+    marc21: { campo001: 'viaje-al-espacio', campo003: 'SOLON-ARGÜELLO' }
+  },
+  'ng-el-espacio': {
+    id: 'ng-el-espacio',
+    titulo: 'National Geographic: El espacio',
+    autor: 'National Geographic',
+    portada: { tipo: 'fotografia-ejemplar', src: '/portadas-biblioteca/ng-el-espacio.jpg' },
+    motivo: 'Lectura complementaria. Un número de revista sobre nuestro lugar en el espacio.',
+    demostracion: false,
+    marc21: { campo001: 'ng-el-espacio', campo003: 'SOLON-ARGÜELLO' }
+  },
+  // Escorpio
+  'esa-inmensa-galaxia': {
+    id: 'esa-inmensa-galaxia',
+    titulo: 'Esa inmensa galaxia',
+    autor: 'Kjartan Poskitt',
+    portada: { tipo: 'fotografia-ejemplar', src: '/portadas-biblioteca/esa-inmensa-galaxia.jpg' },
+    motivo: 'Lectura complementaria. Una introducción a la galaxia como contexto para observar el cielo nocturno.',
+    demostracion: false,
+    marc21: { campo001: 'esa-inmensa-galaxia', campo003: 'SOLON-ARGÜELLO' }
+  },
+  'oscuro-muy-oscuro': {
+    id: 'oscuro-muy-oscuro',
+    titulo: 'Oscuro, muy oscuro',
+    autor: 'Ruth Brown',
+    portada: { tipo: 'fotografia-ejemplar', src: '/portadas-biblioteca/oscuro-muy-oscuro.jpg' },
+    motivo: 'Lectura complementaria. Un relato sobre la noche y la oscuridad del firmamento.',
+    demostracion: false,
+    marc21: { campo001: 'oscuro-muy-oscuro', campo003: 'SOLON-ARGÜELLO' }
+  },
+  'por-que-la-luna': {
+    id: 'por-que-la-luna',
+    titulo: 'Por qué la Luna no se cae',
+    autor: 'Jordi Fortuny',
+    portada: { tipo: 'fotografia-ejemplar', src: '/portadas-biblioteca/por-que-la-luna.jpg' },
+    motivo: 'Lectura complementaria. Respuestas claras y visuales sobre la gravedad y la mecánica celeste.',
+    demostracion: false,
+    marc21: { campo001: 'por-que-la-luna', campo003: 'SOLON-ARGÜELLO' }
+  },
+  // Can Mayor
+  'cosmografia-y-astrofisica': {
+    id: 'cosmografia-y-astrofisica',
+    titulo: 'Cosmografía y astrofísica',
+    autor: 'Manuel E. Maldonado',
+    portada: { tipo: 'fotografia-ejemplar', src: '/portadas-biblioteca/cosmografia-y-astrofisica.jpg' },
+    motivo: 'Lectura complementaria. Fundamentos científicos de los astros y las estrellas de fondo.',
+    demostracion: false,
+    marc21: { campo001: 'cosmografia-y-astrofisica', campo003: 'SOLON-ARGÜELLO' }
+  },
+  'el-sistema-solar-sitesa': {
+    id: 'el-sistema-solar-sitesa',
+    titulo: 'El Sistema Solar',
+    autor: 'Giles Sparrow',
+    portada: { tipo: 'fotografia-ejemplar', src: '/portadas-biblioteca/el-sistema-solar-sitesa.jpg' },
+    motivo: 'Lectura complementaria. Guía visual del vecindario cósmico y los cuerpos celestes.',
+    demostracion: false,
+    marc21: { campo001: 'el-sistema-solar-sitesa', campo003: 'SOLON-ARGÜELLO' }
+  },
+  'ng-sistema-solar': {
+    id: 'ng-sistema-solar',
+    titulo: 'National Geographic: Sistema Solar',
+    autor: 'National Geographic',
+    portada: { tipo: 'fotografia-ejemplar', src: '/portadas-biblioteca/ng-sistema-solar.jpg' },
+    motivo: 'Lectura complementaria. Reportaje gráfico sobre los planetas y la exploración astronómica.',
+    demostracion: false,
+    marc21: { campo001: 'ng-sistema-solar', campo003: 'SOLON-ARGÜELLO' }
+  },
+  // Boyero
+  'conacyt-la-tierra': {
+    id: 'conacyt-la-tierra',
+    titulo: 'Conacyt: La Tierra',
+    autor: 'Consejo Nacional de Ciencia y Tecnología',
+    portada: { tipo: 'fotografia-ejemplar', src: '/portadas-biblioteca/conacyt-la-tierra.jpg' },
+    motivo: 'Lectura complementaria. Nuestro planeta observado desde el firmamento y las estaciones del año.',
+    demostracion: false,
+    marc21: { campo001: 'conacyt-la-tierra', campo003: 'SOLON-ARGÜELLO' }
+  },
+  'el-libro-de-los-cientificos': {
+    id: 'el-libro-de-los-cientificos',
+    titulo: 'El libro de los científicos',
+    autor: 'Equipo Editorial',
+    portada: { tipo: 'fotografia-ejemplar', src: '/portadas-biblioteca/el-libro-de-los-cientificos.jpg' },
+    motivo: 'Lectura complementaria. Semblanzas de quienes descifraron los movimientos estelares.',
+    demostracion: false,
+    marc21: { campo001: 'el-libro-de-los-cientificos', campo003: 'SOLON-ARGÜELLO' }
+  },
+  'ng-destino-pluton': {
+    id: 'ng-destino-pluton',
+    titulo: 'National Geographic: Destino Plutón',
+    autor: 'National Geographic',
+    portada: { tipo: 'fotografia-ejemplar', src: '/portadas-biblioteca/ng-destino-pluton.jpg' },
+    motivo: 'Lectura complementaria. Crónica de la exploración de las fronteras de nuestro sistema solar.',
+    demostracion: false,
+    marc21: { campo001: 'ng-destino-pluton', campo003: 'SOLON-ARGÜELLO' }
+  },
+  // Libros clásicos adicionales / demostración
   'star-lore': {
     id: 'star-lore',
     titulo: 'Star Lore of All Ages',
@@ -277,18 +419,9 @@ const CONSTELACIONES_CONFIG = [
     historia: 'En un relato de la tradición griega, Orión era un cazador que recorría la tierra. Las personas imaginaron su figura entre las estrellas: dos hombros, dos pies y un cinturón en el centro. Contar su historia ayudaba a recordar ese dibujo en el cielo. Esta es una adaptación breve de muestra; otras culturas han encontrado figuras y relatos diferentes en las mismas estrellas.',
     comoReconecerla: 'Busca tres estrellas cercanas que parecen formar una línea: representan el cinturón. Imagina después una figura alrededor de ellas.',
     libros: [
-      {
-        ...LIBROS_CATALOGO['star-lore'],
-        motivo: 'Descubre relatos antiguos sobre las estrellas y por qué imaginamos a Orión en el cielo.'
-      },
-      {
-        ...LIBROS_CATALOGO['field-stars'],
-        motivo: 'Observa cómo una guía clásica describe y organiza las estrellas del cielo nocturno.'
-      },
-      {
-        ...LIBROS_CATALOGO['half-hours'],
-        motivo: 'Dedica una lectura corta a reconocer las figuras del cielo y sus relaciones.'
-      }
+      LIBROS_CATALOGO['cazador-de-estrellas'],
+      LIBROS_CATALOGO['el-astronomo'],
+      LIBROS_CATALOGO['mi-gran-libro-del-espacio']
     ],
     estrellas: [
       { nombre: 'Betelgeuse', pos: [-36, 42, -210], color: 0xffaa55, size: 3.2 },
@@ -313,18 +446,9 @@ const CONSTELACIONES_CONFIG = [
     historia: 'Una historia de la tradición griega relaciona a la Osa Mayor con Calisto, transformada en una osa y situada en el cielo. Es una de muchas maneras de interpretar estas estrellas. Otras personas han visto en parte de la figura un carro o un cucharón. Esos dibujos compartidos permiten recordar las estrellas y pasar historias de una generación a otra. Este relato es una adaptación de muestra.',
     comoReconecerla: 'En una parte de esta constelación se distingue una figura de siete estrellas: cuatro parecen formar un recipiente y tres, un mango.',
     libros: [
-      {
-        ...LIBROS_CATALOGO['star-lore'],
-        motivo: 'Conoce las leyendas que acompañan a las figuras de la Osa Mayor a lo largo de la historia.'
-      },
-      {
-        ...LIBROS_CATALOGO['field-stars'],
-        motivo: 'Continúa la observación de la Osa Mayor con una guía práctica de estrellas.'
-      },
-      {
-        ...LIBROS_CATALOGO['half-hours'],
-        motivo: 'Amplía tu recorrido con explicaciones sencillas sobre grupos de estrellas circumpolares.'
-      }
+      LIBROS_CATALOGO['para-comprender-el-universo'],
+      LIBROS_CATALOGO['viaje-al-espacio'],
+      LIBROS_CATALOGO['ng-el-espacio']
     ],
     estrellas: [
       { nombre: 'Dubhe', pos: [110, 150, -90], color: 0xffe2aa, size: 3.1 },
@@ -348,18 +472,9 @@ const CONSTELACIONES_CONFIG = [
     historia: 'Algunos relatos de la tradición griega cuentan que un escorpión se enfrentó a Orión. Quienes narraban la historia imaginaron a ambos entre las estrellas y convirtieron sus figuras en una forma de recordar el cielo. El arco de estrellas de Escorpio recuerda una cola curvada.',
     comoReconecerla: 'Imagina una línea larga que termina en una curva, como la cola de un escorpión. Una de sus estrellas más conocidas es Antares.',
     libros: [
-      {
-        ...LIBROS_CATALOGO['half-hours'],
-        motivo: 'Explora relatos y mapas estelares de la constelación de Escorpio y el corazón de Antares.'
-      },
-      {
-        ...LIBROS_CATALOGO['star-lore'],
-        motivo: 'Descubre el mito clásico del cazador y el escorpión enfrentados en el firmamento.'
-      },
-      {
-        ...LIBROS_CATALOGO['field-stars'],
-        motivo: 'Guía de observación para ubicar las estrellas principales del gancho celestial de Escorpio.'
-      }
+      LIBROS_CATALOGO['esa-inmensa-galaxia'],
+      LIBROS_CATALOGO['oscuro-muy-oscuro'],
+      LIBROS_CATALOGO['por-que-la-luna']
     ],
     estrellas: [
       { nombre: 'Antares', pos: [210, 62, 50], color: 0xff4422, size: 3.7 },
@@ -383,18 +498,9 @@ const CONSTELACIONES_CONFIG = [
     historia: 'En la tradición clásica, el Can Mayor representa a Lélape, el perro más veloz que acompañaba al cazador Orión a través del firmamento. En su pecho brilla Sirio, una estrella tan luminosa y cercana que los pueblos antiguos la usaban para marcar las estaciones del año y la crecida de los ríos.',
     comoReconecerla: 'Ubica primero el cinturón de tres estrellas de Orión y sigue esa línea recta hacia abajo y hacia la izquierda: encontrarás a Sirio, inconfundible por su intenso brillo azulado.',
     libros: [
-      {
-        ...LIBROS_CATALOGO['star-lore'],
-        motivo: 'Relatos antiguos sobre el Can Mayor y el resplandor de Sirio en la historia de las civilizaciones.'
-      },
-      {
-        ...LIBROS_CATALOGO['field-stars'],
-        motivo: 'Guía práctica para ubicar a Sirio y las estrellas acompañantes del Can Mayor.'
-      },
-      {
-        ...LIBROS_CATALOGO['half-hours'],
-        motivo: 'Observaciones astronómicas del cielo invernal y la joya azulada de Sirio.'
-      }
+      LIBROS_CATALOGO['cosmografia-y-astrofisica'],
+      LIBROS_CATALOGO['el-sistema-solar-sitesa'],
+      LIBROS_CATALOGO['ng-sistema-solar']
     ],
     estrellas: [
       { nombre: 'Sirio', pos: [-95, -75, -180], color: 0xc8e6ff, size: 4.8 },
@@ -416,18 +522,9 @@ const CONSTELACIONES_CONFIG = [
     historia: 'El Boyero es imaginado en diversas tradiciones como un pastor o campesino que guía los rebaños en el cielo nocturno y vigila a las osas que giran alrededor del polo norte celeste. Su corazón resplandece con Arturo, una estrella gigante de color anaranjado que es una de las más luminosas visibles a simple vista.',
     comoReconecerla: 'Localiza las tres estrellas que forman el mango curvo de la Osa Mayor y sigue esa curva natural por el cielo: te conducirá directamente a Arturo, brillante y de tono cálido anaranjado.',
     libros: [
-      {
-        ...LIBROS_CATALOGO['field-stars'],
-        motivo: 'Observa el trazado en cometa de Boyero y la posición estelar de la gigante naranja Arturo.'
-      },
-      {
-        ...LIBROS_CATALOGO['half-hours'],
-        motivo: 'Guía estelar para reconocer la silueta del Boyero siguiendo el mango curvo de la Osa Mayor.'
-      },
-      {
-        ...LIBROS_CATALOGO['star-lore'],
-        motivo: 'Mitos clásicos del pastor cósmico y de navegantes antiguos que se orientaban con Arturo.'
-      }
+      LIBROS_CATALOGO['conacyt-la-tierra'],
+      LIBROS_CATALOGO['el-libro-de-los-cientificos'],
+      LIBROS_CATALOGO['ng-destino-pluton']
     ],
     estrellas: [
       { nombre: 'Arturo', pos: [-140, 100, 140], color: 0xff8833, size: 3.8 },
@@ -621,7 +718,54 @@ function renderQuadroTexture(data, mode = 'ficha') {
       const bx = startX + i * (bookWidth + gap)
       const by = 320
 
-      // Cuerpo del libro con sombra
+      // Si tiene fotografía de portada, dibujarla directamente en la cubierta
+      const fotoSrc = libro.portada?.src || (libro.portada?.tipo === 'fotografia-ejemplar' ? `/portadas-biblioteca/${libro.id}.jpg` : (typeof libro.portada === 'string' && libro.portada.startsWith('/') ? libro.portada : null))
+      if (fotoSrc) {
+        let img = bookImageCache.get(fotoSrc)
+        if (!img) {
+          img = new Image()
+          img.crossOrigin = 'anonymous'
+          img.onload = () => {
+            textureQuadro.needsUpdate = true
+            renderQuadroTexture(selectedData.value, vistaQuadro.value)
+          }
+          img.src = fotoSrc
+          bookImageCache.set(fotoSrc, img)
+        }
+        if (img.complete && img.naturalWidth > 0) {
+          ctx.save()
+          ctx.beginPath()
+          ctx.roundRect(bx, by, bookWidth, bookHeight, 18)
+          ctx.clip()
+          ctx.drawImage(img, bx, by, bookWidth, bookHeight)
+          ctx.restore()
+
+          // Borde dorado elegante
+          ctx.beginPath()
+          ctx.roundRect(bx, by, bookWidth, bookHeight, 18)
+          ctx.lineWidth = 6
+          ctx.strokeStyle = '#f5c842'
+          ctx.stroke()
+
+          // Distintivo inferior "✦ Toca o enfoca para leer ✦"
+          ctx.save()
+          ctx.beginPath()
+          ctx.roundRect(bx + 20, by + bookHeight - 56, bookWidth - 40, 42, 21)
+          ctx.fillStyle = 'rgba(10, 18, 42, 0.88)'
+          ctx.fill()
+          ctx.lineWidth = 2
+          ctx.strokeStyle = '#f5c842'
+          ctx.stroke()
+          ctx.fillStyle = '#f5c842'
+          ctx.font = 'bold 20px "Space Grotesk", sans-serif'
+          ctx.textAlign = 'center'
+          ctx.fillText('✦ Toca o enfoca para leer ✦', bx + bookWidth / 2, by + bookHeight - 29)
+          ctx.restore()
+          return
+        }
+      }
+
+      // Cuerpo del libro con sombra si la foto aún está cargando o es ilustrativo
       ctx.save()
       ctx.shadowColor = 'rgba(0, 0, 0, 0.7)'
       ctx.shadowBlur = 20
@@ -768,15 +912,17 @@ function renderQuadroTexture(data, mode = 'ficha') {
 
     ctx.fillStyle = '#f5c842'
     ctx.font = 'bold 32px "Space Grotesk", sans-serif'
-    ctx.fillText('REFERENCIA DOCUMENTAL · BIBLIOTECA SOLÓN ARGÜELLO', 130, 745)
+    const esReal = libro.demostracion === false || libro.portada?.tipo === 'fotografia-ejemplar'
+    ctx.fillText(esReal ? 'EJEMPLAR FÍSICO · BIBLIOTECA PÚBLICA CENTRAL ESTATAL SOLÓN ARGÜELLO' : 'REFERENCIA DOCUMENTAL · BIBLIOTECA SOLÓN ARGÜELLO', 130, 745)
 
     ctx.fillStyle = '#cbd5e1'
     ctx.font = '36px "Space Grotesk", sans-serif'
-    ctx.fillText('Ejemplar disponible para lectura libre en Internet en Project Gutenberg / Archive.org.', 130, 805)
+    ctx.fillText(esReal ? 'Ejemplar físico perteneciente a la colección disponible en la biblioteca.' : 'Ejemplar disponible para lectura libre en Internet en Project Gutenberg / Archive.org.', 130, 805)
 
     ctx.fillStyle = '#94a3b8'
     ctx.font = '30px "Space Grotesk", sans-serif'
-    ctx.fillText(`Identificador MARC 21: ${libro.marc21?.campo001 || 'DEMO-001'} (Campo 003: DEMO)`, 130, 865)
+    const idTxt = libro.marc21?.campo001 ? `Identificador: ${libro.marc21.campo001}` : `Identificador del ejemplar: ${libro.id}`
+    ctx.fillText(idTxt, 130, 865)
   }
 
   ctx.textAlign = 'left'
@@ -1659,14 +1805,25 @@ function seleccionarConstelacion(id) {
 
   const dynamicRecorrido = catalogoRecorridos.value.find((r) => r.id === id)
 
-  // Combinar libros de configuración con datos dinámicos si existen
+  // Priorizar libros con fotografía del ejemplar real de la biblioteca
   let librosLista = cfg.libros
   if (dynamicRecorrido?.libros && dynamicRecorrido.libros.length > 0) {
-    librosLista = dynamicRecorrido.libros.map((l, idx) => ({
+    const ordenados = [...dynamicRecorrido.libros].sort((a, b) => {
+      const aFoto = a.portada?.tipo === 'fotografia-ejemplar' || a.demostracion === false
+      const bFoto = b.portada?.tipo === 'fotografia-ejemplar' || b.demostracion === false
+      return Number(bFoto) - Number(aFoto)
+    })
+    librosLista = ordenados.map((l) => ({
       ...l,
-      motivo: cfg.libros[idx]?.motivo || l.aclaracion || 'Lectura recomendada de astronomía y mitología.',
-      portada: l.portada || cfg.libros[idx]?.portada || '/libros-demo/star-lore.svg',
-      marc21: cfg.libros[idx]?.marc21 || { campo001: `DEMO-00${idx + 1}`, campo003: 'DEMO', signatura: 'Sin signatura asignada' }
+      id: l.libroId || l.id,
+      titulo: l.titulo,
+      autor: l.autor || 'Autor sin confirmar',
+      anio: l.anio,
+      motivo: l.motivo || l.aclaracion || 'Lectura recomendada de astronomía y mitología.',
+      portada: l.portada || { tipo: 'fotografia-ejemplar', src: `/portadas-biblioteca/${l.libroId || l.id}.jpg` },
+      portadaIlustrativa: l.portada?.src || `/portadas-biblioteca/${l.libroId || l.id}.jpg`,
+      demostracion: l.demostracion ?? false,
+      marc21: l.marc21 || { campo001: l.libroId || l.id, campo003: 'SOLON-ARGÜELLO', signatura: 'Acervo Biblioteca Estatal' }
     }))
   }
 
