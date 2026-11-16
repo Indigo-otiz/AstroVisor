@@ -61,6 +61,8 @@ function cubierta(doc,libro) {
   doc.querySelector('a-assets').appendChild(c);return '#'+c.id;
 }
 /** Portadas como planos A-Frame delante de una repisa; selección con el mismo dwell del visor. */
+export const LIMITES_ESTANTERIA = { x: 0, y: 0.0625, ancho: 3.66, alto: 2.605, zMin: -0.17, zMax: 0.24 };
+
 export function crearEstanteria3D(doc,grupo,libros,ligar,pantalla = false) {
   const nodos=new Map();
   crear(doc,'a-plane',{width:3.64,height:2.45,position:'0 0.14 -0.17',

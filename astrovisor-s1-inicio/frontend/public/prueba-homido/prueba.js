@@ -15,7 +15,8 @@ import { registrarCielo } from './js/cielo.js';
 import { vistasOjos } from './js/estereo.js';
 import { leerParametros, iniciarDiagnostico } from './js/diagnostico.js';
 import { calcularLayout, dibujarFicha, zonaAMundo, presentarAudio, PLANO_ALTO } from './js/ficha-canvas.js';
-import { crearEstanteria3D, extraerLibros, calcularDetalleLibro } from './js/estanteria-3d.js';
+import { crearEstanteria3D, extraerLibros, calcularDetalleLibro, LIMITES_ESTANTERIA } from './js/estanteria-3d.js';
+import { anclajePanel, escalaPanel, alturasPanel, crearPruebaVisibilidad, crearCierreFueraDeVista, LIMITES_CONTROLES } from './js/panel-espacial.js';
 import { rutaLibro2D } from './js/ruta-libro-2d.js';
 
 (function () {
@@ -95,10 +96,13 @@ import { rutaLibro2D } from './js/ruta-libro-2d.js';
   let estanteria = null;
   let userReady = false; // evita autodisparos mientras la persona acomoda el visor
   let saliendo = false;
+  let anclajeLectura = null;
+  let escalaLectura = null;
+  let limitesFicha = null;
+  const cierreFueraDeVista = crearCierreFueraDeVista();
 
   // Geometría de la escena (m): la ficha termina en y=0.9 y los controles quedan debajo, sin tocarla
   const FICHA_BASE_Y = 0.9;
-  const POS_CONTROLES = { recorrido: '0 0.45 -3.5' };
   const POS_CONTROLES_Y = 0.45;
 
   // --- Retroalimentación auditiva (Web Audio) ---
@@ -261,6 +265,7 @@ import { rutaLibro2D } from './js/ruta-libro-2d.js';
 
   /** Reutiliza un único canvas para ficha de constelación y detalle de libro. */
   function pintarLayout(layout) {
+    limitesFicha = zonaAMundo(layout.items.find((item) => item.k === 'caja').rect);
     dibujarFicha(cardCanvas.getContext('2d'), layout);
     actualizarTextura();
     detailCover.setAttribute('visible', Boolean(layout.portada));
@@ -335,9 +340,10 @@ import { rutaLibro2D } from './js/ruta-libro-2d.js';
     constelaciones.forEach((c) => c.resaltar(false));
     if (!sincronizando) narracion = null; // hasta que el reproductor confirme el audio de ESTA ficha (si nos abre él, su estado ya llegó)
     selectionCount++;
-    // La ficha y sus controles aparecen frente a donde mira la persona (las constelaciones están a ±40°)
-    colocarVistaFrente(infoPanel3D);
+    anclajeLectura = anclajePanel(constelaciones.get(id).direccion);
+    cierreFueraDeVista.reiniciar();
     pintarFicha(ficha);
+    colocarVistaAnclada();
     // S5: Mantener constelaciones visibles de fondo y resaltar la activa
     constelacionesEl.setAttribute('visible', 'true');
     constelacionesEl.querySelectorAll('[data-action]').forEach((el) => el.classList.remove('selectable'));
@@ -355,36 +361,48 @@ import { rutaLibro2D } from './js/ruta-libro-2d.js';
     if (!sincronizando) narracion = null;
     vistaLectura = 'ficha';
     libroSeleccionado = null;
+    anclajeLectura = null;
+    cierreFueraDeVista.reiniciar();
     activarGrupo(estanteriaEl, false);
     activarGrupo(infoPanel3D, false);
     activarGrupo(constelacionesEl, true);
     constelaciones.forEach((c) => c.resaltar(false));
-    visorControls3D.setAttribute('position', POS_CONTROLES.recorrido);
-    visorControls3D.setAttribute('rotation', '0 0 0');
+    visorControls3D.object3D.position.set(0, POS_CONTROLES_Y, -3.5);
+    visorControls3D.object3D.rotation.set(0, 0, 0);
+    visorControls3D.object3D.scale.setScalar(1);
     refrescarRaycaster();
     selectionStatus.textContent = mensajeEnReposo();
     eventLine('Regreso al recorrido de constelaciones.');
     if (!sincronizando) window.dispatchEvent(new Event('astrovisor:ficha-cerrada'));
   }
 
-  /** El panel y la estantería siempre se colocan delante de la dirección actual de la mirada. */
-  function colocarVistaFrente(grupo) {
-    const camera = scene.camera;
-    const { Quaternion, Vector3, MathUtils } = AFRAME.THREE;
-    const giro = camera.getWorldQuaternion(new Quaternion());
-    const origen = camera.getWorldPosition(new Vector3());
-    const distancia = 3.4;
-    const aspecto = camera.aspect / (stereoActive ? 2 : 1);
-    const anchoVisible = 2 * distancia * Math.tan(MathUtils.degToRad(camera.fov) / 2) * aspecto;
-    const escala = Math.min(1, anchoVisible * .91 / 3.78);
-    const posicionar = (el, y) => {
-      const relativo = new Vector3(0, y * escala, -distancia).applyQuaternion(giro);
-      el.object3D.position.copy(origen).add(relativo);
-      el.object3D.quaternion.copy(giro);
-      el.object3D.scale.setScalar(escala);
+  function limitesVistaActiva() {
+    return vistaLectura === 'estanteria' ? LIMITES_ESTANTERIA : limitesFicha;
+  }
+
+  function grupoVistaActiva() {
+    return vistaLectura === 'estanteria' ? estanteriaEl.object3D : infoPanel3D.object3D;
+  }
+
+  function ajustarVistaAnclada(aspecto) {
+    if (!anclajeLectura || !(aspecto > 0)) return;
+    const escala = escalaPanel(scene.camera.fov, aspecto);
+    if (escala === escalaLectura) return;
+    escalaLectura = escala;
+    const { x, y, z, rotY } = anclajeLectura;
+    const alturas = alturasPanel(y, escala, limitesVistaActiva());
+    const orientar = (objeto, altura) => {
+      objeto.position.set(x, altura, z);
+      objeto.rotation.set(0, rotY * Math.PI / 180, 0);
+      objeto.scale.setScalar(escala);
     };
-    posicionar(grupo, vistaLectura === 'ficha' && grupo === infoPanel3D ? .14 : 0);
-    posicionar(visorControls3D, -1.48);
+    orientar(grupoVistaActiva(), alturas.panel);
+    orientar(visorControls3D.object3D, alturas.controles);
+  }
+
+  function colocarVistaAnclada() {
+    escalaLectura = null;
+    if (scene.camera) ajustarVistaAnclada(scene.camera.aspect / (stereoActive ? 2 : 1));
   }
 
   function abrirEstanteria() {
@@ -396,7 +414,7 @@ import { rutaLibro2D } from './js/ruta-libro-2d.js';
     document.querySelectorAll('[data-portada-homido]').forEach(c => c.remove());
     estanteria = crearEstanteria3D(document, estanteriaEl, libros, ligar, pantalla);
     vistaLectura = 'estanteria';
-    colocarVistaFrente(estanteriaEl);
+    colocarVistaAnclada();
     estanteria.mostrar(estado.fichaId);
     activarGrupo(infoPanel3D, false);
     activarGrupo(estanteriaEl, true);
@@ -412,8 +430,8 @@ import { rutaLibro2D } from './js/ruta-libro-2d.js';
     dwell.cancelar();
     libroSeleccionado = libro;
     vistaLectura = 'detalle';
-    colocarVistaFrente(infoPanel3D);
     pintarLayout(calcularDetalleLibro(cardCanvas.getContext('2d'), libro));
+    colocarVistaAnclada();
     activarGrupo(estanteriaEl, false);
     activarGrupo(infoPanel3D, true);
     refrescarRaycaster();
@@ -426,7 +444,7 @@ import { rutaLibro2D } from './js/ruta-libro-2d.js';
     dwell.cancelar();
     libroSeleccionado = null;
     vistaLectura = 'estanteria';
-    colocarVistaFrente(estanteriaEl);
+    colocarVistaAnclada();
     activarGrupo(infoPanel3D, false);
     activarGrupo(estanteriaEl, true);
     refrescarRaycaster();
@@ -437,8 +455,8 @@ import { rutaLibro2D } from './js/ruta-libro-2d.js';
     if (vistaLectura !== 'estanteria') return;
     dwell.cancelar();
     vistaLectura = 'ficha';
-    colocarVistaFrente(infoPanel3D);
     pintarFicha(fichas.get(estado.fichaId));
+    colocarVistaAnclada();
     activarGrupo(estanteriaEl, false);
     activarGrupo(infoPanel3D, true);
     refrescarRaycaster();
@@ -738,7 +756,7 @@ import { rutaLibro2D } from './js/ruta-libro-2d.js';
       const figura = FIGURAS[ficha.id];
       const dir = figura.direccion ?? { az: (i * 360) / lista.length, el: 25 };
       const c = crearConstelacion(document, { ficha, figura, pos: posicionEnEsfera(dir.az, dir.el) });
-      constelaciones.set(ficha.id, c);
+      constelaciones.set(ficha.id, { ...c, direccion: dir });
       constelacionesEl.appendChild(c.el);
       c.el.querySelectorAll('[data-action]').forEach(ligar);
     });
@@ -830,6 +848,18 @@ import { rutaLibro2D } from './js/ruta-libro-2d.js';
     return;
   }
 
+  const enCampoDeVision = crearPruebaVisibilidad(AFRAME.THREE);
+  function vigilarVista(tiempo, aspecto, camara, otroOjo) {
+    if (!anclajeLectura || saliendo) return;
+    ajustarVistaAnclada(aspecto);
+    const grupo = grupoVistaActiva();
+    const limites = limitesVistaActiva();
+    const visibleEn = (vista) => enCampoDeVision(vista, grupo, limites) ||
+      enCampoDeVision(vista, visorControls3D.object3D, LIMITES_CONTROLES);
+    const visible = visibleEn(camara) || Boolean(otroOjo && visibleEn(otroOjo));
+    if (cierreFueraDeVista.debeCerrar(visible, tiempo)) cerrarFicha();
+  }
+
   AFRAME.registerComponent('experimental-stereo', {
     init() {
       this.stereoCamera = new AFRAME.THREE.StereoCamera();
@@ -837,16 +867,22 @@ import { rutaLibro2D } from './js/ruta-libro-2d.js';
       this.enabledStereo = false;
       stereoComponent = this;
     },
-    tock() {
-      if (!this.enabledStereo || !this.el.renderer || !this.el.camera) return;
+    tock(tiempo) {
+      if (!this.el.renderer || !this.el.camera) return;
+      if (!this.enabledStereo && !anclajeLectura) return;
       const renderer = this.el.renderer;
       if (renderer.xr && renderer.xr.isPresenting) return;
-      const size = renderer.getSize(new AFRAME.THREE.Vector2()); // px CSS (ver js/estereo.js)
-      const vistas = vistasOjos(size.x, size.y);
       const camera = this.el.camera;
       camera.updateWorldMatrix(true, false);
+      if (!this.enabledStereo) {
+        vigilarVista(tiempo, camera.aspect, camera);
+        return;
+      }
+      const size = renderer.getSize(new AFRAME.THREE.Vector2()); // px CSS (ver js/estereo.js)
+      const vistas = vistasOjos(size.x, size.y);
       this.stereoCamera.aspect = vistas.aspecto / camera.aspect;
       this.stereoCamera.update(camera);
+      vigilarVista(tiempo, vistas.aspecto, this.stereoCamera.cameraL, this.stereoCamera.cameraR);
       renderer.setScissorTest(true);
       for (const [vista, ojo] of [[vistas.izquierdo, this.stereoCamera.cameraL], [vistas.derecho, this.stereoCamera.cameraR]]) {
         renderer.setViewport(vista.x, vista.y, vista.ancho, vista.alto);
