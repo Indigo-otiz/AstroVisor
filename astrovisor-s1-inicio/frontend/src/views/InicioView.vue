@@ -536,47 +536,39 @@ onBeforeUnmount(() => {
       <span class="text-white/60 ml-1.5 font-mono text-[9px]">{{ starTooltip.mag }}</span>
     </div>
 
-    <!-- Top Overlay: Logo AstroVisor -->
-    <header class="hero-topbar">
-      <div class="hero-brand-panel">
-        <h1 class="hero-brand-title">
-          <svg class="hero-brand-star" viewBox="0 0 32 32" aria-hidden="true">
-            <path d="m16 2 4 10 10 4-10 4-4 10-4-10-10-4 10-4Z" fill="currentColor" />
-          </svg>
-          ASTROVISOR
-        </h1>
-      </div>
-    </header>
-
-    <div></div>
-
-    <!-- Bottom Overlay: Experience Buttons -->
+    <!-- Bottom Overlay: Experience Cards (Dual Glassmorphism) -->
     <div class="hero-bottom">
-      <!-- Action Buttons -->
-      <div class="hero-action-buttons">
-        <RouterLink class="hero-btn-web" to="/explorar">
-          <svg class="hero-btn-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
-          </svg>
-          <div class="hero-btn-texts">
-            <span class="hero-btn-title">Explorar en Pantalla</span>
-            <span class="hero-btn-subtitle">Constelaciones, relatos y libros</span>
+      <div class="hero-cards-container">
+        <!-- Tarjeta 1: Web Educativa (Pantalla 2D) -->
+        <RouterLink class="hero-glass-card web-card" to="/explorar">
+          <div class="card-icon-box" aria-hidden="true">
+            <svg class="card-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+            </svg>
+          </div>
+          <div class="card-content">
+            <span class="card-badge badge-web">PANTALLA 2D</span>
+            <span class="card-title">Explorar Constelaciones</span>
+            <span class="card-hint">Relatos y biblioteca &rarr;</span>
           </div>
         </RouterLink>
 
-        <!-- Experiencia VR con 3 opciones: 2D, 3D Lite y 3D Versión Completa -->
+        <!-- Tarjeta 2: Inmersión 3D / VR -->
         <button
           id="btnVRExperiencia"
-          class="hero-btn-vr"
+          class="hero-glass-card vr-card"
           type="button"
           @click="mostrarModalVR = true"
         >
-          <svg class="hero-btn-icon" fill="currentColor" viewBox="0 0 24 24">
-            <path d="M21 6H3c-1.1 0-2 .9-2 2v8c0 1.1.9 2 2 2h4.5l2.5-3 2.5 3H21c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm-14 7c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm10 0c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2z"/>
-          </svg>
-          <div class="hero-btn-texts">
-            <span class="hero-btn-title">Entrar al Visor 3D / VR</span>
-            <span class="hero-btn-subtitle">Cielo en 360° · Con o sin lentes</span>
+          <div class="card-icon-box" aria-hidden="true">
+            <svg class="card-icon" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M21 6H3c-1.1 0-2 .9-2 2v8c0 1.1.9 2 2 2h4.5l2.5-3 2.5 3H21c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm-14 7c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm10 0c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2z"/>
+            </svg>
+          </div>
+          <div class="card-content">
+            <span class="card-badge badge-vr">INMERSIÓN 3D</span>
+            <span class="card-title">Entrar al Visor 360°</span>
+            <span class="card-hint">Con o sin gafas VR &#10022;</span>
           </div>
         </button>
       </div>

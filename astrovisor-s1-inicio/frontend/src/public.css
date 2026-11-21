@@ -1,3 +1,9 @@
+:root {
+  --font-orbitron: 'Orbitron', system-ui, -apple-system, sans-serif;
+  --font-sans: 'Space Grotesk', system-ui, -apple-system, sans-serif;
+  --font-serif: 'Newsreader', Georgia, serif;
+}
+
 .sr-only {
   position: absolute;
   width: 1px;
@@ -1147,12 +1153,14 @@
 .hero-section {
   position: relative;
   width: 100%;
-  min-height: 94vh;
+  min-height: calc(100vh - 125px);
+  min-height: calc(100dvh - 125px);
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
-  padding: 2.5rem 2rem 1.5rem;
+  justify-content: flex-end;
+  align-items: center;
+  padding: 1.5rem 1rem 1.25rem;
   background-color: #080d22;
   color: #ffffff;
   user-select: none;
@@ -1160,7 +1168,8 @@
 
 @media (min-width: 768px) {
   .hero-section {
-    padding: 3rem 3.5rem 2rem;
+    min-height: 92vh;
+    padding: 3rem 2rem 2.5rem;
   }
 }
 
@@ -1175,35 +1184,11 @@
 }
 
 .hero-topbar {
-  position: relative;
-  z-index: 10;
-  display: flex;
-  flex-direction: column;
-  gap: 1.25rem;
-  pointer-events: none;
-}
-
-@media (min-width: 640px) {
-  .hero-topbar {
-    flex-direction: row;
-    justify-content: space-between;
-    align-items: flex-start;
-  }
+  display: none !important;
 }
 
 .hero-brand-panel {
-  pointer-events: auto;
-  background: rgba(250, 247, 240, 0.95);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  padding: 0.75rem 1.25rem;
-  border: 1px solid #dedbd3;
-  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.2);
-  border-radius: 6px;
-  display: inline-flex;
-  align-items: center;
-  max-width: 90vw;
-  color: #0b1530;
+  display: none !important;
 }
 
 .hero-brand-badge {
@@ -1253,17 +1238,197 @@
   position: relative;
   z-index: 10;
   display: flex;
-  flex-direction: column;
-  gap: 1.25rem;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
   pointer-events: none;
+  margin-bottom: 2rem;
+}
+
+@media (min-width: 640px) {
+  .hero-bottom {
+    margin-bottom: 2.75rem;
+  }
 }
 
 @media (min-width: 900px) {
   .hero-bottom {
-    flex-direction: row;
-    align-items: flex-end;
-    justify-content: flex-end;
+    justify-content: center;
+    align-items: center;
   }
+}
+
+/* Glassmorphism Dual Cards */
+.hero-cards-container {
+  pointer-events: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  width: 100%;
+  max-width: 780px;
+  justify-content: center;
+  align-items: stretch;
+}
+
+@media (min-width: 640px) {
+  .hero-cards-container {
+    flex-direction: row;
+    gap: 1.15rem;
+    align-items: stretch;
+    justify-content: center;
+  }
+}
+
+.hero-glass-card {
+  flex: 0 0 auto;
+  width: 100%;
+  max-width: 380px;
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  padding: 0.85rem 1.15rem;
+  background: rgba(11, 21, 48, 0.65);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 14px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.38), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  text-decoration: none;
+  color: #ffffff;
+  cursor: pointer;
+  text-align: left;
+  position: relative;
+  overflow: hidden;
+  font-family: inherit;
+  transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 0.28s cubic-bezier(0.16, 1, 0.3, 1),
+              border-color 0.28s ease,
+              background-color 0.28s ease;
+}
+
+@media (min-width: 640px) {
+  .hero-glass-card {
+    flex: 1 1 0px;
+    width: auto;
+    min-width: 240px;
+    gap: 1.1rem;
+    padding: 1.05rem 1.4rem;
+  }
+}
+
+.hero-glass-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.35), transparent);
+}
+
+.hero-glass-card:hover,
+.hero-glass-card:focus-visible {
+  transform: translateY(-4px);
+}
+
+.hero-glass-card.web-card:hover,
+.hero-glass-card.web-card:focus-visible {
+  background: rgba(15, 28, 62, 0.82);
+  border-color: rgba(56, 189, 248, 0.65);
+  box-shadow: 0 16px 38px rgba(0, 0, 0, 0.45), 0 0 24px rgba(56, 189, 248, 0.25);
+}
+
+.hero-glass-card.vr-card:hover,
+.hero-glass-card.vr-card:focus-visible {
+  background: rgba(22, 28, 52, 0.82);
+  border-color: rgba(245, 179, 1, 0.7);
+  box-shadow: 0 16px 38px rgba(0, 0, 0, 0.45), 0 0 24px rgba(245, 179, 1, 0.25);
+}
+
+.hero-glass-card .card-icon-box {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.hero-glass-card:hover .card-icon-box {
+  transform: scale(1.08);
+}
+
+.hero-glass-card.web-card .card-icon-box {
+  background: rgba(56, 189, 248, 0.15);
+  border: 1px solid rgba(56, 189, 248, 0.35);
+  color: #38bdf8;
+}
+
+.hero-glass-card.vr-card .card-icon-box {
+  background: rgba(245, 179, 1, 0.15);
+  border: 1px solid rgba(245, 179, 1, 0.35);
+  color: #f5b301;
+}
+
+.hero-glass-card .card-icon {
+  width: 24px;
+  height: 24px;
+}
+
+.hero-glass-card .card-content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.22rem;
+  min-width: 0;
+}
+
+.hero-glass-card .card-badge {
+  font-family: var(--font-orbitron);
+  font-size: 0.64rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  line-height: 1;
+}
+
+.hero-glass-card .card-badge.badge-web {
+  color: #7dd3fc;
+}
+
+.hero-glass-card .card-badge.badge-vr {
+  color: #fbbf24;
+}
+
+.hero-glass-card .card-title {
+  font-family: var(--font-orbitron);
+  font-size: 0.8rem;
+  font-weight: 800;
+  letter-spacing: 0.03em;
+  color: #ffffff;
+  line-height: 1.25;
+  white-space: nowrap;
+}
+
+@media (min-width: 640px) {
+  .hero-glass-card .card-title {
+    font-size: 0.88rem;
+    letter-spacing: 0.04em;
+  }
+}
+
+.hero-glass-card .card-hint {
+  font-family: var(--font-sans);
+  font-size: 0.74rem;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.68);
+  line-height: 1.2;
+  transition: color 0.2s ease;
+}
+
+.hero-glass-card:hover .card-hint {
+  color: rgba(255, 255, 255, 0.95);
 }
 
 .hero-logos-wrapper {
