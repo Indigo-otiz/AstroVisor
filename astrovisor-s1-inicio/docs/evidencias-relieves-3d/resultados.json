@@ -1,4 +1,38 @@
 {
+  "estrellasPantalla": [
+    {
+      "figura": true,
+      "rotulo": true,
+      "controles": true,
+      "controlesSobreTerreno": true,
+      "emblemasDetras": true
+    }
+  ],
+  "estrellasEstereo": [
+    {
+      "figura": true,
+      "rotulo": true,
+      "controles": true,
+      "controlesSobreTerreno": true,
+      "emblemasDetras": true
+    },
+    {
+      "figura": true,
+      "rotulo": true,
+      "controles": true,
+      "controlesSobreTerreno": true,
+      "emblemasDetras": true
+    }
+  ],
+  "trasCerrarFicha": [
+    {
+      "figura": true,
+      "rotulo": true,
+      "controles": true,
+      "controlesSobreTerreno": true,
+      "emblemasDetras": true
+    }
+  ],
   "geometria": {
     "profundidad": 0.10000000149011612,
     "hueco": 0,
@@ -12,9 +46,9 @@
       "capas": 7,
       "triangulos": 22016,
       "dimensiones": [
-        2.236357118116345,
-        2.472888571023941,
-        1.2711427222385172
+        4.841260180327599,
+        4.919783719686109,
+        2.309356319310476
       ]
     },
     {
@@ -22,9 +56,9 @@
       "capas": 2,
       "triangulos": 17556,
       "dimensiones": [
-        4.384544733551307,
-        1.814800035953522,
-        1.3940735953285621
+        8.21303860033553,
+        3.4546278721684245,
+        2.0046751834141094
       ]
     }
   ],
@@ -48,7 +82,7 @@
     "mensajeAudio": "Narración en pausa. Reanudar continúa donde la dejaste.",
     "medios": [
       {
-        "src": "http://127.0.0.1:5194/audio/orion-kokoro-v1.wav",
+        "src": "http://127.0.0.1:5173/audio/orion-kokoro-v1.wav",
         "readyState": 4,
         "networkState": 1,
         "paused": true,
@@ -61,31 +95,31 @@
     [
       {
         "id": "itTepicLogo3D",
-        "maxX": 0.9234772033719433,
-        "maxY": 0.3021385308654923
+        "maxX": 0.8032705628696596,
+        "maxY": 0.2533531157519505
       },
       {
         "id": "bibliotecaLogo3D",
-        "maxX": 0.8819355473824624,
-        "maxY": 0.2262972122038522
+        "maxX": 0.7977566254064263,
+        "maxY": 0.18079098394907617
       }
     ],
     [
       {
         "id": "itTepicLogo3D",
-        "maxX": 0.9318327183796755,
-        "maxY": 0.3021385308654923
+        "maxX": 0.8026085133813139,
+        "maxY": 0.2533531157519505
       },
       {
         "id": "bibliotecaLogo3D",
-        "maxX": 0.8723336723289257,
-        "maxY": 0.2262972122038522
+        "maxX": 0.798264288822421,
+        "maxY": 0.18079098394907617
       }
     ]
   ],
   "errores": [],
   "salida": "Inicio",
-  "fechaUTC": "2026-11-15T07:04:32.794Z",
-  "navegador": "Chrome/157.0.8103.51",
+  "fechaUTC": "2026-11-21T19:05:14.203Z",
+  "navegador": "Chrome/157.0.8103.79",
   "entorno": "Chrome headless; pantalla y estéreo simulado; sin visor físico"
 }

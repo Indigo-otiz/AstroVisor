@@ -1,5 +1,5 @@
 // Contornos preparados offline: una malla por capa, con espesor y detalles elevados.
-export function crearRelieve(THREE, datos, textura) {
+export function crearRelieve(THREE, datos, textura, { opacidad = 0.55, opacidadLateral = 0.35, marcaAgua = true } = {}) {
   const grupo = new THREE.Group();
   grupo.userData.textura = textura;
   try {
@@ -29,9 +29,23 @@ export function crearRelieve(THREE, datos, textura) {
           uv.setXY(i, posiciones.getX(i) + 0.5, posiciones.getY(i) * datos.width / datos.height + 0.5);
         }
       }
-      const frente = new THREE.MeshStandardMaterial({ color: textura ? '#ffffff' : capa.color,
-        map: textura || null, roughness: 0.65, metalness: 0 });
-      const lateral = new THREE.MeshStandardMaterial({ color: capa.color, roughness: 0.42, metalness: 0.15 });
+      const frente = new THREE.MeshStandardMaterial({
+        color: textura ? '#ffffff' : capa.color,
+        map: textura || null,
+        roughness: 0.65,
+        metalness: 0,
+        transparent: marcaAgua,
+        opacity: marcaAgua ? opacidad : 1.0,
+        depthWrite: !marcaAgua,
+      });
+      const lateral = new THREE.MeshStandardMaterial({
+        color: capa.color,
+        roughness: 0.42,
+        metalness: 0.15,
+        transparent: marcaAgua,
+        opacity: marcaAgua ? opacidadLateral : 1.0,
+        depthWrite: !marcaAgua,
+      });
       const malla = new THREE.Mesh(geometria, [frente, lateral]);
       malla.position.z = capa.z;
       grupo.add(malla);
@@ -55,7 +69,12 @@ export function liberarRelieve(grupo) {
 export function registrarRelieves(AFRAME) {
   if (AFRAME.components['relieve-institucional']) return;
   AFRAME.registerComponent('relieve-institucional', {
-    schema: { src: { type: 'string' }, ancho: { default: 1 } },
+    schema: {
+      src: { type: 'string' },
+      ancho: { default: 1 },
+      opacidad: { default: 0.55 },
+      marcaAgua: { default: true },
+    },
     init() {
       this.cancelar = new AbortController();
       this.cargar();
@@ -72,7 +91,11 @@ export function registrarRelieves(AFRAME) {
           textura.colorSpace = AFRAME.THREE.SRGBColorSpace;
           if (this.cancelar.signal.aborted) { textura.dispose(); return; }
         }
-        this.relieve = crearRelieve(AFRAME.THREE, datos, textura);
+        this.relieve = crearRelieve(AFRAME.THREE, datos, textura, {
+          opacidad: this.data.opacidad,
+          opacidadLateral: this.data.opacidad * 0.65,
+          marcaAgua: this.data.marcaAgua,
+        });
         this.relieve.scale.setScalar(this.data.ancho);
         this.el.setObject3D('relieve', this.relieve);
         this.el.emit('relieve-listo');
