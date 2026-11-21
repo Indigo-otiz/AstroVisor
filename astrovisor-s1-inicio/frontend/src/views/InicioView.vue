@@ -106,7 +106,7 @@ onMounted(() => {
 
   let globalRotation = 0
   let currentCenterX = width / 2
-  let currentCenterY = height / 2
+  let currentCenterY = height * 0.44
   let mouseX = width / 2
   let mouseY = height / 2
   let targetMouseX = width / 2
@@ -311,7 +311,7 @@ onMounted(() => {
     const dy = (mouseY - height / 2) * 0.035
 
     currentCenterX = width / 2 - dx
-    currentCenterY = height / 2 - dy
+    currentCenterY = height * 0.44 - dy
 
     // Background stars
     ctx.save()
