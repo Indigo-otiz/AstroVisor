@@ -3,7 +3,7 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 
-function capture(width, height, filename) {
+function capture(width, height, filename, scrollY = 0) {
   return new Promise((resolve, reject) => {
     const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'chrome-ss-'));
     const out = path.join('C:\\Users\\aneao\\.gemini\\antigravity\\brain\\5bcac432-61df-4746-983b-96cb5f2aee5c\\capturas', filename);
@@ -32,7 +32,6 @@ function capture(width, height, filename) {
 
 async function run() {
   await capture(1280, 800, 'nueva-portada-glass.png');
-  await capture(390, 844, 'nueva-portada-glass-movil.png');
 }
 
 run();

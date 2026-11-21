@@ -87,7 +87,7 @@ test('S5-05: InicioView incorpora la sección de los tres manuales con estado pe
   assert.ok(matches && matches.length >= 3, 'Los tres manuales deben indicar estado de pendiente de grabación');
 });
 
-test('S5-06: InicioView acredita formalmente al Equipo 8 y deslinde de CECAN/Gobierno', () => {
+test('S5-06: InicioView acredita formalmente al Equipo 8 sin redundancias institucionales', () => {
   const viewPath = path.resolve(__dirname, '../src/views/InicioView.vue');
   const content = fs.readFileSync(viewPath, 'utf8');
 
@@ -97,11 +97,16 @@ test('S5-06: InicioView acredita formalmente al Equipo 8 y deslinde de CECAN/Gob
   assert.ok(content.includes('Luis Alberto Rodríguez'), 'Debe listar a Luis');
   assert.ok(content.includes('Carlos Martínez Orozco'), 'Debe listar a Carlos');
   assert.ok(content.includes('Índigo Andre Ortiz Vega'), 'Debe listar a Índigo');
-
-  // Deslinde de CECAN / Gobierno como dependencia externa
-  assert.ok(content.includes('CECAN y Gobierno del Estado'), 'Debe mencionar la nota de trazabilidad de CECAN/Gobierno');
-  assert.ok(content.includes('dependencia externa pendiente de autorización'), 'Debe deslindar la dependencia externa');
-  assert.ok(content.includes('Nayarit_CECAN_Convivencia_Horizontal.png'), 'Debe incluir el logo de CECAN en créditos de inicio');
+  assert.equal(
+    content.includes('credits-logo-cecan'),
+    false,
+    'No debe incluir logo redundante de CECAN en créditos de inicio'
+  );
+  assert.equal(
+    content.includes('Nota de trazabilidad institucional'),
+    false,
+    'No debe incluir nota de trazabilidad en créditos de inicio'
+  );
 });
 
 test('S5-06: App.vue incorpora el logotipo oficial horizontal de CECAN en el pie institucional', () => {

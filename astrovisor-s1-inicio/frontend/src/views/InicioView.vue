@@ -813,26 +813,14 @@ onBeforeUnmount(() => {
           Desarrollado por el <strong>Equipo 8</strong> de la materia <strong>Taller de Full Stack</strong>:
         </p>
         <ul class="team-list">
-          <li><strong>Karime Rendón Vázquez</strong> — UX/UI, Accesibilidad y Coordinación de Manuales</li>
-          <li><strong>Luis Alberto Rodríguez</strong> — Experiencia 3D, Sensores e Interacción VR</li>
-          <li><strong>Carlos Martínez Orozco</strong> — Backend, Arquitectura Web y Catálogo Bibliográfico</li>
-          <li><strong>Índigo Andre Ortiz Vega</strong> — Persistencia Documental, Integración y QA Transversal</li>
+          <li>Karime Rendón Vázquez</li>
+          <li>Luis Alberto Rodríguez</li>
+          <li>Carlos Martínez Orozco</li>
+          <li>Índigo Andre Ortiz Vega</li>
         </ul>
         <div class="credits-affiliations">
           <p>
             En vinculación con la <strong>Biblioteca Pública Central Estatal Solón Argüello</strong> y el <strong>Instituto Tecnológico de Tepic (TecNM)</strong>.
-          </p>
-          <div class="credits-institutions-logos">
-            <img
-              class="credits-logo-cecan"
-              src="/Nayarit_CECAN_Convivencia_Horizontal.png"
-              width="11479"
-              height="1968"
-              alt="Gobierno del Estado de Nayarit y Consejo Estatal para la Cultura y las Artes de Nayarit (CECAN)"
-            />
-          </div>
-          <p class="credits-disclaimer">
-            <em>Nota de trazabilidad institucional:</em> Se incorpora el logotipo oficial horizontal de CECAN y Gobierno del Estado, clasificado como dependencia externa pendiente de autorización formal definitiva de uso.
           </p>
         </div>
       </div>
