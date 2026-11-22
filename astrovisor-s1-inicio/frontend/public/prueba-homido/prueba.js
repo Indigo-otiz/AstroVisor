@@ -105,7 +105,7 @@ import { rutaLibro2D } from './js/ruta-libro-2d.js';
   const FICHA_BASE_Y = 0.9;
   const POS_CONTROLES_Y = 0.45;
   const direccionInicial = FIGURAS['can-mayor'].direccion;
-  const controlesRecorrido = posicionEnEsfera(direccionInicial.az, 0, 3.5, POS_CONTROLES_Y);
+  const controlesRecorrido = posicionEnEsfera(0, 0, 3.5, POS_CONTROLES_Y);
 
   // --- Retroalimentación auditiva (Web Audio) ---
   function playConfirmationSound() {
@@ -908,10 +908,12 @@ import { rutaLibro2D } from './js/ruta-libro-2d.js';
   if (leerParametros(location.search).activo) iniciarDiagnostico({ scene, log: eventLine }); // ?diag=1: modo temporal de aislamiento
 
   function onSceneReady() {
+    const relieves = $('institutionalLogos3D').object3D.position;
+    const camara = camaraRig.object3D.position;
     const controles = camaraRig.components['look-controls'];
     if (controles?.yawObject && controles.pitchObject) {
-      controles.yawObject.rotation.y = -direccionInicial.az * Math.PI / 180;
-      controles.pitchObject.rotation.x = (direccionInicial.el - 10) * Math.PI / 180;
+      controles.yawObject.rotation.y = 0;
+      controles.pitchObject.rotation.x = Math.atan2(relieves.y - camara.y, camara.z - relieves.z);
     }
     colocarControlesRecorrido();
     if (!stereoComponent) stereoComponent = scene.components['experimental-stereo'];

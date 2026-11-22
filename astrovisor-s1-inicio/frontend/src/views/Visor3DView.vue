@@ -45,8 +45,8 @@ let clock = new THREE.Clock()
 let isDragging = false
 let startX = 0, startY = 0
 let prevMouseX = 0, prevMouseY = 0
-let lon = 0, lat = 0
-let targetLon = 0, targetLat = 0
+let lon = 90, lat = 6.3
+let targetLon = 90, targetLat = 6.3
 
 // Datos del giroscopio del celular
 let hasDeviceOrientation = false
@@ -1047,12 +1047,15 @@ function initThree() {
   // Cámaras
   cameraMono = new THREE.PerspectiveCamera(65, width / height, 0.1, 2000)
   cameraMono.position.set(0, 0, 0.1)
+  cameraMono.lookAt(0, 5, 45)
 
   cameraLeft = new THREE.PerspectiveCamera(65, width / 2 / height, 0.1, 2000)
   cameraLeft.position.set(-0.35, 0, 0.1)
+  cameraLeft.lookAt(0, 5, 45)
 
   cameraRight = new THREE.PerspectiveCamera(65, width / 2 / height, 0.1, 2000)
   cameraRight.position.set(0.35, 0, 0.1)
+  cameraRight.lookAt(0, 5, 45)
 
   // WebGL Renderer de alto rendimiento
   renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: 'high-performance' })
