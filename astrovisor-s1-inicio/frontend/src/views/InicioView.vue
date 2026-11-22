@@ -611,47 +611,82 @@ onBeforeUnmount(() => {
       <div class="vr-modal-grid">
         <!-- Opción 1: Visor Físico -->
         <a
-          class="vr-modal-card"
+          class="vr-modal-card card-vr-homido"
           href="/prueba-homido/index.html?modo=homido"
         >
-          <div>
-            <span class="vr-modal-card-badge">Opción 1 · Para Gafas o Visor</span>
-            <h3>Visor para Celular (Homido)</h3>
-            <p>
-              Divide la pantalla en dos imágenes para colocar tu celular dentro de un visor Homido, Google Cardboard o gafas VR y contemplar las estrellas en 3D estereoscópico.
+          <div class="modal-card-top">
+            <div class="modal-card-head">
+              <span class="vr-modal-card-badge badge-homido">Gafas o Visor</span>
+              <div class="modal-card-icon-box icon-homido" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="currentColor" width="24" height="24">
+                  <path d="M21 6H3c-1.1 0-2 .9-2 2v8c0 1.1.9 2 2 2h4.5l2.5-3 2.5 3H21c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm-14 7c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm10 0c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2z"/>
+                </svg>
+              </div>
+            </div>
+            <h3 class="modal-card-title">Visor Celular (Homido)</h3>
+            <p class="modal-card-desc">
+              Inmersión estéreo en 3D colocando tu celular dentro de gafas Homido o Cardboard.
             </p>
+            <ul class="modal-card-tags">
+              <li><span>✦</span> Doble pantalla 3D</li>
+              <li><span>✦</span> Manos libres por mirada</li>
+            </ul>
           </div>
-          <span class="vr-modal-card-action">Iniciar con Visor &rarr;</span>
+          <span class="vr-modal-card-action action-homido">Iniciar con Visor &rarr;</span>
         </a>
 
         <!-- Opción 2: 3D Versión Lite -->
         <a
-          class="vr-modal-card"
+          class="vr-modal-card card-vr-lite"
           href="/prueba-homido/index.html?modo=libre"
         >
-          <div>
-            <span class="vr-modal-card-badge">Opción 2 · Sin Lentes</span>
-            <h3>3D Versión Lite (Ligera)</h3>
-            <p>
-              Exploración ágil en 360 grados para cualquier celular o computadora. Gira el firmamento arrastrando con el dedo o el mouse sin necesidad de accesorios ni gafas.
+          <div class="modal-card-top">
+            <div class="modal-card-head">
+              <span class="vr-modal-card-badge badge-lite">Sin Accesorios</span>
+              <div class="modal-card-icon-box icon-lite" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="24" height="24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 21a9 9 0 100-18 9 9 0 000 18z"/>
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M3.6 9h16.8M3.6 15h16.8"/>
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M11.5 3a17 17 0 000 18M12.5 3a17 17 0 010 18"/>
+                </svg>
+              </div>
+            </div>
+            <h3 class="modal-card-title">3D Versión Lite</h3>
+            <p class="modal-card-desc">
+              Exploración 360° fluida directamente en tu pantalla, sin necesidad de accesorios.
             </p>
+            <ul class="modal-card-tags">
+              <li><span>✦</span> Gira con dedo o mouse</li>
+              <li><span>✦</span> Carga ágil para todo equipo</li>
+            </ul>
           </div>
-          <span class="vr-modal-card-action">Iniciar Versión Lite &rarr;</span>
+          <span class="vr-modal-card-action action-lite">Iniciar Versión Lite &rarr;</span>
         </a>
 
         <!-- Opción 3: 3D Versión Completa (Full) -->
         <RouterLink
-          class="vr-modal-card accent"
+          class="vr-modal-card card-vr-full"
           to="/visor-3d"
         >
-          <div>
-            <span class="vr-modal-card-badge gold">Opción 3 · Inmersión Total (Full)</span>
-            <h3>3D Versión Completa (Full)</h3>
-            <p>
-              La experiencia visual más completa: bóveda celeste profunda, iluminación realista de estrellas, estantería interactiva de libros y narración de voz guiada.
+          <div class="modal-card-top">
+            <div class="modal-card-head">
+              <span class="vr-modal-card-badge badge-full">Inmersión Total ★</span>
+              <div class="modal-card-icon-box icon-full" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="currentColor" width="24" height="24">
+                  <path d="m12 2 3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                </svg>
+              </div>
+            </div>
+            <h3 class="modal-card-title">3D Versión Completa</h3>
+            <p class="modal-card-desc">
+              Experiencia estelar máxima con estantería interactiva de libros y voz guiada.
             </p>
+            <ul class="modal-card-tags">
+              <li><span>✦</span> Bóveda + Estantería 3D</li>
+              <li><span>✦</span> Narración espacial guiada</li>
+            </ul>
           </div>
-          <span class="vr-modal-card-action">Iniciar Versión Completa &rarr;</span>
+          <span class="vr-modal-card-action action-full">Iniciar Versión Full &rarr;</span>
         </RouterLink>
       </div>
     </div>
