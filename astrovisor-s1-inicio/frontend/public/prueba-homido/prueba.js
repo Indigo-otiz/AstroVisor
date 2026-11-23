@@ -932,6 +932,18 @@ import { rutaLibro2D } from './js/ruta-libro-2d.js';
       directExitBtn.addEventListener('click', () => salir('/'));
     }
 
+    const avisoGiro = $('orientacionAviso');
+    const btnDescartarGiro = $('btnDescartarGiro');
+    if (avisoGiro && btnDescartarGiro) {
+      if (sessionStorage.getItem('astrovisor_giro_ignorado') === '1') {
+        avisoGiro.classList.add('descartado');
+      }
+      btnDescartarGiro.addEventListener('click', () => {
+        avisoGiro.classList.add('descartado');
+        sessionStorage.setItem('astrovisor_giro_ignorado', '1');
+      });
+    }
+
     const modoEfectivo = modoParam || 'libre';
     if ((modoParam === 'libre' || modoParam === 'homido' || !modoParam) && !diagParam) {
       document.body.classList.add('modo-directo');

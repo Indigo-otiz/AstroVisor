@@ -836,3 +836,144 @@ body.modo-directo .scene-host {
   background: rgba(30, 24, 16, 0.94);
   color: #FEF3C7;
 }
+
+/* ==========================================================================
+   AVISO ELEGANTE DE GIRO DE DISPOSITIVO PARA VR EN SMARTPHONE
+   ========================================================================== */
+.orientacion-aviso {
+  display: none;
+  position: fixed;
+  top: 18px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 99999;
+  width: calc(100% - 24px);
+  max-width: 420px;
+  pointer-events: auto;
+  animation: orientacionSlideDown 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+@keyframes orientacionSlideDown {
+  from { opacity: 0; transform: translate(-50%, -18px); }
+  to { opacity: 1; transform: translate(-50%, 0); }
+}
+
+@media (orientation: portrait) and (max-width: 900px) {
+  .orientacion-aviso:not(.descartado) {
+    display: flex;
+  }
+}
+
+@media (orientation: landscape) {
+  .orientacion-aviso {
+    display: none !important;
+  }
+}
+
+.orientacion-card {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 16px;
+  background: linear-gradient(135deg, rgba(14, 24, 54, 0.95) 0%, rgba(8, 14, 34, 0.98) 100%);
+  border: 1.5px solid rgba(56, 189, 248, 0.45);
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.65), 0 0 24px rgba(56, 189, 248, 0.28);
+  border-radius: 16px;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  color: #ffffff;
+  position: relative;
+}
+
+.orientacion-icon-wrapper {
+  flex-shrink: 0;
+  width: 46px;
+  height: 46px;
+  border-radius: 12px;
+  background: rgba(56, 189, 248, 0.12);
+  border: 1px solid rgba(56, 189, 248, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.phone-rotate-svg {
+  width: 32px;
+  height: 32px;
+  overflow: visible;
+}
+
+.phone-body,
+.phone-home,
+.phone-notch {
+  transform-origin: 24px 24px;
+  animation: phoneTurnAnim 2.8s infinite ease-in-out;
+}
+
+@keyframes phoneTurnAnim {
+  0%, 20% { transform: rotate(0deg); }
+  50%, 75% { transform: rotate(-90deg); }
+  95%, 100% { transform: rotate(0deg); }
+}
+
+.phone-rotate-arrow {
+  animation: arrowPulse 2.8s infinite ease-in-out;
+}
+
+@keyframes arrowPulse {
+  0%, 20% { opacity: 0.3; }
+  50%, 75% { opacity: 1; stroke: #fcd34d; }
+  95%, 100% { opacity: 0.3; }
+}
+
+.orientacion-texto {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.orientacion-titulo {
+  display: block;
+  font-family: inherit;
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: #f8fafc;
+  letter-spacing: 0.01em;
+  margin-bottom: 2px;
+}
+
+.orientacion-desc {
+  font-family: inherit;
+  font-size: 0.76rem;
+  line-height: 1.35;
+  color: rgba(224, 242, 254, 0.85);
+  margin: 0;
+}
+
+.orientacion-btn-descartar {
+  position: absolute;
+  top: 6px;
+  right: 8px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 1.25rem;
+  line-height: 1;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all 0.2s;
+  padding: 0;
+}
+
+.orientacion-btn-descartar:hover,
+.orientacion-btn-descartar:focus-visible {
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.35);
+}

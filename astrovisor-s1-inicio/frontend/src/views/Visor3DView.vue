@@ -24,6 +24,7 @@ const dwellProgress = ref(0) // 0 a 1
 const isDwellConfirmed = ref(false)
 const catalogoRecorridos = ref([])
 const hasSensorsActive = ref(false)
+const avisoGiroDescartado = ref(typeof sessionStorage !== 'undefined' && sessionStorage.getItem('astrovisor_giro_ignorado') === '1')
 
 // Estados de vista de información (Ficha con controles de audio vs Estantería de Libros vs Detalle de Libro)
 const vistaPanel = ref('ficha') // 'ficha' | 'estanteria' | 'detalle'
@@ -2214,6 +2215,39 @@ onBeforeUnmount(() => {
 
 <template>
   <div class="visor-3d-wrapper">
+    <!-- Aviso elegante de rotación de dispositivo para smartphone en modo vertical -->
+    <aside
+      id="orientacionAviso"
+      class="orientacion-aviso"
+      :class="{ 'descartado': avisoGiroDescartado }"
+      role="status"
+      aria-live="polite"
+    >
+      <div class="orientacion-card">
+        <div class="orientacion-icon-wrapper" aria-hidden="true">
+          <svg class="phone-rotate-svg" viewBox="0 0 48 48" fill="none">
+            <rect class="phone-body" x="14" y="6" width="20" height="36" rx="4" stroke="#38bdf8" stroke-width="2.5" fill="rgba(56, 189, 248, 0.12)"/>
+            <circle class="phone-home" cx="24" cy="36" r="1.5" fill="#38bdf8"/>
+            <path class="phone-notch" d="M20 10h8" stroke="#38bdf8" stroke-width="2" stroke-linecap="round"/>
+            <path class="phone-rotate-arrow" d="M37 14a15 15 0 0 1 3 13m-3-13l3 3m-3-3l-3 3" stroke="#f5b301" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <div class="orientacion-texto">
+          <strong class="orientacion-titulo">Gira tu dispositivo</strong>
+          <p class="orientacion-desc">Coloca tu pantalla en horizontal para disfrutar la inmersión 360°</p>
+        </div>
+        <button
+          type="button"
+          class="orientacion-btn-descartar"
+          id="btnDescartarGiro"
+          aria-label="Continuar en vertical"
+          @click="avisoGiroDescartado = true; sessionStorage.setItem('astrovisor_giro_ignorado', '1')"
+        >
+          &times;
+        </button>
+      </div>
+    </aside>
+
     <!-- WebGL Canvas Container: 100% de la ventana -->
     <div ref="containerRef" class="webgl-canvas-container" :class="{ 'cursor-grab': !isDragging, 'cursor-grabbing': isDragging }"></div>
 

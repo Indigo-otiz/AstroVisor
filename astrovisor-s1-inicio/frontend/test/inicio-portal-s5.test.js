@@ -125,10 +125,6 @@ test('S5-06: App.vue incorpora el logotipo oficial horizontal de CECAN en el pie
     content.includes('Consejo Estatal para la Cultura y las Artes de Nayarit (CECAN)'),
     'Debe incluir texto alternativo accesible'
   );
-  assert.ok(
-    content.includes('Autorización institucional'),
-    'Debe dejar constancia explícita del estado de trámite de autorización'
-  );
   assert.equal(
     content.includes('maqueta de co-patrocinio cultural aprobada'),
     false,

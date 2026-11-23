@@ -80,7 +80,6 @@ watch(
         <li><img class="institutional-logo-tepic" src="/ITTepic_logo.jpg" width="225" height="225" alt="Instituto Tecnológico de Tepic" /></li>
       </ul>
       <p>AstroVisor · Prototipo académico de divulgación astronómica y cultural.</p>
-      <p class="institutional-footer-auth"><em>Autorización institucional:</em> La formalización y autorización de uso para los logotipos oficiales de CECAN y Gobierno del Estado de Nayarit se encuentran en trámite ante las instancias correspondientes.</p>
     </footer>
   </div>
 </template>

@@ -33,6 +33,13 @@ onMounted(() => {
   window.addEventListener('resize', resize)
   resize()
 
+  function onKeyDown(e) {
+    if (e.key === 'Escape' && mostrarModalVR.value) {
+      mostrarModalVR.value = false
+    }
+  }
+  window.addEventListener('keydown', onKeyDown)
+
   const bgStars = Array.from({ length: 360 }, () => ({
     x: Math.random() * width,
     y: Math.random() * height,
@@ -501,6 +508,7 @@ onMounted(() => {
   animate()
 
   cleanupListeners = () => {
+    window.removeEventListener('keydown', onKeyDown)
     window.removeEventListener('resize', resize)
     window.removeEventListener('mousedown', onMouseDown)
     window.removeEventListener('mousemove', onMouseMove)
@@ -688,6 +696,20 @@ onBeforeUnmount(() => {
           </div>
           <span class="vr-modal-card-action action-full">Iniciar Versión Full &rarr;</span>
         </RouterLink>
+      </div>
+
+      <!-- Pie del modal accesible con botón para volver en móvil -->
+      <div class="vr-modal-footer">
+        <button
+          type="button"
+          class="vr-modal-footer-close"
+          @click="mostrarModalVR = false"
+        >
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" width="18" height="18" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+          </svg>
+          Volver a la portada
+        </button>
       </div>
     </div>
   </div>
