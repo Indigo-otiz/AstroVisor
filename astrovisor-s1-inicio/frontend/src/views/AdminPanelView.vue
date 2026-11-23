@@ -1,12 +1,14 @@
 <script setup>
-import { ref, onMounted, onBeforeUnmount, nextTick, watch } from 'vue'
-import { useRouter } from 'vue-router'
+import { ref, computed, onMounted, onBeforeUnmount, nextTick, watch } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
 import { useAuth } from '../composables/useAuth.js'
 import { useEditorCatalogo } from '../composables/useEditorCatalogo.js'
 import { alternativaPortada } from '../services/librosDemoService.js'
 
 const router = useRouter()
+const route = useRoute()
 const { userDisplayName, username, signOut, token, invalidarSesion } = useAuth()
+const esModoDemo = computed(() => route.query.modo === 'demo' || !token.value)
 
 const isIniciando3D = ref(false)
 const modoTransicion3D = ref('ligera')
@@ -15,13 +17,20 @@ const { catalogo, seleccion, borrador, cargando, guardando, error, mensaje, conf
   libroActual, recorridoActual, cargar, seleccionarLibro, seleccionarRecorrido, cancelarEdicion, guardar, cancelarPeticiones,
   hayBorradorPendiente, recuperarBorrador, descartarBorradorPendiente, nuevoLibro, previsualizar, previsualizacion, previsualizando,subirImagen,puedeEditarTexto,requierePreview } = useEditorCatalogo({
   obtenerToken: () => token.value,
-  obtenerUsuario: () => username.value,
-  alExpirarSesion: () => { invalidarSesion(); void router.replace({ name: 'admin-acceso' }) },
+  obtenerUsuario: () => username.value || (esModoDemo.value ? 'demo-admin' : ''),
+  alExpirarSesion: () => {
+    if (esModoDemo.value) return
+    invalidarSesion()
+    void router.replace({ name: 'admin-acceso' })
+  },
+  esModoDemo: () => esModoDemo.value,
 })
 
 async function handleLogout() {
   descartarBorradorPendiente()
-  await signOut()
+  if (!esModoDemo.value) {
+    await signOut()
+  }
   router.push('/admin/acceso')
 }
 
@@ -132,10 +141,26 @@ onBeforeUnmount(cancelarPeticiones)
             <polyline points="16 17 21 12 16 7" />
             <line x1="21" y1="12" x2="9" y2="12" />
           </svg>
-          <span>Cerrar sesión</span>
+          <span>{{ esModoDemo ? 'Salir de demo' : 'Cerrar sesión' }}</span>
         </button>
       </nav>
     </header>
+
+    <!-- AVISO DE MODO DEMOSTRACIÓN (EN VERCEL / NUBE) -->
+    <aside v-if="esModoDemo" class="admin-demo-alert-bar" aria-label="Aviso de demostración" role="status">
+      <div class="container demo-alert-content">
+        <div class="demo-alert-badge">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" class="demo-icon-mini" aria-hidden="true">
+            <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83" />
+          </svg>
+          <span>Modo Demostración en la Nube (Vercel)</span>
+        </div>
+        <p class="demo-alert-text">
+          Estás navegando en vista previa interactiva. Puedes registrar libros, editar fichas documentales y probar la interfaz. Los cambios se mantienen únicamente en tu navegador durante esta sesión y no alteran la base de datos de la biblioteca.
+        </p>
+        <RouterLink to="/admin/acceso" class="demo-alert-exit">Volver al acceso</RouterLink>
+      </div>
+    </aside>
 
     <!-- BANNER HERO AZUL NOCHE -->
     <section class="admin-hero-banner">
@@ -160,7 +185,7 @@ onBeforeUnmount(cancelarPeticiones)
 
       <div class="banner-content container">
         <h1 class="welcome-heading">
-          Hola, {{ userDisplayName || username || 'Ana' }}
+          Hola, {{ esModoDemo ? 'Evaluador (Demostración)' : (userDisplayName || username || 'Ana') }}
         </h1>
         <p class="welcome-subheading">Elige la versión para el visor de hoy.</p>
       </div>

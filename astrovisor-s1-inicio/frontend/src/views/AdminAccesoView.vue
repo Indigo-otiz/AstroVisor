@@ -180,6 +180,23 @@ async function handleSubmit() {
             <RouterLink to="/" class="return-link">Volver al sitio público</RouterLink>
           </div>
         </form>
+
+        <div class="demo-access-divider">
+          <span>o bien</span>
+        </div>
+
+        <div class="demo-access-card">
+          <RouterLink :to="{ path: '/admin', query: { modo: 'demo' } }" class="btn-demo-access">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="demo-eye-icon" aria-hidden="true">
+              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+              <circle cx="12" cy="12" r="3" />
+            </svg>
+            <span>Entrar en modo demostración</span>
+          </RouterLink>
+          <p class="demo-access-note">
+            Para evaluadores y docentes: explora las herramientas del panel de administración en la nube sin necesidad de servidor local ni credenciales.
+          </p>
+        </div>
       </div>
     </div>
   </div>

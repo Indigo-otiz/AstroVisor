@@ -1,12 +1,14 @@
 import { ref, computed, watch } from 'vue'
 import { cargarCatalogoAdmin, guardarLibro, guardarRecorrido, crearLibro, previsualizarPortada, prepararImagen } from '../services/catalogoAdminService.js'
+import { cargarCatalogoDemo } from '../services/catalogoDemoLoader.js'
 
 // Solo memoria de esta pestaña: se pierde al recargar o cerrar, sin tokens ni contraseñas.
 const pendiente = ref(null)
 export const hayBorradorPendiente = computed(() => Boolean(pendiente.value))
 export function descartarBorradorPendiente() { pendiente.value = null }
 
-export function useEditorCatalogo({ obtenerToken, obtenerUsuario = () => '', alExpirarSesion = () => {} }) {
+export function useEditorCatalogo({ obtenerToken, obtenerUsuario = () => '', alExpirarSesion = () => {}, esModoDemo = false }) {
+  const esDemo = typeof esModoDemo === 'function' ? esModoDemo : () => Boolean(esModoDemo?.value ?? esModoDemo)
   const catalogo = ref(null), etag = ref(null), seleccion = ref(null), borrador = ref(null)
   const cargando = ref(false), guardando = ref(false), error = ref(''), mensaje = ref('')
   const conflicto = ref(false), necesitaRecarga = ref(false), sesionExpirada = ref(false)
@@ -46,6 +48,15 @@ export function useEditorCatalogo({ obtenerToken, obtenerUsuario = () => '', alE
     const actual = solicitud = new AbortController()
     cargando.value = true; error.value = ''; mensaje.value = ''
     try {
+      if (esDemo()) {
+        const respuesta = await cargarCatalogoDemo({ signal: actual.signal })
+        if (actual.signal.aborted) return false
+        catalogo.value = respuesta.catalogo
+        etag.value = respuesta.etag
+        necesitaRecarga.value = false
+        descartar()
+        return true
+      }
       const respuesta = await cargarCatalogoAdmin({ token: obtenerToken(), signal: actual.signal })
       if (actual.signal.aborted) return false
       catalogo.value = respuesta.catalogo; etag.value = respuesta.etag; necesitaRecarga.value = false; descartar()
@@ -85,6 +96,16 @@ export function useEditorCatalogo({ obtenerToken, obtenerUsuario = () => '', alE
     previsualizando.value = true; error.value = ''
     try {
       const b = borrador.value
+      if (esDemo()) {
+        const paletas = { azul: '#173868', verde: '#1b4d3e', violeta: '#3b2164' }
+        const colorFondo = paletas[b.portada?.paleta] || '#173868'
+        const tit = (b.titulo || 'Sin título').replace(/&/g, '&amp;').replace(/</g, '&lt;')
+        const aut = (b.autor || 'Sin autor').replace(/&/g, '&amp;').replace(/</g, '&lt;')
+        const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="300" height="420" viewBox="0 0 300 420"><rect width="100%" height="100%" fill="${colorFondo}"/><circle cx="150" cy="95" r="45" fill="none" stroke="#f6ad55" stroke-width="2" opacity="0.6"/><polygon points="150,60 178,117 115,80 185,80 122,117" fill="#f6ad55" opacity="0.4"/><text x="50%" y="225" fill="#ffffff" font-size="20" font-weight="bold" text-anchor="middle" font-family="Georgia, serif">${tit}</text><text x="50%" y="260" fill="#cbd5e1" font-size="14" text-anchor="middle" font-family="sans-serif">${aut}</text><text x="50%" y="385" fill="#f6ad55" font-size="11" text-anchor="middle" font-family="sans-serif">DEMOSTRACIÓN — ASTROVISOR</text></svg>`
+        if (actual.signal.aborted || !activo) return false
+        previsualizacion.value = URL.createObjectURL(new Blob([svg], { type: 'image/svg+xml' }))
+        return true
+      }
       const blob = await previsualizarPortada({ titulo: b.titulo, autor: b.autor, portada: { tipo:'ilustrativa',plantilla:b.portada.plantilla,paleta:b.portada.paleta } }, { token: obtenerToken(), etag: etag.value, signal: actual.signal })
       if (actual.signal.aborted || !activo) return false
       previsualizacion.value = URL.createObjectURL(blob)
@@ -97,6 +118,20 @@ export function useEditorCatalogo({ obtenerToken, obtenerUsuario = () => '', alE
     limpiarPreview();const actual=previewSolicitud=new AbortController()
     previsualizando.value=true;error.value=''
     try{
+      if (esDemo()) {
+        if (!file || !['image/png', 'image/jpeg'].includes(file.type) || file.size > 2 * 1024 * 1024) {
+          throw Object.assign(new Error('Elige un PNG o JPEG de hasta 2 MiB.'), { status: 400 })
+        }
+        if (actual.signal.aborted || !activo) return false
+        previsualizacion.value = URL.createObjectURL(file)
+        borrador.value.portada = {
+          ...borrador.value.portada,
+          recursoId: 'demo-img-' + Date.now(),
+          formato: file.type.includes('png') ? 'png' : 'jpeg',
+        }
+        mensaje.value = 'Imagen preparada (modo demostración); el libro aún no se ha guardado.'
+        return true
+      }
       const r=await prepararImagen(file,{token:obtenerToken(),etag:etag.value,signal:actual.signal})
       if(actual.signal.aborted||!activo)return false
       borrador.value.portada={...borrador.value.portada,...r.recurso}
@@ -153,6 +188,63 @@ export function useEditorCatalogo({ obtenerToken, obtenerUsuario = () => '', alE
     if(tipo==='libro'){
       for(const k of ['titulo','autor'])if(b[k]!==libroActual.value[k])datos[k]=b[k]
       if(portadaCambiada.value)datos.portada={...portada}
+    }
+    if (esDemo()) {
+      if (tipo === 'nuevo') {
+        const nuevo = {
+          id: b.id,
+          titulo: b.titulo,
+          autor: b.autor,
+          ...(anioNormalizado !== undefined ? { anio: anioNormalizado } : {}),
+          enlacePublico: b.enlacePublico,
+          portada: { ...portada },
+          demostracion: true,
+          portadaIlustrativa: previsualizacion.value || '/libros-demo/star-lore.svg',
+          recomendaciones: Object.fromEntries(
+            b.relaciones.filter((r) => r.seleccionada).map((r) => [r.constelacionId, r.motivo]),
+          ),
+        }
+        catalogo.value.libros.unshift(nuevo)
+        for (const rel of b.relaciones.filter((r) => r.seleccionada)) {
+          const rec = catalogo.value.recorridos.find((r) => r.id === rel.constelacionId)
+          if (rec) {
+            rec.libroRefs.push({ libroId: b.id, motivo: rel.motivo })
+          }
+        }
+      } else if (tipo === 'libro') {
+        const libro = catalogo.value.libros.find((l) => l.id === id)
+        if (libro) {
+          if (datos.titulo) libro.titulo = datos.titulo
+          if (datos.autor) libro.autor = datos.autor
+          if ('anio' in datos) {
+            if (datos.anio === null) delete libro.anio
+            else libro.anio = datos.anio
+          }
+          if (datos.enlacePublico !== undefined) libro.enlacePublico = datos.enlacePublico
+          if (datos.portada) libro.portada = datos.portada
+          if (previsualizacion.value) libro.portadaIlustrativa = previsualizacion.value
+        }
+        for (const rec of catalogo.value.recorridos) {
+          const ref = rec.libroRefs.find((v) => v.libroId === id)
+          const nuevaRel = datos.relaciones?.find((r) => r.constelacionId === rec.id)
+          if (ref && nuevaRel) {
+            ref.motivo = nuevaRel.motivo
+          } else if (!ref && nuevaRel) {
+            rec.libroRefs.push({ libroId: id, motivo: nuevaRel.motivo })
+          } else if (ref && !nuevaRel) {
+            rec.libroRefs = rec.libroRefs.filter((v) => v.libroId !== id)
+          }
+        }
+      } else if (tipo === 'recorrido') {
+        const rec = catalogo.value.recorridos.find((r) => r.id === id)
+        if (rec) {
+          rec.resumen = datos.resumen
+          rec.comoReconocerla = datos.comoReconocerla
+        }
+      }
+      mensaje.value = 'Guardado simulado en modo demostración. Los cambios están activos durante esta sesión en tu navegador y no alteran el servidor.'
+      descartar()
+      return true
     }
     const actual = solicitud = new AbortController()
     guardando.value = true; error.value = ''; mensaje.value = ''
