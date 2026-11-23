@@ -1867,27 +1867,40 @@ function seleccionarConstelacion(id) {
   vistaQuadro.value = 'ficha'
   libroDetalle.value = null
 
-  // 1. Posicionar el 3D Quadro flotante: A UN LADO Y UN POCO ABAJO para NO tapar la constelación
+  // 1. Posicionar el 3D Quadro flotante: perfectamente centrado a la vista
+  // y nivelado con el horizonte para una lectura recta y cómoda sin inclinación ni ladeo
   if (infoQuadroGroup) {
     renderQuadroTexture(selectedData.value, 'ficha')
     actualizarBotones3DQuadro()
 
     const dir = cfg.direccion.clone().normalize()
-    const up = new THREE.Vector3(0, 1, 0)
-    let rightVec = new THREE.Vector3().crossVectors(dir, up).normalize()
+    const worldUp = new THREE.Vector3(0, 1, 0)
+    let rightVec = new THREE.Vector3().crossVectors(dir, worldUp).normalize()
     if (rightVec.lengthSq() < 0.01) {
       rightVec = new THREE.Vector3(1, 0, 0)
     }
 
-    const distance = 135
-    const lateralOffset = 50 // Desplazamiento lateral sin tapar estrellas
-    const verticalOffset = -30 // Desplazamiento hacia abajo
-
-    const quadroPos = dir.clone().multiplyScalar(distance).add(rightVec.clone().multiplyScalar(lateralOffset))
-    quadroPos.y += verticalOffset
+    // Centrado exactamente con el azimut de la constelación (sin desplazamiento lateral).
+    // Aplicamos un leve descenso angular esférico (~8.5 grados) a lo largo del horizonte local
+    // para que las estrellas principales sigan visibles justo arriba del cuadro sin encimarse.
+    const pitchAngle = -0.15
+    const cardDir = dir.clone().applyAxisAngle(rightVec, pitchAngle).normalize()
+    const distance = 125
+    const quadroPos = cardDir.multiplyScalar(distance)
 
     orientPlaneFacingOrigin(infoQuadroGroup, quadroPos)
     infoQuadroGroup.visible = true
+
+    // Si no está activo el giroscopio del dispositivo, orientar suavemente la cámara al centro de la experiencia
+    if (!hasDeviceOrientation) {
+      const viewDir = dir.clone().applyAxisAngle(rightVec, pitchAngle * 0.45).normalize()
+      const destLat = Math.asin(Math.max(-1, Math.min(1, viewDir.y))) * (180 / Math.PI)
+      let destLon = Math.atan2(viewDir.z, viewDir.x) * (180 / Math.PI)
+      while (destLon - lon > 180) destLon -= 360
+      while (destLon - lon < -180) destLon += 360
+      targetLon = destLon
+      targetLat = THREE.MathUtils.clamp(destLat, -85, 85)
+    }
   }
 
   // 2. Iniciar audio narrativo real
