@@ -66,6 +66,9 @@ let textureQuadro = null
 const bookImageCache = new Map()
 
 // Botones 3D asociados al Quadro
+let infoQuadroMesh = null
+let btnQuadroGeo = null
+let btnAudioGeo = null
 let quadroBtn1 = null
 let quadroBtn2 = null
 let quadroBtn3 = null
@@ -548,24 +551,25 @@ const CONSTELACIONES_CONFIG = [
 // Generador de textura para botones 3D (Escala compacta, nítida y perfectamente proporcionada)
 function createButtonCanvasTexture(texto, isPrimary = false, isAccent = false, isAudioPill = false) {
   const canvas = document.createElement('canvas')
-  canvas.width = isAudioPill ? 320 : 640
-  canvas.height = 160
+  canvas.width = isAudioPill ? 256 : 640
+  canvas.height = isAudioPill ? 256 : 160
   const ctx = canvas.getContext('2d')
 
   ctx.beginPath()
   if (isAudioPill) {
-    ctx.roundRect(16, 16, 288, 128, 64)
-    ctx.fillStyle = 'rgba(16, 28, 58, 0.70)'
+    // Botón circular nítido de alto contraste, visible bajo cualquier ángulo
+    ctx.arc(128, 128, 114, 0, Math.PI * 2)
+    ctx.fillStyle = '#172554' // Azul marino cósmico sólido y nítido
     ctx.fill()
-    ctx.lineWidth = 4
-    ctx.strokeStyle = 'rgba(147, 197, 253, 0.50)'
+    ctx.lineWidth = 10
+    ctx.strokeStyle = '#38bdf8' // Borde celeste brillante
     ctx.stroke()
 
-    ctx.fillStyle = '#e2e8f0'
-    ctx.font = 'bold 72px "Space Grotesk", "Segoe UI Symbol", "Apple Color Emoji", sans-serif'
+    ctx.fillStyle = '#ffffff'
+    ctx.font = 'bold 106px "Space Grotesk", "Segoe UI Symbol", "Apple Color Emoji", sans-serif'
     ctx.textAlign = 'center'
     ctx.textBaseline = 'middle'
-    ctx.fillText(texto, 160, 82)
+    ctx.fillText(texto, 128, 134)
   } else {
     ctx.roundRect(8, 8, 624, 144, 28)
     ctx.fillStyle = isAccent
@@ -977,17 +981,19 @@ function actualizarBotones3DQuadro() {
     // Controles de Audio DENTRO de la caja de sonido (Y = -15.8)
     if (quadroBtn1) {
       const txt = isAudioPlaying.value ? '⏸' : '▶'
+      quadroBtn1.geometry = btnAudioGeo || quadroBtn1.geometry
       quadroBtn1.material.map = createButtonCanvasTexture(txt, true, false, true)
       quadroBtn1.userData.action = 'toggle-audio'
-      quadroBtn1.position.set(-8.5, -15.8, 0.6)
-      quadroBtn1.scale.set(0.48, 0.72, 1)
+      quadroBtn1.position.set(-8.5, -15.8, 1.2)
+      quadroBtn1.scale.set(1, 1, 1)
       quadroBtn1.visible = true
     }
     if (quadroBtn2) {
+      quadroBtn2.geometry = btnAudioGeo || quadroBtn2.geometry
       quadroBtn2.material.map = createButtonCanvasTexture('↺', false, false, true)
       quadroBtn2.userData.action = 'repeat-audio'
-      quadroBtn2.position.set(8.5, -15.8, 0.6)
-      quadroBtn2.scale.set(0.48, 0.72, 1)
+      quadroBtn2.position.set(8.5, -15.8, 1.2)
+      quadroBtn2.scale.set(1, 1, 1)
       quadroBtn2.visible = true
     }
     // Única Fila Inferior (Debajo del Quadro): Solo 2 botones de navegación limpios
@@ -1030,6 +1036,7 @@ function actualizarBotones3DQuadro() {
     // 3. Vista Detalle: Volver a la estantería o volver al cielo
     bookQuadroMeshes.forEach((bm) => { bm.visible = false })
     if (quadroBtn1) {
+      quadroBtn1.geometry = btnQuadroGeo || quadroBtn1.geometry
       quadroBtn1.material.map = createButtonCanvasTexture('Volver a los libros', true, false)
       quadroBtn1.userData.action = 'back-shelf'
       quadroBtn1.position.set(-15.5, -35, 0.6)
@@ -1037,6 +1044,7 @@ function actualizarBotones3DQuadro() {
       quadroBtn1.visible = true
     }
     if (quadroBtn2) {
+      quadroBtn2.geometry = btnQuadroGeo || quadroBtn2.geometry
       quadroBtn2.material.map = createButtonCanvasTexture('Volver al cielo', false, true)
       quadroBtn2.userData.action = 'close-card'
       quadroBtn2.position.set(15.5, -35, 0.6)
@@ -1222,30 +1230,37 @@ function initThree() {
   const quadroMat = new THREE.MeshBasicMaterial({
     map: textureQuadro,
     transparent: true,
+    depthWrite: false,
     side: THREE.DoubleSide
   })
-  const infoQuadroMesh = new THREE.Mesh(quadroGeo, quadroMat)
+  infoQuadroMesh = new THREE.Mesh(quadroGeo, quadroMat)
+  infoQuadroMesh.renderOrder = 1
   infoQuadroGroup.add(infoQuadroMesh)
 
-  // 4 Botones 3D interactivos debajo del Quadro (Compactos y legibles: 28 x 7.5)
-  const btnQuadroGeo = new THREE.PlaneGeometry(28, 7.5)
+  // Botones 3D interactivos:
+  btnQuadroGeo = new THREE.PlaneGeometry(28, 7.5)
+  btnAudioGeo = new THREE.PlaneGeometry(9.5, 9.5)
 
-  quadroBtn1 = new THREE.Mesh(btnQuadroGeo, new THREE.MeshBasicMaterial({ transparent: true, depthWrite: false, side: THREE.DoubleSide }))
+  quadroBtn1 = new THREE.Mesh(btnAudioGeo, new THREE.MeshBasicMaterial({ transparent: true, depthWrite: false, depthTest: false, side: THREE.DoubleSide }))
+  quadroBtn1.renderOrder = 10
   quadroBtn1.userData = { is3DButton: true, action: 'toggle-audio' }
   infoQuadroGroup.add(quadroBtn1)
   interactive3DButtons.push(quadroBtn1)
 
-  quadroBtn2 = new THREE.Mesh(btnQuadroGeo, new THREE.MeshBasicMaterial({ transparent: true, depthWrite: false, side: THREE.DoubleSide }))
+  quadroBtn2 = new THREE.Mesh(btnAudioGeo, new THREE.MeshBasicMaterial({ transparent: true, depthWrite: false, depthTest: false, side: THREE.DoubleSide }))
+  quadroBtn2.renderOrder = 10
   quadroBtn2.userData = { is3DButton: true, action: 'repeat-audio' }
   infoQuadroGroup.add(quadroBtn2)
   interactive3DButtons.push(quadroBtn2)
 
   quadroBtn3 = new THREE.Mesh(btnQuadroGeo, new THREE.MeshBasicMaterial({ transparent: true, depthWrite: false, side: THREE.DoubleSide }))
+  quadroBtn3.renderOrder = 5
   quadroBtn3.userData = { is3DButton: true, action: 'open-shelf' }
   infoQuadroGroup.add(quadroBtn3)
   interactive3DButtons.push(quadroBtn3)
 
   quadroBtn4 = new THREE.Mesh(btnQuadroGeo, new THREE.MeshBasicMaterial({ transparent: true, depthWrite: false, side: THREE.DoubleSide }))
+  quadroBtn4.renderOrder = 5
   quadroBtn4.userData = { is3DButton: true, action: 'close-card' }
   infoQuadroGroup.add(quadroBtn4)
   interactive3DButtons.push(quadroBtn4)

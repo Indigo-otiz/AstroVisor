@@ -63,11 +63,11 @@ export function calcularLayout(ctx, ficha, audio = { etiqueta: 'Escuchar', activ
   const boton = (accion, texto, rect, principal = false, esIcono = false) => {
     zonas[accion] = rect
     items.push({
-      k: 'boton', rect, radio: esIcono ? 28 : 18,
-      fill: esIcono ? 'rgba(16, 28, 58, 0.72)' : (principal ? '#f5ce6d' : '#233657'),
-      stroke: esIcono ? 'rgba(147, 197, 253, 0.50)' : (principal ? null : '#7790b6'), sw: 3,
-      texto, font: fuente(esIcono ? 72 : 52, true),
-      color: esIcono ? '#e2e8f0' : (principal ? '#111b31' : '#ffffff'), padIzq: esIcono ? 0 : rect.h * .6,
+      k: 'boton', rect, radio: esIcono ? 32 : 18,
+      fill: esIcono ? '#172554' : (principal ? '#f5ce6d' : '#233657'),
+      stroke: esIcono ? '#38bdf8' : (principal ? null : '#7790b6'), sw: esIcono ? 4 : (principal ? 0 : 3),
+      texto, font: fuente(esIcono ? 76 : 52, true),
+      color: esIcono ? '#ffffff' : (principal ? '#111b31' : '#ffffff'), padIzq: esIcono ? 0 : rect.h * .6,
     })
   }
 
