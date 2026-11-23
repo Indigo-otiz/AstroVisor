@@ -9,6 +9,7 @@ let desmontado = false
 const tiempo = (valor = 0) => `${Math.floor(valor / 60)}:${String(Math.floor(valor % 60)).padStart(2, '0')}`
 const progreso = computed(() => `${tiempo(estado.value.posicion)} / ${tiempo(estado.value.duracion)}`)
 const accion = computed(() => estado.value.puedePausar ? 'Pausar' : estado.value.puedeReanudar ? 'Reanudar' : 'Escuchar')
+const iconoAccion = computed(() => estado.value.puedePausar ? '⏸' : '▶')
 function controlar() {
   if (estado.value.puedePausar) narrador.pausar()
   else if (estado.value.puedeReanudar) narrador.reanudar()
@@ -43,8 +44,20 @@ onBeforeUnmount(() => {
     <h2 id="narracion-titulo">Escucha la historia</h2>
     <p v-if="recurso" class="narracion-origen">{{ recurso.voz }} · Contenido de demostración.</p>
     <div v-if="recurso" class="narracion-acciones">
-      <button class="public-button" type="button" :disabled="!estado.puedeEscuchar && !estado.puedePausar && !estado.puedeReanudar" @click="controlar">{{ accion }}</button>
-      <button v-if="estado.estado === 'bloqueado'" class="public-button narracion-secundario" type="button" @click="narrador.activar()">Activar audio</button>
+      <button
+        class="public-button narracion-btn-audio"
+        type="button"
+        :disabled="!estado.puedeEscuchar && !estado.puedePausar && !estado.puedeReanudar"
+        :aria-label="`${accion} narración`"
+        :title="accion"
+        @click="controlar"
+      >
+        <span class="btn-icon" aria-hidden="true">{{ iconoAccion }}</span>
+        <span class="btn-text">{{ accion }}</span>
+      </button>
+      <button v-if="estado.estado === 'bloqueado'" class="public-button narracion-secundario" type="button" @click="narrador.activar()">
+        <span class="btn-icon" aria-hidden="true">🔊</span> Activar audio
+      </button>
     </div>
     <p class="narracion-estado" role="status" aria-live="polite">{{ estado.mensaje }}</p>
     <p v-if="estado.activacion" class="narracion-origen">{{ estado.activacion }}</p>

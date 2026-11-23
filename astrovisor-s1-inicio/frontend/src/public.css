@@ -551,6 +551,16 @@
   gap: 12px;
   margin-block: 20px;
 }
+.narracion-btn-audio {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.55rem;
+}
+.narracion-btn-audio .btn-icon {
+  font-size: 1.1em;
+  line-height: 1;
+}
 .public-shell .narracion-secundario {
   background: #e8edf4;
   color: var(--blue);

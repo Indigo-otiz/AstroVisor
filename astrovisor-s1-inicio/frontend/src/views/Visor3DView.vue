@@ -276,8 +276,8 @@ const LIBROS_CATALOGO = {
   }
 }
 
-// Función para crear relieves tridimensionales con extrusión (Idéntica a la versión anterior de Homido)
-function crearRelieve(THREE_LIB, datos, textura = null) {
+// Función para crear relieves tridimensionales con extrusión y acabado de marca de agua integrada
+function crearRelieve(THREE_LIB, datos, textura = null, { opacidad = 0.38, opacidadLateral = 0.22, marcaAgua = true } = {}) {
   const grupo = new THREE_LIB.Group()
   grupo.userData.textura = textura
   try {
@@ -313,12 +313,18 @@ function crearRelieve(THREE_LIB, datos, textura = null) {
         color: textura ? '#ffffff' : capa.color,
         map: textura || null,
         roughness: 0.65,
-        metalness: 0
+        metalness: 0.05,
+        transparent: marcaAgua,
+        opacity: marcaAgua ? opacidad : 1.0,
+        depthWrite: !marcaAgua
       })
       const lateral = new THREE_LIB.MeshStandardMaterial({
         color: capa.color,
         roughness: 0.42,
-        metalness: 0.15
+        metalness: 0.15,
+        transparent: marcaAgua,
+        opacity: marcaAgua ? opacidadLateral : 1.0,
+        depthWrite: !marcaAgua
       })
       const malla = new THREE_LIB.Mesh(geometria, [frente, lateral])
       malla.position.z = capa.z
@@ -560,10 +566,10 @@ function createButtonCanvasTexture(texto, isPrimary = false, isAccent = false) {
 
   ctx.fillStyle = '#ffffff'
   let fSize = 40
-  ctx.font = `bold ${fSize}px "Space Grotesk", sans-serif`
+  ctx.font = `bold ${fSize}px "Space Grotesk", "Segoe UI Symbol", "Apple Color Emoji", sans-serif`
   while (ctx.measureText(texto).width > 560 && fSize > 24) {
     fSize -= 2
-    ctx.font = `bold ${fSize}px "Space Grotesk", sans-serif`
+    ctx.font = `bold ${fSize}px "Space Grotesk", "Segoe UI Symbol", "Apple Color Emoji", sans-serif`
   }
   ctx.textAlign = 'center'
   ctx.textBaseline = 'middle'
@@ -673,10 +679,10 @@ function renderQuadroTexture(data, mode = 'ficha') {
     }
 
     ctx.fillStyle = '#cbd5e1'
-    ctx.font = 'bold 36px "Space Grotesk", sans-serif'
+    ctx.font = 'bold 36px "Space Grotesk", "Segoe UI Symbol", sans-serif'
     const hintTxt = isAudioPlaying.value
-      ? 'Usa los controles inferiores para pausar, repetir o explorar los libros'
-      : 'Usa los controles inferiores para reanudar la narración o ver libros'
+      ? 'Usa los controles inferiores (⏸ Pausar / ↺ Repetir) o explora los libros'
+      : 'Usa los controles inferiores (▶ Reproducir / ↺ Repetir) o explora los libros'
     ctx.fillText(hintTxt, w / 2, 735)
   } else if (mode === 'estanteria') {
     // 2. VISTA ESTANTERÍA: Muestra los 3 libros como portadas sobre una repisa de madera
@@ -954,9 +960,9 @@ function actualizarBotones3DQuadro() {
   if (vistaQuadro.value === 'ficha') {
     // 1. Vista Ficha: 4 Botones bien proporcionados debajo del cuadro (2 filas de 2 botones)
     bookQuadroMeshes.forEach((bm) => { bm.visible = false })
-    // Fila 1: Control de Audio (Pausar/Reanudar y Repetir)
+    // Fila 1: Control de Audio con Iconos Universales (▶/⏸ y ↺)
     if (quadroBtn1) {
-      const txt = isAudioPlaying.value ? 'Pausar audio' : 'Reanudar audio'
+      const txt = isAudioPlaying.value ? '⏸ Pausar' : '▶ Reproducir'
       quadroBtn1.material.map = createButtonCanvasTexture(txt, true, false)
       quadroBtn1.userData.action = 'toggle-audio'
       quadroBtn1.position.set(-15.5, -31.5, 0.6)
@@ -964,7 +970,7 @@ function actualizarBotones3DQuadro() {
       quadroBtn1.visible = true
     }
     if (quadroBtn2) {
-      quadroBtn2.material.map = createButtonCanvasTexture('Repetir narración', false, false)
+      quadroBtn2.material.map = createButtonCanvasTexture('↺ Repetir', false, false)
       quadroBtn2.userData.action = 'repeat-audio'
       quadroBtn2.position.set(15.5, -31.5, 0.6)
       quadroBtn2.scale.set(1, 1, 1)
@@ -1356,7 +1362,7 @@ function handleDeviceOrientation(e) {
   }
 }
 
-// Emblemas Institucionales 3D auténticos detrás del observador (ITT y Solón Argüello)
+// Emblemas Institucionales 3D auténticos detrás del observador (ITT y Solón Argüello) con acabado de marca de agua
 async function initInstitutionalLogos3D() {
   const logosGroup = new THREE.Group()
   // Colocados detrás del observador en Z = +45, rotados 180° en Y para mirar directamente hacia la cámara
@@ -1372,7 +1378,7 @@ async function initInstitutionalLogos3D() {
       const tepicData = await resTepic.json()
       textureLoader.load('/ITTepic_logo.jpg', (tex) => {
         tex.colorSpace = THREE.SRGBColorSpace
-        const relieveTepic = crearRelieve(THREE, tepicData, tex)
+        const relieveTepic = crearRelieve(THREE, tepicData, tex, { opacidad: 0.38, opacidadLateral: 0.22, marcaAgua: true })
         if (relieveTepic) {
           relieveTepic.scale.setScalar(13)
           relieveTepic.position.set(-11, 0, 0)
@@ -1390,7 +1396,7 @@ async function initInstitutionalLogos3D() {
     const resBib = await fetch('/prueba-homido/logos/biblioteca.json')
     if (resBib.ok) {
       const bibData = await resBib.json()
-      const relieveBib = crearRelieve(THREE, bibData, null)
+      const relieveBib = crearRelieve(THREE, bibData, null, { opacidad: 0.38, opacidadLateral: 0.22, marcaAgua: true })
       if (relieveBib) {
         relieveBib.scale.setScalar(24)
         relieveBib.position.set(11, 0, 0)
@@ -1402,8 +1408,8 @@ async function initInstitutionalLogos3D() {
     console.warn('Fallback para logo Biblioteca:', e)
   }
 
-  // Luz puntual dedicada para realzar los relieves 3D traseros
-  const logoLight = new THREE.PointLight(0xfff5e6, 2.5, 70, 1)
+  // Luz puntual dedicada suave para realzar los relieves 3D traseros integrados al fondo cósmico
+  const logoLight = new THREE.PointLight(0xc8dcfa, 0.9, 70, 1)
   logoLight.position.set(0, 6, 12)
   logosGroup.add(logoLight)
 

@@ -1,5 +1,5 @@
-// Contornos preparados offline: una malla por capa, con espesor y detalles elevados.
-export function crearRelieve(THREE, datos, textura, { opacidad = 0.55, opacidadLateral = 0.35, marcaAgua = true } = {}) {
+// Contornos preparados offline: una malla por capa, con espesor y detalles elevados con acabado marca de agua.
+export function crearRelieve(THREE, datos, textura, { opacidad = 0.38, opacidadLateral = 0.22, marcaAgua = true } = {}) {
   const grupo = new THREE.Group();
   grupo.userData.textura = textura;
   try {
@@ -72,7 +72,7 @@ export function registrarRelieves(AFRAME) {
     schema: {
       src: { type: 'string' },
       ancho: { default: 1 },
-      opacidad: { default: 0.55 },
+      opacidad: { default: 0.38 },
       marcaAgua: { default: true },
     },
     init() {

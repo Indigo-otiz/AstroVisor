@@ -21,6 +21,7 @@ export function presentarAudio(narracion) {
   const { estado, puedePausar, puedeReanudar, puedeEscuchar } = narracion
   return {
     etiqueta: puedePausar ? 'Pausar' : puedeReanudar ? 'Reanudar' : estado === 'finalizado' ? 'Repetir' : 'Escuchar',
+    icono: puedePausar ? '⏸' : estado === 'finalizado' ? '↺' : '▶',
     aviso: MENSAJES_NARRACION[estado] ?? narracion.mensaje,
     activo: puedePausar || puedeReanudar || puedeEscuchar,
     repetir: Boolean(puedePausar || puedeReanudar || puedeEscuchar || estado === 'pausado' || estado === 'finalizado'),
@@ -28,7 +29,7 @@ export function presentarAudio(narracion) {
 }
 
 export const BIBLIO_PENDIENTE = 'Sin lecturas recomendadas.'
-const FUENTE = 'system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif'
+const FUENTE = 'system-ui, -apple-system, "Segoe UI", "Segoe UI Symbol", Roboto, Arial, sans-serif'
 const fuente = (px, negrita = false) => `${negrita ? 'bold ' : ''}${px}px ${FUENTE}`
 
 export function ajustarLineas(ctx, texto, anchoMax) {
@@ -76,10 +77,13 @@ export function calcularLayout(ctx, ficha, audio = { etiqueta: 'Escuchar', activ
   const audioRect = { x: x + 46, y: 835, w: 508, h: 138 }
   const repetir = { x: 680, y: 835, w: 380, h: 138 }
   zonas.audio = audioRect
-  if (audio.activo) boton('audio', audio.etiqueta, audioRect, true)
+  if (audio.activo) {
+    const icono = audio.icono ?? (audio.etiqueta === 'Pausar' ? '⏸' : '▶')
+    boton('audio', `${icono} ${audio.etiqueta}`, audioRect, true)
+  }
   if (audio.repetir) {
     zonas.repetir = repetir
-    boton('repetir', 'Repetir', repetir)
+    boton('repetir', '↺ Repetir', repetir)
   }
   if (hayLibro) {
     const libros = { x: x + 46, y: 1001, w: 435, h: 131 }
