@@ -2273,7 +2273,7 @@ onBeforeUnmount(() => {
           @click="salirModoVR"
           aria-label="Salir de Modo Homido y volver a pantalla normal 2D"
         >
-          📺 Salir a 2D
+          Salir a 2D
         </button>
         <button
           type="button"
@@ -2281,7 +2281,7 @@ onBeforeUnmount(() => {
           @click="salir"
           aria-label="Salir al menú principal"
         >
-          🏠 Salir
+          Salir
         </button>
       </div>
 
@@ -2292,7 +2292,7 @@ onBeforeUnmount(() => {
           @click="salirModoVR"
           aria-label="Salir de Modo Homido y volver a pantalla normal 2D"
         >
-          📺 Salir a 2D
+          Salir a 2D
         </button>
         <button
           type="button"
@@ -2300,7 +2300,7 @@ onBeforeUnmount(() => {
           @click="salir"
           aria-label="Salir al menú principal"
         >
-          🏠 Salir
+          Salir
         </button>
       </div>
 
@@ -2332,12 +2332,15 @@ onBeforeUnmount(() => {
           <span class="live-dot" :class="{ 'paused': isGazePaused }"></span>
           <h1 class="brand-heading">AstroVisor</h1>
         </div>
+      </div>
 
-        <!-- Emblemas institucionales oficiales en cabecera -->
-        <div class="hud-logos-strip">
-          <img src="/institucional/biblioteca-solon-arguello.png" alt="Biblioteca Solón Argüello" class="hud-logo-img" />
-          <img src="/ITTepic_logo.jpg" alt="IT Tepic" class="hud-logo-img circular" />
-        </div>
+      <!-- Emblemas institucionales oficiales centrados en la cabecera -->
+      <div class="hud-logos-strip" aria-label="Instituciones participantes">
+        <img src="/Nayarit_CECAN_Convivencia_Horizontal_LetrasBlancas.png" alt="Gobierno del Estado de Nayarit y CECAN" class="hud-logo-img cecan" />
+        <span class="hud-logo-sep" aria-hidden="true"></span>
+        <img src="/institucional/biblioteca-solon-arguello.png" alt="Biblioteca Solón Argüello" class="hud-logo-img" />
+        <span class="hud-logo-sep" aria-hidden="true"></span>
+        <img src="/ITTepic_logo.jpg" alt="IT Tepic" class="hud-logo-img circular" />
       </div>
 
       <!-- Acciones de control superior -->
@@ -2524,10 +2527,10 @@ onBeforeUnmount(() => {
   gap: 0.35rem;
   padding: 8px 16px;
   background: rgba(15, 23, 42, 0.90);
-  border: 1.5px solid rgba(245, 200, 66, 0.65);
+  border: 1.5px solid rgba(255, 255, 255, 0.35);
   border-radius: 9999px;
-  color: #f5c842;
-  font-family: 'Space Grotesk', sans-serif;
+  color: #ffffff;
+  font-family: system-ui, -apple-system, sans-serif;
   font-size: 14px;
   font-weight: 700;
   cursor: pointer;
@@ -2537,19 +2540,22 @@ onBeforeUnmount(() => {
 }
 
 .homido-exit-pill:hover {
-  background: rgba(245, 200, 66, 0.22);
-  border-color: #f5c842;
+  background: rgba(31, 78, 140, 0.4);
+  border-color: #38bdf8;
+  color: #ffffff;
   transform: translateY(-1px);
 }
 
 .homido-exit-pill.exit-home {
-  border-color: rgba(244, 63, 94, 0.65);
-  color: #fca5a5;
+  border-color: rgba(122, 21, 43, 0.7);
+  color: #ffffff;
+  background: rgba(122, 21, 43, 0.35);
 }
 
 .homido-exit-pill.exit-home:hover {
-  background: rgba(244, 63, 94, 0.22);
-  border-color: #f43f5e;
+  background: #7a152b;
+  border-color: #961d37;
+  color: #ffffff;
 }
 
 /* Botón inferior central: Activar pantalla completa, sensores y audio (Fiel a Imagen 3) */
@@ -2637,8 +2643,8 @@ onBeforeUnmount(() => {
 }
 
 .btn-back:hover {
-  background: rgba(245, 200, 66, 0.25);
-  border-color: #f5c842;
+  background: rgba(31, 78, 140, 0.4);
+  border-color: #38bdf8;
   color: #ffffff;
 }
 
@@ -2652,8 +2658,8 @@ onBeforeUnmount(() => {
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background-color: #f5c842;
-  box-shadow: 0 0 8px #f5c842;
+  background-color: #38bdf8;
+  box-shadow: 0 0 8px #38bdf8;
   animation: pulseDot 2s infinite ease-in-out;
 }
 
@@ -2669,33 +2675,47 @@ onBeforeUnmount(() => {
 }
 
 .brand-heading {
-  font-family: 'Orbitron', 'Space Grotesk', sans-serif;
-  font-size: 0.95rem;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 1.15rem;
   font-weight: 700;
-  letter-spacing: 0.15em;
-  text-transform: uppercase;
+  letter-spacing: 0.02em;
   color: #ffffff;
 }
 
 .hud-logos-strip {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
   display: flex;
   align-items: center;
-  gap: 0.8rem;
-  padding: 0.3rem 0.8rem;
-  background: rgba(13, 18, 39, 0.75);
-  backdrop-filter: blur(8px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  gap: 0.75rem;
+  padding: 0.35rem 1rem;
+  background: rgba(13, 18, 39, 0.82);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.18);
   border-radius: 9999px;
+  pointer-events: auto;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
 }
 
 .hud-logo-img {
-  height: 20px;
+  height: 22px;
   width: auto;
-  opacity: 0.85;
+  opacity: 0.92;
+}
+
+.hud-logo-img.cecan {
+  height: 18px;
 }
 
 .hud-logo-img.circular {
   border-radius: 50%;
+}
+
+.hud-logo-sep {
+  width: 1px;
+  height: 14px;
+  background: rgba(255, 255, 255, 0.22);
 }
 
 .top-controls {
@@ -2778,23 +2798,22 @@ onBeforeUnmount(() => {
 .hud-badge {
   display: inline-block;
   padding: 0.25rem 0.75rem;
-  background: rgba(245, 200, 66, 0.15);
-  border: 1.5px solid rgba(245, 200, 66, 0.4);
+  background: rgba(122, 21, 43, 0.55);
+  border: 1.5px solid rgba(255, 255, 255, 0.25);
   border-radius: 9999px;
   font-size: 0.78rem;
   font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: #f5c842;
+  letter-spacing: 0.04em;
+  color: #ffffff;
   margin-bottom: 0.45rem;
 }
 
 .hud-title {
-  font-family: 'Orbitron', 'Space Grotesk', sans-serif;
+  font-family: Georgia, 'Times New Roman', serif;
   font-size: 1.85rem;
-  font-weight: 800;
+  font-weight: 700;
   color: #ffffff;
-  letter-spacing: -0.02em;
+  letter-spacing: -0.01em;
   line-height: 1.15;
 }
 
@@ -2962,13 +2981,14 @@ onBeforeUnmount(() => {
 }
 
 .invite-badge {
-  font-size: 0.75rem;
-  font-weight: 800;
-  letter-spacing: 0.08em;
-  color: #f5c842;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: #bae6fd;
 }
 
 .invite-title {
+  font-family: Georgia, 'Times New Roman', serif;
   font-size: 1.2rem;
   font-weight: 700;
   color: #ffffff;
@@ -3163,11 +3183,11 @@ onBeforeUnmount(() => {
 }
 
 .detail-heading {
+  font-family: Georgia, 'Times New Roman', serif;
   font-size: 1.25rem;
   font-weight: 700;
-  color: #f5c842;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
+  color: #bae6fd;
+  letter-spacing: 0.03em;
   margin-bottom: 0.6rem;
 }
 
@@ -3282,14 +3302,14 @@ onBeforeUnmount(() => {
 }
 
 .btn-nav-step.primary {
-  background: rgba(245, 200, 66, 0.2);
-  border-color: rgba(245, 200, 66, 0.6);
-  color: #f5c842;
+  background: rgba(122, 21, 43, 0.45);
+  border-color: rgba(255, 255, 255, 0.3);
+  color: #ffffff;
 }
 
 .btn-nav-step.primary:hover {
-  background: #f5c842;
-  color: #050814;
+  background: #7a152b;
+  color: #ffffff;
 }
 
 /* Transición animada para la ficha */
@@ -3327,11 +3347,10 @@ onBeforeUnmount(() => {
 }
 
 .bottom-label {
-  font-size: 0.78rem;
+  font-size: 0.82rem;
   font-weight: 700;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: #f5c842;
+  letter-spacing: 0.04em;
+  color: #bae6fd;
   white-space: nowrap;
 }
 
@@ -3388,6 +3407,9 @@ onBeforeUnmount(() => {
 }
 
 @media (max-width: 640px) {
+  .hud-logos-strip {
+    display: none;
+  }
   .constellation-hud-card {
     top: auto;
     bottom: 5.5rem;

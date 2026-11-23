@@ -17,6 +17,20 @@ export function useRecorridos() {
       const datos = await cargarRecorridos({ signal: actual.signal })
       if (!actual.signal.aborted) recorridos.value = datos
     } catch {
+      // Fallback para entornos de demostración estáticos (p.ej. Vercel) sin backend activo
+      try {
+        const respDemo = await fetch('/prueba-homido/data/recorridos-demo.json', { signal: actual.signal })
+        if (respDemo.ok) {
+          const datosDemo = await respDemo.json()
+          if (Array.isArray(datosDemo) && datosDemo.length > 0 && !actual.signal.aborted) {
+            recorridos.value = datosDemo
+            return
+          }
+        }
+      } catch {
+        // Si el respaldo tampoco responde, se presenta el mensaje de error normal
+      }
+
       if (!actual.signal.aborted)
         error.value = 'No pudimos cargar las constelaciones. Inténtalo de nuevo en un momento.'
     } finally {
