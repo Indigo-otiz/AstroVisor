@@ -1151,11 +1151,11 @@
   flex-wrap: wrap;
   align-items: center;
   justify-content: center;
-  gap: 1.5rem 2.25rem;
+  gap: 2rem 3rem;
   list-style: none;
   padding: 0;
-  margin: 0 auto 1.5rem;
-  max-width: 960px;
+  margin: 0 auto 1.75rem;
+  max-width: 1100px;
 }
 
 .institutional-footer-logos li {
@@ -1167,31 +1167,29 @@
 .institutional-footer-logos img {
   display: block;
   height: auto;
-  max-height: 48px;
   width: auto;
-  max-width: 190px;
   object-fit: contain;
 }
 
 .institutional-logo-cecan {
-  max-height: 42px !important;
-  max-width: 220px !important;
+  max-height: 58px !important;
+  max-width: 320px !important;
   aspect-ratio: 11479 / 1968;
 }
 
 .institutional-logo-library {
-  max-height: 45px !important;
-  max-width: 160px !important;
+  max-height: 72px !important;
+  max-width: 230px !important;
 }
 
 .institutional-logo-tecnm {
-  max-height: 40px !important;
-  max-width: 160px !important;
+  max-height: 66px !important;
+  max-width: 210px !important;
 }
 
 .institutional-logo-tepic {
-  max-height: 44px !important;
-  max-width: 48px !important;
+  max-height: 76px !important;
+  max-width: 76px !important;
   border-radius: 50%;
 }
 
@@ -1209,31 +1207,31 @@
   .institutional-footer-logos {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 1.15rem 1.25rem;
+    gap: 1.25rem 1.5rem;
     align-items: center;
     justify-items: center;
-    max-width: 340px;
+    max-width: 350px;
     margin: 0 auto 1.25rem;
   }
   .institutional-footer-logos img {
-    max-height: 36px;
-    max-width: 140px;
+    max-height: 48px;
+    max-width: 150px;
   }
   .institutional-logo-cecan {
-    max-height: 32px !important;
-    max-width: 145px !important;
+    max-height: 38px !important;
+    max-width: 160px !important;
   }
   .institutional-logo-library {
-    max-height: 36px !important;
-    max-width: 125px !important;
+    max-height: 48px !important;
+    max-width: 140px !important;
   }
   .institutional-logo-tecnm {
-    max-height: 32px !important;
-    max-width: 125px !important;
+    max-height: 44px !important;
+    max-width: 135px !important;
   }
   .institutional-logo-tepic {
-    max-height: 36px !important;
-    max-width: 38px !important;
+    max-height: 52px !important;
+    max-width: 52px !important;
   }
 }
 
@@ -1980,6 +1978,7 @@
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
   flex: 1 1 auto;
+  align-content: start;
 }
 
 .vr-modal-footer {
@@ -2228,11 +2227,27 @@
   }
   .vr-modal-grid {
     grid-template-columns: 1fr;
-    gap: 0.85rem;
+    grid-auto-rows: max-content;
+    align-content: start;
+    gap: 1rem;
     padding: 1rem 1.15rem;
   }
   .vr-modal-card {
-    padding: 1rem 1.15rem;
+    padding: 1.25rem 1.25rem;
+    min-height: max-content;
+    overflow: visible;
+  }
+  .modal-card-desc {
+    font-size: 0.86rem;
+    line-height: 1.5;
+    margin-bottom: 0.85rem;
+  }
+  .modal-card-tags {
+    margin-bottom: 1.15rem;
+  }
+  .vr-modal-card-action {
+    margin-top: 0.5rem;
+    font-size: 0.88rem;
   }
   .vr-modal-footer {
     display: flex;
@@ -2267,12 +2282,16 @@
   }
   .vr-modal-grid {
     grid-template-columns: repeat(3, 1fr) !important;
+    grid-auto-rows: 1fr !important;
+    align-content: stretch !important;
     gap: 0.65rem;
     padding: 0.65rem 0.85rem;
   }
   .vr-modal-card {
     padding: 0.75rem 0.85rem;
     min-width: 0;
+    min-height: auto !important;
+    overflow: hidden;
   }
   .modal-card-desc {
     font-size: 0.75rem;
@@ -2281,6 +2300,10 @@
   }
   .modal-card-tags {
     display: none;
+  }
+  .vr-modal-card-action {
+    font-size: 0.78rem;
+    margin-top: auto;
   }
   .vr-modal-footer {
     display: none;
