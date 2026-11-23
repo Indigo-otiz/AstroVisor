@@ -547,7 +547,7 @@ onBeforeUnmount(() => {
             </svg>
           </div>
           <div class="card-content">
-            <span class="card-badge badge-web">PANTALLA 2D</span>
+            <span class="card-badge badge-web">Pantalla 2D</span>
             <span class="card-title">Explorar Constelaciones</span>
             <span class="card-hint">Relatos y biblioteca &rarr;</span>
           </div>
@@ -566,7 +566,7 @@ onBeforeUnmount(() => {
             </svg>
           </div>
           <div class="card-content">
-            <span class="card-badge badge-vr">INMERSIÓN 3D</span>
+            <span class="card-badge badge-vr">Inmersión 3D</span>
             <span class="card-title">Entrar al Visor 360°</span>
             <span class="card-hint">Con o sin gafas VR &#10022;</span>
           </div>
@@ -576,7 +576,7 @@ onBeforeUnmount(() => {
 
     <!-- Scroll Indicator -->
     <a class="hero-scroll-link" href="#observatorio">
-      <span>DESPLAZA HACIA ABAJO</span>
+      <span>Desplazar hacia abajo</span>
       <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
       </svg>

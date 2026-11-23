@@ -4,6 +4,7 @@ html { font-size: 18px; }
 body { margin: 0; line-height: 1.65; }
 a { color: #124a91; }
 a:focus-visible, button:focus-visible { outline: 3px solid #e18c00; outline-offset: 3px; }
+h1, h2, h3, h4, h5, h6 { font-family: Georgia, 'Times New Roman', serif; }
 h1, h2 { line-height: 1.2; }
 h1 { font-size: clamp(2rem, 5vw, 3.4rem); margin: .4rem 0 1rem; }
 h2 { font-size: 1.35rem; }

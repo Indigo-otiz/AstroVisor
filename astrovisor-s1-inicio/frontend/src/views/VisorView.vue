@@ -150,10 +150,10 @@ onMounted(() => {
     <!-- AVISO DE SALUD Y PRECAUCIÓN -->
     <div class="visor-caution-card" role="note">
       <div class="caution-icon-box">
-        <svg viewBox="0 0 24 24" fill="none" stroke="#b07800" stroke-width="2" class="caution-svg">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#7a152b" stroke-width="2" class="caution-svg">
           <circle cx="12" cy="12" r="10" />
           <line x1="12" y1="8" x2="12" y2="12" stroke-width="2.5" />
-          <circle cx="12" cy="16" r="1" fill="#b07800" />
+          <circle cx="12" cy="16" r="1" fill="#7a152b" />
         </svg>
       </div>
       <div class="caution-content">
@@ -180,11 +180,10 @@ onMounted(() => {
 }
 
 .visor-eyebrow {
-  color: #b07800;
+  color: var(--cecan-wine, #7a152b);
   font-weight: 700;
   font-size: 0.9444rem;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
+  letter-spacing: 0.02em;
   margin: 0 0 8px;
 }
 
@@ -230,9 +229,9 @@ onMounted(() => {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  background: rgba(245, 179, 1, 0.15);
-  border: 1px solid rgba(245, 179, 1, 0.45);
-  color: #ffd666;
+  background: rgba(122, 21, 43, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  color: #ffffff;
   padding: 6px 14px;
   border-radius: 999px;
   font-size: 0.9444rem;
@@ -266,17 +265,17 @@ onMounted(() => {
 }
 
 .visor-btn-primary {
-  background: #f5b301 !important;
-  color: #0b1530 !important;
+  background: var(--cecan-wine, #7a152b) !important;
+  color: #ffffff !important;
   font-weight: 750 !important;
   border-radius: 14px !important;
   padding: 14px 28px !important;
-  box-shadow: 0 4px 14px rgba(245, 179, 1, 0.35);
+  box-shadow: 0 4px 14px rgba(122, 21, 43, 0.35);
   transition: transform 0.15s ease, background 0.15s ease;
 }
 
 .visor-btn-primary:hover {
-  background: #ffc226 !important;
+  background: #961d37 !important;
   transform: translateY(-1px);
 }
 
@@ -438,8 +437,9 @@ onMounted(() => {
 .visor-caution-card {
   display: flex;
   gap: 18px;
-  background: #fffbf0;
-  border: 1.5px solid #f5b301;
+  background: #fdf8f6;
+  border: 1.5px solid #e2d1c3;
+  border-left: 4px solid var(--cecan-wine, #7a152b);
   border-radius: 18px;
   padding: 24px;
   margin-bottom: 28px;
@@ -458,12 +458,12 @@ onMounted(() => {
 
 .caution-content h3 {
   font: 700 1.15rem/1.3 Georgia, serif;
-  color: #614700;
+  color: var(--cecan-wine, #7a152b);
   margin: 0 0 6px;
 }
 
 .caution-content p {
-  color: #785900;
+  color: #2a292f;
   font-size: 1rem;
   line-height: 1.55;
   margin: 0;

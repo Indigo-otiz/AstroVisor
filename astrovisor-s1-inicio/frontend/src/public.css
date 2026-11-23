@@ -1,7 +1,7 @@
 :root {
-  --font-orbitron: 'Orbitron', system-ui, -apple-system, sans-serif;
-  --font-sans: 'Space Grotesk', system-ui, -apple-system, sans-serif;
-  --font-serif: 'Newsreader', Georgia, serif;
+  --font-orbitron: system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  --font-sans: system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  --font-serif: 'Newsreader', Georgia, 'Times New Roman', serif;
 }
 
 .sr-only {
@@ -20,10 +20,13 @@
   --paper: #faf7f0;
   --ink: #1b2430;
   --blue: #1f4e8c;
+  --brand-blue: #1f4e8c;
+  --cecan-wine: #7a152b;
+  --cecan-wine-hover: #961b36;
   --muted: #535e6c;
   --night: #0b1530;
   --star: #fff4cf;
-  --accent: #f5b301;
+  --accent: #1f4e8c;
   background: var(--paper);
   color: var(--ink);
   font-size: 1.1111rem;
@@ -95,6 +98,14 @@
 .public-shell .main-content {
   padding: 20px 0 48px;
 }
+.public-shell h1,
+.public-shell h2,
+.public-shell h3,
+.public-shell h4,
+.public-shell h5,
+.public-shell h6 {
+  font-family: Georgia, 'Times New Roman', serif;
+}
 .public-shell h1 {
   font:
     700 clamp(2rem, 4.5vw, 3.2222rem)/1.13 Georgia,
@@ -106,6 +117,7 @@
   margin: 0 0 22px;
 }
 .public-shell h2 {
+  font-family: Georgia, 'Times New Roman', serif;
   color: var(--night);
   line-height: 1.3;
   font-size: 1.4444rem;
@@ -808,8 +820,7 @@
   align-self: flex-start;
   font-size: 0.75rem;
   font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.03em;
   padding: 3px 8px;
   border-radius: 6px;
   background: #e8edf4;
@@ -818,8 +829,8 @@
 }
 
 .portal-card-badge.accent {
-  background: #fbf1d8;
-  color: #8c5b00;
+  background: #fdf2f4;
+  color: var(--cecan-wine, #7a152b);
 }
 
 .portal-card-badge.muted {
@@ -976,9 +987,9 @@
   gap: 8px;
   font-size: 0.78rem;
   font-weight: 700;
-  color: #8c5b00;
-  background: #fff8e8;
-  border: 1px solid #eddcb9;
+  color: var(--cecan-wine, #7a152b);
+  background: #fdf2f4;
+  border: 1px solid rgba(122, 21, 43, 0.25);
   padding: 4px 10px;
   border-radius: 6px;
   margin-bottom: 12px;
@@ -988,7 +999,7 @@
 .manual-badge-status .badge-dot {
   width: 8px;
   height: 8px;
-  background: #d97706;
+  background: var(--cecan-wine, #7a152b);
   border-radius: 50%;
   display: inline-block;
 }
@@ -1095,7 +1106,7 @@
   background: #f7f6f2;
   padding: 10px 14px;
   border-radius: 6px;
-  border-left: 3px solid #b07800;
+  border-left: 3px solid var(--cecan-wine, #7a152b);
   margin-top: 12px !important;
 }
 
@@ -1199,10 +1210,10 @@
   display: inline-flex;
   align-items: center;
   gap: 0.65rem;
-  font-family: var(--font-orbitron);
+  font-family: Georgia, 'Times New Roman', serif;
   font-size: clamp(1.15rem, 4.5vw, 1.85rem);
-  font-weight: 900;
-  letter-spacing: 0.08em;
+  font-weight: 700;
+  letter-spacing: 0.02em;
   white-space: nowrap;
   word-break: keep-all;
   color: #0b1530;
@@ -1375,9 +1386,9 @@
 }
 
 .hero-glass-card.vr-card .card-icon-box {
-  background: rgba(245, 179, 1, 0.18);
-  border: 1.5px solid rgba(245, 179, 1, 0.45);
-  color: #f5b301;
+  background: rgba(122, 21, 43, 0.35);
+  border: 1.5px solid rgba(190, 40, 70, 0.6);
+  color: #ffffff;
 }
 
 .hero-glass-card .card-icon {
@@ -1400,42 +1411,42 @@
 }
 
 .hero-glass-card .card-badge {
-  font-family: var(--font-orbitron);
-  font-size: 0.64rem;
-  font-weight: 700;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
+  font-family: var(--font-sans);
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: none;
   line-height: 1;
-  padding: 3px 8px;
+  padding: 4px 10px;
   border-radius: 6px;
   width: fit-content;
 }
 
 @media (min-width: 640px) {
   .hero-glass-card .card-badge {
-    font-size: 0.72rem;
-    letter-spacing: 0.14em;
+    font-size: 0.74rem;
+    letter-spacing: 0.04em;
     padding: 4px 10px;
   }
 }
 
 .hero-glass-card .card-badge.badge-web {
-  color: #7dd3fc;
-  background: rgba(56, 189, 248, 0.14);
-  border: 1px solid rgba(56, 189, 248, 0.28);
+  color: #bae6fd;
+  background: rgba(56, 189, 248, 0.16);
+  border: 1px solid rgba(56, 189, 248, 0.35);
 }
 
 .hero-glass-card .card-badge.badge-vr {
-  color: #fbbf24;
-  background: rgba(245, 179, 1, 0.14);
-  border: 1px solid rgba(245, 179, 1, 0.28);
+  color: #ffffff;
+  background: rgba(122, 21, 43, 0.45);
+  border: 1px solid rgba(190, 40, 70, 0.55);
 }
 
 .hero-glass-card .card-title {
-  font-family: var(--font-orbitron);
-  font-size: 0.86rem;
-  font-weight: 800;
-  letter-spacing: 0.03em;
+  font-family: var(--font-serif);
+  font-size: 1.05rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
   color: #ffffff;
   line-height: 1.25;
   white-space: nowrap;
@@ -1443,8 +1454,8 @@
 
 @media (min-width: 640px) {
   .hero-glass-card .card-title {
-    font-size: 1.15rem;
-    letter-spacing: 0.04em;
+    font-size: 1.25rem;
+    letter-spacing: -0.01em;
   }
 }
 
@@ -1544,7 +1555,7 @@
 
 .hero-btn-web:hover {
   background: #ffffff;
-  border-color: #d49e1e;
+  border-color: #1f4e8c;
   transform: translateY(-2px);
   box-shadow: 0 6px 22px rgba(31, 78, 140, 0.3);
 }
@@ -1566,10 +1577,10 @@
 
 .hero-btn-vr:hover {
   background: #0b1530;
-  border-color: #f5b301;
+  border-color: var(--cecan-wine, #7a152b);
   color: #ffffff;
   transform: translateY(-2px);
-  box-shadow: 0 6px 25px rgba(245, 179, 1, 0.4);
+  box-shadow: 0 6px 25px rgba(122, 21, 43, 0.4);
 }
 
 .hero-btn-icon {
@@ -1583,7 +1594,7 @@
 }
 
 .hero-btn-vr .hero-btn-icon {
-  color: #f5b301;
+  color: #bae6fd;
 }
 
 .hero-btn-texts {
@@ -1593,11 +1604,10 @@
 }
 
 .hero-btn-title {
-  font-family: var(--font-orbitron);
-  font-size: 0.84rem;
-  font-weight: 800;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 0.95rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
   line-height: 1.2;
 }
 
@@ -1619,10 +1629,11 @@
   align-items: center;
   gap: 0.4rem;
   font-family: var(--font-sans);
-  font-size: 0.68rem;
-  letter-spacing: 0.35em;
-  text-transform: uppercase;
-  color: #76767e;
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: none;
+  font-weight: 500;
+  color: #94a3b8;
   text-decoration: none;
   padding: 0.4rem 0.8rem;
   transition: color 0.25s;
@@ -1630,7 +1641,7 @@
 }
 
 .hero-scroll-link:hover {
-  color: #f5c842;
+  color: #ffffff;
 }
 
 .hero-scroll-link svg {
@@ -1650,17 +1661,17 @@
   transform: translate(-50%, -100%);
   margin-top: -12px;
   padding: 6px 12px;
-  border-radius: 4px;
-  background: rgba(8, 13, 34, 0.9);
+  border-radius: 6px;
+  background: rgba(8, 13, 34, 0.95);
   backdrop-filter: blur(8px);
-  border: 1px solid rgba(245, 200, 66, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.25);
   font-family: var(--font-sans);
   font-size: 11px;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: #f5c842;
+  letter-spacing: 0.04em;
+  text-transform: none;
+  color: #ffffff;
   white-space: nowrap;
-  box-shadow: 0 0 20px rgba(245, 200, 66, 0.3);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
   transition: opacity 0.2s ease;
 }
 
@@ -1713,10 +1724,10 @@
 
 .public-shell .vr-modal-title,
 .vr-modal-title {
-  font-family: var(--font-orbitron);
-  font-size: 1.35rem;
-  font-weight: 800;
-  letter-spacing: 0.05em;
+  font-family: var(--font-serif);
+  font-size: 1.45rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
   color: #ffffff !important;
   margin: 0;
 }
@@ -1847,46 +1858,46 @@
 }
 
 .icon-full {
-  background: rgba(245, 179, 1, 0.16);
-  border: 1px solid rgba(245, 179, 1, 0.4);
-  color: #f5b301;
+  background: rgba(122, 21, 43, 0.35);
+  border: 1px solid rgba(190, 40, 70, 0.6);
+  color: #ffffff;
 }
 
 .vr-modal-card-badge {
   display: inline-block;
-  font-family: var(--font-orbitron);
-  font-size: 0.65rem;
-  font-weight: 700;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
+  font-family: var(--font-sans);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: none;
   padding: 4px 10px;
   border-radius: 6px;
   line-height: 1;
 }
 
 .badge-homido {
-  color: #7dd3fc;
-  background: rgba(56, 189, 248, 0.12);
-  border: 1px solid rgba(56, 189, 248, 0.28);
+  color: #bae6fd;
+  background: rgba(56, 189, 248, 0.16);
+  border: 1px solid rgba(56, 189, 248, 0.35);
 }
 
 .badge-lite {
-  color: #5eead4;
-  background: rgba(45, 212, 191, 0.12);
-  border: 1px solid rgba(45, 212, 191, 0.28);
+  color: #a7f3d0;
+  background: rgba(45, 212, 191, 0.16);
+  border: 1px solid rgba(45, 212, 191, 0.35);
 }
 
 .badge-full {
-  color: #fbbf24;
-  background: rgba(245, 179, 1, 0.14);
-  border: 1px solid rgba(245, 179, 1, 0.32);
+  color: #ffffff;
+  background: rgba(122, 21, 43, 0.45);
+  border: 1px solid rgba(190, 40, 70, 0.55);
 }
 
 .modal-card-title {
-  font-family: var(--font-orbitron);
-  font-size: 1.08rem;
-  font-weight: 800;
-  letter-spacing: 0.03em;
+  font-family: var(--font-serif);
+  font-size: 1.25rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
   color: #ffffff;
   margin: 0 0 0.55rem;
   line-height: 1.3;
@@ -1925,14 +1936,14 @@
 
 .card-vr-homido .modal-card-tags li span { color: #38bdf8; }
 .card-vr-lite .modal-card-tags li span { color: #2dd4bf; }
-.card-vr-full .modal-card-tags li span { color: #f5b301; }
+.card-vr-full .modal-card-tags li span { color: #fed7aa; }
 
 .vr-modal-card-action {
-  font-family: var(--font-orbitron);
-  font-size: 0.78rem;
-  font-weight: 800;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
+  font-family: var(--font-sans);
+  font-size: 0.82rem;
+  font-weight: 650;
+  letter-spacing: 0.02em;
+  text-transform: none;
   display: inline-flex;
   align-items: center;
   gap: 0.4rem;
@@ -1940,16 +1951,16 @@
   transition: transform 0.2s ease, color 0.2s ease;
 }
 
-.action-homido { color: #38bdf8; }
-.action-lite { color: #2dd4bf; }
-.action-full { color: #f5b301; }
+.action-homido { color: #bae6fd; }
+.action-lite { color: #a7f3d0; }
+.action-full { color: #fed7aa; }
 
 .vr-modal-card:hover .vr-modal-card-action {
   transform: translateX(5px);
 }
-.vr-modal-card.card-vr-homido:hover .vr-modal-card-action { color: #7dd3fc; }
-.vr-modal-card.card-vr-lite:hover .vr-modal-card-action { color: #5eead4; }
-.vr-modal-card.card-vr-full:hover .vr-modal-card-action { color: #fde047; }
+.vr-modal-card.card-vr-homido:hover .vr-modal-card-action { color: #e0f2fe; }
+.vr-modal-card.card-vr-lite:hover .vr-modal-card-action { color: #d1fae5; }
+.vr-modal-card.card-vr-full:hover .vr-modal-card-action { color: #ffffff; }
 
 /* Constelaciones & Explorar View Editorial Extensions */
 .filtros-temporada {
@@ -2081,21 +2092,22 @@
 .catalogo-card-season {
   display: inline-block;
   font-family: var(--font-sans);
-  font-size: 0.72rem;
-  font-weight: 700;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: #8c5b00;
-  background: #f6f3ec;
+  font-size: 0.74rem;
+  font-weight: 650;
+  letter-spacing: 0.04em;
+  text-transform: none;
+  color: #7a152b;
+  background: #fdf2f4;
+  border: 1px solid rgba(122, 21, 43, 0.15);
   padding: 3px 8px;
   border-radius: 4px;
   margin-bottom: 0.6rem;
 }
 
 .catalogo-card-title {
-  font-family: var(--font-orbitron);
-  font-size: 1.25rem;
-  font-weight: 800;
+  font-family: var(--font-serif);
+  font-size: 1.45rem;
+  font-weight: 700;
   color: #0b1530;
   margin: 0 0 0.3rem;
 }
@@ -2110,7 +2122,7 @@
 
 .catalogo-card-desc {
   font-family: var(--font-sans);
-  font-size: 0.88rem;
+  font-size: 0.92rem;
   color: #45464d;
   line-height: 1.55;
   margin: 0 0 1.2rem;
@@ -2121,7 +2133,7 @@
   align-items: center;
   gap: 0.4rem;
   font-family: var(--font-sans);
-  font-size: 0.74rem;
+  font-size: 0.78rem;
   color: #1f4e8c;
   font-weight: 600;
   margin-bottom: 1rem;
@@ -2131,12 +2143,12 @@
   display: inline-flex;
   align-items: center;
   gap: 0.4rem;
-  font-family: var(--font-orbitron);
-  font-size: 0.78rem;
-  font-weight: 800;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: #0b1530;
+  font-family: var(--font-sans);
+  font-size: 0.88rem;
+  font-weight: 650;
+  letter-spacing: 0.02em;
+  text-transform: none;
+  color: #1f4e8c;
   text-decoration: none;
   transition: all 0.2s;
   padding-top: 0.75rem;
@@ -2145,7 +2157,7 @@
 }
 
 .catalogo-editorial-card:hover .catalogo-card-link {
-  color: #1f4e8c;
+  color: #7a152b;
   transform: translateX(4px);
 }
 
@@ -2175,14 +2187,14 @@
   align-items: center;
   gap: 0.5rem;
   font-family: var(--font-sans);
-  font-size: 0.72rem;
-  letter-spacing: 0.18em;
+  font-size: 0.8rem;
+  letter-spacing: 0.04em;
   font-weight: 700;
-  text-transform: uppercase;
-  color: #8c5b00;
-  background: rgba(245, 179, 1, 0.2);
+  color: var(--cecan-wine, #7a152b);
+  background: #fdf2f4;
+  border: 1px solid rgba(122, 21, 43, 0.2);
   padding: 4px 10px;
-  border-radius: 4px;
+  border-radius: 6px;
   margin-bottom: 0.6rem;
 }
 
@@ -2227,11 +2239,10 @@
 }
 
 .logos-institucionales-title {
-  font-family: var(--font-sans);
-  font-size: 0.75rem;
-  letter-spacing: 0.25em;
-  text-transform: uppercase;
-  color: #705100;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 0.95rem;
+  letter-spacing: 0.02em;
+  color: var(--cecan-wine, #7a152b);
   font-weight: 700;
   margin: 0 0 0.4rem;
 }
@@ -2316,10 +2327,9 @@
 
 .boveda-editorial-badge {
   font-family: var(--font-sans);
-  font-size: 0.72rem;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-  color: #fdc344;
+  font-size: 0.8rem;
+  letter-spacing: 0.04em;
+  color: #bae6fd;
   font-weight: 700;
   display: flex;
   align-items: center;
@@ -2389,9 +2399,8 @@
   background: #f6f3ec;
   border: 1px solid #dedbd3;
   font-family: var(--font-sans);
-  font-size: 0.72rem;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
+  font-size: 0.78rem;
+  letter-spacing: 0.04em;
   color: #45464d;
   font-weight: 700;
 }
@@ -2400,7 +2409,7 @@
   width: 6px;
   height: 6px;
   border-radius: 9999px;
-  background: #d49e1e;
+  background: var(--cecan-wine, #7a152b);
 }
 
 .ficha-compact-title {
@@ -2462,29 +2471,29 @@
 }
 
 .boveda-vr-btn {
-  background: #d49e1e;
-  border: 1px solid #f5b301;
-  color: #0b1530;
-  font-family: var(--font-orbitron);
-  font-weight: 800;
-  font-size: 0.76rem;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  padding: 0.6rem 1.2rem;
-  border-radius: 6px;
+  background: #1f4e8c;
+  border: 1px solid #3b82f6;
+  color: #ffffff;
+  font-family: var(--font-sans);
+  font-weight: 600;
+  font-size: 0.88rem;
+  letter-spacing: 0.02em;
+  text-transform: none;
+  padding: 0.65rem 1.3rem;
+  border-radius: 8px;
   cursor: pointer;
   text-decoration: none;
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
   transition: all 0.25s;
-  box-shadow: 0 4px 14px rgba(212, 158, 30, 0.3);
+  box-shadow: 0 4px 14px rgba(31, 78, 140, 0.3);
 }
 
 .boveda-vr-btn:hover {
-  background: #f5b301;
+  background: #163a6b;
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(245, 179, 1, 0.5);
+  box-shadow: 0 6px 20px rgba(31, 78, 140, 0.45);
 }
 
 .ficha-card-white {
@@ -2508,11 +2517,11 @@
   align-items: center;
   gap: 0.4rem;
   font-family: var(--font-sans);
-  font-size: 0.74rem;
-  font-weight: 700;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  color: #8c5b00;
+  font-size: 0.76rem;
+  font-weight: 650;
+  letter-spacing: 0.04em;
+  text-transform: none;
+  color: #7a152b;
   margin-bottom: 0.5rem;
 }
 
@@ -2543,12 +2552,12 @@
   width: 52px;
   height: 68px;
   background: #111a35;
-  border: 1px solid #d49e1e;
+  border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 6px;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #f5b301;
+  color: #ffffff;
   flex-shrink: 0;
   box-shadow: 0 4px 12px rgba(0,0,0,0.15);
 }
