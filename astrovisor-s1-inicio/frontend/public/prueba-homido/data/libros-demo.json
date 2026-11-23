@@ -1,0 +1,354 @@
+[
+  {
+    "id": "star-lore",
+    "titulo": "Star Lore of All Ages",
+    "autor": "William Tyler Olcott",
+    "anio": 1911,
+    "enlacePublico": "https://archive.org/details/starloreofallage00olco",
+    "portadaIlustrativa": "/libros-demo/star-lore.svg",
+    "tema": "#142a56",
+    "demostracion": true,
+    "marc21": {
+      "campo001": "DEMO-001",
+      "campo003": "DEMO",
+      "signatura852": null,
+      "ubicacion852": null
+    },
+    "recomendaciones": {
+      "orion": "Descubre relatos antiguos sobre las estrellas y por qué imaginamos a Orión en el cielo.",
+      "osa-mayor": "Conoce las leyendas que acompañan a las figuras de la Osa Mayor.",
+      "escorpio": "Explora cómo distintas historias dieron nombre y significado a las constelaciones.",
+      "can-mayor": "Relatos antiguos sobre el Can Mayor y el resplandor de Sirio en la historia."
+    }
+  },
+  {
+    "id": "field-stars",
+    "titulo": "A Field Book of the Stars",
+    "autor": "William Tyler Olcott",
+    "anio": 1914,
+    "enlacePublico": "https://archive.org/details/fieldbookofstars00olcorich",
+    "portadaIlustrativa": "/libros-demo/field-stars.svg",
+    "tema": "#22463f",
+    "demostracion": true,
+    "marc21": {
+      "campo001": "DEMO-002",
+      "campo003": "DEMO",
+      "signatura852": null,
+      "ubicacion852": null
+    },
+    "recomendaciones": {
+      "orion": "Observa cómo una guía clásica describe y organiza las estrellas del cielo nocturno.",
+      "osa-mayor": "Continúa la observación de la Osa Mayor con una guía de estrellas.",
+      "escorpio": "Conoce otros dibujos del firmamento y aprende a buscar sus estrellas.",
+      "can-mayor": "Guía práctica para ubicar a Sirio y las estrellas del Can Mayor.",
+      "boyero": "Observa el trazado en cometa de Boyero y la posición estelar de Arturo."
+    }
+  },
+  {
+    "id": "half-hours",
+    "titulo": "Half-Hours with the Stars",
+    "autor": "Richard A. Proctor",
+    "anio": 1887,
+    "enlacePublico": "https://www.gutenberg.org/ebooks/23300",
+    "portadaIlustrativa": "/libros-demo/half-hours.svg",
+    "tema": "#4d2844",
+    "demostracion": true,
+    "marc21": {
+      "campo001": "DEMO-003",
+      "campo003": "DEMO",
+      "signatura852": null,
+      "ubicacion852": null
+    },
+    "recomendaciones": {
+      "orion": "Dedica una lectura corta a reconocer las figuras del cielo y sus relaciones.",
+      "osa-mayor": "Amplía tu recorrido con explicaciones sencillas sobre grupos de estrellas.",
+      "escorpio": "Después de observar Escorpio, sigue explorando el cielo nocturno con esta lectura.",
+      "boyero": "Guía estelar para reconocer la silueta del Boyero junto a la Osa Mayor."
+    }
+  },
+  {
+    "id": "cazador-de-estrellas",
+    "titulo": "Cazador de estrellas",
+    "autor": "Silvia L. Cuesy",
+    "demostracion": false,
+    "portada": {
+      "tipo": "fotografia-ejemplar"
+    },
+    "portadaIlustrativa": "/portadas-biblioteca/cazador-de-estrellas.jpg",
+    "marc21": {
+      "campo001": "cazador-de-estrellas",
+      "campo003": "ASTROVISOR",
+      "signatura852": null,
+      "ubicacion852": null
+    },
+    "recomendaciones": {
+      "orion": "Lectura complementaria. Una biografía ilustrada sobre la observación de las estrellas."
+    }
+  },
+  {
+    "id": "el-astronomo",
+    "titulo": "El astrónomo",
+    "autor": "Walt Whitman",
+    "demostracion": false,
+    "portada": {
+      "tipo": "fotografia-ejemplar"
+    },
+    "portadaIlustrativa": "/portadas-biblioteca/el-astronomo.jpg",
+    "marc21": {
+      "campo001": "el-astronomo",
+      "campo003": "ASTROVISOR",
+      "signatura852": null,
+      "ubicacion852": null
+    },
+    "recomendaciones": {
+      "orion": "Lectura complementaria. Una lectura literaria sobre la experiencia de mirar el cielo."
+    }
+  },
+  {
+    "id": "mi-gran-libro-del-espacio",
+    "titulo": "Mi gran libro del espacio",
+    "autor": "Roger Priddy",
+    "demostracion": false,
+    "portada": {
+      "tipo": "fotografia-ejemplar"
+    },
+    "portadaIlustrativa": "/portadas-biblioteca/mi-gran-libro-del-espacio.jpg",
+    "marc21": {
+      "campo001": "mi-gran-libro-del-espacio",
+      "campo003": "ASTROVISOR",
+      "signatura852": null,
+      "ubicacion852": null
+    },
+    "recomendaciones": {
+      "orion": "Lectura complementaria. Una introducción ilustrada para continuar explorando el espacio."
+    }
+  },
+  {
+    "id": "para-comprender-el-universo",
+    "titulo": "Para comprender el Universo",
+    "autor": "Nathalie Fredette y Claude Lafleur",
+    "demostracion": false,
+    "portada": {
+      "tipo": "fotografia-ejemplar"
+    },
+    "portadaIlustrativa": "/portadas-biblioteca/para-comprender-el-universo.jpg",
+    "marc21": {
+      "campo001": "para-comprender-el-universo",
+      "campo003": "ASTROVISOR",
+      "signatura852": null,
+      "ubicacion852": null
+    },
+    "recomendaciones": {
+      "osa-mayor": "Lectura complementaria. Una guía general para situar la observación del cielo en el contexto del universo."
+    }
+  },
+  {
+    "id": "viaje-al-espacio",
+    "titulo": "Viaje al espacio",
+    "autor": "Ian Graham",
+    "demostracion": false,
+    "portada": {
+      "tipo": "fotografia-ejemplar"
+    },
+    "portadaIlustrativa": "/portadas-biblioteca/viaje-al-espacio.jpg",
+    "marc21": {
+      "campo001": "viaje-al-espacio",
+      "campo003": "ASTROVISOR",
+      "signatura852": null,
+      "ubicacion852": null
+    },
+    "recomendaciones": {
+      "osa-mayor": "Lectura complementaria. Una lectura ilustrada sobre la exploración espacial."
+    }
+  },
+  {
+    "id": "ng-el-espacio",
+    "titulo": "National Geographic: El espacio",
+    "autor": "National Geographic",
+    "demostracion": false,
+    "portada": {
+      "tipo": "fotografia-ejemplar"
+    },
+    "portadaIlustrativa": "/portadas-biblioteca/ng-el-espacio.jpg",
+    "marc21": {
+      "campo001": "ng-el-espacio",
+      "campo003": "ASTROVISOR",
+      "signatura852": null,
+      "ubicacion852": null
+    },
+    "recomendaciones": {
+      "osa-mayor": "Lectura complementaria. Un número de revista sobre nuestro lugar en el espacio."
+    }
+  },
+  {
+    "id": "esa-inmensa-galaxia",
+    "titulo": "Esa inmensa galaxia",
+    "autor": "Kjartan Poskitt",
+    "demostracion": false,
+    "portada": {
+      "tipo": "fotografia-ejemplar"
+    },
+    "portadaIlustrativa": "/portadas-biblioteca/esa-inmensa-galaxia.jpg",
+    "marc21": {
+      "campo001": "esa-inmensa-galaxia",
+      "campo003": "ASTROVISOR",
+      "signatura852": null,
+      "ubicacion852": null
+    },
+    "recomendaciones": {
+      "escorpio": "Lectura complementaria. Una introducción a la galaxia como contexto para observar el cielo nocturno."
+    }
+  },
+  {
+    "id": "oscuro-muy-oscuro",
+    "titulo": "Oscuro, muy oscuro",
+    "autor": "Ruth Brown",
+    "demostracion": false,
+    "portada": {
+      "tipo": "fotografia-ejemplar"
+    },
+    "portadaIlustrativa": "/portadas-biblioteca/oscuro-muy-oscuro.jpg",
+    "marc21": {
+      "campo001": "oscuro-muy-oscuro",
+      "campo003": "ASTROVISOR",
+      "signatura852": null,
+      "ubicacion852": null
+    },
+    "recomendaciones": {
+      "escorpio": "Lectura complementaria. Un cuento ilustrado para acompañar el tema de la oscuridad nocturna."
+    }
+  },
+  {
+    "id": "ng-destino-pluton",
+    "titulo": "National Geographic: Destino Plutón",
+    "autor": "National Geographic",
+    "demostracion": false,
+    "portada": {
+      "tipo": "fotografia-ejemplar"
+    },
+    "portadaIlustrativa": "/portadas-biblioteca/ng-destino-pluton.jpg",
+    "marc21": {
+      "campo001": "ng-destino-pluton",
+      "campo003": "ASTROVISOR",
+      "signatura852": null,
+      "ubicacion852": null
+    },
+    "recomendaciones": {
+      "escorpio": "Lectura complementaria. Una lectura sobre la exploración de un mundo lejano del Sistema Solar."
+    }
+  },
+  {
+    "id": "cosmografia-y-astrofisica",
+    "titulo": "Cosmografía y astrofísica",
+    "autor": "Salvador Mosquera R.",
+    "demostracion": false,
+    "portada": {
+      "tipo": "fotografia-ejemplar"
+    },
+    "portadaIlustrativa": "/portadas-biblioteca/cosmografia-y-astrofisica.jpg",
+    "marc21": {
+      "campo001": "cosmografia-y-astrofisica",
+      "campo003": "ASTROVISOR",
+      "signatura852": null,
+      "ubicacion852": null
+    },
+    "recomendaciones": {
+      "can-mayor": "Lectura complementaria. Un texto general para ampliar los conceptos de astronomía y astrofísica."
+    }
+  },
+  {
+    "id": "el-sistema-solar-sitesa",
+    "titulo": "El Sistema Solar",
+    "autor": "Miguel Ángel Herrera y Julieta Fierro",
+    "demostracion": false,
+    "portada": {
+      "tipo": "fotografia-ejemplar"
+    },
+    "portadaIlustrativa": "/portadas-biblioteca/el-sistema-solar-sitesa.jpg",
+    "marc21": {
+      "campo001": "el-sistema-solar-sitesa",
+      "campo003": "ASTROVISOR",
+      "signatura852": null,
+      "ubicacion852": null
+    },
+    "recomendaciones": {
+      "can-mayor": "Lectura complementaria. Una guía sobre los cuerpos que componen nuestro Sistema Solar."
+    }
+  },
+  {
+    "id": "ng-sistema-solar",
+    "titulo": "National Geographic: Sistema Solar",
+    "autor": "National Geographic",
+    "demostracion": false,
+    "portada": {
+      "tipo": "fotografia-ejemplar"
+    },
+    "portadaIlustrativa": "/portadas-biblioteca/ng-sistema-solar.jpg",
+    "marc21": {
+      "campo001": "ng-sistema-solar",
+      "campo003": "ASTROVISOR",
+      "signatura852": null,
+      "ubicacion852": null
+    },
+    "recomendaciones": {
+      "can-mayor": "Lectura complementaria. Un número ilustrado para explorar el entorno planetario."
+    }
+  },
+  {
+    "id": "conacyt-la-tierra",
+    "titulo": "CONACYT te cuenta: La Tierra",
+    "autor": "Albert Ducrocq",
+    "demostracion": false,
+    "portada": {
+      "tipo": "fotografia-ejemplar"
+    },
+    "portadaIlustrativa": "/portadas-biblioteca/conacyt-la-tierra.jpg",
+    "marc21": {
+      "campo001": "conacyt-la-tierra",
+      "campo003": "ASTROVISOR",
+      "signatura852": null,
+      "ubicacion852": null
+    },
+    "recomendaciones": {
+      "boyero": "Lectura complementaria. Una lectura sobre la Tierra, nuestro punto de observación del cielo."
+    }
+  },
+  {
+    "id": "por-que-la-luna",
+    "titulo": "¿Por qué la Luna cambia de forma?",
+    "autor": "Helen Orme",
+    "demostracion": false,
+    "portada": {
+      "tipo": "fotografia-ejemplar"
+    },
+    "portadaIlustrativa": "/portadas-biblioteca/por-que-la-luna.jpg",
+    "marc21": {
+      "campo001": "por-que-la-luna",
+      "campo003": "ASTROVISOR",
+      "signatura852": null,
+      "ubicacion852": null
+    },
+    "recomendaciones": {
+      "boyero": "Lectura complementaria. Una introducción a las fases de la Luna y a la observación del cielo."
+    }
+  },
+  {
+    "id": "el-libro-de-los-cientificos",
+    "titulo": "El libro de los científicos",
+    "autor": "Struan Reid y Patricia Fara",
+    "demostracion": false,
+    "portada": {
+      "tipo": "fotografia-ejemplar"
+    },
+    "portadaIlustrativa": "/portadas-biblioteca/el-libro-de-los-cientificos.jpg",
+    "marc21": {
+      "campo001": "el-libro-de-los-cientificos",
+      "campo003": "ASTROVISOR",
+      "signatura852": null,
+      "ubicacion852": null
+    },
+    "recomendaciones": {
+      "boyero": "Lectura complementaria. Un recorrido por la historia de la ciencia para ampliar el contexto de la observación."
+    }
+  }
+]

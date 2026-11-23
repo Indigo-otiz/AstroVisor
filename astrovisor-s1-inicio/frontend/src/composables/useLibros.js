@@ -16,6 +16,23 @@ export function useLibros() {
       } })
       if (!actual.signal.aborted) libros.value = datos
     } catch {
+      // Fallback para entornos estáticos (p.ej. Vercel) sin backend Express activo
+      try {
+        const resp = await fetch('/prueba-homido/data/libros-demo.json', { signal: actual.signal })
+        if (resp.ok) {
+          const catalogo = await resp.json()
+          if (Array.isArray(catalogo) && !actual.signal.aborted) {
+            libros.value = catalogo
+              .filter((l) => typeof l.recomendaciones?.[id] === 'string')
+              .sort((a, b) => Number(a.demostracion) - Number(b.demostracion))
+              .map((l) => ({ ...l, motivo: l.recomendaciones[id] }))
+            return
+          }
+        }
+      } catch {
+        // Fallback no disponible, proceder al mensaje de error normal
+      }
+
       if (!actual.signal.aborted) error.value = 'No pudimos consultar los libros. Revisa la conexión y vuelve a intentar; no estamos mostrando una copia antigua.'
     } finally { if (!actual.signal.aborted) cargando.value = false }
   }
