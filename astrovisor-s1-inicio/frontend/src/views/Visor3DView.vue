@@ -67,6 +67,9 @@ let textureQuadro = null
 const bookImageCache = new Map()
 
 // Botones 3D asociados al Quadro
+let infoQuadroMesh = null
+let btnQuadroGeo = null
+let btnAudioGeo = null
 let quadroBtn1 = null
 let quadroBtn2 = null
 let quadroBtn3 = null
@@ -277,8 +280,8 @@ const LIBROS_CATALOGO = {
   }
 }
 
-// Función para crear relieves tridimensionales con extrusión (Idéntica a la versión anterior de Homido)
-function crearRelieve(THREE_LIB, datos, textura = null) {
+// Función para crear relieves tridimensionales con extrusión y acabado de marca de agua integrada
+function crearRelieve(THREE_LIB, datos, textura = null, { opacidad = 0.20, opacidadLateral = 0.10, marcaAgua = true } = {}) {
   const grupo = new THREE_LIB.Group()
   grupo.userData.textura = textura
   try {
@@ -311,15 +314,21 @@ function crearRelieve(THREE_LIB, datos, textura = null) {
         }
       }
       const frente = new THREE_LIB.MeshStandardMaterial({
-        color: textura ? '#ffffff' : capa.color,
+        color: textura ? '#5a7394' : '#6f88a8',
         map: textura || null,
-        roughness: 0.65,
-        metalness: 0
+        roughness: 0.90,
+        metalness: 0.0,
+        transparent: marcaAgua,
+        opacity: marcaAgua ? opacidad : 1.0,
+        depthWrite: !marcaAgua
       })
       const lateral = new THREE_LIB.MeshStandardMaterial({
-        color: capa.color,
-        roughness: 0.42,
-        metalness: 0.15
+        color: '#3d4f66',
+        roughness: 0.85,
+        metalness: 0.05,
+        transparent: marcaAgua,
+        opacity: marcaAgua ? opacidadLateral : 1.0,
+        depthWrite: !marcaAgua
       })
       const malla = new THREE_LIB.Mesh(geometria, [frente, lateral])
       malla.position.z = capa.z
@@ -541,34 +550,54 @@ const CONSTELACIONES_CONFIG = [
 ]
 
 // Generador de textura para botones 3D (Escala compacta, nítida y perfectamente proporcionada)
-function createButtonCanvasTexture(texto, isPrimary = false, isAccent = false) {
+function createButtonCanvasTexture(texto, isPrimary = false, isAccent = false, isAudioPill = false) {
   const canvas = document.createElement('canvas')
-  canvas.width = 640
-  canvas.height = 160
+  canvas.width = isAudioPill ? 256 : 640
+  canvas.height = isAudioPill ? 256 : 160
   const ctx = canvas.getContext('2d')
 
   ctx.beginPath()
-  ctx.roundRect(8, 8, 624, 144, 28)
-  ctx.fillStyle = isAccent
-    ? 'rgba(74, 32, 48, 0.96)'
-    : isPrimary
-      ? 'rgba(27, 42, 90, 0.96)'
-      : 'rgba(15, 23, 42, 0.96)'
-  ctx.fill()
-  ctx.lineWidth = 6
-  ctx.strokeStyle = isAccent ? '#ef4444' : isPrimary ? '#f5c842' : 'rgba(255, 255, 255, 0.85)'
-  ctx.stroke()
+  if (isAudioPill) {
+    // Botón circular nítido de alto contraste, visible bajo cualquier ángulo
+    ctx.arc(128, 128, 114, 0, Math.PI * 2)
+    ctx.fillStyle = '#172554' // Azul marino cósmico sólido y nítido
+    ctx.fill()
+    ctx.lineWidth = 10
+    ctx.strokeStyle = '#38bdf8' // Borde celeste brillante
+    ctx.stroke()
 
-  ctx.fillStyle = '#ffffff'
-  let fSize = 40
-  ctx.font = `bold ${fSize}px "Space Grotesk", sans-serif`
-  while (ctx.measureText(texto).width > 560 && fSize > 24) {
-    fSize -= 2
-    ctx.font = `bold ${fSize}px "Space Grotesk", sans-serif`
+    ctx.fillStyle = '#ffffff'
+    ctx.font = 'bold 106px "Space Grotesk", "Segoe UI Symbol", "Apple Color Emoji", sans-serif'
+    ctx.textAlign = 'center'
+    ctx.textBaseline = 'middle'
+    ctx.fillText(texto, 128, 134)
+  } else {
+    ctx.roundRect(8, 8, 624, 144, 28)
+    ctx.fillStyle = isAccent
+      ? 'rgba(74, 32, 48, 0.96)'
+      : isPrimary
+        ? 'rgba(27, 42, 90, 0.96)'
+        : 'rgba(15, 23, 42, 0.96)'
+    ctx.fill()
+    ctx.lineWidth = 6
+    ctx.strokeStyle = isAccent
+      ? '#ef4444'
+      : isPrimary
+        ? '#f5c842'
+        : 'rgba(255, 255, 255, 0.85)'
+    ctx.stroke()
+
+    ctx.fillStyle = '#ffffff'
+    let fSize = 40
+    ctx.font = `bold ${fSize}px "Space Grotesk", "Segoe UI Symbol", "Apple Color Emoji", sans-serif`
+    while (ctx.measureText(texto).width > 560 && fSize > 24) {
+      fSize -= 2
+      ctx.font = `bold ${fSize}px "Space Grotesk", "Segoe UI Symbol", "Apple Color Emoji", sans-serif`
+    }
+    ctx.textAlign = 'center'
+    ctx.textBaseline = 'middle'
+    ctx.fillText(texto, 320, 80)
   }
-  ctx.textAlign = 'center'
-  ctx.textBaseline = 'middle'
-  ctx.fillText(texto, 320, 80)
 
   const texture = new THREE.CanvasTexture(canvas)
   texture.needsUpdate = true
@@ -641,24 +670,24 @@ function renderQuadroTexture(data, mode = 'ficha') {
     ctx.lineTo(w - 90, 315)
     ctx.stroke()
 
-    // Caja de Estado de Audio con Gráfica de Onda
+    // Caja de Estado de Audio con Gráfica de Onda integrada
     ctx.save()
     ctx.beginPath()
     ctx.roundRect(80, 350, w - 160, 470, 36)
-    ctx.fillStyle = 'rgba(10, 18, 42, 0.78)'
+    ctx.fillStyle = 'rgba(10, 18, 42, 0.60)'
     ctx.fill()
-    ctx.lineWidth = 4
-    ctx.strokeStyle = isAudioPlaying.value ? 'rgba(74, 222, 128, 0.85)' : 'rgba(245, 200, 66, 0.75)'
+    ctx.lineWidth = 3
+    ctx.strokeStyle = 'rgba(125, 179, 232, 0.40)'
     ctx.stroke()
     ctx.restore()
 
-    ctx.fillStyle = isAudioPlaying.value ? '#4ade80' : '#f5c842'
-    ctx.font = 'bold 52px "Space Grotesk", sans-serif'
+    ctx.fillStyle = '#cbd5e1'
+    ctx.font = 'bold 46px "Space Grotesk", sans-serif'
     ctx.textAlign = 'center'
     const estadoAudioTxt = isAudioPlaying.value
-      ? '🔊 REPRODUCIENDO NARRACIÓN ASTRONÓMICA'
+      ? '🔊 REPRODUCIENDO NARRACIÓN'
       : '⏸ NARRACIÓN EN PAUSA'
-    ctx.fillText(estadoAudioTxt, w / 2, 455)
+    ctx.fillText(estadoAudioTxt, w / 2, 445)
 
     // Barras de ecualizador gráfico dinámicas
     const barCount = 18
@@ -668,17 +697,12 @@ function renderQuadroTexture(data, mode = 'ficha') {
     const startBarX = (w - totalBarsWidth) / 2
 
     for (let b = 0; b < barCount; b++) {
-      const barH = isAudioPlaying.value ? 24 + Math.sin(b * 0.7 + 1.2) * 40 + 40 : 18
-      ctx.fillStyle = isAudioPlaying.value ? '#4ade80' : '#f5c842'
-      ctx.fillRect(startBarX + b * (barWidth + barGap), 595 - barH / 2, barWidth, barH)
+      const barH = isAudioPlaying.value ? 20 + Math.sin(b * 0.7 + 1.2) * 36 + 36 : 14
+      ctx.fillStyle = isAudioPlaying.value ? 'rgba(147, 197, 253, 0.75)' : 'rgba(148, 163, 184, 0.50)'
+      ctx.fillRect(startBarX + b * (barWidth + barGap), 575 - barH / 2, barWidth, barH)
     }
 
-    ctx.fillStyle = '#cbd5e1'
-    ctx.font = 'bold 36px "Space Grotesk", sans-serif'
-    const hintTxt = isAudioPlaying.value
-      ? 'Usa los controles inferiores para pausar, repetir o explorar los libros'
-      : 'Usa los controles inferiores para reanudar la narración o ver libros'
-    ctx.fillText(hintTxt, w / 2, 735)
+    // La zona inferior del recuadro contiene directamente los botones 3D interactivos de audio (⏸/▶ y ↺)
   } else if (mode === 'estanteria') {
     // 2. VISTA ESTANTERÍA: Muestra los 3 libros como portadas sobre una repisa de madera
     ctx.textAlign = 'left'
@@ -953,36 +977,38 @@ function actualizarBotones3DQuadro() {
   if (!infoQuadroGroup) return
 
   if (vistaQuadro.value === 'ficha') {
-    // 1. Vista Ficha: 4 Botones bien proporcionados debajo del cuadro (2 filas de 2 botones)
+    // 1. Vista Ficha: Controles de Audio interactivos DENTRO de la caja de sonido y solo 2 botones limpios debajo
     bookQuadroMeshes.forEach((bm) => { bm.visible = false })
-    // Fila 1: Control de Audio (Pausar/Reanudar y Repetir)
+    // Controles de Audio DENTRO de la caja de sonido (Y = -15.8)
     if (quadroBtn1) {
-      const txt = isAudioPlaying.value ? 'Pausar audio' : 'Reanudar audio'
-      quadroBtn1.material.map = createButtonCanvasTexture(txt, true, false)
+      const txt = isAudioPlaying.value ? '⏸' : '▶'
+      quadroBtn1.geometry = btnAudioGeo || quadroBtn1.geometry
+      quadroBtn1.material.map = createButtonCanvasTexture(txt, true, false, true)
       quadroBtn1.userData.action = 'toggle-audio'
-      quadroBtn1.position.set(-15.5, -31.5, 0.6)
+      quadroBtn1.position.set(-8.5, -15.8, 1.2)
       quadroBtn1.scale.set(1, 1, 1)
       quadroBtn1.visible = true
     }
     if (quadroBtn2) {
-      quadroBtn2.material.map = createButtonCanvasTexture('Repetir narración', false, false)
+      quadroBtn2.geometry = btnAudioGeo || quadroBtn2.geometry
+      quadroBtn2.material.map = createButtonCanvasTexture('↺', false, false, true)
       quadroBtn2.userData.action = 'repeat-audio'
-      quadroBtn2.position.set(15.5, -31.5, 0.6)
+      quadroBtn2.position.set(8.5, -15.8, 1.2)
       quadroBtn2.scale.set(1, 1, 1)
       quadroBtn2.visible = true
     }
-    // Fila 2: Exploración de Libros y Salir al Cielo
+    // Única Fila Inferior (Debajo del Quadro): Solo 2 botones de navegación limpios
     if (quadroBtn3) {
       quadroBtn3.material.map = createButtonCanvasTexture('Ver libros recomendados', true, false)
       quadroBtn3.userData.action = 'open-shelf'
-      quadroBtn3.position.set(-15.5, -40.5, 0.6)
+      quadroBtn3.position.set(-15.5, -31.5, 0.6)
       quadroBtn3.scale.set(1, 1, 1)
       quadroBtn3.visible = true
     }
     if (quadroBtn4) {
       quadroBtn4.material.map = createButtonCanvasTexture('Volver al cielo', false, true)
       quadroBtn4.userData.action = 'close-card'
-      quadroBtn4.position.set(15.5, -40.5, 0.6)
+      quadroBtn4.position.set(15.5, -31.5, 0.6)
       quadroBtn4.scale.set(1, 1, 1)
       quadroBtn4.visible = true
     }
@@ -1011,6 +1037,7 @@ function actualizarBotones3DQuadro() {
     // 3. Vista Detalle: Volver a la estantería o volver al cielo
     bookQuadroMeshes.forEach((bm) => { bm.visible = false })
     if (quadroBtn1) {
+      quadroBtn1.geometry = btnQuadroGeo || quadroBtn1.geometry
       quadroBtn1.material.map = createButtonCanvasTexture('Volver a los libros', true, false)
       quadroBtn1.userData.action = 'back-shelf'
       quadroBtn1.position.set(-15.5, -35, 0.6)
@@ -1018,6 +1045,7 @@ function actualizarBotones3DQuadro() {
       quadroBtn1.visible = true
     }
     if (quadroBtn2) {
+      quadroBtn2.geometry = btnQuadroGeo || quadroBtn2.geometry
       quadroBtn2.material.map = createButtonCanvasTexture('Volver al cielo', false, true)
       quadroBtn2.userData.action = 'close-card'
       quadroBtn2.position.set(15.5, -35, 0.6)
@@ -1203,30 +1231,37 @@ function initThree() {
   const quadroMat = new THREE.MeshBasicMaterial({
     map: textureQuadro,
     transparent: true,
+    depthWrite: false,
     side: THREE.DoubleSide
   })
-  const infoQuadroMesh = new THREE.Mesh(quadroGeo, quadroMat)
+  infoQuadroMesh = new THREE.Mesh(quadroGeo, quadroMat)
+  infoQuadroMesh.renderOrder = 1
   infoQuadroGroup.add(infoQuadroMesh)
 
-  // 4 Botones 3D interactivos debajo del Quadro (Compactos y legibles: 28 x 7.5)
-  const btnQuadroGeo = new THREE.PlaneGeometry(28, 7.5)
+  // Botones 3D interactivos:
+  btnQuadroGeo = new THREE.PlaneGeometry(28, 7.5)
+  btnAudioGeo = new THREE.PlaneGeometry(9.5, 9.5)
 
-  quadroBtn1 = new THREE.Mesh(btnQuadroGeo, new THREE.MeshBasicMaterial({ transparent: true, depthWrite: false, side: THREE.DoubleSide }))
+  quadroBtn1 = new THREE.Mesh(btnAudioGeo, new THREE.MeshBasicMaterial({ transparent: true, depthWrite: false, depthTest: false, side: THREE.DoubleSide }))
+  quadroBtn1.renderOrder = 10
   quadroBtn1.userData = { is3DButton: true, action: 'toggle-audio' }
   infoQuadroGroup.add(quadroBtn1)
   interactive3DButtons.push(quadroBtn1)
 
-  quadroBtn2 = new THREE.Mesh(btnQuadroGeo, new THREE.MeshBasicMaterial({ transparent: true, depthWrite: false, side: THREE.DoubleSide }))
+  quadroBtn2 = new THREE.Mesh(btnAudioGeo, new THREE.MeshBasicMaterial({ transparent: true, depthWrite: false, depthTest: false, side: THREE.DoubleSide }))
+  quadroBtn2.renderOrder = 10
   quadroBtn2.userData = { is3DButton: true, action: 'repeat-audio' }
   infoQuadroGroup.add(quadroBtn2)
   interactive3DButtons.push(quadroBtn2)
 
   quadroBtn3 = new THREE.Mesh(btnQuadroGeo, new THREE.MeshBasicMaterial({ transparent: true, depthWrite: false, side: THREE.DoubleSide }))
+  quadroBtn3.renderOrder = 5
   quadroBtn3.userData = { is3DButton: true, action: 'open-shelf' }
   infoQuadroGroup.add(quadroBtn3)
   interactive3DButtons.push(quadroBtn3)
 
   quadroBtn4 = new THREE.Mesh(btnQuadroGeo, new THREE.MeshBasicMaterial({ transparent: true, depthWrite: false, side: THREE.DoubleSide }))
+  quadroBtn4.renderOrder = 5
   quadroBtn4.userData = { is3DButton: true, action: 'close-card' }
   infoQuadroGroup.add(quadroBtn4)
   interactive3DButtons.push(quadroBtn4)
@@ -1357,7 +1392,7 @@ function handleDeviceOrientation(e) {
   }
 }
 
-// Emblemas Institucionales 3D auténticos detrás del observador (ITT y Solón Argüello)
+// Emblemas Institucionales 3D auténticos detrás del observador (ITT y Solón Argüello) con acabado de marca de agua
 async function initInstitutionalLogos3D() {
   const logosGroup = new THREE.Group()
   // Colocados detrás del observador en Z = +45, rotados 180° en Y para mirar directamente hacia la cámara
@@ -1373,7 +1408,7 @@ async function initInstitutionalLogos3D() {
       const tepicData = await resTepic.json()
       textureLoader.load('/ITTepic_logo.jpg', (tex) => {
         tex.colorSpace = THREE.SRGBColorSpace
-        const relieveTepic = crearRelieve(THREE, tepicData, tex)
+        const relieveTepic = crearRelieve(THREE, tepicData, tex, { opacidad: 0.20, opacidadLateral: 0.10, marcaAgua: true })
         if (relieveTepic) {
           relieveTepic.scale.setScalar(13)
           relieveTepic.position.set(-11, 0, 0)
@@ -1391,7 +1426,7 @@ async function initInstitutionalLogos3D() {
     const resBib = await fetch('/prueba-homido/logos/biblioteca.json')
     if (resBib.ok) {
       const bibData = await resBib.json()
-      const relieveBib = crearRelieve(THREE, bibData, null)
+      const relieveBib = crearRelieve(THREE, bibData, null, { opacidad: 0.20, opacidadLateral: 0.10, marcaAgua: true })
       if (relieveBib) {
         relieveBib.scale.setScalar(24)
         relieveBib.position.set(11, 0, 0)
@@ -1403,8 +1438,8 @@ async function initInstitutionalLogos3D() {
     console.warn('Fallback para logo Biblioteca:', e)
   }
 
-  // Luz puntual dedicada para realzar los relieves 3D traseros
-  const logoLight = new THREE.PointLight(0xfff5e6, 2.5, 70, 1)
+  // Luz puntual dedicada muy suave para realzar los relieves 3D traseros integrados al fondo cósmico
+  const logoLight = new THREE.PointLight(0x8fa9cc, 0.35, 70, 1)
   logoLight.position.set(0, 6, 12)
   logosGroup.add(logoLight)
 
@@ -1833,27 +1868,40 @@ function seleccionarConstelacion(id) {
   vistaQuadro.value = 'ficha'
   libroDetalle.value = null
 
-  // 1. Posicionar el 3D Quadro flotante: A UN LADO Y UN POCO ABAJO para NO tapar la constelación
+  // 1. Posicionar el 3D Quadro flotante: perfectamente centrado a la vista
+  // y nivelado con el horizonte para una lectura recta y cómoda sin inclinación ni ladeo
   if (infoQuadroGroup) {
     renderQuadroTexture(selectedData.value, 'ficha')
     actualizarBotones3DQuadro()
 
     const dir = cfg.direccion.clone().normalize()
-    const up = new THREE.Vector3(0, 1, 0)
-    let rightVec = new THREE.Vector3().crossVectors(dir, up).normalize()
+    const worldUp = new THREE.Vector3(0, 1, 0)
+    let rightVec = new THREE.Vector3().crossVectors(dir, worldUp).normalize()
     if (rightVec.lengthSq() < 0.01) {
       rightVec = new THREE.Vector3(1, 0, 0)
     }
 
-    const distance = 135
-    const lateralOffset = 50 // Desplazamiento lateral sin tapar estrellas
-    const verticalOffset = -30 // Desplazamiento hacia abajo
-
-    const quadroPos = dir.clone().multiplyScalar(distance).add(rightVec.clone().multiplyScalar(lateralOffset))
-    quadroPos.y += verticalOffset
+    // Centrado exactamente con el azimut de la constelación (sin desplazamiento lateral).
+    // Aplicamos un leve descenso angular esférico (~8.5 grados) a lo largo del horizonte local
+    // para que las estrellas principales sigan visibles justo arriba del cuadro sin encimarse.
+    const pitchAngle = -0.15
+    const cardDir = dir.clone().applyAxisAngle(rightVec, pitchAngle).normalize()
+    const distance = 125
+    const quadroPos = cardDir.multiplyScalar(distance)
 
     orientPlaneFacingOrigin(infoQuadroGroup, quadroPos)
     infoQuadroGroup.visible = true
+
+    // Si no está activo el giroscopio del dispositivo, orientar suavemente la cámara al centro de la experiencia
+    if (!hasDeviceOrientation) {
+      const viewDir = dir.clone().applyAxisAngle(rightVec, pitchAngle * 0.45).normalize()
+      const destLat = Math.asin(Math.max(-1, Math.min(1, viewDir.y))) * (180 / Math.PI)
+      let destLon = Math.atan2(viewDir.z, viewDir.x) * (180 / Math.PI)
+      while (destLon - lon > 180) destLon -= 360
+      while (destLon - lon < -180) destLon += 360
+      targetLon = destLon
+      targetLat = THREE.MathUtils.clamp(destLat, -85, 85)
+    }
   }
 
   // 2. Iniciar audio narrativo real

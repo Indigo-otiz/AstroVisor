@@ -23,7 +23,9 @@ function actualizar(estado) {
   ultimaVista = clave
   $('listenStory').hidden = !estado.recurso
   $('listenStory').disabled = !estado.puedeEscuchar && !estado.puedePausar && !estado.puedeReanudar
-  $('listenStory').textContent = estado.puedePausar ? 'Pausar' : estado.puedeReanudar ? 'Reanudar' : estado.estado === 'finalizado' ? 'Repetir' : 'Escuchar'
+  const iconoAudio = estado.puedePausar ? '⏸' : estado.estado === 'finalizado' ? '↺' : '▶'
+  const accionAudio = estado.puedePausar ? 'Pausar' : estado.puedeReanudar ? 'Reanudar' : estado.estado === 'finalizado' ? 'Repetir' : 'Escuchar'
+  $('listenStory').textContent = `${iconoAudio} ${accionAudio}`
   $('storyAudioStatus').textContent = estado.mensaje
   if (estado.activacion) $('audioPreparation').textContent = estado.activacion
   if (estado.estado === 'bloqueado') $('audioPreparation').textContent = estado.mensaje

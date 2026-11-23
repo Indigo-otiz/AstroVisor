@@ -21,6 +21,7 @@ export function presentarAudio(narracion) {
   const { estado, puedePausar, puedeReanudar, puedeEscuchar } = narracion
   return {
     etiqueta: puedePausar ? 'Pausar' : puedeReanudar ? 'Reanudar' : estado === 'finalizado' ? 'Repetir' : 'Escuchar',
+    icono: puedePausar ? '⏸' : estado === 'finalizado' ? '↺' : '▶',
     aviso: MENSAJES_NARRACION[estado] ?? narracion.mensaje,
     activo: puedePausar || puedeReanudar || puedeEscuchar,
     repetir: Boolean(puedePausar || puedeReanudar || puedeEscuchar || estado === 'pausado' || estado === 'finalizado'),
@@ -28,7 +29,7 @@ export function presentarAudio(narracion) {
 }
 
 export const BIBLIO_PENDIENTE = 'Sin lecturas recomendadas.'
-const FUENTE = 'system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif'
+const FUENTE = 'system-ui, -apple-system, "Segoe UI", "Segoe UI Symbol", Roboto, Arial, sans-serif'
 const fuente = (px, negrita = false) => `${negrita ? 'bold ' : ''}${px}px ${FUENTE}`
 
 export function ajustarLineas(ctx, texto, anchoMax) {
@@ -59,12 +60,14 @@ export function calcularLayout(ctx, ficha, audio = { etiqueta: 'Escuchar', activ
     items.push({ k: 'texto', lineas, x: x + 46, y, lh: tam + 9, font: ctx.font, color, align: 'left', base: 'top' })
     return lineas.length * (tam + 9)
   }
-  const boton = (accion, texto, rect, principal = false) => {
+  const boton = (accion, texto, rect, principal = false, esIcono = false) => {
     zonas[accion] = rect
     items.push({
-      k: 'boton', rect, radio: 18, fill: principal ? '#f5ce6d' : '#233657',
-      stroke: principal ? null : '#7790b6', sw: 3, texto, font: fuente(52, true),
-      color: principal ? '#111b31' : '#ffffff', padIzq: rect.h * .6,
+      k: 'boton', rect, radio: esIcono ? 32 : 18,
+      fill: esIcono ? '#172554' : (principal ? '#f5ce6d' : '#233657'),
+      stroke: esIcono ? '#38bdf8' : (principal ? null : '#7790b6'), sw: esIcono ? 4 : (principal ? 0 : 3),
+      texto, font: fuente(esIcono ? 76 : 52, true),
+      color: esIcono ? '#ffffff' : (principal ? '#111b31' : '#ffffff'), padIzq: esIcono ? 0 : rect.h * .6,
     })
   }
 
@@ -73,13 +76,21 @@ export function calcularLayout(ctx, ficha, audio = { etiqueta: 'Escuchar', activ
   const textoEstado = audio.aviso || (!hayLibro ? BIBLIO_PENDIENTE : '')
   if (textoEstado) agregarTexto(textoEstado, 660 + altoTitulo, 41, '#dce7f8')
 
-  const audioRect = { x: x + 46, y: 835, w: 508, h: 138 }
-  const repetir = { x: 680, y: 835, w: 380, h: 138 }
+  // Caja de audio integrada con estética de marca de agua
+  const cajaAudio = { x: x + 46, y: 790, w: ancho - 92, h: 175 }
+  items.push({ k: 'caja', rect: cajaAudio, radio: 22, fill: 'rgba(12, 22, 46, 0.65)', stroke: 'rgba(125, 179, 232, 0.40)', sw: 2 })
+
+  // Botones de iconos interactivos universales dentro de la caja de sonido
+  const audioRect = { x: 470, y: 818, w: 200, h: 120 }
+  const repetir = { x: 730, y: 818, w: 200, h: 120 }
   zonas.audio = audioRect
-  if (audio.activo) boton('audio', audio.etiqueta, audioRect, true)
+  if (audio.activo) {
+    const icono = audio.icono ?? (audio.etiqueta === 'Pausar' ? '⏸' : '▶')
+    boton('audio', icono, audioRect, false, true)
+  }
   if (audio.repetir) {
     zonas.repetir = repetir
-    boton('repetir', 'Repetir', repetir)
+    boton('repetir', '↺', repetir, false, true)
   }
   if (hayLibro) {
     const libros = { x: x + 46, y: 1001, w: 435, h: 131 }
