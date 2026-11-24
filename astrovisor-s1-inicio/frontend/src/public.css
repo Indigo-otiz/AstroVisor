@@ -3077,3 +3077,71 @@
   border-color: rgba(255, 255, 255, 0.35);
 }
 
+/* ==========================================================================
+   Modo Oscuro Global (Anti-deslumbramiento total en lectura / libros)
+   Cubre el 100% de la pantalla: shell, cabecera, navegación, fondo y pie
+   ========================================================================== */
+html.modo-oscuro-total,
+body.modo-oscuro-total {
+  background-color: #070d1e !important;
+  color: #f1f5f9 !important;
+}
+
+body.modo-oscuro-total .public-shell {
+  --paper: #070d1e !important;
+  --ink: #f1f5f9 !important;
+  --muted: #94a3b8 !important;
+  --blue: #38bdf8 !important;
+  --accent: #38bdf8 !important;
+  background-color: #070d1e !important;
+  color: #f1f5f9 !important;
+}
+
+body.modo-oscuro-total .site-header {
+  background-color: #070d1e !important;
+  border-bottom: 1px solid #1e293b !important;
+}
+
+body.modo-oscuro-total .brand {
+  color: #f8fafc !important;
+}
+
+body.modo-oscuro-total .brand-star {
+  color: #f5b301 !important;
+}
+
+body.modo-oscuro-total .nav-links a {
+  color: #94a3b8 !important;
+}
+
+body.modo-oscuro-total .nav-links a:hover,
+body.modo-oscuro-total .nav-links a.nav-current,
+body.modo-oscuro-total .nav-links a.router-link-active:not([href='/']) {
+  background: #111d3d !important;
+  color: #38bdf8 !important;
+}
+
+body.modo-oscuro-total .presentation-toggle {
+  background: #0f1c3d !important;
+  border-color: #38bdf8 !important;
+  color: #bae6fd !important;
+}
+
+body.modo-oscuro-total #contenido {
+  background-color: #070d1e !important;
+  color: #f1f5f9 !important;
+}
+
+body.modo-oscuro-total .site-footer {
+  background-color: #050914 !important;
+  border-top: 1px solid #1e293b !important;
+}
+
+body.modo-oscuro-total .site-footer img {
+  filter: brightness(0.9) contrast(1.1);
+}
+
+body.modo-oscuro-total .public-back {
+  color: #38bdf8 !important;
+}
+

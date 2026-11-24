@@ -83,11 +83,22 @@ let homidoToggle3DMesh = null
 let exit3DMesh = null
 const interactive3DButtons = []
 
-// Temporizadores de Mirada Dwell (3 segundos)
+// Temporizadores de Mirada Dwell (3 segundos con ventana de gracia anti-temblor de 750 ms)
 let dwellTarget = null
 let dwellStartTime = 0
 let dwellGraceTimer = null
+let dwellPausedElapsed = 0
 const DWELL_DURATION = 3000
+const DWELL_GRACE_MS = 750
+
+// Sesión WebXR nativa para distorsión óptica de lentes (Modo VR Real)
+let xrSession = null
+const isWebXRActive = ref(false)
+
+// Retícula 3D in-scene para WebXR nativo (Modo VR con distorsión de lentes)
+let reticle3DMesh = null
+let reticle3DTexture = null
+let reticleCanvasCtx = null
 
 // Constantes matemáticas y cuaterniones para orientación espacial y filtrado anti-temblor
 const DEG2RAD = Math.PI / 180
@@ -549,6 +560,49 @@ const CONSTELACIONES_CONFIG = [
   }
 ]
 
+// Dibujar y actualizar textura canvas del retículo 3D in-scene para WebXR
+function dibujarReticle3D(progress, isConfirmed, isPaused) {
+  if (!reticleCanvasCtx) return
+  const ctx = reticleCanvasCtx
+  ctx.clearRect(0, 0, 128, 128)
+
+  // 1. Halo oscuro exterior
+  ctx.beginPath()
+  ctx.arc(64, 64, 48, 0, Math.PI * 2)
+  ctx.lineWidth = 10
+  ctx.strokeStyle = 'rgba(5, 8, 20, 0.65)'
+  ctx.stroke()
+
+  // 2. Anillo de referencia blanco translúcido
+  ctx.beginPath()
+  ctx.arc(64, 64, 42, 0, Math.PI * 2)
+  ctx.lineWidth = 4
+  ctx.strokeStyle = 'rgba(255, 255, 255, 0.45)'
+  ctx.stroke()
+
+  // 3. Arco de progreso de selección dwell
+  if (!isPaused || (dwellTarget && dwellTarget.action === 'toggle-gaze')) {
+    if (progress > 0) {
+      ctx.beginPath()
+      const startAngle = -Math.PI / 2
+      const endAngle = startAngle + Math.min(1, Math.max(0, progress)) * (Math.PI * 2)
+      ctx.arc(64, 64, 42, startAngle, endAngle)
+      ctx.lineWidth = 7
+      ctx.strokeStyle = isConfirmed ? '#4ade80' : '#f5c842'
+      ctx.lineCap = 'round'
+      ctx.stroke()
+    }
+  }
+
+  // 4. Punto central de puntería
+  ctx.beginPath()
+  ctx.arc(64, 64, 6, 0, Math.PI * 2)
+  ctx.fillStyle = isPaused ? '#94a3b8' : (isConfirmed ? '#4ade80' : '#f5c842')
+  ctx.fill()
+
+  reticle3DTexture.needsUpdate = true
+}
+
 // Generador de textura para botones 3D (Escala compacta, nítida y perfectamente proporcionada)
 function createButtonCanvasTexture(texto, isPrimary = false, isAccent = false, isAudioPill = false) {
   const canvas = document.createElement('canvas')
@@ -588,9 +642,9 @@ function createButtonCanvasTexture(texto, isPrimary = false, isAccent = false, i
     ctx.stroke()
 
     ctx.fillStyle = '#ffffff'
-    let fSize = 40
+    let fSize = 52
     ctx.font = `bold ${fSize}px "Space Grotesk", "Segoe UI Symbol", "Apple Color Emoji", sans-serif`
-    while (ctx.measureText(texto).width > 560 && fSize > 24) {
+    while (ctx.measureText(texto).width > 560 && fSize > 28) {
       fSize -= 2
       ctx.font = `bold ${fSize}px "Space Grotesk", "Segoe UI Symbol", "Apple Color Emoji", sans-serif`
     }
@@ -627,96 +681,60 @@ function renderQuadroTexture(data, mode = 'ficha') {
   ctx.restore()
 
   if (mode === 'ficha') {
-    // 1. VISTA FICHA: Sin pared de texto. Enfocada 100% en controles de audio y botones claros
-    ctx.textAlign = 'left'
+    // 1. VISTA FICHA: Compacta en contenido (solo nombre, estado de audio y controles)
+    ctx.textAlign = 'center'
     ctx.textBaseline = 'alphabetic'
-
-    // Categoría / Temporada
-    ctx.fillStyle = '#f5c842'
-    let catFontSize = 36
-    ctx.font = `bold ${catFontSize}px "Space Grotesk", sans-serif`
-    const catText = `${(data.temporada || '').toUpperCase()} · CONSTELACIÓN MAYOR`
-    while (ctx.measureText(catText).width > w - 200 && catFontSize > 22) {
-      catFontSize -= 2
-      ctx.font = `bold ${catFontSize}px "Space Grotesk", sans-serif`
-    }
-    ctx.fillText(catText, 90, 115)
 
     // Nombre de la constelación
     ctx.fillStyle = '#ffffff'
-    let nameFontSize = 96
+    let nameFontSize = 124
     ctx.font = `bold ${nameFontSize}px "Orbitron", "Space Grotesk", sans-serif`
-    while (ctx.measureText(data.nombre).width > w - 200 && nameFontSize > 46) {
+    while (ctx.measureText(data.nombre).width > w - 180 && nameFontSize > 60) {
       nameFontSize -= 4
       ctx.font = `bold ${nameFontSize}px "Orbitron", "Space Grotesk", sans-serif`
     }
-    ctx.fillText(data.nombre, 90, 215)
+    ctx.fillText(data.nombre, w / 2, 185)
 
-    // Subtítulo
-    ctx.fillStyle = '#94a3b8'
-    let subFontSize = 40
-    ctx.font = `bold ${subFontSize}px "Space Grotesk", sans-serif`
-    while (ctx.measureText(data.subtitulo).width > w - 200 && subFontSize > 22) {
-      subFontSize -= 2
-      ctx.font = `bold ${subFontSize}px "Space Grotesk", sans-serif`
-    }
-    ctx.fillText(data.subtitulo, 90, 280)
+    // Estado de la narración (limpio, sin texto amarillo ni onda)
+    ctx.fillStyle = '#cbd5e1'
+    ctx.font = 'bold 52px "Space Grotesk", sans-serif'
+    const estadoAudioTxt = isAudioPlaying.value
+      ? 'Reproduciendo narración'
+      : 'Narración en pausa'
+    ctx.fillText(estadoAudioTxt, w / 2, 275)
 
-    // Línea divisoria dorada
-    ctx.strokeStyle = 'rgba(245, 200, 66, 0.45)'
+    // Línea divisoria sutil
+    ctx.strokeStyle = 'rgba(245, 200, 66, 0.38)'
     ctx.lineWidth = 4
     ctx.beginPath()
-    ctx.moveTo(90, 315)
-    ctx.lineTo(w - 90, 315)
+    ctx.moveTo(120, 325)
+    ctx.lineTo(w - 120, 325)
     ctx.stroke()
 
-    // Caja de Estado de Audio con Gráfica de Onda integrada
+    // Caja contenedora para los botones interactivos de audio (⏸/▶ y ↺)
     ctx.save()
     ctx.beginPath()
-    ctx.roundRect(80, 350, w - 160, 470, 36)
+    ctx.roundRect(140, 370, w - 280, 490, 36)
     ctx.fillStyle = 'rgba(10, 18, 42, 0.60)'
     ctx.fill()
     ctx.lineWidth = 3
     ctx.strokeStyle = 'rgba(125, 179, 232, 0.40)'
     ctx.stroke()
     ctx.restore()
-
-    ctx.fillStyle = '#cbd5e1'
-    ctx.font = 'bold 46px "Space Grotesk", sans-serif'
-    ctx.textAlign = 'center'
-    const estadoAudioTxt = isAudioPlaying.value
-      ? '🔊 REPRODUCIENDO NARRACIÓN'
-      : '⏸ NARRACIÓN EN PAUSA'
-    ctx.fillText(estadoAudioTxt, w / 2, 445)
-
-    // Barras de ecualizador gráfico dinámicas
-    const barCount = 18
-    const barWidth = 18
-    const barGap = 18
-    const totalBarsWidth = barCount * (barWidth + barGap)
-    const startBarX = (w - totalBarsWidth) / 2
-
-    for (let b = 0; b < barCount; b++) {
-      const barH = isAudioPlaying.value ? 20 + Math.sin(b * 0.7 + 1.2) * 36 + 36 : 14
-      ctx.fillStyle = isAudioPlaying.value ? 'rgba(147, 197, 253, 0.75)' : 'rgba(148, 163, 184, 0.50)'
-      ctx.fillRect(startBarX + b * (barWidth + barGap), 575 - barH / 2, barWidth, barH)
-    }
-
-    // La zona inferior del recuadro contiene directamente los botones 3D interactivos de audio (⏸/▶ y ↺)
   } else if (mode === 'estanteria') {
     // 2. VISTA ESTANTERÍA: Muestra los 3 libros como portadas sobre una repisa de madera
     ctx.textAlign = 'left'
     ctx.fillStyle = '#f5c842'
-    ctx.font = 'bold 34px "Space Grotesk", sans-serif'
+    ctx.font = 'bold 42px "Space Grotesk", sans-serif'
     ctx.fillText('LA BIBLIOTECA DE LAS ESTRELLAS · SOLÓN ARGÜELLO', 80, 95)
 
     ctx.fillStyle = '#ffffff'
-    ctx.font = 'bold 70px "Orbitron", "Space Grotesk", sans-serif'
+    ctx.font = 'bold 84px "Orbitron", "Space Grotesk", sans-serif'
     ctx.fillText(`Estantería de Libros: ${data.nombre}`, 80, 180)
 
     ctx.fillStyle = '#94a3b8'
-    ctx.font = 'bold 34px "Space Grotesk", sans-serif'
-    ctx.fillText('Enfoca o toca directamente cualquiera de los libros para ver su información', 80, 235)
+    ctx.font = 'bold 44px "Space Grotesk", sans-serif'
+    ctx.fillText('Enfoca o toca directamente cualquiera de los libros para ver su información', 80, 240)
 
     // Línea divisoria dorada
     ctx.strokeStyle = 'rgba(245, 200, 66, 0.4)'
@@ -782,9 +800,9 @@ function renderQuadroTexture(data, mode = 'ficha') {
           ctx.strokeStyle = '#f5c842'
           ctx.stroke()
           ctx.fillStyle = '#f5c842'
-          ctx.font = 'bold 20px "Space Grotesk", sans-serif'
+          ctx.font = 'bold 26px "Space Grotesk", sans-serif'
           ctx.textAlign = 'center'
-          ctx.fillText('✦ Toca o enfoca para leer ✦', bx + bookWidth / 2, by + bookHeight - 29)
+          ctx.fillText('✦ Toca o enfoca para leer ✦', bx + bookWidth / 2, by + bookHeight - 27)
           ctx.restore()
           return
         }
@@ -814,7 +832,7 @@ function renderQuadroTexture(data, mode = 'ficha') {
       // Contenido de la cubierta del libro (el libro es el botón interactivo)
       ctx.textAlign = 'center'
       ctx.fillStyle = '#f5c842'
-      ctx.font = 'bold 22px "Space Grotesk", sans-serif'
+      ctx.font = 'bold 26px "Space Grotesk", sans-serif'
       ctx.fillText('✦ COLECCIÓN SOLÓN ARGÜELLO ✦', bx + bookWidth / 2, by + 65)
 
       ctx.fillStyle = '#ffffff'
@@ -822,7 +840,7 @@ function renderQuadroTexture(data, mode = 'ficha') {
       ctx.fillText('✦  ✧  ✦', bx + bookWidth / 2, by + 130)
 
       ctx.fillStyle = '#ffffff'
-      ctx.font = 'bold 36px Georgia, serif'
+      ctx.font = 'bold 42px Georgia, serif'
       // Ajuste de título
       const titleWords = libro.titulo.split(' ')
       let tLine = ''
@@ -832,7 +850,7 @@ function renderQuadroTexture(data, mode = 'ficha') {
         if (ctx.measureText(test).width > bookWidth - 40 && tLine) {
           ctx.fillText(tLine, bx + bookWidth / 2, ty)
           tLine = tw
-          ty += 46
+          ty += 50
         } else {
           tLine = test
         }
@@ -840,9 +858,9 @@ function renderQuadroTexture(data, mode = 'ficha') {
       ctx.fillText(tLine, bx + bookWidth / 2, ty)
 
       ctx.fillStyle = '#cbd5e1'
-      ctx.font = '28px "Space Grotesk", sans-serif'
+      ctx.font = '32px "Space Grotesk", sans-serif'
       ctx.fillText(libro.autor, bx + bookWidth / 2, by + 440)
-      ctx.font = '24px "Space Grotesk", sans-serif'
+      ctx.font = '28px "Space Grotesk", sans-serif'
       ctx.fillText(`(${libro.anio || 'Edición histórica'})`, bx + bookWidth / 2, by + 480)
 
       // Indicador integrado en la base del libro
@@ -857,7 +875,7 @@ function renderQuadroTexture(data, mode = 'ficha') {
       ctx.restore()
 
       ctx.fillStyle = '#f5c842'
-      ctx.font = 'bold 22px "Space Grotesk", sans-serif'
+      ctx.font = 'bold 26px "Space Grotesk", sans-serif'
       ctx.fillText('✦ Toca o enfoca para leer ✦', bx + bookWidth / 2, by + 533)
     })
   } else if (mode === 'detalle' && libroDetalle.value) {
@@ -867,21 +885,21 @@ function renderQuadroTexture(data, mode = 'ficha') {
     ctx.textBaseline = 'alphabetic'
 
     ctx.fillStyle = '#f5c842'
-    ctx.font = 'bold 36px "Space Grotesk", sans-serif'
+    ctx.font = 'bold 44px "Space Grotesk", sans-serif'
     ctx.fillText('LA BIBLIOTECA DE LAS ESTRELLAS · FICHA DE LECTURA', 90, 95)
 
     ctx.fillStyle = '#ffffff'
-    let tSize = 76
+    let tSize = 92
     ctx.font = `bold ${tSize}px "Orbitron", "Space Grotesk", sans-serif`
-    while (ctx.measureText(`"${libro.titulo}"`).width > w - 220 && tSize > 48) {
+    while (ctx.measureText(`"${libro.titulo}"`).width > w - 220 && tSize > 54) {
       tSize -= 4
       ctx.font = `bold ${tSize}px "Orbitron", "Space Grotesk", sans-serif`
     }
-    ctx.fillText(`"${libro.titulo}"`, 90, 180)
+    ctx.fillText(`"${libro.titulo}"`, 90, 185)
 
     ctx.fillStyle = '#cbd5e1'
-    ctx.font = 'bold 44px "Space Grotesk", sans-serif'
-    ctx.fillText(`${libro.autor} (${libro.anio || 'Edición histórica'})`, 90, 240)
+    ctx.font = 'bold 54px "Space Grotesk", sans-serif'
+    ctx.fillText(`${libro.autor} (${libro.anio || 'Edición histórica'})`, 90, 245)
 
     // Línea divisoria dorada
     ctx.strokeStyle = 'rgba(245, 200, 66, 0.45)'
@@ -903,11 +921,11 @@ function renderQuadroTexture(data, mode = 'ficha') {
     ctx.restore()
 
     ctx.fillStyle = '#f5c842'
-    ctx.font = 'bold 42px "Space Grotesk", sans-serif'
+    ctx.font = 'bold 50px "Space Grotesk", sans-serif'
     ctx.fillText('¿POR QUÉ LEERLO?', 130, 385)
 
     ctx.fillStyle = '#ffffff'
-    ctx.font = 'bold 46px "Space Grotesk", sans-serif'
+    ctx.font = 'bold 52px "Space Grotesk", sans-serif'
     const maxWidth = w - 260
     const words = (libro.motivo || 'Obra clásica de divulgación y observación astronómica.').split(' ')
     let line = ''
@@ -917,7 +935,7 @@ function renderQuadroTexture(data, mode = 'ficha') {
       if (ctx.measureText(test).width > maxWidth && line) {
         ctx.fillText(line, 130, y)
         line = wd
-        y += 64
+        y += 66
       } else {
         line = test
       }
@@ -936,17 +954,18 @@ function renderQuadroTexture(data, mode = 'ficha') {
     ctx.restore()
 
     ctx.fillStyle = '#f5c842'
-    ctx.font = 'bold 32px "Space Grotesk", sans-serif'
+    ctx.font = 'bold 38px "Space Grotesk", sans-serif'
     const esReal = libro.demostracion === false || libro.portada?.tipo === 'fotografia-ejemplar'
     ctx.fillText(esReal ? 'EJEMPLAR FÍSICO · BIBLIOTECA PÚBLICA CENTRAL ESTATAL SOLÓN ARGÜELLO' : 'REFERENCIA DOCUMENTAL · BIBLIOTECA SOLÓN ARGÜELLO', 130, 745)
 
     ctx.fillStyle = '#cbd5e1'
-    ctx.font = '36px "Space Grotesk", sans-serif'
+    ctx.font = '42px "Space Grotesk", sans-serif'
     ctx.fillText(esReal ? 'Ejemplar físico perteneciente a la colección disponible en la biblioteca.' : 'Ejemplar disponible para lectura libre en Internet en Project Gutenberg / Archive.org.', 130, 805)
 
     ctx.fillStyle = '#94a3b8'
-    ctx.font = '30px "Space Grotesk", sans-serif'
+    ctx.font = '36px "Space Grotesk", sans-serif'
     const idTxt = libro.marc21?.campo001 ? `Identificador: ${libro.marc21.campo001}` : `Identificador del ejemplar: ${libro.id}`
+    ctx.fillText(idTxt, 130, 865)
     ctx.fillText(idTxt, 130, 865)
   }
 
@@ -977,42 +996,44 @@ function actualizarBotones3DQuadro() {
   if (!infoQuadroGroup) return
 
   if (vistaQuadro.value === 'ficha') {
-    // 1. Vista Ficha: Controles de Audio interactivos DENTRO de la caja de sonido y solo 2 botones limpios debajo
+    // 1. Vista Ficha: Tarjeta compacta en contenido y altura, con controles de audio y 2 botones debajo
+    if (infoQuadroMesh) infoQuadroMesh.scale.set(0.78, 0.56, 1)
     bookQuadroMeshes.forEach((bm) => { bm.visible = false })
-    // Controles de Audio DENTRO de la caja de sonido (Y = -15.8)
+    // Controles de Audio DENTRO de la caja de sonido (Y = -4.5)
     if (quadroBtn1) {
       const txt = isAudioPlaying.value ? '⏸' : '▶'
       quadroBtn1.geometry = btnAudioGeo || quadroBtn1.geometry
       quadroBtn1.material.map = createButtonCanvasTexture(txt, true, false, true)
       quadroBtn1.userData.action = 'toggle-audio'
-      quadroBtn1.position.set(-8.5, -15.8, 1.2)
-      quadroBtn1.scale.set(1, 1, 1)
+      quadroBtn1.position.set(-9.5, -4.5, 1.2)
+      quadroBtn1.scale.set(0.92, 0.92, 1)
       quadroBtn1.visible = true
     }
     if (quadroBtn2) {
       quadroBtn2.geometry = btnAudioGeo || quadroBtn2.geometry
       quadroBtn2.material.map = createButtonCanvasTexture('↺', false, false, true)
       quadroBtn2.userData.action = 'repeat-audio'
-      quadroBtn2.position.set(8.5, -15.8, 1.2)
-      quadroBtn2.scale.set(1, 1, 1)
+      quadroBtn2.position.set(9.5, -4.5, 1.2)
+      quadroBtn2.scale.set(0.92, 0.92, 1)
       quadroBtn2.visible = true
     }
     // Única Fila Inferior (Debajo del Quadro): Solo 2 botones de navegación limpios
     if (quadroBtn3) {
       quadroBtn3.material.map = createButtonCanvasTexture('Ver libros recomendados', true, false)
       quadroBtn3.userData.action = 'open-shelf'
-      quadroBtn3.position.set(-15.5, -31.5, 0.6)
+      quadroBtn3.position.set(-16.2, -22.2, 0.6)
       quadroBtn3.scale.set(1, 1, 1)
       quadroBtn3.visible = true
     }
     if (quadroBtn4) {
       quadroBtn4.material.map = createButtonCanvasTexture('Volver al cielo', false, true)
       quadroBtn4.userData.action = 'close-card'
-      quadroBtn4.position.set(15.5, -31.5, 0.6)
+      quadroBtn4.position.set(16.2, -22.2, 0.6)
       quadroBtn4.scale.set(1, 1, 1)
       quadroBtn4.visible = true
     }
   } else if (vistaQuadro.value === 'estanteria') {
+    if (infoQuadroMesh) infoQuadroMesh.scale.set(1, 1, 1)
     // 2. Vista Estantería: Los libros mismos son los botones interactivos
     // Ocultar los botones inferiores de libro 1, 2 y 3
     if (quadroBtn1) quadroBtn1.visible = false
@@ -1034,13 +1055,14 @@ function actualizarBotones3DQuadro() {
       quadroBtn4.visible = true
     }
   } else if (vistaQuadro.value === 'detalle') {
-    // 3. Vista Detalle: Volver a la estantería o volver al cielo
+    if (infoQuadroMesh) infoQuadroMesh.scale.set(1, 1, 1)
+    // 3. Vista Detalle: Volver a la estantería, consultar en 2D o volver al cielo
     bookQuadroMeshes.forEach((bm) => { bm.visible = false })
     if (quadroBtn1) {
       quadroBtn1.geometry = btnQuadroGeo || quadroBtn1.geometry
       quadroBtn1.material.map = createButtonCanvasTexture('Volver a los libros', true, false)
       quadroBtn1.userData.action = 'back-shelf'
-      quadroBtn1.position.set(-15.5, -35, 0.6)
+      quadroBtn1.position.set(-22, -35, 0.6)
       quadroBtn1.scale.set(1, 1, 1)
       quadroBtn1.visible = true
     }
@@ -1048,11 +1070,18 @@ function actualizarBotones3DQuadro() {
       quadroBtn2.geometry = btnQuadroGeo || quadroBtn2.geometry
       quadroBtn2.material.map = createButtonCanvasTexture('Volver al cielo', false, true)
       quadroBtn2.userData.action = 'close-card'
-      quadroBtn2.position.set(15.5, -35, 0.6)
+      quadroBtn2.position.set(22, -35, 0.6)
       quadroBtn2.scale.set(1, 1, 1)
       quadroBtn2.visible = true
     }
-    if (quadroBtn3) quadroBtn3.visible = false
+    if (quadroBtn3) {
+      quadroBtn3.geometry = btnQuadroGeo || quadroBtn3.geometry
+      quadroBtn3.material.map = createButtonCanvasTexture('Consultar en 2D', false, false)
+      quadroBtn3.userData.action = 'consultar-libro-2d'
+      quadroBtn3.position.set(0, -35, 0.6)
+      quadroBtn3.scale.set(1, 1, 1)
+      quadroBtn3.visible = true
+    }
     if (quadroBtn4) quadroBtn4.visible = false
   }
 }
@@ -1077,6 +1106,27 @@ function initThree() {
   cameraMono = new THREE.PerspectiveCamera(65, width / height, 0.1, 2000)
   cameraMono.position.set(0, 0, 0.1)
   cameraMono.lookAt(0, 5, 45)
+  scene.add(cameraMono)
+
+  // Retícula 3D in-scene para sesiones WebXR nativas (renderizada directamente en ambos ojos por la GPU)
+  const reticleCanvas = document.createElement('canvas')
+  reticleCanvas.width = 128
+  reticleCanvas.height = 128
+  reticleCanvasCtx = reticleCanvas.getContext('2d')
+  reticle3DTexture = new THREE.CanvasTexture(reticleCanvas)
+
+  const reticleGeo = new THREE.PlaneGeometry(0.075, 0.075)
+  const reticleMat = new THREE.MeshBasicMaterial({
+    map: reticle3DTexture,
+    transparent: true,
+    depthTest: false,
+    depthWrite: false
+  })
+  reticle3DMesh = new THREE.Mesh(reticleGeo, reticleMat)
+  reticle3DMesh.position.set(0, 0, -1.2)
+  reticle3DMesh.renderOrder = 9999
+  reticle3DMesh.visible = false
+  cameraMono.add(reticle3DMesh)
 
   cameraLeft = new THREE.PerspectiveCamera(65, width / 2 / height, 0.1, 2000)
   cameraLeft.position.set(-0.35, 0, 0.1)
@@ -1086,11 +1136,12 @@ function initThree() {
   cameraRight.position.set(0.35, 0, 0.1)
   cameraRight.lookAt(0, 5, 45)
 
-  // WebGL Renderer de alto rendimiento
+  // WebGL Renderer de alto rendimiento con WebXR nativo para soporte de visor VR
   renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: 'high-performance' })
   renderer.setSize(width, height)
   renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2))
   renderer.autoClear = false
+  renderer.xr.enabled = true
   containerRef.value.appendChild(renderer.domElement)
 
   // 1. Campo de estrellas de fondo (3,400 puntos estelares naturales)
@@ -1195,8 +1246,8 @@ function initThree() {
       sMesh.userData.sprite = sprite
     })
 
-    // Hit Sphere amplia e invisible para selección al toque y mirada
-    const hitGeo = new THREE.SphereGeometry(60, 8, 8)
+    // Hit Sphere amplia e invisible para selección al toque y mirada (con tolerancia ampliada a 75 unidades)
+    const hitGeo = new THREE.SphereGeometry(75, 8, 8)
     const hitMat = new THREE.MeshBasicMaterial({ visible: false, transparent: true, opacity: 0 })
     const hitMesh = new THREE.Mesh(hitGeo, hitMat)
     const centerPos = new THREE.Vector3().copy(cData.direccion).multiplyScalar(210)
@@ -1227,7 +1278,7 @@ function initThree() {
   infoQuadroGroup = new THREE.Group()
   infoQuadroGroup.visible = false
 
-  const quadroGeo = new THREE.PlaneGeometry(96, 52)
+  const quadroGeo = new THREE.PlaneGeometry(108, 58.5)
   const quadroMat = new THREE.MeshBasicMaterial({
     map: textureQuadro,
     transparent: true,
@@ -1239,8 +1290,8 @@ function initThree() {
   infoQuadroGroup.add(infoQuadroMesh)
 
   // Botones 3D interactivos:
-  btnQuadroGeo = new THREE.PlaneGeometry(28, 7.5)
-  btnAudioGeo = new THREE.PlaneGeometry(9.5, 9.5)
+  btnQuadroGeo = new THREE.PlaneGeometry(31, 8.8)
+  btnAudioGeo = new THREE.PlaneGeometry(12.5, 12.5)
 
   quadroBtn1 = new THREE.Mesh(btnAudioGeo, new THREE.MeshBasicMaterial({ transparent: true, depthWrite: false, depthTest: false, side: THREE.DoubleSide }))
   quadroBtn1.renderOrder = 10
@@ -1297,12 +1348,12 @@ function initThree() {
   const posControls = new THREE.Vector3(0, -10.5, 43)
   orientPlaneFacingOrigin(visorControls3DGroup, posControls)
 
-  const btnPedestalGeo = new THREE.PlaneGeometry(8.8, 2.5)
+  const btnPedestalGeo = new THREE.PlaneGeometry(10.2, 3.0)
 
   // Botón 3D: Pausar Mirada (Izquierda)
   const pauseTex = createButtonCanvasTexture('Pausar mirada', true, false)
   pause3DMesh = new THREE.Mesh(btnPedestalGeo, new THREE.MeshBasicMaterial({ map: pauseTex, transparent: true, depthWrite: false, side: THREE.DoubleSide }))
-  pause3DMesh.position.set(-9.8, 0, 0)
+  pause3DMesh.position.set(-11.2, 0, 0)
   pause3DMesh.userData = { is3DButton: true, action: 'toggle-gaze' }
   visorControls3DGroup.add(pause3DMesh)
   interactive3DButtons.push(pause3DMesh)
@@ -1320,7 +1371,7 @@ function initThree() {
   // Botón 3D: Salir al menú principal (Derecha)
   const exitTex = createButtonCanvasTexture('Salir al inicio', false, true)
   exit3DMesh = new THREE.Mesh(btnPedestalGeo, new THREE.MeshBasicMaterial({ map: exitTex, transparent: true, depthWrite: false, side: THREE.DoubleSide }))
-  exit3DMesh.position.set(9.8, 0, 0)
+  exit3DMesh.position.set(11.2, 0, 0)
   exit3DMesh.userData = { is3DButton: true, action: 'exit' }
   visorControls3DGroup.add(exit3DMesh)
   interactive3DButtons.push(exit3DMesh)
@@ -1342,7 +1393,7 @@ function initThree() {
   // Activar sensores de movimiento si están disponibles
   activarSensoresGiroscopio()
 
-  animate()
+  renderer.setAnimationLoop(animate)
 }
 
 function onFullscreenChange() {
@@ -1545,9 +1596,8 @@ function onWindowResize() {
   renderer.setSize(width, height)
 }
 
-// Bucle de renderizado continuo
+// Bucle de renderizado continuo sincronizado con WebXR o display
 function animate() {
-  animationFrameId = requestAnimationFrame(animate)
   const delta = clock.getDelta()
 
   // Rotación cósmica pasiva
@@ -1556,7 +1606,23 @@ function animate() {
   }
 
   // 1. Orientación de cámara: giro por giroscopio del celular (con filtro anti-temblor) o arrastre táctil
-  if (hasDeviceOrientation && hasValidOrientation) {
+  // En modo WebXR nativo, la orientación la calcula directamente el runtime de WebXR desde la pose del visor
+  if (renderer.xr.isPresenting) {
+    const xrCam = renderer.xr.getCamera()
+    cameraMono.position.copy(xrCam.position)
+    cameraMono.quaternion.copy(xrCam.quaternion)
+    cameraMono.updateMatrixWorld(true)
+
+    if (reticle3DMesh) {
+      reticle3DMesh.visible = true
+      dibujarReticle3D(dwellProgress.value, isDwellConfirmed.value, isGazePaused.value)
+    }
+  } else {
+    if (reticle3DMesh) {
+      reticle3DMesh.visible = false
+    }
+
+    if (hasDeviceOrientation && hasValidOrientation) {
     // Tomar siempre el arco más corto para evitar giros de 360 grados
     if (smoothedQuat.dot(targetQuat) < 0) {
       targetQuat.x = -targetQuat.x
@@ -1595,6 +1661,7 @@ function animate() {
     cameraLeft.lookAt(targetDir)
     cameraRight.lookAt(targetDir)
   }
+}
 
   // 2. Chequeo de Mirada Gaze Dwell (3 segundos con confirmación)
   checkGazeDwell(delta)
@@ -1650,7 +1717,10 @@ function animate() {
 
   // 4. Renderizado final
   renderer.clear()
-  if (isHomidoSplit.value) {
+  if (renderer.xr.isPresenting) {
+    // Sesión WebXR activa: Three.js renderiza con la cámara estéreo y la distorsión de barril del visor
+    renderer.render(scene, cameraMono)
+  } else if (isHomidoSplit.value) {
     const w = window.innerWidth
     const h = window.innerHeight
 
@@ -1673,8 +1743,17 @@ function animate() {
 
 // Selección por mirada continua (Gaze Dwell)
 function checkGazeDwell(delta) {
-  const activeCam = isHomidoSplit.value ? cameraLeft : cameraMono
-  raycaster.setFromCamera(centerScreenVec, activeCam)
+  if (renderer.xr.isPresenting) {
+    const xrCam = renderer.xr.getCamera()
+    const camOrigin = new THREE.Vector3()
+    xrCam.getWorldPosition(camOrigin)
+    const camDir = new THREE.Vector3(0, 0, -1)
+    camDir.applyQuaternion(xrCam.quaternion).normalize()
+    raycaster.set(camOrigin, camDir)
+  } else {
+    const activeCam = isHomidoSplit.value ? cameraLeft : cameraMono
+    raycaster.setFromCamera(centerScreenVec, activeCam)
+  }
 
   // 1. Comprobar Botones 3D en escena primero
   const activeButtons = interactive3DButtons.filter((b) => {
@@ -1722,30 +1801,38 @@ function checkGazeDwell(delta) {
     }
   }
 
-  // Período de gracia breve (350ms)
+  // Período de gracia generoso (750ms) con retención de progreso para evitar reinicios por micro-temblor
   if (dwellTarget && !dwellGraceTimer) {
+    dwellPausedElapsed = performance.now() - dwellStartTime
     dwellGraceTimer = setTimeout(() => {
       dwellTarget = null
       dwellProgress.value = 0
+      dwellPausedElapsed = 0
       dwellGraceTimer = null
-    }, 350)
+    }, DWELL_GRACE_MS)
   }
 }
 
 function handleDwellTarget(target) {
-  if (dwellGraceTimer) {
-    clearTimeout(dwellGraceTimer)
-    dwellGraceTimer = null
-  }
-
   const isSameTarget =
     dwellTarget &&
     dwellTarget.type === target.type &&
     (target.type === 'constellation' ? dwellTarget.id === target.id : dwellTarget.action === target.action)
 
+  if (dwellGraceTimer) {
+    clearTimeout(dwellGraceTimer)
+    dwellGraceTimer = null
+    if (isSameTarget && dwellPausedElapsed > 0) {
+      // Reanudar suavemente exactamente donde se quedó el progreso sin reiniciar a 0
+      dwellStartTime = performance.now() - dwellPausedElapsed
+      dwellPausedElapsed = 0
+    }
+  }
+
   if (!isSameTarget) {
     dwellTarget = target
     dwellStartTime = performance.now()
+    dwellPausedElapsed = 0
   }
 
   const elapsed = performance.now() - dwellStartTime
@@ -1765,6 +1852,7 @@ function handleDwellTarget(target) {
       isDwellConfirmed.value = false
       dwellProgress.value = 0
       dwellTarget = null
+      dwellPausedElapsed = 0
     }, 800)
   }
 }
@@ -1819,6 +1907,15 @@ function handle3DButtonAction(action) {
     vistaQuadro.value = 'ficha'
     renderQuadroTexture(selectedData.value, 'ficha')
     actualizarBotones3DQuadro()
+  } else if (action === 'consultar-libro-2d') {
+    if (selectedId.value && libroDetalle.value?.id) {
+      detenerAudio()
+      router.push({
+        name: 'libro',
+        params: { id: selectedId.value, libroId: libroDetalle.value.id },
+        query: { origen: 'visor' }
+      })
+    }
   }
 }
 
@@ -1882,15 +1979,24 @@ function seleccionarConstelacion(id) {
     }
 
     // Centrado exactamente con el azimut de la constelación (sin desplazamiento lateral).
-    // Aplicamos un leve descenso angular esférico (~8.5 grados) a lo largo del horizonte local
-    // para que las estrellas principales sigan visibles justo arriba del cuadro sin encimarse.
-    const pitchAngle = -0.15
+    // Escala legible (0.64) y descenso angular (~19.5°) para dejar toda la constelación libre y visible arriba.
+    const pitchAngle = -0.34
     const cardDir = dir.clone().applyAxisAngle(rightVec, pitchAngle).normalize()
-    const distance = 125
+    const distance = 110
     const quadroPos = cardDir.multiplyScalar(distance)
 
     orientPlaneFacingOrigin(infoQuadroGroup, quadroPos)
+    infoQuadroGroup.scale.setScalar(0.64)
     infoQuadroGroup.visible = true
+
+    // Colocar los botones globales (Pausar mirada, Modo Homido/2D y Salir) justo debajo del menú de la constelación
+    if (visorControls3DGroup) {
+      const controlsPitch = pitchAngle - 0.22
+      const controlsDir = dir.clone().applyAxisAngle(rightVec, controlsPitch).normalize()
+      const controlsPos = controlsDir.multiplyScalar(distance)
+      orientPlaneFacingOrigin(visorControls3DGroup, controlsPos)
+      visorControls3DGroup.scale.setScalar(1.55)
+    }
 
     // Si no está activo el giroscopio del dispositivo, orientar suavemente la cámara al centro de la experiencia
     if (!hasDeviceOrientation) {
@@ -1919,6 +2025,11 @@ function resetSelection() {
 
   if (infoQuadroGroup) {
     infoQuadroGroup.visible = false
+  }
+  if (visorControls3DGroup) {
+    const posControls = new THREE.Vector3(0, -10.5, 43)
+    orientPlaneFacingOrigin(visorControls3DGroup, posControls)
+    visorControls3DGroup.scale.setScalar(1)
   }
 }
 
@@ -2072,22 +2183,55 @@ function actualizarPedestal3D() {
   homidoToggle3DMesh.material.needsUpdate = true
 }
 
-// Controles de visor y modo inmersivo Homido VR
+// Controles de visor y modo inmersivo Homido VR (con WebXR nativo para distorsión de barril óptica)
 async function activarModoVRCompleto() {
   // 1. Permiso directo de sensores en el gesto del usuario (imprescindible en iOS / Safari)
   await activarSensoresGiroscopio()
 
-  // 2. Activar vista estereoscópica dividida Homido
+  // 2. Desbloqueo auditivo inmediato
+  playChime()
+
+  // 3. Comprobar e iniciar sesión nativa de WebXR (Modo VR Real con distorsión de barril de lentes)
+  if (navigator.xr && renderer && renderer.xr) {
+    try {
+      const isSupported = await navigator.xr.isSessionSupported('immersive-vr')
+      if (isSupported) {
+        if (!xrSession) {
+          const sessionInit = { optionalFeatures: ['local-floor', 'bounded-floor'] }
+          const wrapperEl = document.querySelector('.visor-3d-wrapper')
+          if (wrapperEl) {
+            sessionInit.optionalFeatures.push('dom-overlay')
+            sessionInit.domOverlay = { root: wrapperEl }
+          }
+          const session = await navigator.xr.requestSession('immersive-vr', sessionInit)
+          xrSession = session
+          isWebXRActive.value = true
+          isHomidoSplit.value = true
+          await renderer.xr.setSession(session)
+
+          session.addEventListener('end', () => {
+            xrSession = null
+            isWebXRActive.value = false
+            salirModoVR()
+          })
+          actualizarPedestal3D()
+          onWindowResize()
+          return
+        }
+      }
+    } catch (err) {
+      console.warn('WebXR no disponible o rechazado por usuario, activando fallback estereoscópico:', err)
+    }
+  }
+
+  // 4. Fallback: Activar vista estereoscópica dividida Homido manual (para navegadores sin WebXR)
   isHomidoSplit.value = true
   if (route.query.modo !== 'homido') {
     router.replace({ query: { ...route.query, modo: 'homido' } })
   }
   actualizarPedestal3D()
 
-  // 3. Desbloqueo auditivo inmediato
-  playChime()
-
-  // 4. Pantalla completa nativa del dispositivo a nivel de documento completo
+  // 5. Pantalla completa nativa del dispositivo a nivel de documento completo
   const docEl = document.documentElement
   if (!document.fullscreenElement) {
     try {
@@ -2099,14 +2243,14 @@ async function activarModoVRCompleto() {
     } catch (_) {}
   }
 
-  // 5. Bloqueo de orientación horizontal en el teléfono
+  // 6. Bloqueo de orientación horizontal en el teléfono
   try {
     if (screen.orientation && screen.orientation.lock) {
       await screen.orientation.lock('landscape')
     }
   } catch (_) {}
 
-  // 6. Wake Lock para evitar apagado de pantalla mientras se usa el visor Homido
+  // 7. Wake Lock para evitar apagado de pantalla mientras se usa el visor Homido
   try {
     if (navigator.wakeLock && navigator.wakeLock.request) {
       await navigator.wakeLock.request('screen')
@@ -2116,7 +2260,17 @@ async function activarModoVRCompleto() {
   onWindowResize()
 }
 
-function salirModoVR() {
+async function salirModoVR() {
+  if (reticle3DMesh) {
+    reticle3DMesh.visible = false
+  }
+  if (xrSession) {
+    try {
+      await xrSession.end()
+    } catch (_) {}
+    xrSession = null
+  }
+  isWebXRActive.value = false
   isHomidoSplit.value = false
   if (route.query.modo === 'homido') {
     const q = { ...route.query }
@@ -2195,6 +2349,9 @@ onMounted(async () => {
 })
 
 onBeforeUnmount(() => {
+  if (renderer) {
+    renderer.setAnimationLoop(null)
+  }
   cancelAnimationFrame(animationFrameId)
   detenerAudio()
 
@@ -2209,6 +2366,14 @@ onBeforeUnmount(() => {
   if (renderer && renderer.domElement) {
     renderer.domElement.removeEventListener('pointerdown', onPointerDown)
     renderer.dispose()
+  }
+
+  if (reticle3DMesh) {
+    if (reticle3DMesh.geometry) reticle3DMesh.geometry.dispose()
+    if (reticle3DMesh.material) reticle3DMesh.material.dispose()
+  }
+  if (reticle3DTexture) {
+    reticle3DTexture.dispose()
   }
 })
 </script>
