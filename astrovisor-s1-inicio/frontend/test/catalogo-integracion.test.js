@@ -1,6 +1,6 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
-import { mkdtemp, writeFile, rm } from 'node:fs/promises'
+import { mkdtemp, writeFile, rm, mkdir } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join, dirname } from 'node:path'
 import { randomBytes } from 'node:crypto'
@@ -15,11 +15,12 @@ import { cargarRecorridos } from '../src/services/contentService.js'
 
 test('servicios Vue → Express: edición autorizada, 412, lectura pública y persistencia desde proceso nuevo', { timeout: 30000 }, async (t) => {
   const dir = await mkdtemp(join(tmpdir(), 'astrovisor-3a-http-'))
+  const dirExport = await mkdtemp(join(tmpdir(), 'astrovisor-export-'))
   assert.equal(dirname(dir), tmpdir())
-  const datos = join(dir, 'datos'), cuenta = join(dir, 'admin.json')
+  const datos = join(dir, 'datos'), cuenta = join(dir, 'admin.json'), exportDir = join(dirExport, 'pub')
   const password = randomBytes(24).toString('hex')
-  const previo = { ASTROVISOR_DATA_DIR: process.env.ASTROVISOR_DATA_DIR, ASTROVISOR_ADMIN_FILE: process.env.ASTROVISOR_ADMIN_FILE }
-  process.env.ASTROVISOR_DATA_DIR = datos; process.env.ASTROVISOR_ADMIN_FILE = cuenta
+  const previo = { ASTROVISOR_DATA_DIR: process.env.ASTROVISOR_DATA_DIR, ASTROVISOR_ADMIN_FILE: process.env.ASTROVISOR_ADMIN_FILE, ASTROVISOR_PUBLIC_EXPORT_DIR: process.env.ASTROVISOR_PUBLIC_EXPORT_DIR }
+  process.env.ASTROVISOR_DATA_DIR = datos; process.env.ASTROVISOR_ADMIN_FILE = cuenta; process.env.ASTROVISOR_PUBLIC_EXPORT_DIR = exportDir
   const app = crearApp()
   let server, hijo
   t.after(async () => {
@@ -30,9 +31,11 @@ test('servicios Vue → Express: edición autorizada, 412, lectura pública y pe
     } finally {
       for (const [k, v] of Object.entries(previo)) { if (v === undefined) delete process.env[k]; else process.env[k] = v }
       await rm(dir, { recursive: true, force: true })
+      await rm(dirExport, { recursive: true, force: true })
     }
   })
   await inicializarCatalogo({ directorio: datos })
+  await mkdir(exportDir, { recursive: true })
   const original = await obtenerCatalogo({ directorio: datos })
   await writeFile(cuenta, JSON.stringify(await crearConfiguracionAdmin('editor-temporal', 'Integración aislada', password)), { mode: 0o600 })
   await app.locals.iniciarEscritor()
@@ -96,7 +99,7 @@ test('servicios Vue → Express: edición autorizada, 412, lectura pública y pe
   await new Promise((r) => server.close(r)); await app.locals.cerrarEscritor()
   const modulo = new URL('../../backend/src/index.js', import.meta.url).href
   hijo = spawn(process.execPath, ['--input-type=module', '-e', `import{crearApp}from ${JSON.stringify(modulo)};const a=crearApp();await a.locals.iniciarEscritor();const s=a.listen(0,'127.0.0.1',()=>process.send(s.address().port));process.once('message',()=>s.close(async()=>{await a.locals.cerrarEscritor();process.exit(0)}))`], {
-    env: { ...process.env, ASTROVISOR_DATA_DIR: datos, ASTROVISOR_ADMIN_FILE: cuenta }, stdio: ['ignore', 'pipe', 'pipe', 'ipc'],
+    env: { ...process.env, ASTROVISOR_DATA_DIR: datos, ASTROVISOR_ADMIN_FILE: cuenta, ASTROVISOR_PUBLIC_EXPORT_DIR: exportDir }, stdio: ['ignore', 'pipe', 'pipe', 'ipc'],
   })
   const [puerto] = await once(hijo, 'message'); base = `http://127.0.0.1:${puerto}`
   assert.equal((await listarLibros('orion'))[0].anio, 1912)

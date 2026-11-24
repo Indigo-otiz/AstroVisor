@@ -2,7 +2,7 @@
 import { onMounted } from 'vue'
 
 onMounted(() => {
-  document.title = 'Modo Homido · AstroVisor'
+  document.title = 'Visor Celular VR · AstroVisor'
 })
 </script>
 
@@ -15,7 +15,7 @@ onMounted(() => {
 
     <div class="visor-intro">
       <p class="visor-eyebrow">Experiencia inmersiva 3D · Realidad Virtual</p>
-      <h1 tabindex="-1">Historias del cielo en el visor Homido</h1>
+      <h1 tabindex="-1">Historias del cielo en el visor VR</h1>
       <p class="visor-lead">
         Recorre la bóveda celeste en 360 grados, descubre constelaciones mediante la mirada y escucha relatos mitológicos narrados con voz natural. Diseñado especialmente para una observación cómoda y pausada.
       </p>
@@ -51,7 +51,7 @@ onMounted(() => {
             <circle cx="16" cy="12" r="2.5" />
             <path d="M11 12h2" />
           </svg>
-          Visor Homido y Smartphone
+          Visor Celular y Smartphone
         </span>
 
         <h2 class="visor-hero-title">Inicia la experiencia inmersiva</h2>
@@ -89,7 +89,7 @@ onMounted(() => {
             </svg>
           </div>
           <h3>Prepara tu teléfono</h3>
-          <p>Desde Inicio, elige <strong>«Explorar con Homido»</strong>. Antes de colocar el teléfono en el visor, toca <strong>«Activar audio»</strong> y, si aparece, <strong>«Permitir movimiento»</strong>.</p>
+          <p>Elige <strong>«Visor Celular»</strong> en el inicio. Pulsa <strong>«Activar audio y sensores»</strong> antes de colocar el celular en el visor.</p>
         </div>
 
         <div class="visor-step-card">
@@ -102,8 +102,8 @@ onMounted(() => {
               <path d="M11 12h2" />
             </svg>
           </div>
-          <h3>Ajusta el visor Homido</h3>
-          <p>La vista se divide al entrar. Gira el teléfono a horizontal, colócalo dentro del visor y ajusta las correas con calma.</p>
+          <h3>Colócalo en el visor</h3>
+          <p><strong>Gira tu pantalla a horizontal</strong>, colócala dentro del visor y acomoda las correas para tu comodidad.</p>
         </div>
 
         <div class="visor-step-card">
@@ -118,8 +118,8 @@ onMounted(() => {
               <line x1="18" y1="12" x2="22" y2="12" />
             </svg>
           </div>
-          <h3>Navega con tu mirada</h3>
-          <p>Mueve suavemente la cabeza. Mantén la mirilla fija durante <strong>3 segundos</strong> sobre una constelación para abrir su historia.</p>
+          <h3>Explora con tu mirada</h3>
+          <p><strong>Mueve la cabeza despacio.</strong> Mantén la mirilla fija <strong>3 segundos</strong> sobre una constelación para abrir su relato.</p>
         </div>
       </div>
     </section>
@@ -129,20 +129,20 @@ onMounted(() => {
       <div class="visor-feature-box">
         <div class="feature-header">
           <span class="feature-icon pause">⏸</span>
-          <h3>Pausar mirada en cualquier momento</h3>
+          <h3>Pausa de mirada</h3>
         </div>
         <p>
-          Si deseas contemplar el cielo sin que la mirilla seleccione botones accidentalmente, enfoca el botón <strong>«Pausar mirada»</strong>. Escucharás un tono suave de confirmación. Tu narración de voz seguirá reproduciéndose sin cortes.
+          Enfoca el botón <strong>«Pausar mirada»</strong> para contemplar las estrellas libremente. El audio narrado continuará sin cortes.
         </p>
       </div>
 
       <div class="visor-feature-box">
         <div class="feature-header">
           <span class="feature-icon exit">↩</span>
-          <h3>Regreso seguro a 2D</h3>
+          <h3>Regreso seguro</h3>
         </div>
         <p>
-          Si en algún momento sientes mareo, incomodidad o cansancio visual, enfoca el botón <strong>«Salir a 2D»</strong>. La experiencia liberará los sensores del celular, detendrá el sonido y te regresará a la lectura normal en pantalla.
+          Si sientes fatiga o mareo, enfoca <strong>«Salir a 2D»</strong> para detener la inmersión y volver a la lectura normal en pantalla.
         </p>
       </div>
     </div>

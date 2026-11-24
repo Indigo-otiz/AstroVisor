@@ -12,7 +12,7 @@ const titulos = {
   explorar: 'Constelaciones e historias del cielo',
   biblioteca: 'La biblioteca de las estrellas',
   libro: 'Información de libro',
-  visor: 'Modo Homido',
+  visor: 'Visor VR',
   'visor-3d': 'Experiencia 3D Mejorada',
   'admin-acceso': 'Acceso administrativo',
   admin: 'Panel de administración',
@@ -48,7 +48,7 @@ watch(
             <RouterLink to="/explorar" :class="{ 'nav-current': route.name === 'constelacion' }"
               >Explorar</RouterLink
             >
-            <RouterLink to="/visor">Homido</RouterLink>
+            <RouterLink to="/visor">Visor VR</RouterLink>
             <RouterLink to="/admin/acceso">Administración</RouterLink>
           </nav>
 

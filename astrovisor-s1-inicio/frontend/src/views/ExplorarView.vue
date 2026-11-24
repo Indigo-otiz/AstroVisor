@@ -188,7 +188,7 @@ function totalLibros(recorrido) {
         </div>
         <h3>¿Prefieres contemplar estas constelaciones en 360 grados?</h3>
         <p>
-          Accede al Modo Homido directamente con tu visor móvil o explora desde el navegador para contemplar las constelaciones en un entorno tridimensional interactivo.
+          Accede al Visor VR directamente con tu celular o explora desde el navegador para contemplar las constelaciones en un entorno tridimensional interactivo.
         </p>
       </div>
 
@@ -197,7 +197,7 @@ function totalLibros(recorrido) {
           <span class="btn-main">Experiencia 3D Mejorada</span>
         </RouterLink>
         <a class="portal-button homido" href="/prueba-homido/index.html?modo=homido">
-          <span class="btn-main">Bóveda VR Homido</span>
+          <span class="btn-main">Bóveda en Visor VR</span>
         </a>
       </div>
     </section>
