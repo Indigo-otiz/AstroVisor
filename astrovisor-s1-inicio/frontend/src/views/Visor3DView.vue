@@ -1307,9 +1307,9 @@ function initThree() {
   visorControls3DGroup.add(pause3DMesh)
   interactive3DButtons.push(pause3DMesh)
 
-  // Botón 3D: Cambiar a Modo 2D / Modo Homido (Centro)
+  // Botón 3D: Cambiar a Modo 2D / Visor VR (Centro)
   const isSplit = isHomidoSplit.value
-  const homidoTxt = isSplit ? 'Salir a 2D' : 'Modo Homido'
+  const homidoTxt = isSplit ? 'Salir a 2D' : 'Visor VR'
   const homidoTex = createButtonCanvasTexture(homidoTxt, !isSplit, isSplit)
   homidoToggle3DMesh = new THREE.Mesh(btnPedestalGeo, new THREE.MeshBasicMaterial({ map: homidoTex, transparent: true, depthWrite: false, side: THREE.DoubleSide }))
   homidoToggle3DMesh.position.set(0, 0, 0)
@@ -2063,11 +2063,11 @@ function abrirDetalleLibro(libro) {
   vistaPanel.value = 'detalle'
 }
 
-// Sincronizar el botón del pedestal 3D según el modo Homido o 2D activo
+// Sincronizar el botón del pedestal 3D según el visor VR o 2D activo
 function actualizarPedestal3D() {
   if (!homidoToggle3DMesh) return
   const isSplit = isHomidoSplit.value
-  const label = isSplit ? 'Salir a 2D' : 'Modo Homido'
+  const label = isSplit ? 'Salir a 2D' : 'Visor VR'
   homidoToggle3DMesh.material.map = createButtonCanvasTexture(label, !isSplit, isSplit)
   homidoToggle3DMesh.material.needsUpdate = true
 }
@@ -2353,7 +2353,7 @@ onBeforeUnmount(() => {
           type="button"
           class="homido-exit-pill"
           @click="salirModoVR"
-          aria-label="Salir de Modo Homido y volver a pantalla normal 2D"
+          aria-label="Salir del visor y volver a pantalla normal 2D"
         >
           Salir a 2D
         </button>
@@ -2372,7 +2372,7 @@ onBeforeUnmount(() => {
           type="button"
           class="homido-exit-pill"
           @click="salirModoVR"
-          aria-label="Salir de Modo Homido y volver a pantalla normal 2D"
+          aria-label="Salir del visor y volver a pantalla normal 2D"
         >
           Salir a 2D
         </button>
@@ -2447,7 +2447,7 @@ onBeforeUnmount(() => {
           class="control-pill"
           :class="{ 'active': isHomidoSplit }"
           @click="toggleHomido"
-          title="Entrar a Modo Homido (VR)"
+          title="Entrar a Visor Celular (VR)"
         >
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="pill-icon">
             <rect x="2" y="6" width="20" height="12" rx="4" />
@@ -2455,7 +2455,7 @@ onBeforeUnmount(() => {
             <circle cx="16" cy="12" r="2.5" />
             <path d="M11 12h2" />
           </svg>
-          <span>Modo Homido (VR)</span>
+          <span>Visor Celular (VR)</span>
         </button>
 
         <button

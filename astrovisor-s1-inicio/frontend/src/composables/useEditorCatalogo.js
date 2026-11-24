@@ -255,8 +255,8 @@ export function useEditorCatalogo({ obtenerToken, obtenerUsuario = () => '', alE
       if (actual.signal.aborted) return false
       confirmado = true; etag.value = resultado.etag
       mensaje.value = resultado.respaldoPublico === 'publicado' && resultado.revisionPublicada === resultado.revision
-        ? `Guardado confirmado. Homido tiene publicada la revisión ${resultado.revisionPublicada}.`
-        : `Guardado confirmado. El respaldo público de Homido sigue pendiente de sincronización.${resultado.revisionPublicada ? ` Copia publicada: revisión ${resultado.revisionPublicada}.` : ''}`
+        ? `Guardado confirmado. El visor Homido tiene publicada la revisión ${resultado.revisionPublicada}.`
+        : `Guardado confirmado. El respaldo público del visor Homido sigue pendiente de sincronización.${resultado.revisionPublicada ? ` Copia publicada: revisión ${resultado.revisionPublicada}.` : ''}`
       if (resultado.durabilidadPendiente || resultado.retencionPendiente) mensaje.value += ' Hay un aviso operativo de almacenamiento; consulta al responsable del servidor.'
       const respuesta = await cargarCatalogoAdmin({ token: obtenerToken(), signal: actual.signal })
       if (actual.signal.aborted) return false

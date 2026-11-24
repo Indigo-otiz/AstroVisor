@@ -69,8 +69,48 @@ async function cancelarYCentrar() {
   if (anterior) document.querySelector(anterior.tipo === 'nuevo' ? '#nuevo-libro' : `[data-editar="${anterior.tipo}-${anterior.id}"]`)?.focus()
 }
 watch(seleccion, async (actual) => { if (actual) { await nextTick(); document.querySelector('#editor-heading')?.focus() } })
-onMounted(cargar)
-onBeforeUnmount(cancelarPeticiones)
+
+const mostrarBotonArriba = ref(false)
+
+function handleScroll() {
+  mostrarBotonArriba.value = window.scrollY > 350
+}
+
+function volverArriba() {
+  window.scrollTo({ top: 0, behavior: 'smooth' })
+}
+
+function irASeccion(id) {
+  const el = document.getElementById(id)
+  if (el) {
+    el.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    if (el.getAttribute('tabindex') !== null) {
+      el.focus({ preventScroll: true })
+    }
+  }
+}
+
+async function registrarLibroDirecto() {
+  nuevoLibro()
+  await nextTick()
+  const formHeading = document.getElementById('editor-heading')
+  if (formHeading) {
+    formHeading.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  }
+  const inputId = document.getElementById('nuevo-id')
+  if (inputId) {
+    inputId.focus()
+  }
+}
+
+onMounted(() => {
+  cargar()
+  window.addEventListener('scroll', handleScroll, { passive: true })
+})
+onBeforeUnmount(() => {
+  cancelarPeticiones()
+  window.removeEventListener('scroll', handleScroll)
+})
 </script>
 
 <template>
@@ -191,6 +231,56 @@ onBeforeUnmount(cancelarPeticiones)
       </div>
     </section>
 
+    <!-- BARRA DE ACCESOS RÁPIDOS (STICKY SUBNAV) -->
+    <nav class="admin-quick-nav" aria-label="Navegación rápida de administración">
+      <div class="quick-nav-inner">
+        <div class="quick-nav-links">
+          <button type="button" class="quick-nav-pill" @click="irASeccion('seccion-experiencias')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="quick-nav-icon">
+              <rect x="2" y="6" width="20" height="12" rx="4" />
+              <circle cx="8" cy="12" r="3" />
+              <circle cx="16" cy="12" r="3" />
+            </svg>
+            <span>Experiencias</span>
+          </button>
+
+          <button type="button" class="quick-nav-pill" @click="irASeccion('seccion-libros')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="quick-nav-icon">
+              <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
+              <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
+            </svg>
+            <span>Catálogo de Libros</span>
+          </button>
+
+          <button type="button" class="quick-nav-pill" @click="irASeccion('seccion-constelaciones')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="quick-nav-icon">
+              <circle cx="12" cy="12" r="2" />
+              <circle cx="6" cy="6" r="1.5" />
+              <circle cx="18" cy="7" r="1.5" />
+              <circle cx="17" cy="17" r="1.5" />
+              <circle cx="7" cy="16" r="1.5" />
+              <path d="M6 6l6 6m0 0l6-5m-6 5l5 5m-5-5l-5 4" opacity="0.6" />
+            </svg>
+            <span>Constelaciones</span>
+          </button>
+        </div>
+
+        <button
+          type="button"
+          class="quick-nav-action-btn"
+          :disabled="!catalogo || cargando || guardando || Boolean(borrador) || necesitaRecarga"
+          @click="registrarLibroDirecto"
+          title="Abrir formulario para registrar un nuevo libro"
+        >
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="quick-nav-icon-plus">
+            <line x1="12" y1="5" x2="12" y2="19" />
+            <line x1="5" y1="12" x2="19" y2="12" />
+          </svg>
+          <span>+ Registrar Libro</span>
+        </button>
+      </div>
+    </nav>
+
     <!-- CUERPO PRINCIPAL -->
     <main class="container admin-body">
       <!-- CÓMO USAR -->
@@ -254,7 +344,7 @@ onBeforeUnmount(cancelarPeticiones)
       </section>
 
       <!-- EXPERIENCIAS DISPONIBLES -->
-      <section class="experiences-section">
+      <section id="seccion-experiencias" class="experiences-section">
         <nav class="breadcrumb-nav" aria-label="Ruta de navegación">
           <span>Administración</span> &rsaquo; <strong>Experiencias</strong>
         </nav>
@@ -371,7 +461,7 @@ onBeforeUnmount(cancelarPeticiones)
       </section>
 
       <!-- SECCIÓN LIBROS -->
-      <section class="books-section" aria-labelledby="catalogo-heading" :aria-busy="cargando || guardando">
+      <section id="seccion-libros" class="books-section" aria-labelledby="catalogo-heading" :aria-busy="cargando || guardando">
         <div class="books-header">
           <div class="books-title-group">
             <h2 id="catalogo-heading" class="experiences-title">Libros y Bibliografía</h2>
@@ -397,8 +487,8 @@ onBeforeUnmount(cancelarPeticiones)
         </div>
         <p v-if="cargando" role="status">Consultando el catálogo…</p>
         <p v-if="catalogo" class="admin-note">Revisión consultada: {{ catalogo.revision }}.
-          <template v-if="catalogo.publicacionHomido?.respaldoPublico === 'publicado' && catalogo.publicacionHomido.revisionPublicada === catalogo.revision">Respaldo Homido publicado para esta revisión.</template>
-          <template v-else>Respaldo Homido pendiente de sincronización. <span v-if="catalogo.publicacionHomido?.revisionPublicada">Copia publicada: revisión {{ catalogo.publicacionHomido.revisionPublicada }}.</span></template>
+          <template v-if="catalogo.publicacionHomido?.respaldoPublico === 'publicado' && catalogo.publicacionHomido.revisionPublicada === catalogo.revision">Respaldo del visor publicado para esta revisión.</template>
+          <template v-else>Respaldo del visor pendiente de sincronización. <span v-if="catalogo.publicacionHomido?.revisionPublicada">Copia publicada: revisión {{ catalogo.publicacionHomido.revisionPublicada }}.</span></template>
           La exportación se ejecuta por separado en el servidor, no desde este panel.
         </p>
         <p v-if="borrador" class="admin-note">Termina o cancela esta edición antes de seleccionar otra ficha.</p>
@@ -418,7 +508,7 @@ onBeforeUnmount(cancelarPeticiones)
         <div v-else-if="catalogo && !cargando" class="empty-books-box">
           <p>No hay libros en el catálogo consultado.</p>
         </div>
-        <section v-if="catalogo" class="catalogo-constelaciones" aria-labelledby="constelaciones-editor">
+        <section v-if="catalogo" id="seccion-constelaciones" class="catalogo-constelaciones" aria-labelledby="constelaciones-editor">
           <h3 id="constelaciones-editor">Constelaciones</h3>
           <ul><li v-for="r in catalogo.recorridos" :key="r.id">
             <button type="button" class="btn-refresh" :data-editar="`recorrido-${r.id}`" :disabled="cargando || guardando || Boolean(borrador) || necesitaRecarga" @click="seleccionarRecorrido(r.id)">Editar información de {{ r.titulo }}</button>
@@ -429,7 +519,7 @@ onBeforeUnmount(cancelarPeticiones)
           <fieldset :disabled="guardando || cargando">
             <legend>{{ seleccion.tipo !== 'recorrido' ? 'Información bibliográfica y motivos de lectura' : 'Información de la constelación' }}</legend>
             <template v-if="seleccion.tipo === 'nuevo'">
-              <p class="admin-note">Referencia de demostración: no registra un ejemplar institucional. La exportación Homido se realiza por separado.</p>
+              <p class="admin-note">Referencia de demostración: no registra un ejemplar institucional. La exportación para el visor se realiza por separado.</p>
               <label for="nuevo-id">ID estable (minúsculas, números y guiones)</label>
               <input id="nuevo-id" v-model="borrador.id" required maxlength="100" pattern="[a-z0-9]+(-[a-z0-9]+)*" aria-describedby="id-ayuda" />
               <p id="id-ayuda" class="admin-note">Debe ser único. Se usará en el enlace del libro y no podrá editarse después.</p>
@@ -439,7 +529,7 @@ onBeforeUnmount(cancelarPeticiones)
               <input id="nuevo-autor" v-model="borrador.autor" required maxlength="200" />
             </template>
             <template v-else-if="libroActual">
-              <p id="restriccion-portadas" class="admin-note">El SVG heredado contiene texto fijo. Para cambiar título o autor, sustituye explícitamente la portada. Homido navega por ID.</p>
+              <p id="restriccion-portadas" class="admin-note">El SVG heredado contiene texto fijo. Para cambiar título o autor, sustituye explícitamente la portada. El visor navega por ID.</p>
               <label for="editor-titulo">Título</label>
               <input id="editor-titulo" v-model="borrador.titulo" :readonly="!puedeEditarTexto" required maxlength="200" aria-describedby="restriccion-portadas" />
               <label for="editor-autor">Autor</label>
@@ -501,6 +591,21 @@ onBeforeUnmount(cancelarPeticiones)
         </form>
       </section>
     </main>
+
+    <!-- BOTÓN FLOTANTE VOLVER ARRIBA -->
+    <button
+      v-if="mostrarBotonArriba"
+      type="button"
+      class="btn-volver-arriba"
+      @click="volverArriba"
+      aria-label="Volver al inicio del panel"
+      title="Volver arriba"
+    >
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="icono-arriba">
+        <polyline points="18 15 12 9 6 15" />
+      </svg>
+      <span>Subir</span>
+    </button>
   </div>
 </template>
 
