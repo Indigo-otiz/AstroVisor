@@ -187,6 +187,7 @@ import { rutaLibro2D } from './js/ruta-libro-2d.js';
   }
 
   const dwell = crearDwell({
+    graciaMs: 750, // ventana de gracia generosa (750 ms) para evitar cancelaciones por micro-temblor
     puedeEnfocar: (t) => !saliendo && userReady && t.el.classList.contains('selectable') &&
       estado.permitido(t.accion, 'mirada') && objetivoEnVista(t),
     onInicio: (t) => {
@@ -473,7 +474,9 @@ import { rutaLibro2D } from './js/ruta-libro-2d.js';
 
   function consultarLibro2D() {
     if (vistaLectura !== 'detalle' || !libroSeleccionado) return;
-    salir(rutaLibro2D(libroSeleccionado));
+    const destino = rutaLibro2D(libroSeleccionado);
+    const queryVisor = destino.includes('?') ? '&origen=visor' : '?origen=visor';
+    salir(destino + queryVisor);
   }
 
   // Audio: el reproductor es el de Luis (narraciones.js). Aquí solo se SOLICITA la acción (Escuchar/Pausar/Reanudar

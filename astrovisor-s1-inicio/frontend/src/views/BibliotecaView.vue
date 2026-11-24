@@ -1,5 +1,5 @@
 <script setup>
-import { computed, watch, nextTick, onBeforeUnmount } from 'vue'
+import { ref, computed, watch, nextTick, onBeforeUnmount } from 'vue'
 import { useRoute } from 'vue-router'
 import { nombresConstelacion, alternativaPortada } from '../services/librosDemoService.js'
 import { useLibros } from '../composables/useLibros.js'
@@ -11,24 +11,104 @@ const { libros, cargando, error, aviso, cargar, cancelar } = useLibros()
 const mostrandoDetalle = computed(() => Boolean(route.params.libroId))
 const libro = computed(() => mostrandoDetalle.value ? libros.value.find((l) => l.id === String(route.params.libroId)) : null)
 const titulo = computed(() => cargando.value ? 'Cargando libros' : error.value ? 'No pudimos consultar los libros' : libro.value?.titulo ?? (nombre.value ? `Libros sobre ${nombre.value}` : 'Biblioteca de las estrellas'))
+
+// Detección de origen: únicamente si proviene explícitamente del visor (?origen=visor)
+// se inicializa en modo oscuro (anti-deslumbramiento). Desde menús o navegador inicia en modo claro.
+const modoOscuro = ref(route.query.origen === 'visor')
+
+watch(() => route.query.origen, (origen) => {
+  modoOscuro.value = origen === 'visor'
+})
+
+watch(modoOscuro, (val) => {
+  if (typeof document !== 'undefined') {
+    document.body.classList.toggle('modo-oscuro-total', val)
+    document.documentElement.classList.toggle('modo-oscuro-total', val)
+  }
+}, { immediate: true })
+
+function alternarModoOscuro() {
+  modoOscuro.value = !modoOscuro.value
+}
 watch(() => [route.params.id, route.params.libroId], () => cargar(id.value), { immediate: true })
 watch([titulo, cargando], async ([valor]) => {
   document.title = `${valor} · AstroVisor`
   await nextTick()
   if (!cargando.value && document.activeElement === document.body) document.querySelector('#contenido h1')?.focus({ preventScroll: true })
 }, { immediate: true })
-onBeforeUnmount(cancelar)
+onBeforeUnmount(() => {
+  cancelar()
+  if (typeof document !== 'undefined') {
+    document.body.classList.remove('modo-oscuro-total')
+    document.documentElement.classList.remove('modo-oscuro-total')
+  }
+})
 
 const rutaConstelacion = computed(() => ({ name: 'constelacion', params: { id: id.value } }))
-const rutaEstanteria = computed(() => ({ name: 'biblioteca', params: { id: id.value } }))
+const rutaEstanteria = computed(() => ({
+  name: 'biblioteca',
+  params: { id: id.value },
+  query: modoOscuro.value ? { origen: 'visor' } : {}
+}))
 </script>
 
 <template>
-  <section class="biblioteca-page">
+  <section class="biblioteca-page" :class="{ 'modo-oscuro': modoOscuro }">
     <p v-if="aviso" class="biblioteca-aviso" role="status">{{ aviso }}</p>
-    <RouterLink class="public-back" :to="nombre ? rutaConstelacion : { name: 'explorar' }">
-      ← Volver {{ nombre ? `a ${nombre}` : 'a las constelaciones' }}
-    </RouterLink>
+    
+    <div class="biblioteca-top-bar">
+      <RouterLink class="public-back" :to="nombre ? (mostrandoDetalle ? rutaEstanteria : rutaConstelacion) : { name: 'explorar' }">
+        ← Volver {{ mostrandoDetalle ? `a la estantería de ${nombre || 'libros'}` : nombre ? `a ${nombre}` : 'a las constelaciones' }}
+      </RouterLink>
+
+      <button
+        type="button"
+        class="biblioteca-theme-toggle"
+        :aria-pressed="modoOscuro"
+        :title="modoOscuro ? 'Cambiar a modo lectura claro' : 'Cambiar a modo nocturno oscuro'"
+        @click="alternarModoOscuro"
+      >
+        <svg
+          v-if="modoOscuro"
+          class="theme-svg"
+          viewBox="0 0 24 24"
+          width="18"
+          height="18"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
+        >
+          <circle cx="12" cy="12" r="5" />
+          <line x1="12" y1="1" x2="12" y2="3" />
+          <line x1="12" y1="21" x2="12" y2="23" />
+          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
+          <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
+          <line x1="1" y1="12" x2="3" y2="12" />
+          <line x1="21" y1="12" x2="23" y2="12" />
+          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
+          <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
+        </svg>
+        <svg
+          v-else
+          class="theme-svg"
+          viewBox="0 0 24 24"
+          width="18"
+          height="18"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
+        >
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+        </svg>
+        <span>{{ modoOscuro ? 'Modo claro' : 'Modo nocturno' }}</span>
+      </button>
+    </div>
 
     <div v-if="cargando" class="public-state" role="status" aria-live="polite">
       <h1 tabindex="-1">Cargando libros…</h1>
@@ -55,14 +135,14 @@ const rutaEstanteria = computed(() => ({ name: 'biblioteca', params: { id: id.va
           <article v-for="item in libros" :key="item.id" class="biblioteca-tarjeta">
             <RouterLink
               class="biblioteca-portada-enlace"
-              :to="{ name: 'libro', params: { id, libroId: item.id } }"
+              :to="{ name: 'libro', params: { id, libroId: item.id }, query: modoOscuro ? { origen: 'visor' } : {} }"
               :aria-label="`Ver información del libro ${item.titulo}`"
             >
               <img :src="item.portadaIlustrativa" :alt="alternativaPortada(item)" width="450" height="640" loading="lazy" />
             </RouterLink>
             <h2>{{ item.titulo }}</h2>
             <p class="biblioteca-autor">{{ item.autor }}</p>
-            <RouterLink class="public-button biblioteca-boton" :to="{ name: 'libro', params: { id, libroId: item.id } }">
+            <RouterLink class="public-button biblioteca-boton" :to="{ name: 'libro', params: { id, libroId: item.id }, query: modoOscuro ? { origen: 'visor' } : {} }">
               Ver información del libro
             </RouterLink>
           </article>
@@ -151,5 +231,120 @@ const rutaEstanteria = computed(() => ({ name: 'biblioteca', params: { id: id.va
   .biblioteca-tarjeta { padding: 1.25rem .9rem; }
   .biblioteca-portada-enlace { max-width: 220px; }
   .biblioteca-detalle-portada { width: min(72%, 280px); }
+}
+
+/* Barra superior con selector de modo claro/oscuro */
+.biblioteca-top-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 1.2rem;
+}
+.biblioteca-top-bar .public-back {
+  margin: 0;
+}
+.biblioteca-theme-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  border-radius: 9999px;
+  font-size: 0.92rem;
+  font-weight: 700;
+  cursor: pointer;
+  border: 2px solid #b9a487;
+  background: #fff8e7;
+  color: #5c4400;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+  transition: all 0.2s ease;
+}
+.biblioteca-theme-toggle .theme-svg {
+  display: block;
+  flex-shrink: 0;
+}
+.biblioteca-theme-toggle:hover {
+  background: #f5ecd5;
+  border-color: #8c6d3b;
+  transform: translateY(-1px);
+}
+
+/* === MODO OSCURO INTEGRADO (Nocturno / Anti-Deslumbramiento) === */
+.biblioteca-page.modo-oscuro {
+  color: #f1f5f9;
+}
+.biblioteca-page.modo-oscuro h1,
+.biblioteca-page.modo-oscuro .biblioteca-intro h1 {
+  color: #f8fafc;
+}
+.biblioteca-page.modo-oscuro .biblioteca-eyebrow {
+  color: #f5b301;
+}
+.biblioteca-page.modo-oscuro .biblioteca-intro p:last-child {
+  color: #94a3b8;
+}
+.biblioteca-page.modo-oscuro .biblioteca-theme-toggle {
+  background: #0f1a36;
+  border-color: #38bdf8;
+  color: #bae6fd;
+  box-shadow: 0 0 12px rgba(56, 189, 248, 0.25);
+}
+.biblioteca-page.modo-oscuro .biblioteca-theme-toggle:hover {
+  background: #182852;
+  border-color: #7dd3fc;
+}
+.biblioteca-page.modo-oscuro .biblioteca-aviso {
+  background: #0f1c3d;
+  color: #dbeafe;
+  border-color: #3b82f6;
+}
+.biblioteca-page.modo-oscuro .biblioteca-estanteria {
+  background: #0b1530;
+  border-color: #1e3a6d;
+  box-shadow: inset 0 -15px #070d1e, 0 8px 24px rgba(0, 0, 0, 0.45);
+}
+.biblioteca-page.modo-oscuro .biblioteca-tarjeta {
+  background: #111d3d;
+  border-bottom-color: #233e75;
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.55);
+}
+.biblioteca-page.modo-oscuro .biblioteca-tarjeta h2 {
+  color: #f8fafc;
+}
+.biblioteca-page.modo-oscuro .biblioteca-autor {
+  color: #94a3b8;
+}
+.biblioteca-page.modo-oscuro .biblioteca-buscar {
+  background: #0d1733;
+  border-color: #1e3a6d;
+  color: #cbd5e1;
+}
+.biblioteca-page.modo-oscuro .biblioteca-buscar h2 {
+  color: #f8fafc;
+}
+.biblioteca-page.modo-oscuro .biblioteca-buscar p {
+  color: #cbd5e1;
+}
+.biblioteca-page.modo-oscuro .biblioteca-buscar strong {
+  color: #f8fafc;
+}
+.biblioteca-page.modo-oscuro .biblioteca-marc summary {
+  color: #38bdf8;
+}
+.biblioteca-page.modo-oscuro .biblioteca-otro {
+  color: #38bdf8;
+}
+.biblioteca-page.modo-oscuro .public-back {
+  color: #38bdf8;
+}
+.biblioteca-page.modo-oscuro .biblioteca-detalle-portada figcaption {
+  color: #94a3b8;
+}
+.biblioteca-page.modo-oscuro .biblioteca-detalle-info p {
+  color: #e2e8f0;
+}
+.biblioteca-page.modo-oscuro .biblioteca-detalle-info strong {
+  color: #f8fafc;
 }
 </style>

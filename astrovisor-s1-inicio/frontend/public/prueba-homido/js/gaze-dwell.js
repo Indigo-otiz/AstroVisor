@@ -3,7 +3,7 @@
    (p. ej. punto y aro colisionador) sin reiniciar la carga. */
 
 export const DWELL_MS = 3000 // 3 s sin prisa, para adultos mayores
-export const GRACIA_MS = 280 // amortigua parpadeos y micro-temblores de cabeza
+export const GRACIA_MS = 280 // constante base de especificación (prueba.js usa graciaMs: 750 para tolerancia en visor)
 
 export function etapaDe(progreso) {
   if (progreso >= 1) return '100%'
