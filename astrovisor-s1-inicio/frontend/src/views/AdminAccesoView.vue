@@ -45,159 +45,96 @@ async function handleSubmit() {
 
 <template>
   <div class="login-page-container">
-    <!-- Mitad Izquierda: Fondo Azul Noche con Ilustración -->
-    <div class="login-hero-side">
-      <svg class="sky-background-svg" viewBox="0 0 600 700" preserveAspectRatio="none" aria-hidden="true">
-        <circle cx="50" cy="80" r="1.5" fill="#ffffff" opacity="0.4" />
-        <circle cx="120" cy="200" r="2" fill="#ffffff" opacity="0.6" />
-        <circle cx="280" cy="110" r="1.5" fill="#ffffff" opacity="0.5" />
-        <circle cx="450" cy="90" r="2" fill="#ffffff" opacity="0.7" />
-        <circle cx="520" cy="240" r="1.5" fill="#ffffff" opacity="0.3" />
-        <circle cx="220" cy="350" r="1" fill="#ffffff" opacity="0.4" />
-        <circle cx="380" cy="480" r="1.5" fill="#ffffff" opacity="0.5" />
+    <!-- Fondo atmosférico difuminado -->
+    <div class="login-bg-image" aria-hidden="true"></div>
+    <div class="login-bg-overlay" aria-hidden="true"></div>
 
-        <!-- Constelación trazada -->
-        <g stroke="#ffffff" stroke-width="1.2" opacity="0.35" fill="none">
-          <polyline points="380,180 430,120 480,150 530,110 560,140" />
-          <circle cx="380" cy="180" r="3.5" fill="#ffffff" />
-          <circle cx="430" cy="120" r="3.5" fill="#ffffff" />
-          <circle cx="480" cy="150" r="3.5" fill="#ffffff" />
-          <circle cx="530" cy="110" r="3.5" fill="#ffffff" />
-          <circle cx="560" cy="140" r="3.5" fill="#ffffff" />
-        </g>
+    <!-- Tarjeta compacta centrada -->
+    <main class="login-card-floating">
+      <div class="login-brand-mini">
+        <span class="brand-name-mini">
+          <svg class="star-icon-mini" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M12 2l2.4 7.4h7.6l-6.2 4.5 2.4 7.4-6.2-4.5-6.2 4.5 2.4-7.4-6.2-4.5h7.6z" fill="#caa065" />
+          </svg>
+          AstroVisor
+        </span>
+        <span class="admin-pill-mini">Administración</span>
+      </div>
 
-        <!-- Planeta con anillos -->
-        <ellipse cx="490" cy="620" rx="140" ry="40" fill="none" stroke="#ffffff" stroke-width="1" opacity="0.2" transform="rotate(-20 490 620)" />
-        <circle cx="490" cy="620" r="48" fill="#5a5e78" opacity="0.8" />
-        <ellipse cx="490" cy="620" rx="85" ry="22" fill="none" stroke="#c0c4dc" stroke-width="3" opacity="0.6" transform="rotate(-20 490 620)" />
-      </svg>
+      <h1 class="card-title">Acceso del personal</h1>
+      <p class="card-subtitle">Personal autorizado de la biblioteca.</p>
 
-      <!-- Tarjeta informativa con borde amarillo -->
-      <div class="brand-hero-card">
-        <div class="brand-badge-row">
-          <span class="brand-name">
-            <svg class="star-icon" viewBox="0 0 24 24" fill="none" stroke="#f6ad55" stroke-width="2.5">
-              <path d="M12 2l2.4 7.4h7.6l-6.2 4.5 2.4 7.4-6.2-4.5-6.2 4.5 2.4-7.4-6.2-4.5h7.6z" fill="#f6ad55" />
-            </svg>
-            AstroVisor
-          </span>
-          <span class="admin-pill">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="lock-mini">
-              <rect x="5" y="11" width="14" height="10" rx="2" />
-              <path d="M8 11V7a4 4 0 0 1 8 0v4" />
-            </svg>
-            Administración
-          </span>
-        </div>
-
-        <div class="hero-callout">
-          <div class="yellow-accent-bar"></div>
-          <div>
-            <h1 class="hero-title">Panel del personal</h1>
-            <p class="hero-subtitle">Prepara el recorrido de AstroVisor para el Visor VR.</p>
-          </div>
+      <div v-if="isAuthenticated" class="active-session-box">
+        <p>Sesión activa: <strong>{{ userDisplayName }}</strong></p>
+        <div class="active-session-actions">
+          <RouterLink to="/admin" class="btn-submit">Ir al panel</RouterLink>
+          <button type="button" class="btn-demo-access" @click="handleLogout">
+            Cerrar sesión
+          </button>
         </div>
       </div>
-    </div>
 
-    <!-- Mitad Derecha: Fondo Crema con Tarjeta de Acceso -->
-    <div class="login-form-side">
-      <div class="login-card-floating">
-        <div class="lock-icon-circle">
-          <svg viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.4" class="lock-svg">
-            <rect x="5" y="11" width="14" height="10" rx="2" />
-            <path d="M8 11V7a4 4 0 0 1 8 0v4" />
-          </svg>
+      <form v-else @submit.prevent="handleSubmit" class="auth-form" novalidate>
+        <p v-if="hayBorradorPendiente" class="env-notice" role="status">
+          Tu sesión terminó. Hay un borrador en memoria de esta pestaña; inicia sesión con la misma cuenta para recuperarlo.
+        </p>
+        <div v-if="errorMessage" class="error-banner" role="alert">
+          {{ errorMessage }}
         </div>
 
-        <h2 class="card-title">Acceso del personal</h2>
-        <p class="card-subtitle">Solo para personal autorizado de la biblioteca.</p>
+        <div class="field-group">
+          <label for="admin-user">Usuario</label>
+          <input
+            id="admin-user"
+            v-model="username"
+            type="text"
+            required
+            autocomplete="username"
+            placeholder="Usuario"
+            :disabled="isSubmitting"
+            class="styled-input"
+          />
+        </div>
 
-
-        <div v-if="isAuthenticated" class="active-session-box">
-          <p>Sesión activa como: <strong>{{ userDisplayName }}</strong></p>
-          <div style="display: flex; flex-direction: column; gap: 0.6rem; margin-top: 1.2rem;">
-            <RouterLink to="/admin" class="btn-submit">Ir al Panel</RouterLink>
-            <button type="button" class="btn-action outline" @click="handleLogout">
-              Cerrar sesión
+        <div class="field-group">
+          <label for="admin-password">Contraseña</label>
+          <div class="password-wrapper">
+            <input
+              id="admin-password"
+              v-model="password"
+              :type="showPassword ? 'text' : 'password'"
+              required
+              autocomplete="current-password"
+              placeholder="••••••••"
+              :disabled="isSubmitting"
+              class="styled-input with-toggle"
+            />
+            <button
+              type="button"
+              class="toggle-pass-btn"
+              @click="showPassword = !showPassword"
+            >
+              {{ showPassword ? 'Ocultar' : 'Mostrar' }}
             </button>
           </div>
         </div>
 
-        <form v-else @submit.prevent="handleSubmit" class="auth-form" novalidate>
-          <p v-if="hayBorradorPendiente" role="status">Tu sesión terminó. Hay un borrador solo en memoria de esta pestaña. Inicia sesión con la misma cuenta para recuperarlo; no recargues ni cierres la pestaña.</p>
-          <div v-if="errorMessage" class="error-banner" role="alert">
-            {{ errorMessage }}
-          </div>
+        <button
+          type="submit"
+          class="btn-submit"
+          :disabled="isSubmitting || loading"
+        >
+          <span v-if="isSubmitting">Verificando...</span>
+          <span v-else>Entrar</span>
+        </button>
+      </form>
 
-          <div class="field-group">
-            <label for="admin-user">Usuario</label>
-            <input
-              id="admin-user"
-              v-model="username"
-              type="text"
-              required
-              autocomplete="username"
-              placeholder="Usuario configurado"
-              :disabled="isSubmitting"
-              class="styled-input"
-            />
-          </div>
-
-          <div class="field-group">
-            <label for="admin-password">Contraseña</label>
-            <div class="password-wrapper">
-              <input
-                id="admin-password"
-                v-model="password"
-                :type="showPassword ? 'text' : 'password'"
-                required
-                autocomplete="current-password"
-                placeholder="••••••••"
-                :disabled="isSubmitting"
-                class="styled-input with-toggle"
-              />
-              <button
-                type="button"
-                class="toggle-pass-btn"
-                @click="showPassword = !showPassword"
-              >
-                {{ showPassword ? 'Ocultar' : 'Mostrar contraseña' }}
-              </button>
-            </div>
-          </div>
-
-          <button
-            type="submit"
-            class="btn-submit"
-            :disabled="isSubmitting || loading"
-          >
-            <span v-if="isSubmitting">Verificando...</span>
-            <span v-else>Entrar</span>
-          </button>
-
-          <div class="return-link-container">
-            <RouterLink to="/" class="return-link">Volver al sitio público</RouterLink>
-          </div>
-        </form>
-
-        <div class="demo-access-divider">
-          <span>o bien</span>
-        </div>
-
-        <div class="demo-access-card">
-          <RouterLink :to="{ path: '/admin', query: { modo: 'demo' } }" class="btn-demo-access">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="demo-eye-icon" aria-hidden="true">
-              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
-              <circle cx="12" cy="12" r="3" />
-            </svg>
-            <span>Entrar en modo demostración</span>
-          </RouterLink>
-          <p class="demo-access-note">
-            Para evaluadores y docentes: explora las herramientas del panel de administración en la nube sin necesidad de servidor local ni credenciales.
-          </p>
-        </div>
+      <div class="login-card-footer">
+        <RouterLink :to="{ path: '/admin', query: { modo: 'demo' } }" class="btn-demo-access" title="Explorar el panel en modo demostración">
+          Modo demo
+        </RouterLink>
+        <RouterLink to="/" class="return-link">Volver al inicio</RouterLink>
       </div>
-    </div>
+    </main>
   </div>
 </template>

@@ -45,7 +45,12 @@ export function useAuth() {
         method: 'POST', headers: { 'Content-Type': 'application/json' }, credentials: 'same-origin',
         body: JSON.stringify({ usuario: usuario.trim(), contrasena: password }),
       })
-      const data = await respuesta.json()
+      let data
+      try {
+        data = await respuesta.json()
+      } catch {
+        throw new Error('No fue posible conectar con el servidor de acceso. Verifica que la API esté activa.')
+      }
       if (!respuesta.ok || !data.ok) throw new Error(data.error || 'Usuario o contraseña incorrectos.')
       if (typeof data.token !== 'string' || !/^[a-f0-9]{64}$/.test(data.token) || !usuarioValido(data.usuario)) throw new Error('Respuesta de acceso inválida')
       token.value = data.token

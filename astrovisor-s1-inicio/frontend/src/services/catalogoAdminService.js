@@ -25,7 +25,9 @@ async function solicitar(ruta, { token, signal, etag, datos, method = 'GET' }) {
   if (!respuesta.ok) throw error(respuesta.status)
   let cuerpo
   try { cuerpo = await respuesta.json() } catch { throw error(0) }
-  const revision = cuerpo?.revision, nueva = respuesta.headers.get('etag')
+  const revision = cuerpo?.revision
+  const rawEtag = respuesta.headers.get('etag')
+  const nueva = rawEtag ? rawEtag.replace(/^W\//, '') : ''
   if (!Number.isSafeInteger(revision) || revision < 1 || nueva !== `"catalogo-${revision}"`) throw error(0, 'No pudimos validar la revisión recibida. Consulta de nuevo el catálogo antes de guardar.')
   return { cuerpo, etag: nueva }
 }
