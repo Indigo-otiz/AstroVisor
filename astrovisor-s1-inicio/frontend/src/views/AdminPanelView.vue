@@ -12,6 +12,8 @@ const { userDisplayName, username, signOut, token, invalidarSesion } = useAuth()
 const esModoDemo = computed(() => route.query.modo === 'demo' || !token.value)
 
 const tabActiva = ref('libros') // 'libros' | 'constelaciones'
+const busquedaLibro = ref('')
+const busquedaConstelacion = ref('')
 
 const { catalogo, seleccion, borrador, cargando, guardando, error, mensaje, conflicto, necesitaRecarga,
   libroActual, recorridoActual, cargar, seleccionarLibro, seleccionarRecorrido, cancelarEdicion, guardar, cancelarPeticiones,
@@ -36,6 +38,31 @@ async function handleLogout() {
 
 const nombreRecorrido = (id) => catalogo.value?.recorridos.find((r) => r.id === id)?.titulo ?? id
 const constelacionesLibro = (id) => catalogo.value?.recorridos.filter((r) => r.libroRefs.some((v) => v.libroId === id)) ?? []
+
+const librosFiltrados = computed(() => {
+  const lista = catalogo.value?.libros || []
+  const q = busquedaLibro.value.trim().toLowerCase()
+  if (!q) return lista
+  return lista.filter((l) => {
+    const titulo = (l.titulo || '').toLowerCase()
+    const autor = (l.autor || '').toLowerCase()
+    const id = (l.id || '').toLowerCase()
+    const constelaciones = constelacionesLibro(l.id).map((r) => r.titulo.toLowerCase()).join(' ')
+    return titulo.includes(q) || autor.includes(q) || id.includes(q) || constelaciones.includes(q)
+  })
+})
+
+const constelacionesFiltradas = computed(() => {
+  const lista = catalogo.value?.recorridos || []
+  const q = busquedaConstelacion.value.trim().toLowerCase()
+  if (!q) return lista
+  return lista.filter((r) => {
+    const titulo = (r.titulo || '').toLowerCase()
+    const resumen = (r.resumen || '').toLowerCase()
+    const id = (r.id || '').toLowerCase()
+    return titulo.includes(q) || resumen.includes(q) || id.includes(q)
+  })
+})
 
 async function guardarYCentrar() {
   await guardar(); await nextTick()
@@ -130,7 +157,7 @@ onBeforeUnmount(() => {
       </div>
 
       <nav class="topbar-right">
-        <RouterLink to="/explorar" class="btn-preview-public" title="Ver la vista pública de constelaciones">
+        <RouterLink to="/explorar" class="btn-preview-public" title="Ver catálogo público de constelaciones">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="btn-icon-sm">
             <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
             <circle cx="12" cy="12" r="3" />
@@ -164,35 +191,45 @@ onBeforeUnmount(() => {
       </div>
     </aside>
 
-    <!-- BANNER HERO AZUL NOCHE CÓSMICO -->
+    <!-- BANNER HERO CÓSMICO CON PROFUNDIDAD Y ACENTOS CÁLIDOS -->
     <section class="admin-hero-banner">
-      <div class="banner-decor-glow" aria-hidden="true"></div>
+      <div class="banner-nebula-glow" aria-hidden="true"></div>
+      <div class="banner-warm-accent" aria-hidden="true"></div>
       <svg class="banner-decor-svg" viewBox="0 0 1100 200" preserveAspectRatio="none" aria-hidden="true">
-        <circle cx="180" cy="40" r="1.5" fill="#bae6fd" opacity="0.6" />
-        <circle cx="450" cy="110" r="1.5" fill="#bae6fd" opacity="0.4" />
-        <circle cx="730" cy="50" r="2" fill="#bae6fd" opacity="0.65" />
-        <circle cx="890" cy="130" r="1.5" fill="#bae6fd" opacity="0.5" />
-        <circle cx="1030" cy="45" r="1.5" fill="#bae6fd" opacity="0.4" />
-        <g stroke="#38bdf8" stroke-width="1.2" opacity="0.25" fill="none">
-          <polyline points="930,95 970,65 1010,85 1050,50" />
-          <circle cx="930" cy="95" r="3" fill="#38bdf8" />
-          <circle cx="970" cy="65" r="3" fill="#38bdf8" />
-          <circle cx="1010" cy="85" r="3" fill="#38bdf8" />
-          <circle cx="1050" cy="50" r="3" fill="#38bdf8" />
+        <circle cx="160" cy="45" r="1.5" fill="#bae6fd" opacity="0.6" />
+        <circle cx="430" cy="120" r="1.5" fill="#bae6fd" opacity="0.4" />
+        <circle cx="710" cy="40" r="2" fill="#bae6fd" opacity="0.7" />
+        <circle cx="880" cy="130" r="1.5" fill="#bae6fd" opacity="0.5" />
+        <circle cx="1020" cy="50" r="1.5" fill="#bae6fd" opacity="0.4" />
+        <g stroke="#38bdf8" stroke-width="1.2" opacity="0.3" fill="none">
+          <polyline points="910,105 950,70 990,90 1040,55" />
+          <circle cx="910" cy="105" r="3" fill="#38bdf8" />
+          <circle cx="950" cy="70" r="3" fill="#38bdf8" />
+          <circle cx="990" cy="90" r="3" fill="#38bdf8" />
+          <circle cx="1040" cy="55" r="3" fill="#38bdf8" />
         </g>
       </svg>
 
       <div class="banner-content container">
+        <div class="hero-eyebrow-pill">
+          <span class="eyebrow-dot"></span>
+          <span>Biblioteca Central Estatal Solón Argüello</span>
+        </div>
         <h1 class="welcome-heading">
           Gestión de Biblioteca y Constelaciones
         </h1>
-        <p class="welcome-subheading">
-          Administrador: <strong>{{ esModoDemo ? 'Evaluador (Demostración)' : (userDisplayName || username || 'Personal Autorizado') }}</strong>
-        </p>
+        <div class="hero-user-profile-strip">
+          <span class="user-pill-tag">Sesión activa</span>
+          <span class="user-pill-name">{{ esModoDemo ? 'Evaluador (Demostración)' : (userDisplayName || username || 'Administrador') }}</span>
+          <span class="user-pill-status">
+            <span class="status-live-dot"></span>
+            En línea
+          </span>
+        </div>
       </div>
     </section>
 
-    <!-- BARRA DE PESTAÑAS Y ACCIÓN PRINCIPAL (CAMBIO DE PANTALLA, NO SCROLL) -->
+    <!-- BARRA DE PESTAÑAS (CAMBIO DE PANTALLA INMEDIATO) -->
     <nav class="admin-quick-nav" aria-label="Vistas del panel de administración">
       <div class="quick-nav-inner container">
         <div class="view-tabs-group" role="tablist">
@@ -232,16 +269,6 @@ onBeforeUnmount(() => {
             <span v-if="catalogo?.recorridos" class="tab-count-badge">{{ catalogo.recorridos.length }}</span>
           </button>
         </div>
-
-        <button
-          type="button"
-          class="btn-primary-action"
-          :disabled="!catalogo || cargando || guardando || Boolean(borrador) || necesitaRecarga"
-          @click="registrarLibroDirecto"
-          title="Abrir formulario para registrar un nuevo libro"
-        >
-          <span>Registrar libro</span>
-        </button>
       </div>
     </nav>
 
@@ -269,24 +296,66 @@ onBeforeUnmount(() => {
         <div class="screen-header">
           <div class="screen-title-group">
             <h2 id="libros-screen-title" class="screen-main-title">Editar los libros</h2>
-            <span class="badge-screen-pill">Fichas documentales</span>
+            <span class="badge-screen-pill">{{ catalogo?.libros?.length || 0 }} libros en acervo</span>
           </div>
-          <button
-            type="button"
-            class="btn-secondary-refresh"
-            @click="cargar()"
-            :disabled="cargando || guardando"
-          >
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="refresh-icon-mini">
-              <path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.2"/>
-            </svg>
-            <span>{{ cargando ? 'Cargando...' : borrador ? 'Recargar y descartar' : 'Actualizar catálogo' }}</span>
-          </button>
         </div>
 
         <p class="section-guidance-text">
           Selecciona un libro para modificar sus datos bibliográficos, portada o motivos de lectura vinculados a cada constelación.
         </p>
+
+        <!-- BARRA DE BÚSQUEDA Y ACCIONES DE LIBROS (INCLUYE REGISTRAR LIBRO AQUÍ) -->
+        <div class="screen-toolbar">
+          <div class="search-box-wrapper">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="search-icon-svg" aria-hidden="true">
+              <circle cx="11" cy="11" r="8" />
+              <line x1="21" y1="21" x2="16.65" y2="16.65" />
+            </svg>
+            <input
+              v-model="busquedaLibro"
+              type="search"
+              placeholder="Buscar libro por título, autor o constelación…"
+              class="search-text-input"
+              aria-label="Buscar libro"
+            />
+            <button
+              v-if="busquedaLibro"
+              type="button"
+              class="btn-clear-search"
+              @click="busquedaLibro = ''"
+              title="Borrar búsqueda"
+            >
+              ✕
+            </button>
+          </div>
+
+          <div class="toolbar-actions-group">
+            <button
+              type="button"
+              class="btn-primary-action"
+              :disabled="!catalogo || cargando || guardando || Boolean(borrador) || necesitaRecarga"
+              @click="registrarLibroDirecto"
+              title="Abrir formulario para registrar un nuevo libro"
+            >
+              <span>Registrar libro</span>
+            </button>
+            <button
+              type="button"
+              class="btn-secondary-refresh"
+              @click="cargar()"
+              :disabled="cargando || guardando"
+            >
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="refresh-icon-mini">
+                <path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.2"/>
+              </svg>
+              <span>{{ cargando ? 'Cargando...' : borrador ? 'Recargar y descartar' : 'Actualizar' }}</span>
+            </button>
+          </div>
+        </div>
+
+        <div v-if="busquedaLibro" class="search-results-indicator">
+          Mostrando {{ librosFiltrados.length }} de {{ catalogo?.libros?.length || 0 }} libros
+        </div>
 
         <div v-if="hayBorradorPendiente" role="status" class="draft-notice-card">
           <p>Hay una edición pendiente de la sesión anterior en la memoria de esta pestaña.</p>
@@ -308,7 +377,7 @@ onBeforeUnmount(() => {
         >
           <div class="editor-card-header">
             <h3 id="editor-heading" tabindex="-1">
-              {{ seleccion.tipo === 'nuevo' ? 'Registrar nuevo libro' : `Editar libro: ${libroActual?.titulo || ''}` }}
+              {{ seleccion.tipo === 'nuevo' ? 'Registrar nuevo libro' : `Editar: ${libroActual?.titulo || ''}` }}
             </h3>
             <button type="button" class="btn-close-editor" @click="cancelarYCentrar" title="Cerrar edición">✕</button>
           </div>
@@ -448,11 +517,11 @@ onBeforeUnmount(() => {
           </fieldset>
         </form>
 
-        <!-- CUADRÍCULA DE TARJETAS DE LIBROS -->
-        <div v-if="catalogo?.libros.length" class="cards-grid-admin">
-          <article v-for="libro in catalogo.libros" :key="libro.id" class="card-item-admin">
+        <!-- CUADRÍCULA DE TARJETAS DE LIBROS (18 LIBROS COMPLETOS) -->
+        <div v-if="librosFiltrados.length" class="cards-grid-admin">
+          <article v-for="libro in librosFiltrados" :key="libro.id" class="card-item-admin">
             <div class="card-book-media">
-              <img class="book-cover-img" :src="libro.portadaIlustrativa" :alt="alternativaPortada(libro)" width="120" height="170" />
+              <img class="book-cover-img" :src="libro.portadaIlustrativa" :alt="alternativaPortada(libro)" width="120" height="170" loading="lazy" />
             </div>
             <div class="card-body-admin">
               <div class="card-id-pill">{{ libro.id }}</div>
@@ -472,7 +541,7 @@ onBeforeUnmount(() => {
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="edit-btn-icon">
                     <path d="M12 20h9M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
                   </svg>
-                  <span>Editar libro</span>
+                  <span>Editar</span>
                 </button>
               </div>
             </div>
@@ -480,7 +549,8 @@ onBeforeUnmount(() => {
         </div>
 
         <div v-else-if="catalogo && !cargando" class="empty-state-card">
-          <p>No hay libros registrados en el catálogo consultado.</p>
+          <p v-if="busquedaLibro">No se encontraron libros que coincidan con «{{ busquedaLibro }}».</p>
+          <p v-else>No hay libros registrados en el catálogo consultado.</p>
         </div>
       </section>
 
@@ -495,24 +565,57 @@ onBeforeUnmount(() => {
         <div class="screen-header">
           <div class="screen-title-group">
             <h2 id="constelaciones-screen-title" class="screen-main-title">Constelaciones</h2>
-            <span class="badge-screen-pill">Relatos y geometría celeste</span>
+            <span class="badge-screen-pill">{{ catalogo?.recorridos?.length || 0 }} figuras estelares</span>
           </div>
-          <button
-            type="button"
-            class="btn-secondary-refresh"
-            @click="cargar()"
-            :disabled="cargando || guardando"
-          >
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="refresh-icon-mini">
-              <path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.2"/>
-            </svg>
-            <span>{{ cargando ? 'Cargando...' : borrador ? 'Recargar y descartar' : 'Actualizar catálogo' }}</span>
-          </button>
         </div>
 
         <p class="section-guidance-text">
           Edita los textos de ayuda, descripción y método de reconocimiento de cada constelación visible en las experiencias 2D y 3D.
         </p>
+
+        <!-- BARRA DE BÚSQUEDA Y ACCIONES DE CONSTELACIONES -->
+        <div class="screen-toolbar">
+          <div class="search-box-wrapper">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="search-icon-svg" aria-hidden="true">
+              <circle cx="11" cy="11" r="8" />
+              <line x1="21" y1="21" x2="16.65" y2="16.65" />
+            </svg>
+            <input
+              v-model="busquedaConstelacion"
+              type="search"
+              placeholder="Buscar constelación por nombre o descripción…"
+              class="search-text-input"
+              aria-label="Buscar constelación"
+            />
+            <button
+              v-if="busquedaConstelacion"
+              type="button"
+              class="btn-clear-search"
+              @click="busquedaConstelacion = ''"
+              title="Borrar búsqueda"
+            >
+              ✕
+            </button>
+          </div>
+
+          <div class="toolbar-actions-group">
+            <button
+              type="button"
+              class="btn-secondary-refresh"
+              @click="cargar()"
+              :disabled="cargando || guardando"
+            >
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="refresh-icon-mini">
+                <path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.2"/>
+              </svg>
+              <span>{{ cargando ? 'Cargando...' : borrador ? 'Recargar y descartar' : 'Actualizar' }}</span>
+            </button>
+          </div>
+        </div>
+
+        <div v-if="busquedaConstelacion" class="search-results-indicator">
+          Mostrando {{ constelacionesFiltradas.length }} de {{ catalogo?.recorridos?.length || 0 }} constelaciones
+        </div>
 
         <!-- FORMULARIO DE EDICIÓN DE CONSTELACIÓN -->
         <form
@@ -555,10 +658,10 @@ onBeforeUnmount(() => {
           </fieldset>
         </form>
 
-        <!-- CUADRÍCULA DE TARJETAS DE CONSTELACIONES (MISMO DISEÑO RICO QUE LIBROS) -->
-        <div v-if="catalogo?.recorridos.length" class="cards-grid-admin">
-          <article v-for="r in catalogo.recorridos" :key="r.id" class="card-item-admin constellation-card-item">
-            <!-- Ventana celestial con arte estelar que ve el cliente -->
+        <!-- CUADRÍCULA DE TARJETAS DE CONSTELACIONES CON ARTE CELESTE RESPLANDECIENTE -->
+        <div v-if="constelacionesFiltradas.length" class="cards-grid-admin">
+          <article v-for="r in constelacionesFiltradas" :key="r.id" class="card-item-admin constellation-card-item">
+            <!-- Ventana celestial idéntica a la vista pública del cliente -->
             <div class="card-constellation-media">
               <ConstellationArt :id="r.id" />
             </div>
@@ -582,7 +685,7 @@ onBeforeUnmount(() => {
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="edit-btn-icon">
                     <path d="M12 20h9M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
                   </svg>
-                  <span>Editar constelación</span>
+                  <span>Editar</span>
                 </button>
               </div>
             </div>
@@ -590,7 +693,8 @@ onBeforeUnmount(() => {
         </div>
 
         <div v-else-if="catalogo && !cargando" class="empty-state-card">
-          <p>No hay constelaciones registradas en el catálogo consultado.</p>
+          <p v-if="busquedaConstelacion">No se encontraron constelaciones que coincidan con «{{ busquedaConstelacion }}».</p>
+          <p v-else>No hay constelaciones registradas en el catálogo consultado.</p>
         </div>
       </section>
     </main>
@@ -613,7 +717,7 @@ onBeforeUnmount(() => {
 </template>
 
 <style scoped>
-/* ESTILOS PROPIOS DE LA VISTA DE ADMINISTRACIÓN REDISEÑADA */
+/* CONTENEDOR GENERAL */
 .admin-dashboard-wrapper {
   background: #f4f6fb;
   min-height: 100vh;
@@ -628,9 +732,9 @@ onBeforeUnmount(() => {
   justify-content: space-between;
   align-items: center;
   padding: 0.85rem 2rem;
-  background: #0b152b;
+  background: #081124;
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
 }
 
 .topbar-left {
@@ -659,7 +763,7 @@ onBeforeUnmount(() => {
   align-items: center;
   gap: 0.35rem;
   background: rgba(56, 189, 248, 0.12);
-  border: 1px solid rgba(56, 189, 248, 0.3);
+  border: 1px solid rgba(56, 189, 248, 0.32);
   color: #7dd3fc;
   font-size: 0.76rem;
   font-weight: 650;
@@ -730,23 +834,33 @@ onBeforeUnmount(() => {
   height: 15px;
 }
 
-/* HERO BANNER AZUL CÓSMICO */
+/* HERO BANNER AZUL CÓSMICO PROFUNDO CON DESTELLOS Y CALIDEZ */
 .admin-hero-banner {
-  background: linear-gradient(180deg, #0b152b 0%, #0d1e3d 100%);
+  background: linear-gradient(135deg, #070d1e 0%, #0d1a38 60%, #112246 100%);
   color: #ffffff;
-  padding: 2.2rem 0 2.5rem;
+  padding: 2.4rem 0 2.8rem;
   position: relative;
   overflow: hidden;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 
-.banner-decor-glow {
+.banner-nebula-glow {
   position: absolute;
-  top: -50px;
-  right: 15%;
-  width: 320px;
-  height: 200px;
-  background: radial-gradient(circle, rgba(56, 189, 248, 0.15) 0%, transparent 70%);
+  top: -40px;
+  right: 12%;
+  width: 360px;
+  height: 220px;
+  background: radial-gradient(circle, rgba(56, 189, 248, 0.18) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.banner-warm-accent {
+  position: absolute;
+  bottom: -30px;
+  left: 8%;
+  width: 280px;
+  height: 160px;
+  background: radial-gradient(circle, rgba(202, 160, 101, 0.12) 0%, transparent 70%);
   pointer-events: none;
 }
 
@@ -766,23 +880,80 @@ onBeforeUnmount(() => {
   padding-inline: 1.5rem;
 }
 
+.hero-eyebrow-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  color: #bae6fd;
+  font-size: 0.78rem;
+  font-weight: 600;
+  padding: 0.22rem 0.7rem;
+  border-radius: 9999px;
+  margin-bottom: 0.6rem;
+}
+
+.eyebrow-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #38bdf8;
+  box-shadow: 0 0 6px #38bdf8;
+}
+
 .welcome-heading {
   font-family: Georgia, serif;
-  font-size: 1.95rem;
+  font-size: 2.1rem;
   font-weight: 700;
-  margin: 0 0 0.35rem;
+  margin: 0 0 0.8rem;
   color: #ffffff;
-  letter-spacing: -0.01em;
+  letter-spacing: -0.015em;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
 }
 
-.welcome-subheading {
+.hero-user-profile-strip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.65rem;
+  background: rgba(15, 23, 42, 0.55);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  padding: 0.3rem 0.8rem;
+  border-radius: 9999px;
+}
+
+.user-pill-tag {
+  font-size: 0.74rem;
   color: #94a3b8;
-  font-size: 0.95rem;
-  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: 700;
 }
 
-.welcome-subheading strong {
-  color: #e2e8f0;
+.user-pill-name {
+  font-size: 0.86rem;
+  color: #f1f5f9;
+  font-weight: 700;
+}
+
+.user-pill-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.74rem;
+  color: #86efac;
+  font-weight: 600;
+  border-left: 1px solid rgba(255, 255, 255, 0.15);
+  padding-left: 0.6rem;
+}
+
+.status-live-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #22c55e;
+  box-shadow: 0 0 6px #22c55e;
 }
 
 /* SUBNAV DE PESTAÑAS (PANTALLAS) */
@@ -792,7 +963,7 @@ onBeforeUnmount(() => {
   z-index: 80;
   background: #ffffff;
   border-bottom: 1px solid #e2e8f0;
-  box-shadow: 0 4px 14px rgba(11, 21, 43, 0.06);
+  box-shadow: 0 4px 14px rgba(11, 21, 43, 0.05);
   padding: 0.65rem 0;
 }
 
@@ -802,9 +973,7 @@ onBeforeUnmount(() => {
   padding-inline: 1.5rem;
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-  flex-wrap: wrap;
+  justify-content: flex-start;
 }
 
 .view-tabs-group {
@@ -821,7 +990,7 @@ onBeforeUnmount(() => {
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  padding: 0.45rem 1.05rem;
+  padding: 0.45rem 1.15rem;
   font-family: inherit;
   font-size: 0.88rem;
   font-weight: 650;
@@ -868,28 +1037,102 @@ onBeforeUnmount(() => {
   color: #1e293b;
 }
 
+/* TOOLBAR CON BÚSQUEDA Y ACCIONES */
+.screen-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-bottom: 1.3rem;
+  background: #ffffff;
+  padding: 0.75rem 1rem;
+  border-radius: 0.75rem;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 2px 8px rgba(15, 31, 56, 0.03);
+}
+
+.search-box-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  flex: 1;
+  min-width: 260px;
+}
+
+.search-icon-svg {
+  position: absolute;
+  left: 0.85rem;
+  width: 16px;
+  height: 16px;
+  color: #64748b;
+  pointer-events: none;
+}
+
+.search-text-input {
+  width: 100%;
+  padding: 0.55rem 2.2rem 0.55rem 2.4rem;
+  background: #f8fafc;
+  border: 1px solid #cbd5e1;
+  border-radius: 0.5rem;
+  font-family: inherit;
+  font-size: 0.88rem;
+  color: #0f1f38;
+  transition: all 0.15s ease;
+}
+
+.search-text-input:focus {
+  outline: none;
+  background: #ffffff;
+  border-color: #173868;
+  box-shadow: 0 0 0 3px rgba(23, 56, 104, 0.12);
+}
+
+.btn-clear-search {
+  position: absolute;
+  right: 0.6rem;
+  background: transparent;
+  border: none;
+  color: #94a3b8;
+  font-size: 0.9rem;
+  cursor: pointer;
+  padding: 0.2rem 0.4rem;
+  border-radius: 50%;
+}
+
+.btn-clear-search:hover {
+  color: #0f1f38;
+}
+
+.toolbar-actions-group {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
 .btn-primary-action {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 0.5rem 1.25rem;
+  padding: 0.52rem 1.15rem;
   font-family: inherit;
   font-size: 0.88rem;
   font-weight: 700;
   color: #ffffff;
   background: #173f75;
   border: 1px solid #102a50;
-  border-radius: 9999px;
+  border-radius: 0.5rem;
   cursor: pointer;
   transition: all 0.18s ease;
   min-height: 38px;
-  box-shadow: 0 2px 8px rgba(23, 63, 117, 0.25);
+  box-shadow: 0 2px 6px rgba(23, 63, 117, 0.25);
+  white-space: nowrap;
 }
 
 .btn-primary-action:hover:not(:disabled) {
-  background: #11305b;
+  background: #0f2b54;
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(23, 63, 117, 0.35);
+  box-shadow: 0 4px 10px rgba(23, 63, 117, 0.35);
 }
 
 .btn-primary-action:disabled {
@@ -898,11 +1141,20 @@ onBeforeUnmount(() => {
   transform: none;
 }
 
+.search-results-indicator {
+  font-size: 0.85rem;
+  color: #64748b;
+  font-weight: 600;
+  margin-top: -0.6rem;
+  margin-bottom: 1.2rem;
+  padding-left: 0.2rem;
+}
+
 /* CUERPO PRINCIPAL */
 .admin-body {
   max-width: 1100px;
   margin-inline: auto;
-  padding: 2rem 1.5rem 4rem;
+  padding: 1.8rem 1.5rem 4rem;
 }
 
 .admin-tab-screen {
@@ -950,7 +1202,7 @@ onBeforeUnmount(() => {
 .section-guidance-text {
   font-size: 0.92rem;
   color: #475569;
-  margin: 0 0 1.6rem;
+  margin: 0 0 1.2rem;
   max-width: 780px;
 }
 
@@ -958,15 +1210,16 @@ onBeforeUnmount(() => {
   display: inline-flex;
   align-items: center;
   gap: 0.4rem;
-  padding: 0.45rem 0.85rem;
+  padding: 0.48rem 0.85rem;
   background: #ffffff;
   color: #334155;
   border: 1px solid #cbd5e1;
-  border-radius: 0.45rem;
+  border-radius: 0.5rem;
   font-size: 0.82rem;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.15s ease;
+  white-space: nowrap;
 }
 
 .btn-secondary-refresh:hover:not(:disabled) {
@@ -1042,7 +1295,7 @@ onBeforeUnmount(() => {
   box-shadow: 0 4px 16px rgba(15, 31, 56, 0.05);
   display: flex;
   flex-direction: column;
-  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.2s ease;
 }
 
 .card-item-admin:hover {
@@ -1070,20 +1323,49 @@ onBeforeUnmount(() => {
   border-radius: 0.25rem;
 }
 
-/* MEDIA DE CONSTELACIÓN (ARTE CELESTE) */
+/* MEDIA DE CONSTELACIÓN (ARTE CELESTE IDÉNTICO A VISTA PÚBLICA) */
 .card-constellation-media {
-  background: #060b18;
-  min-height: 180px;
   position: relative;
+  height: 190px;
+  width: 100%;
+  background: radial-gradient(circle at 50% 45%, #0e1b3d 0%, #060b18 100%);
   overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 
-.card-constellation-media :deep(.constellation-art-container),
-.card-constellation-media :deep(svg) {
+.card-constellation-media :deep(.constellation-art) {
   width: 100%;
-  height: 180px;
-  display: block;
+  height: 100%;
+  color: #38bdf8;
+  transition: transform 0.35s ease;
+}
+
+.card-item-admin:hover .card-constellation-media :deep(.constellation-art) {
+  transform: scale(1.05);
+}
+
+.card-constellation-media :deep(.constellation-art polyline) {
+  stroke: #38bdf8 !important;
+  stroke-width: 2.2px !important;
+  opacity: 1 !important;
+  filter: drop-shadow(0 0 6px rgba(56, 189, 248, 0.85));
+}
+
+.card-constellation-media :deep(.constellation-art circle) {
+  fill: #ffffff !important;
+  stroke: #38bdf8 !important;
+  stroke-width: 1.5px !important;
+  opacity: 1 !important;
+  filter: drop-shadow(0 0 6px rgba(56, 189, 248, 0.9));
+}
+
+.card-constellation-media :deep(.constellation-art g[opacity=".25"] circle) {
+  fill: rgba(255, 255, 255, 0.5) !important;
+  stroke: none !important;
+  filter: none !important;
 }
 
 /* CUERPO DE TARJETA */
@@ -1154,6 +1436,7 @@ onBeforeUnmount(() => {
   border-top: 1px solid #f1f5f9;
 }
 
+/* BOTÓN DE EDITAR SENCILLO ("Editar") */
 .btn-card-edit {
   width: 100%;
   display: inline-flex;
@@ -1165,7 +1448,7 @@ onBeforeUnmount(() => {
   color: #ffffff;
   border: none;
   border-radius: 0.5rem;
-  font-size: 0.86rem;
+  font-size: 0.88rem;
   font-weight: 650;
   cursor: pointer;
   transition: all 0.18s ease;
@@ -1472,16 +1755,16 @@ onBeforeUnmount(() => {
   .admin-topbar {
     padding: 0.8rem 1rem;
   }
-  .quick-nav-inner {
+  .screen-toolbar {
     flex-direction: column;
     align-items: stretch;
   }
-  .view-tabs-group {
+  .toolbar-actions-group {
     width: 100%;
-    justify-content: center;
+    justify-content: space-between;
   }
   .btn-primary-action {
-    width: 100%;
+    flex: 1;
   }
 }
 </style>
