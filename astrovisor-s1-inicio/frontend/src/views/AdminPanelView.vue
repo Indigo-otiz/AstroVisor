@@ -211,21 +211,12 @@ onBeforeUnmount(() => {
       </svg>
 
       <div class="banner-content container">
-        <div class="hero-eyebrow-pill">
-          <span class="eyebrow-dot"></span>
-          <span>Biblioteca Central Estatal Solón Argüello</span>
-        </div>
         <h1 class="welcome-heading">
           Gestión de Biblioteca y Constelaciones
         </h1>
-        <div class="hero-user-profile-strip">
-          <span class="user-pill-tag">Sesión activa</span>
-          <span class="user-pill-name">{{ esModoDemo ? 'Evaluador (Demostración)' : (userDisplayName || username || 'Administrador') }}</span>
-          <span class="user-pill-status">
-            <span class="status-live-dot"></span>
-            En línea
-          </span>
-        </div>
+        <p class="hero-subheading">
+          Catálogo digital de libros astronómicos y recorridos del cielo nocturno.
+        </p>
       </div>
     </section>
 
@@ -277,7 +268,13 @@ onBeforeUnmount(() => {
       <!-- MENSAJES Y NOTIFICACIONES GLOBALES -->
       <div id="editor-resultados" tabindex="-1">
         <p v-if="error" class="alert-box-error" role="alert">{{ error }}</p>
-        <p v-if="mensaje" class="alert-box-success" role="status">{{ mensaje }}</p>
+        <div v-if="mensaje" class="alert-box-success" role="status">
+          <svg class="success-icon-check" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+          </svg>
+          <span class="success-msg-text">{{ mensaje }}</span>
+          <button type="button" class="btn-dismiss-msg" @click="mensaje = ''" title="Cerrar aviso" aria-label="Cerrar aviso">✕</button>
+        </div>
       </div>
 
       <div v-if="cargando" class="loading-state-box" role="status">
@@ -836,9 +833,9 @@ onBeforeUnmount(() => {
 
 /* HERO BANNER AZUL CÓSMICO PROFUNDO CON DESTELLOS Y CALIDEZ */
 .admin-hero-banner {
-  background: linear-gradient(135deg, #070d1e 0%, #0d1a38 60%, #112246 100%);
+  background: radial-gradient(circle at 50% 25%, #0e1c3e 0%, #060b18 100%);
   color: #ffffff;
-  padding: 2.4rem 0 2.8rem;
+  padding: 2.2rem 0 2.5rem;
   position: relative;
   overflow: hidden;
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
@@ -880,72 +877,22 @@ onBeforeUnmount(() => {
   padding-inline: 1.5rem;
 }
 
-.hero-eyebrow-pill {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.45rem;
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  color: #bae6fd;
-  font-size: 0.78rem;
-  font-weight: 600;
-  padding: 0.22rem 0.7rem;
-  border-radius: 9999px;
-  margin-bottom: 0.6rem;
-}
-
-.eyebrow-dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: #38bdf8;
-  box-shadow: 0 0 6px #38bdf8;
-}
-
 .welcome-heading {
   font-family: Georgia, serif;
   font-size: 2.1rem;
   font-weight: 700;
-  margin: 0 0 0.8rem;
+  margin: 0 0 0.4rem;
   color: #ffffff;
   letter-spacing: -0.015em;
   text-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
 }
 
-.hero-user-profile-strip {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.65rem;
-  background: rgba(15, 23, 42, 0.55);
-  backdrop-filter: blur(8px);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  padding: 0.3rem 0.8rem;
-  border-radius: 9999px;
-}
-
-.user-pill-tag {
-  font-size: 0.74rem;
+.hero-subheading {
+  font-size: 0.98rem;
   color: #94a3b8;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  font-weight: 700;
-}
-
-.user-pill-name {
-  font-size: 0.86rem;
-  color: #f1f5f9;
-  font-weight: 700;
-}
-
-.user-pill-status {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.35rem;
-  font-size: 0.74rem;
-  color: #86efac;
-  font-weight: 600;
-  border-left: 1px solid rgba(255, 255, 255, 0.15);
-  padding-left: 0.6rem;
+  margin: 0;
+  max-width: 650px;
+  line-height: 1.45;
 }
 
 .status-live-dot {
@@ -1246,12 +1193,44 @@ onBeforeUnmount(() => {
 
 .alert-box-success {
   background: #f0fdf4;
-  color: #166534;
-  border: 1px solid #86efac;
+  color: #14532d;
+  border: 1px solid #bbf7d0;
   padding: 0.75rem 1rem;
-  border-radius: 0.5rem;
-  font-size: 0.88rem;
+  border-radius: 0.6rem;
+  font-size: 0.92rem;
+  font-weight: 550;
   margin-bottom: 1.2rem;
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  box-shadow: 0 2px 8px rgba(22, 101, 52, 0.08);
+}
+
+.success-icon-check {
+  width: 20px;
+  height: 20px;
+  color: #16a34a;
+  flex-shrink: 0;
+}
+
+.success-msg-text {
+  flex: 1;
+}
+
+.btn-dismiss-msg {
+  background: none;
+  border: none;
+  color: #166534;
+  font-size: 1rem;
+  cursor: pointer;
+  padding: 0.2rem 0.4rem;
+  border-radius: 0.25rem;
+  opacity: 0.7;
+  transition: opacity 0.15s ease;
+}
+
+.btn-dismiss-msg:hover {
+  opacity: 1;
 }
 
 .loading-state-box {
@@ -1306,12 +1285,13 @@ onBeforeUnmount(() => {
 
 /* MEDIA DE LIBRO */
 .card-book-media {
-  background: #0f1f38;
+  background: radial-gradient(circle at 50% 50%, #f8fafc 0%, #e2e8f0 100%);
   padding: 1.4rem 1rem;
   display: flex;
   align-items: center;
   justify-content: center;
   min-height: 190px;
+  border-bottom: 1px solid #e2e8f0;
 }
 
 .book-cover-img {
@@ -1319,8 +1299,13 @@ onBeforeUnmount(() => {
   max-height: 160px;
   width: auto;
   object-fit: contain;
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
-  border-radius: 0.25rem;
+  box-shadow: 0 8px 18px rgba(15, 23, 42, 0.18), 0 2px 6px rgba(15, 23, 42, 0.1);
+  border-radius: 0.35rem;
+  transition: transform 0.2s ease;
+}
+
+.card-item-admin:hover .book-cover-img {
+  transform: scale(1.03);
 }
 
 /* MEDIA DE CONSTELACIÓN (ARTE CELESTE IDÉNTICO A VISTA PÚBLICA) */
@@ -1444,9 +1429,9 @@ onBeforeUnmount(() => {
   justify-content: center;
   gap: 0.45rem;
   padding: 0.6rem 0.9rem;
-  background: #173868;
+  background: #1e293b;
   color: #ffffff;
-  border: none;
+  border: 1px solid #334155;
   border-radius: 0.5rem;
   font-size: 0.88rem;
   font-weight: 650;
@@ -1455,9 +1440,10 @@ onBeforeUnmount(() => {
 }
 
 .btn-card-edit:hover:not(:disabled) {
-  background: #0f203b;
+  background: #0f172a;
+  border-color: #475569;
   transform: translateY(-1px);
-  box-shadow: 0 4px 10px rgba(15, 32, 59, 0.2);
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.25);
 }
 
 .btn-card-edit:disabled {
@@ -1673,9 +1659,9 @@ onBeforeUnmount(() => {
 
 .btn-save-confirm {
   padding: 0.65rem 1.4rem;
-  background: #173868;
+  background: #1e293b;
   color: #ffffff;
-  border: none;
+  border: 1px solid #334155;
   border-radius: 0.5rem;
   font-size: 0.9rem;
   font-weight: 700;
@@ -1684,8 +1670,10 @@ onBeforeUnmount(() => {
 }
 
 .btn-save-confirm:hover:not(:disabled) {
-  background: #0f203b;
+  background: #0f172a;
+  border-color: #475569;
   transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.2);
 }
 
 .btn-save-confirm:disabled {

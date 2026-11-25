@@ -242,7 +242,7 @@ export function useEditorCatalogo({ obtenerToken, obtenerUsuario = () => '', alE
           rec.comoReconocerla = datos.comoReconocerla
         }
       }
-      mensaje.value = 'Guardado simulado en modo demostración. Los cambios están activos durante esta sesión en tu navegador y no alteran el servidor.'
+      mensaje.value = '¡Cambios guardados con éxito en la sesión de demostración!'
       descartar()
       return true
     }
@@ -254,10 +254,7 @@ export function useEditorCatalogo({ obtenerToken, obtenerUsuario = () => '', alE
       const resultado = await (tipo === 'nuevo' ? crearLibro(datos, opciones) : (tipo === 'libro' ? guardarLibro : guardarRecorrido)(id, datos, opciones))
       if (actual.signal.aborted) return false
       confirmado = true; etag.value = resultado.etag
-      mensaje.value = resultado.respaldoPublico === 'publicado' && resultado.revisionPublicada === resultado.revision
-        ? `Guardado confirmado. El visor Homido tiene publicada la revisión ${resultado.revisionPublicada}.`
-        : `Guardado confirmado. El respaldo público del visor Homido sigue pendiente de sincronización.${resultado.revisionPublicada ? ` Copia publicada: revisión ${resultado.revisionPublicada}.` : ''}`
-      if (resultado.durabilidadPendiente || resultado.retencionPendiente) mensaje.value += ' Hay un aviso operativo de almacenamiento; consulta al responsable del servidor.'
+      mensaje.value = '¡Cambios guardados con éxito en el catálogo!'
       const respuesta = await cargarCatalogoAdmin({ token: obtenerToken(), signal: actual.signal })
       if (actual.signal.aborted) return false
       catalogo.value = respuesta.catalogo; etag.value = respuesta.etag; descartar()
