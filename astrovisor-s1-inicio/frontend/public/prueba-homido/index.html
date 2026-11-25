@@ -58,7 +58,8 @@
     </div>
   </header>
 
-  <button id="directExitBtn" class="direct-exit-button" type="button" aria-label="Volver al inicio" hidden>← Salir al inicio</button>
+  <button id="directExitBtn" class="direct-exit-button" type="button" aria-label="Salir" hidden>Salir</button>
+  <button id="directExitBtnRight" class="direct-exit-button direct-exit-right" type="button" aria-label="Salir" hidden>Salir</button>
 
   <!-- Aviso de rotación de dispositivo para smartphone en modo vertical -->
   <aside id="orientacionAviso" class="orientacion-aviso" role="status" aria-live="polite">
@@ -129,7 +130,7 @@
         <button id="activateAudio" type="button" disabled>1. Activar audio</button>
         <button id="permissionButton" type="button">2. Solicitar sensores</button>
         <button id="stereoButton" type="button" disabled>3. Probar vista dividida</button>
-        <button id="pauseButton" class="secondary" type="button">Pausar mirilla</button>
+        <button id="pauseButton" class="secondary" type="button">Solo mirar</button>
         <button id="reticleToggleButton" class="secondary" type="button">Ocultar mirilla guía</button>
         <button id="exitButton" class="secondary" type="button" hidden>Salir de vista dividida</button>
         <a class="button secondary btn-return" href="/explorar">Regresar al modo web 2D</a>
@@ -186,16 +187,9 @@
             <a-entity light="type: point; color: #8fa9cc; intensity: 0.35; distance: 14; decay: 1" position="-3 4 4"></a-entity>
           </a-entity>
 
-          <a-entity id="visorControls3D" position="0 0.45 -3.5">
-            <a-plane position="-1.0 0 -0.01" width="1.78" height="0.5" color="#FFFFFF" material="shader: flat"></a-plane>
-            <a-plane id="pauseBtn3D" class="selectable" position="-1.0 0 0" data-action="pausa" data-ring="pauseProgressRing" width="1.7" height="0.42" color="#1B2A5A" material="shader: flat">
-              <a-ring id="pauseProgressRing" visible="false" position="-0.6 0 0.02" data-rin="0.13" data-rout="0.19" radius-inner="0.13" radius-outer="0.19" theta-start="90" theta-length="0.001" color="#F5B301" material="shader: flat; side: double; opacity: 0.95"></a-ring>
-              <a-plane id="pause3DLabel" class="selectable" data-action="pausa" data-ring="pauseProgressRing" position="0.12 0 0.03"></a-plane>
-            </a-plane>
-            <a-plane position="1.0 0 -0.01" width="1.78" height="0.5" color="#FFFFFF" material="shader: flat"></a-plane>
-            <a-plane id="exitBtn3D" class="selectable" position="1.0 0 0" data-action="salir" data-ring="exitProgressRing" width="1.7" height="0.42" color="#4A2030" material="shader: flat">
-              <a-ring id="exitProgressRing" visible="false" position="-0.6 0 0.02" data-rin="0.13" data-rout="0.19" radius-inner="0.13" radius-outer="0.19" theta-start="90" theta-length="0.001" color="#F5B301" material="shader: flat; side: double; opacity: 0.95"></a-ring>
-              <a-plane id="exit3DLabel" class="selectable" data-action="salir" data-ring="exitProgressRing" position="0.12 0 0.03"></a-plane>
+          <a-entity id="visorControls3D" position="0 1.55 -3.5">
+            <a-plane id="pauseBtn3D" class="selectable" position="0 0 0" data-action="pausa" data-ring="pauseProgressRing" width="1.7" height="0.42" material="shader: flat; transparent: true; depthWrite: false">
+              <a-ring id="pauseProgressRing" visible="false" position="-0.62 0 0.02" data-rin="0.11" data-rout="0.16" radius-inner="0.11" radius-outer="0.16" theta-start="90" theta-length="0.001" color="#F5B301" material="shader: flat; side: double; opacity: 0.95"></a-ring>
             </a-plane>
           </a-entity>
 

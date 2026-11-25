@@ -74,8 +74,42 @@ import { rutaLibro2D } from './js/ruta-libro-2d.js';
   const detailCover = $('detailCover');
   const cardCanvas = $('cardCanvas');
 
-  const etiquetaPausa = vincularEtiqueta($('pause3DLabel'), 'Pausar mirada', { ancho: 1.2, alto: 0.3 });
-  vincularEtiqueta($('exit3DLabel'), 'Salir a 2D', { ancho: 1.2, alto: 0.3 });
+  function crearBotonPildora3D(el, textoInicial) {
+    if (!el) return { actualizar() {} };
+    const canvas = document.createElement('canvas');
+    canvas.id = 'tex-pausa-pildora';
+    canvas.width = 680;
+    canvas.height = 168;
+    document.querySelector('a-assets')?.appendChild(canvas);
+    const ctx = canvas.getContext('2d');
+    const dibujar = (texto, pausado = false) => {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      const r = 74;
+      const x = 10, y = 10, w = canvas.width - 20, h = canvas.height - 20;
+      ctx.beginPath();
+      ctx.roundRect(x, y, w, h, r);
+      ctx.fillStyle = pausado ? 'rgba(92, 56, 14, 0.78)' : 'rgba(11, 21, 48, 0.72)';
+      ctx.fill();
+      ctx.lineWidth = 3;
+      ctx.strokeStyle = pausado ? 'rgba(245, 200, 66, 0.78)' : 'rgba(148, 197, 248, 0.48)';
+      ctx.stroke();
+
+      ctx.fillStyle = '#e2e8f0';
+      ctx.font = '600 54px system-ui, -apple-system, "Segoe UI", Roboto, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(texto, canvas.width / 2, canvas.height / 2 + 2);
+
+      const mesh = el.getObject3D && el.getObject3D('mesh');
+      if (mesh && mesh.material && mesh.material.map) mesh.material.map.needsUpdate = true;
+    };
+    dibujar(textoInicial, false);
+    el.setAttribute('material', { shader: 'flat', transparent: true, depthWrite: false, src: `#${canvas.id}` });
+    return { actualizar: (texto, pausado) => dibujar(texto, pausado) };
+  }
+
+  const etiquetaPausa = crearBotonPildora3D(pauseBtn3D, 'Solo mirar');
+  if ($('exit3DLabel')) vincularEtiqueta($('exit3DLabel'), 'Salir', { ancho: 1.2, alto: 0.3 });
 
   const estado = crearEstado();
   const fichas = new Map(); // id -> ficha del JSON
@@ -101,9 +135,9 @@ import { rutaLibro2D } from './js/ruta-libro-2d.js';
   let limitesFicha = null;
   const cierreFueraDeVista = crearCierreFueraDeVista();
 
-  // Geometría de la escena (m): la ficha termina en y=0.9 y los controles quedan debajo, sin tocarla
+  // Geometría de la escena (m): la ficha termina en y=0.9 y los controles en reposo van justo debajo de los logos
   const FICHA_BASE_Y = 0.9;
-  const POS_CONTROLES_Y = 0.45;
+  const POS_CONTROLES_Y = 1.55;
   const direccionInicial = FIGURAS['can-mayor'].direccion;
   const controlesRecorrido = posicionEnEsfera(0, 0, 3.5, POS_CONTROLES_Y);
 
@@ -165,14 +199,14 @@ import { rutaLibro2D } from './js/ruta-libro-2d.js';
 
   function nombreDe(t) {
     if (t.accion === 'constelacion') return fichas.get(t.id)?.titulo || t.id;
-    return { volver: '← Volver al recorrido', audio: 'Escuchar narración', repetir: 'Repetir narración desde el inicio', libros: 'Ver libros recomendados', libro: 'Abrir libro', 'volver-ficha': 'Volver a la constelación', 'volver-libros': 'Volver a los libros', 'consultar-libro': 'Consultar libro en 2D', pausa: estado.pausado ? 'Reanudar mirada' : 'Pausar mirada', salir: 'Salir a 2D' }[t.accion] || t.accion;
+    return { volver: 'Cerrar ficha', audio: 'Escuchar narración', repetir: 'Repetir narración desde el inicio', libros: 'Ver libros recomendados', libro: 'Abrir libro', 'volver-ficha': 'Volver a la constelación', 'volver-libros': 'Volver a los libros', 'consultar-libro': 'Consultar libro en 2D', pausa: estado.pausado ? 'Reanudar' : 'Solo mirar', salir: 'Salir' }[t.accion] || t.accion;
   }
 
   function mensajeEnReposo() {
-    if (estado.pausado) return 'Mirada en PAUSA. Enfoca "Reanudar mirada" para continuar, o "Salir a 2D" para salir.';
+    if (estado.pausado) return 'Modo solo mirar activo. Enfoca "Reanudar" para volver a seleccionar.';
     if (estado.modo === 'ficha' && vistaLectura === 'estanteria') return 'Biblioteca de las estrellas: mira una portada 3 segundos o vuelve a la constelación.';
     if (estado.modo === 'ficha' && vistaLectura === 'detalle') return 'Libro seleccionado: consulta en 2D o vuelve a los libros con la mirada.';
-    if (estado.modo === 'ficha') return `Ficha de ${fichas.get(estado.fichaId)?.titulo ?? ''} abierta. Enfoca "Volver al cielo" durante 3 s o tócalo.`;
+    if (estado.modo === 'ficha') return `Ficha de ${fichas.get(estado.fichaId)?.titulo ?? ''} abierta. Enfoca la "✕" durante 3 s o tócala para cerrar.`;
     return 'Mirada activa: enfoca una constelación o un botón durante 3 s para seleccionarlo.';
   }
 
@@ -519,15 +553,14 @@ import { rutaLibro2D } from './js/ruta-libro-2d.js';
     const pausado = estado.alternarPausa();
     dwell.cancelar();
     playPauseSound(pausado);
-    etiquetaPausa.actualizar(pausado ? 'Reanudar mirada' : 'Pausar mirada');
-    pauseBtn3D.setAttribute('color', pausado ? '#B26A00' : '#1B2A5A');
+    etiquetaPausa.actualizar(pausado ? 'Reanudar' : 'Solo mirar', pausado);
     if (pauseButton) {
-      pauseButton.textContent = pausado ? 'Reanudar mirilla' : 'Pausar mirilla';
+      pauseButton.textContent = pausado ? 'Reanudar' : 'Solo mirar';
       pauseButton.style.background = pausado ? '#e59b3d' : '';
       pauseButton.style.color = pausado ? '#fff' : '';
     }
     selectionStatus.textContent = pausado
-      ? 'Mirada en PAUSA: la selección por mirada está desactivada. Salir a 2D sigue disponible.'
+      ? 'Modo solo mirar activo: la selección por mirada está pausada.'
       : mensajeEnReposo();
     eventLine(pausado ? 'Mirada pausada.' : 'Mirada reanudada.');
     if (!pausado) setTimeout(comprobarFoco, 250);
@@ -612,8 +645,8 @@ import { rutaLibro2D } from './js/ruta-libro-2d.js';
     });
   }
 
-  ligar(pauseBtn3D);
-  ligar(exitBtn3D);
+  if (pauseBtn3D) ligar(pauseBtn3D);
+  if (exitBtn3D) ligar(exitBtn3D);
   const pause3DLabel = $('pause3DLabel');
   if (pause3DLabel) ligar(pause3DLabel);
   const exit3DLabel = $('exit3DLabel');
@@ -710,7 +743,7 @@ import { rutaLibro2D } from './js/ruta-libro-2d.js';
 
     ctx.fillStyle = '#1B2A5A';
     ctx.font = 'bold 36px system-ui, sans-serif';
-    ctx.fillText('Enfoca con la mirada o toca el botón «Salir a 2D» para volver.', 80, y + 80);
+    ctx.fillText('Pulsa el botón «Salir» para volver.', 80, y + 80);
 
     actualizarTextura();
     const frente = frenteAlFrente(3.0);
@@ -746,10 +779,10 @@ import { rutaLibro2D } from './js/ruta-libro-2d.js';
     } catch (error) {
       await esperar;
       avisar('No pudimos cargar las historias. Puedes volver a la web 2D.');
-      selectionStatus.textContent = 'No se pudieron cargar las constelaciones. Usa "Salir a 2D".';
+      selectionStatus.textContent = 'No se pudieron cargar las constelaciones. Usa "Salir".';
       if ($('fuenteDatos')) $('fuenteDatos').textContent = 'No hay una fuente de contenidos disponible.';
       eventLine(`Error al cargar datos: ${error.message}`);
-      mostrarAvisoError3D('No fue posible cargar las historias', 'Ocurrió un problema de conexión con los contenidos. Si estás usando el visor, enfoca o pulsa «Salir a 2D» para volver a la pantalla principal.');
+      mostrarAvisoError3D('No fue posible cargar las historias', 'Ocurrió un problema de conexión con los contenidos. Pulsa «Salir» para volver a la pantalla principal.');
       return;
     }
     await esperar;
@@ -934,6 +967,10 @@ import { rutaLibro2D } from './js/ruta-libro-2d.js';
     if (directExitBtn) {
       directExitBtn.addEventListener('click', () => salir('/'));
     }
+    const directExitBtnRight = $('directExitBtnRight');
+    if (directExitBtnRight) {
+      directExitBtnRight.addEventListener('click', () => salir('/'));
+    }
 
     const avisoGiro = $('orientacionAviso');
     const btnDescartarGiro = $('btnDescartarGiro');
@@ -951,6 +988,7 @@ import { rutaLibro2D } from './js/ruta-libro-2d.js';
     if ((modoParam === 'libre' || modoParam === 'homido' || !modoParam) && !diagParam) {
       document.body.classList.add('modo-directo');
       if (directExitBtn) directExitBtn.hidden = false;
+      if (directExitBtnRight) directExitBtnRight.hidden = false;
     }
 
     const btnActivar = $('btnActivarInmersion');

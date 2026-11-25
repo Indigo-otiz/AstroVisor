@@ -2157,7 +2157,7 @@
 .modal-card-tags {
   list-style: none;
   padding: 0;
-  margin: 0 0 1.5rem;
+  margin: 0;
   display: flex;
   flex-direction: column;
   gap: 0.35rem;
@@ -2243,7 +2243,7 @@
     margin-bottom: 0.85rem;
   }
   .modal-card-tags {
-    margin-bottom: 1.15rem;
+    margin-bottom: 0;
   }
   .vr-modal-card-action {
     margin-top: 0.5rem;

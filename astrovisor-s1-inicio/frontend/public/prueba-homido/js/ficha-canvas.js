@@ -54,27 +54,32 @@ export function calcularLayout(ctx, ficha, audio = { etiqueta: 'Escuchar', activ
   const zonas = {}
   const x = 100
   const ancho = 1200
-  const agregarTexto = (valor, y, tam, color, negrita = false) => {
+  const agregarTexto = (valor, y, tam, color, negrita = false, anchoTexto = ancho - 92) => {
     ctx.font = fuente(tam, negrita)
-    const lineas = ajustarLineas(ctx, valor, ancho - 92)
+    const lineas = ajustarLineas(ctx, valor, anchoTexto)
     items.push({ k: 'texto', lineas, x: x + 46, y, lh: tam + 9, font: ctx.font, color, align: 'left', base: 'top' })
     return lineas.length * (tam + 9)
   }
-  const boton = (accion, texto, rect, principal = false, esIcono = false) => {
+  const boton = (accion, texto, rect, variante = 'normal') => {
     zonas[accion] = rect
+    const esIcono = variante === 'icono'
+    const esCerrar = variante === 'cerrar'
+    const esPrincipal = variante === 'principal'
     items.push({
-      k: 'boton', rect, radio: esIcono ? 32 : 18,
-      fill: esIcono ? '#172554' : (principal ? '#f5ce6d' : '#233657'),
-      stroke: esIcono ? '#38bdf8' : (principal ? null : '#7790b6'), sw: esIcono ? 4 : (principal ? 0 : 3),
-      texto, font: fuente(esIcono ? 86 : 60, true),
-      color: esIcono ? '#ffffff' : (principal ? '#111b31' : '#ffffff'), padIzq: esIcono ? 0 : rect.h * .6,
+      k: 'boton', rect, radio: esIcono ? 32 : (esCerrar ? 22 : 18),
+      fill: esCerrar ? '#5c1927' : (esIcono ? '#172554' : (esPrincipal ? '#f5ce6d' : '#233657')),
+      stroke: esCerrar ? '#ef4444' : (esIcono ? '#38bdf8' : (esPrincipal ? null : '#7790b6')),
+      sw: esCerrar || esIcono ? 4 : (esPrincipal ? 0 : 3),
+      texto, font: fuente(esIcono ? 86 : (esCerrar ? 52 : 60), true),
+      color: esCerrar ? '#fecaca' : (esIcono ? '#ffffff' : (esPrincipal ? '#111b31' : '#ffffff')),
+      padIzq: esIcono || esCerrar ? 0 : rect.h * .6,
     })
   }
 
   items.push({ k: 'caja', rect: { x, y: 610, w: ancho, h: 564 }, radio: 26, fill: '#101d37', stroke: '#7790b6', sw: 4 })
-  const altoTitulo = agregarTexto(ficha.titulo, 642, 88, '#ffffff', true)
+  const altoTitulo = agregarTexto(ficha.titulo, 642, 88, '#ffffff', true, ancho - 220)
   const textoEstado = audio.aviso || (!hayLibro ? BIBLIO_PENDIENTE : '')
-  if (textoEstado) agregarTexto(textoEstado, 650 + altoTitulo, 50, '#dce7f8')
+  if (textoEstado) agregarTexto(textoEstado, 650 + altoTitulo, 50, '#dce7f8', false, ancho - 220)
 
   // Caja de audio integrada con estética de marca de agua
   const cajaAudio = { x: x + 46, y: 790, w: ancho - 92, h: 175 }
@@ -86,20 +91,20 @@ export function calcularLayout(ctx, ficha, audio = { etiqueta: 'Escuchar', activ
   zonas.audio = audioRect
   if (audio.activo) {
     const icono = audio.icono ?? (audio.etiqueta === 'Pausar' ? '⏸' : '▶')
-    boton('audio', icono, audioRect, false, true)
+    boton('audio', icono, audioRect, 'icono')
   }
   if (audio.repetir) {
     zonas.repetir = repetir
-    boton('repetir', '↺', repetir, false, true)
+    boton('repetir', '↺', repetir, 'icono')
   }
   if (hayLibro) {
-    const libros = { x: x + 46, y: 1001, w: 435, h: 131 }
+    const libros = { x: 420, y: 1001, w: 560, h: 131 }
     zonas.libros = libros
     boton('libros', 'Ver libros', libros)
   }
-  const volver = { x: 656, y: 1001, w: 598, h: 131 }
+  const volver = { x: 1184, y: 634, w: 92, h: 92 }
   zonas.volver = volver
-  boton('volver', 'Volver al cielo', volver)
+  boton('volver', '✕', volver, 'cerrar')
   return { ...CANVAS, items, zonas }
 }
 

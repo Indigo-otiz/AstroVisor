@@ -70,6 +70,7 @@ const bookImageCache = new Map()
 let infoQuadroMesh = null
 let btnQuadroGeo = null
 let btnAudioGeo = null
+let btnCloseGeo = null
 let quadroBtn1 = null
 let quadroBtn2 = null
 let quadroBtn3 = null
@@ -604,14 +605,27 @@ function dibujarReticle3D(progress, isConfirmed, isPaused) {
 }
 
 // Generador de textura para botones 3D (Escala compacta, nítida y perfectamente proporcionada)
-function createButtonCanvasTexture(texto, isPrimary = false, isAccent = false, isAudioPill = false) {
+function createButtonCanvasTexture(texto, isPrimary = false, isAccent = false, isAudioPill = false, isCloseIcon = false, isSubtle = false) {
   const canvas = document.createElement('canvas')
-  canvas.width = isAudioPill ? 256 : 640
-  canvas.height = isAudioPill ? 256 : 160
+  canvas.width = isAudioPill || isCloseIcon ? 256 : 640
+  canvas.height = isAudioPill || isCloseIcon ? 256 : 160
   const ctx = canvas.getContext('2d')
 
   ctx.beginPath()
-  if (isAudioPill) {
+  if (isCloseIcon) {
+    ctx.roundRect(14, 14, 228, 228, 52)
+    ctx.fillStyle = 'rgba(127, 29, 29, 0.92)'
+    ctx.fill()
+    ctx.lineWidth = 10
+    ctx.strokeStyle = '#ef4444'
+    ctx.stroke()
+
+    ctx.fillStyle = '#fecaca'
+    ctx.font = 'bold 124px "Space Grotesk", "Segoe UI Symbol", sans-serif'
+    ctx.textAlign = 'center'
+    ctx.textBaseline = 'middle'
+    ctx.fillText(texto, 128, 134)
+  } else if (isAudioPill) {
     // Botón circular nítido de alto contraste, visible bajo cualquier ángulo
     ctx.arc(128, 128, 114, 0, Math.PI * 2)
     ctx.fillStyle = '#172554' // Azul marino cósmico sólido y nítido
@@ -625,6 +639,32 @@ function createButtonCanvasTexture(texto, isPrimary = false, isAccent = false, i
     ctx.textAlign = 'center'
     ctx.textBaseline = 'middle'
     ctx.fillText(texto, 128, 134)
+  } else if (isSubtle) {
+    ctx.roundRect(8, 8, 624, 144, 34)
+    ctx.fillStyle = isAccent
+      ? 'rgba(74, 24, 38, 0.74)'
+      : isPrimary
+        ? 'rgba(120, 74, 12, 0.76)'
+        : 'rgba(13, 18, 39, 0.74)'
+    ctx.fill()
+    ctx.lineWidth = 3
+    ctx.strokeStyle = isAccent
+      ? 'rgba(248, 113, 113, 0.55)'
+      : isPrimary
+        ? 'rgba(245, 200, 66, 0.72)'
+        : 'rgba(148, 197, 248, 0.45)'
+    ctx.stroke()
+
+    ctx.fillStyle = '#e2e8f0'
+    let fSize = 48
+    ctx.font = `600 ${fSize}px "Space Grotesk", "Segoe UI Symbol", "Apple Color Emoji", sans-serif`
+    while (ctx.measureText(texto).width > 560 && fSize > 28) {
+      fSize -= 2
+      ctx.font = `600 ${fSize}px "Space Grotesk", "Segoe UI Symbol", "Apple Color Emoji", sans-serif`
+    }
+    ctx.textAlign = 'center'
+    ctx.textBaseline = 'middle'
+    ctx.fillText(texto, 320, 80)
   } else {
     ctx.roundRect(8, 8, 624, 144, 28)
     ctx.fillStyle = isAccent
@@ -1017,19 +1057,23 @@ function actualizarBotones3DQuadro() {
       quadroBtn2.scale.set(0.92, 0.92, 1)
       quadroBtn2.visible = true
     }
-    // Única Fila Inferior (Debajo del Quadro): Solo 2 botones de navegación limpios
+    // Única Fila Inferior (Debajo del Quadro): Solo botón de libros centrado; cerrar (✕) en esquina superior derecha
     if (quadroBtn3) {
+      quadroBtn3.geometry = btnQuadroGeo || quadroBtn3.geometry
       quadroBtn3.material.map = createButtonCanvasTexture('Ver libros recomendados', true, false)
       quadroBtn3.userData.action = 'open-shelf'
-      quadroBtn3.position.set(-16.2, -22.2, 0.6)
+      quadroBtn3.position.set(0, -22.2, 0.6)
       quadroBtn3.scale.set(1, 1, 1)
       quadroBtn3.visible = true
     }
     if (quadroBtn4) {
-      quadroBtn4.material.map = createButtonCanvasTexture('Volver al cielo', false, true)
+      quadroBtn4.geometry = btnCloseGeo || quadroBtn4.geometry
+      quadroBtn4.material.map = createButtonCanvasTexture('✕', false, true, false, true)
       quadroBtn4.userData.action = 'close-card'
-      quadroBtn4.position.set(16.2, -22.2, 0.6)
+      quadroBtn4.position.set(36.5, 11.5, 1.2)
       quadroBtn4.scale.set(1, 1, 1)
+      quadroBtn4.renderOrder = 10
+      quadroBtn4.material.depthTest = false
       quadroBtn4.visible = true
     }
   } else if (vistaQuadro.value === 'estanteria') {
@@ -1048,29 +1092,32 @@ function actualizarBotones3DQuadro() {
 
     // Botón único centrado y proporcionado para volver a la constelación / ficha de audio
     if (quadroBtn4) {
+      quadroBtn4.geometry = btnQuadroGeo || quadroBtn4.geometry
       quadroBtn4.material.map = createButtonCanvasTexture('Volver a la constelación', false, false)
       quadroBtn4.userData.action = 'back-constellation'
       quadroBtn4.position.set(0, -35, 0.6)
       quadroBtn4.scale.set(1, 1, 1)
+      quadroBtn4.renderOrder = 5
+      quadroBtn4.material.depthTest = true
       quadroBtn4.visible = true
     }
   } else if (vistaQuadro.value === 'detalle') {
     if (infoQuadroMesh) infoQuadroMesh.scale.set(1, 1, 1)
-    // 3. Vista Detalle: Volver a la estantería, consultar en 2D o volver al cielo
+    // 3. Vista Detalle: Volver a la estantería, consultar en 2D y cerrar (✕) en esquina
     bookQuadroMeshes.forEach((bm) => { bm.visible = false })
     if (quadroBtn1) {
       quadroBtn1.geometry = btnQuadroGeo || quadroBtn1.geometry
       quadroBtn1.material.map = createButtonCanvasTexture('Volver a los libros', true, false)
       quadroBtn1.userData.action = 'back-shelf'
-      quadroBtn1.position.set(-22, -35, 0.6)
+      quadroBtn1.position.set(-18, -35, 0.6)
       quadroBtn1.scale.set(1, 1, 1)
       quadroBtn1.visible = true
     }
     if (quadroBtn2) {
-      quadroBtn2.geometry = btnQuadroGeo || quadroBtn2.geometry
-      quadroBtn2.material.map = createButtonCanvasTexture('Volver al cielo', false, true)
+      quadroBtn2.geometry = btnCloseGeo || quadroBtn2.geometry
+      quadroBtn2.material.map = createButtonCanvasTexture('✕', false, true, false, true)
       quadroBtn2.userData.action = 'close-card'
-      quadroBtn2.position.set(22, -35, 0.6)
+      quadroBtn2.position.set(47.5, 23.0, 1.2)
       quadroBtn2.scale.set(1, 1, 1)
       quadroBtn2.visible = true
     }
@@ -1078,7 +1125,7 @@ function actualizarBotones3DQuadro() {
       quadroBtn3.geometry = btnQuadroGeo || quadroBtn3.geometry
       quadroBtn3.material.map = createButtonCanvasTexture('Consultar en 2D', false, false)
       quadroBtn3.userData.action = 'consultar-libro-2d'
-      quadroBtn3.position.set(0, -35, 0.6)
+      quadroBtn3.position.set(18, -35, 0.6)
       quadroBtn3.scale.set(1, 1, 1)
       quadroBtn3.visible = true
     }
@@ -1292,6 +1339,7 @@ function initThree() {
   // Botones 3D interactivos:
   btnQuadroGeo = new THREE.PlaneGeometry(31, 8.8)
   btnAudioGeo = new THREE.PlaneGeometry(12.5, 12.5)
+  btnCloseGeo = new THREE.PlaneGeometry(6.8, 6.8)
 
   quadroBtn1 = new THREE.Mesh(btnAudioGeo, new THREE.MeshBasicMaterial({ transparent: true, depthWrite: false, depthTest: false, side: THREE.DoubleSide }))
   quadroBtn1.renderOrder = 10
@@ -1350,28 +1398,28 @@ function initThree() {
 
   const btnPedestalGeo = new THREE.PlaneGeometry(10.2, 3.0)
 
-  // Botón 3D: Pausar Mirada (Izquierda)
-  const pauseTex = createButtonCanvasTexture('Pausar mirada', true, false)
+  // Botón 3D: Solo mirar / Reanudar (Izquierda)
+  const pauseTex = createButtonCanvasTexture('Solo mirar', false, false, false, false, true)
   pause3DMesh = new THREE.Mesh(btnPedestalGeo, new THREE.MeshBasicMaterial({ map: pauseTex, transparent: true, depthWrite: false, side: THREE.DoubleSide }))
-  pause3DMesh.position.set(-11.2, 0, 0)
+  pause3DMesh.position.set(isHomidoSplit.value ? -6.0 : -11.2, 0, 0)
   pause3DMesh.userData = { is3DButton: true, action: 'toggle-gaze' }
   visorControls3DGroup.add(pause3DMesh)
   interactive3DButtons.push(pause3DMesh)
 
-  // Botón 3D: Cambiar a Modo 2D / Visor VR (Centro)
+  // Botón 3D: Entrar a Visor VR (Centro, oculto dentro de VR para no mostrar Salir a 2D)
   const isSplit = isHomidoSplit.value
-  const homidoTxt = isSplit ? 'Salir a 2D' : 'Visor VR'
-  const homidoTex = createButtonCanvasTexture(homidoTxt, !isSplit, isSplit)
+  const homidoTex = createButtonCanvasTexture('Visor VR', false, false, false, false, true)
   homidoToggle3DMesh = new THREE.Mesh(btnPedestalGeo, new THREE.MeshBasicMaterial({ map: homidoTex, transparent: true, depthWrite: false, side: THREE.DoubleSide }))
   homidoToggle3DMesh.position.set(0, 0, 0)
+  homidoToggle3DMesh.visible = !isSplit
   homidoToggle3DMesh.userData = { is3DButton: true, action: 'toggle-homido' }
   visorControls3DGroup.add(homidoToggle3DMesh)
   interactive3DButtons.push(homidoToggle3DMesh)
 
   // Botón 3D: Salir al menú principal (Derecha)
-  const exitTex = createButtonCanvasTexture('Salir al inicio', false, true)
+  const exitTex = createButtonCanvasTexture('Salir', false, false, false, false, true)
   exit3DMesh = new THREE.Mesh(btnPedestalGeo, new THREE.MeshBasicMaterial({ map: exitTex, transparent: true, depthWrite: false, side: THREE.DoubleSide }))
-  exit3DMesh.position.set(11.2, 0, 0)
+  exit3DMesh.position.set(isSplit ? 6.0 : 11.2, 0, 0)
   exit3DMesh.userData = { is3DButton: true, action: 'exit' }
   visorControls3DGroup.add(exit3DMesh)
   interactive3DButtons.push(exit3DMesh)
@@ -1523,8 +1571,10 @@ function onPointerMove(e) {
 }
 
 function onPointerUp(e) {
+  if (!isDragging) return
   const dist = Math.hypot(e.clientX - startX, e.clientY - startY)
   isDragging = false
+  if (e.target !== renderer.domElement) return
 
   if (dist < 8) {
     const rect = renderer.domElement.getBoundingClientRect()
@@ -1989,13 +2039,13 @@ function seleccionarConstelacion(id) {
     infoQuadroGroup.scale.setScalar(0.64)
     infoQuadroGroup.visible = true
 
-    // Colocar los botones globales (Pausar mirada, Modo Homido/2D y Salir) justo debajo del menú de la constelación
+    // Colocar los botones globales (Solo mirar, Visor VR y Salir) debajo del menú sin solaparse con estantería/detalle
     if (visorControls3DGroup) {
-      const controlsPitch = pitchAngle - 0.22
+      const controlsPitch = pitchAngle - 0.31
       const controlsDir = dir.clone().applyAxisAngle(rightVec, controlsPitch).normalize()
       const controlsPos = controlsDir.multiplyScalar(distance)
       orientPlaneFacingOrigin(visorControls3DGroup, controlsPos)
-      visorControls3DGroup.scale.setScalar(1.55)
+      visorControls3DGroup.scale.setScalar(1.35)
     }
 
     // Si no está activo el giroscopio del dispositivo, orientar suavemente la cámara al centro de la experiencia
@@ -2174,13 +2224,22 @@ function abrirDetalleLibro(libro) {
   vistaPanel.value = 'detalle'
 }
 
-// Sincronizar el botón del pedestal 3D según el visor VR o 2D activo
+// Sincronizar el botón del pedestal 3D según el visor VR o 360° activo
 function actualizarPedestal3D() {
-  if (!homidoToggle3DMesh) return
   const isSplit = isHomidoSplit.value
-  const label = isSplit ? 'Salir a 2D' : 'Visor VR'
-  homidoToggle3DMesh.material.map = createButtonCanvasTexture(label, !isSplit, isSplit)
-  homidoToggle3DMesh.material.needsUpdate = true
+  if (homidoToggle3DMesh) {
+    homidoToggle3DMesh.visible = !isSplit
+    if (!isSplit) {
+      homidoToggle3DMesh.material.map = createButtonCanvasTexture('Visor VR', false, false, false, false, true)
+      homidoToggle3DMesh.material.needsUpdate = true
+    }
+  }
+  if (pause3DMesh) {
+    pause3DMesh.position.set(isSplit ? -6.0 : -11.2, 0, 0)
+  }
+  if (exit3DMesh) {
+    exit3DMesh.position.set(isSplit ? 6.0 : 11.2, 0, 0)
+  }
 }
 
 // Controles de visor y modo inmersivo Homido VR (con WebXR nativo para distorsión de barril óptica)
@@ -2300,8 +2359,8 @@ function toggleGazePause() {
   dwellProgress.value = 0
 
   if (pause3DMesh) {
-    const texto = isGazePaused.value ? 'Reanudar mirada' : 'Pausar mirada'
-    pause3DMesh.material.map = createButtonCanvasTexture(texto, !isGazePaused.value, false)
+    const texto = isGazePaused.value ? 'Reanudar' : 'Solo mirar'
+    pause3DMesh.material.map = createButtonCanvasTexture(texto, isGazePaused.value, false, false, false, true)
     pause3DMesh.material.needsUpdate = true
   }
 }
@@ -2512,16 +2571,8 @@ onBeforeUnmount(() => {
         </svg>
       </div>
 
-      <!-- Navegación estéreo para ambos ojos: Salir a 2D y Salir al Menú Principal -->
+      <!-- Navegación estéreo para ambos ojos: Salir al Menú Principal -->
       <div class="homido-dual-nav left-eye-nav">
-        <button
-          type="button"
-          class="homido-exit-pill"
-          @click="salirModoVR"
-          aria-label="Salir del visor y volver a pantalla normal 2D"
-        >
-          Salir a 2D
-        </button>
         <button
           type="button"
           class="homido-exit-pill exit-home"
@@ -2533,14 +2584,6 @@ onBeforeUnmount(() => {
       </div>
 
       <div class="homido-dual-nav right-eye-nav">
-        <button
-          type="button"
-          class="homido-exit-pill"
-          @click="salirModoVR"
-          aria-label="Salir del visor y volver a pantalla normal 2D"
-        >
-          Salir a 2D
-        </button>
         <button
           type="button"
           class="homido-exit-pill exit-home"
@@ -2568,11 +2611,8 @@ onBeforeUnmount(() => {
     <!-- Barra Superior de Navegación (Solo en Modo 360° estándar; se oculta en Homido) -->
     <header v-if="!isHomidoSplit" class="hud-top-bar">
       <div class="brand-group">
-        <button type="button" class="btn-back" @click="salir" title="Volver al menú principal">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-            <path d="M19 12H5m7-7l-7 7 7 7" />
-          </svg>
-          <span class="btn-back-text">Volver al inicio</span>
+        <button type="button" class="btn-back" @click="salir" aria-label="Salir" title="Salir">
+          Salir
         </button>
 
         <div class="brand-title">
@@ -2597,14 +2637,14 @@ onBeforeUnmount(() => {
           class="control-pill"
           :class="{ 'active': isGazePaused }"
           @click="toggleGazePause"
-          :title="isGazePaused ? 'Reanudar selección por mirada' : 'Pausar selección por mirada para contemplar sin disparos'"
+          :title="isGazePaused ? 'Volver a seleccionar constelaciones con la mirada' : 'Mirar el cielo sin abrir constelaciones'"
         >
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="pill-icon">
             <rect v-if="!isGazePaused" x="6" y="4" width="4" height="16" />
             <rect v-if="!isGazePaused" x="14" y="4" width="4" height="16" />
             <polygon v-else points="5 3 19 12 5 21 5 3" fill="currentColor" />
           </svg>
-          <span>{{ isGazePaused ? 'Mirilla Pausada' : 'Pausar mirada' }}</span>
+          <span>{{ isGazePaused ? 'Reanudar' : 'Solo mirar' }}</span>
         </button>
 
         <button
@@ -2761,48 +2801,60 @@ onBeforeUnmount(() => {
 }
 
 .left-eye-nav {
-  left: 1.2rem;
+  left: 16px;
 }
 
 .right-eye-nav {
-  left: calc(50% + 1.2rem);
+  left: calc(50% + 16px);
 }
 
 .homido-exit-pill {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 0.35rem;
-  padding: 8px 16px;
-  background: rgba(15, 23, 42, 0.90);
-  border: 1.5px solid rgba(255, 255, 255, 0.35);
+  padding: 9px 18px;
+  background: rgba(11, 21, 48, 0.76);
+  border: 1.5px solid rgba(255, 255, 255, 0.22);
   border-radius: 9999px;
-  color: #ffffff;
-  font-family: system-ui, -apple-system, sans-serif;
-  font-size: 14px;
-  font-weight: 700;
+  color: #e2e8f0;
+  font-family: inherit;
+  font-size: 0.92rem;
+  font-weight: 650;
   cursor: pointer;
-  backdrop-filter: blur(8px);
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.55);
-  transition: all 0.2s ease;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.38);
+  transition: transform 0.24s cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 0.24s cubic-bezier(0.16, 1, 0.3, 1),
+              border-color 0.24s ease,
+              background 0.24s ease,
+              color 0.24s ease;
 }
 
-.homido-exit-pill:hover {
-  background: rgba(31, 78, 140, 0.4);
-  border-color: #38bdf8;
+.homido-exit-pill:hover,
+.homido-exit-pill:focus-visible {
+  transform: translateY(-2px);
+  background: rgba(16, 30, 66, 0.9);
+  border-color: rgba(56, 189, 248, 0.65);
   color: #ffffff;
-  transform: translateY(-1px);
+  box-shadow: 0 10px 26px rgba(0, 0, 0, 0.5), 0 0 22px rgba(56, 189, 248, 0.3);
+  outline: none;
 }
 
 .homido-exit-pill.exit-home {
-  border-color: rgba(122, 21, 43, 0.7);
-  color: #ffffff;
-  background: rgba(122, 21, 43, 0.35);
+  border-color: rgba(255, 255, 255, 0.22);
+  color: #e2e8f0;
+  background: rgba(11, 21, 48, 0.76);
 }
 
-.homido-exit-pill.exit-home:hover {
-  background: #7a152b;
-  border-color: #961d37;
+.homido-exit-pill.exit-home:hover,
+.homido-exit-pill.exit-home:focus-visible {
+  transform: translateY(-2px);
+  background: rgba(16, 30, 66, 0.9);
+  border-color: rgba(56, 189, 248, 0.65);
   color: #ffffff;
+  box-shadow: 0 10px 26px rgba(0, 0, 0, 0.5), 0 0 22px rgba(56, 189, 248, 0.3);
 }
 
 /* Botón inferior central: Activar pantalla completa, sensores y audio (Fiel a Imagen 3) */
@@ -2871,28 +2923,34 @@ onBeforeUnmount(() => {
 .btn-back {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 0.4rem;
-  padding: 0.5rem 0.9rem;
-  background: rgba(13, 18, 39, 0.85);
-  border: 1px solid rgba(255, 255, 255, 0.22);
+  padding: 9px 18px;
+  background: rgba(11, 21, 48, 0.76);
+  border: 1.5px solid rgba(255, 255, 255, 0.22);
   border-radius: 9999px;
   color: #e2e8f0;
-  font-size: 0.85rem;
-  font-weight: 600;
+  font-size: 0.92rem;
+  font-weight: 650;
   backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.38);
   cursor: pointer;
-  transition: all 0.2s;
+  transition: transform 0.24s cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 0.24s cubic-bezier(0.16, 1, 0.3, 1),
+              border-color 0.24s ease,
+              background 0.24s ease,
+              color 0.24s ease;
 }
 
-.btn-back svg {
-  width: 1rem;
-  height: 1rem;
-}
-
-.btn-back:hover {
-  background: rgba(31, 78, 140, 0.4);
-  border-color: #38bdf8;
+.btn-back:hover,
+.btn-back:focus-visible {
+  transform: translateY(-2px);
+  background: rgba(16, 30, 66, 0.9);
+  border-color: rgba(56, 189, 248, 0.65);
   color: #ffffff;
+  box-shadow: 0 10px 26px rgba(0, 0, 0, 0.5), 0 0 22px rgba(56, 189, 248, 0.3);
+  outline: none;
 }
 
 .brand-title {

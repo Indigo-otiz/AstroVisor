@@ -557,7 +557,6 @@ onBeforeUnmount(() => {
           <div class="card-content">
             <span class="card-badge badge-web">Pantalla 2D</span>
             <span class="card-title">Explorar Constelaciones</span>
-            <span class="card-hint">Relatos y biblioteca &rarr;</span>
           </div>
         </RouterLink>
 
@@ -640,7 +639,6 @@ onBeforeUnmount(() => {
               <li><span>✦</span> Manos libres por mirada</li>
             </ul>
           </div>
-          <span class="vr-modal-card-action action-homido">Iniciar con Visor &rarr;</span>
         </a>
 
         <!-- Opción 2: 3D Versión Lite -->
@@ -668,7 +666,6 @@ onBeforeUnmount(() => {
               <li><span>✦</span> Carga ágil para todo equipo</li>
             </ul>
           </div>
-          <span class="vr-modal-card-action action-lite">Iniciar Versión Lite &rarr;</span>
         </a>
 
         <!-- Opción 3: 3D Versión Completa (Full) -->
@@ -694,7 +691,6 @@ onBeforeUnmount(() => {
               <li><span>✦</span> Narración espacial guiada</li>
             </ul>
           </div>
-          <span class="vr-modal-card-action action-full">Iniciar Versión Full &rarr;</span>
         </RouterLink>
       </div>
 
