@@ -1,0 +1,7 @@
+{
+  "name": "astrovisor-root",
+  "private": true,
+  "scripts": {
+    "build": "cd astrovisor-s1-inicio && npm install && npm run build --workspace frontend"
+  }
+}
