@@ -2652,7 +2652,7 @@ onBeforeUnmount(() => {
           class="control-pill"
           :class="{ 'active': isHomidoSplit }"
           @click="toggleHomido"
-          title="Entrar a Visor Celular (VR)"
+          title="Entrar a Visor VR"
         >
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="pill-icon">
             <rect x="2" y="6" width="20" height="12" rx="4" />
@@ -2660,7 +2660,7 @@ onBeforeUnmount(() => {
             <circle cx="16" cy="12" r="2.5" />
             <path d="M11 12h2" />
           </svg>
-          <span>Visor Celular (VR)</span>
+          <span>Visor VR</span>
         </button>
 
         <button

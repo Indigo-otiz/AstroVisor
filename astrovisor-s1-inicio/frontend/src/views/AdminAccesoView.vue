@@ -94,7 +94,7 @@ async function handleSubmit() {
           <div class="yellow-accent-bar"></div>
           <div>
             <h1 class="hero-title">Panel del personal</h1>
-            <p class="hero-subtitle">Prepara el recorrido de AstroVisor para el visor Homido.</p>
+            <p class="hero-subtitle">Prepara el recorrido de AstroVisor para el Visor VR.</p>
           </div>
         </div>
       </div>

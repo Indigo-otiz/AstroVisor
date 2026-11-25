@@ -955,7 +955,7 @@ import { rutaLibro2D } from './js/ruta-libro-2d.js';
     if (!stereoComponent) stereoComponent = scene.components['experimental-stereo'];
     stereoButton.disabled = !stereoComponent;
     stereoStatus.textContent = stereoComponent
-      ? 'Escena lista. Compatible con 2D y vista dividida Homido.'
+      ? 'Escena lista. Compatible con 2D y vista dividida Visor VR.'
       : 'Escena cargada sin componente estéreo.';
 
     // S5: Modos directos desde URL

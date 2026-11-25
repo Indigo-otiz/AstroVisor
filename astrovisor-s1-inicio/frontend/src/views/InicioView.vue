@@ -630,9 +630,9 @@ onBeforeUnmount(() => {
                 </svg>
               </div>
             </div>
-            <h3 class="modal-card-title">Visor Celular (Homido)</h3>
+            <h3 class="modal-card-title">Visor VR</h3>
             <p class="modal-card-desc">
-              Inmersión estéreo en 3D colocando tu celular dentro de gafas Homido o Cardboard.
+              Inmersión estéreo en 3D colocando tu celular dentro de un Visor VR o Cardboard.
             </p>
             <ul class="modal-card-tags">
               <li><span>✦</span> Doble pantalla 3D</li>
@@ -641,7 +641,7 @@ onBeforeUnmount(() => {
           </div>
         </a>
 
-        <!-- Opción 2: 3D Versión Lite -->
+        <!-- Opción 2: Recorrido 360° Ligero -->
         <a
           class="vr-modal-card card-vr-lite"
           href="/prueba-homido/index.html?modo=libre"
@@ -657,7 +657,7 @@ onBeforeUnmount(() => {
                 </svg>
               </div>
             </div>
-            <h3 class="modal-card-title">3D Versión Lite</h3>
+            <h3 class="modal-card-title">3D Ligero</h3>
             <p class="modal-card-desc">
               Exploración 360° fluida directamente en tu pantalla, sin necesidad de accesorios.
             </p>
@@ -668,7 +668,7 @@ onBeforeUnmount(() => {
           </div>
         </a>
 
-        <!-- Opción 3: 3D Versión Completa (Full) -->
+        <!-- Opción 3: 3D Alta Calidad -->
         <RouterLink
           class="vr-modal-card card-vr-full"
           to="/visor-3d"
@@ -682,7 +682,7 @@ onBeforeUnmount(() => {
                 </svg>
               </div>
             </div>
-            <h3 class="modal-card-title">3D Versión Completa</h3>
+            <h3 class="modal-card-title">3D Alta Calidad</h3>
             <p class="modal-card-desc">
               Experiencia estelar máxima con estantería interactiva de libros y voz guiada.
             </p>
@@ -755,7 +755,7 @@ onBeforeUnmount(() => {
                 <span class="btn-main">3D ligera · mouse o dedo</span>
               </a>
               <a class="portal-button homido" href="/prueba-homido/index.html?modo=homido">
-                <span class="btn-main">Visor Homido · pantalla dividida</span>
+                <span class="btn-main">Visor VR · pantalla dividida</span>
               </a>
             </div>
           </article>
@@ -814,16 +814,16 @@ onBeforeUnmount(() => {
             <span class="badge-dot"></span>
             Guion preparado · Pendiente de grabación
           </div>
-          <h3 id="manual-vr-title">2. Cómo explorar en VR (Libre y Homido)</h3>
+          <h3 id="manual-vr-title">2. Cómo explorar en VR (Libre y Visor VR)</h3>
           <p class="manual-desc">
-            Instrucciones para navegar en 3D: interacción con mouse o dedo en modo libre, colocación en el visor Homido, selección por mirada durante 3 segundos y botones de bienestar.
+            Instrucciones para navegar en 3D: interacción con mouse o dedo en modo libre, colocación en el Visor VR, selección por mirada durante 3 segundos y botones de bienestar.
           </p>
           <details class="manual-details">
             <summary>Ver guion técnico y transcripción accesible</summary>
             <div class="manual-transcript">
               <ol>
                 <li><strong>Modo Libre (mouse/dedo):</strong> Selecciona «Pantalla completa · mouse o dedo». Arrastra con el cursor o desliza la pantalla táctil para recorrer las estrellas.</li>
-                <li><strong>Modo Homido (pantalla dividida):</strong> Selecciona «Visor Homido». El sistema activa automáticamente la doble cámara para cada ojo. Coloca el teléfono dentro del visor.</li>
+                <li><strong>Modo Visor VR (pantalla dividida):</strong> Selecciona «Visor VR». El sistema activa automáticamente la doble cámara para cada ojo. Coloca el teléfono dentro del visor.</li>
                 <li><strong>Selección por mirada:</strong> Centra el aro blanco en Orión, Osa Mayor o Escorpio durante 3 segundos. El aro amarillo indicará el progreso hasta abrir la ficha.</li>
                 <li><strong>Cielo visible y audio:</strong> La constelación seguirá iluminada de fondo mientras escuchas el relato. Pulsa «Pausar» o «Repetir» en cualquier momento.</li>
                 <li><strong>Pausa de mirada y salida:</strong> Usa el botón «Pausar mirada» si deseas contemplar las estrellas sin activar fichas. El botón «Salir» detiene el audio y vuelve a la web con seguridad.</li>

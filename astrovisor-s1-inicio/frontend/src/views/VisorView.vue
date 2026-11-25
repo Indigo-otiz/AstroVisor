@@ -2,7 +2,7 @@
 import { onMounted } from 'vue'
 
 onMounted(() => {
-  document.title = 'Visor Celular VR · AstroVisor'
+  document.title = 'Visor VR · AstroVisor'
 })
 </script>
 
@@ -51,7 +51,7 @@ onMounted(() => {
             <circle cx="16" cy="12" r="2.5" />
             <path d="M11 12h2" />
           </svg>
-          Visor Celular y Smartphone
+          Visor VR y Smartphone
         </span>
 
         <h2 class="visor-hero-title">Inicia la experiencia inmersiva</h2>
@@ -89,7 +89,7 @@ onMounted(() => {
             </svg>
           </div>
           <h3>Prepara tu teléfono</h3>
-          <p>Elige <strong>«Visor Celular»</strong> en el inicio. Pulsa <strong>«Activar audio y sensores»</strong> antes de colocar el celular en el visor.</p>
+          <p>Elige <strong>«Visor VR»</strong> en el inicio. Pulsa <strong>«Activar audio y sensores»</strong> antes de colocar el celular en el visor.</p>
         </div>
 
         <div class="visor-step-card">
@@ -165,7 +165,7 @@ onMounted(() => {
     </div>
 
     <p class="public-demo">
-      Demostración tecnológica académica para visores Homido. Las figuras son esquemas didácticos adaptados; el material definitivo de la biblioteca está en proceso.
+      Demostración tecnológica académica para Visor VR. Las figuras son esquemas didácticos adaptados; el material definitivo de la biblioteca está en proceso.
     </p>
   </section>
 </template>
